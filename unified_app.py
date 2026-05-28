@@ -217,37 +217,61 @@ def api_topics():
 def call_gemini_ai(prompt):
     """Dynamically discover and call the best available Gemini model."""
     try:
-        # 1. Discover all models that support 'generateContent'
-        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        
-        # 2. Sort to prioritize 'flash' or 'pro' and keep it "free tier" friendly
-        # Often named like models/gemini-1.5-flash, models/gemini-pro, etc.
-        priority_models = [m for m in available_models if 'flash' in m.lower()]
-        priority_models += [m for m in available_models if 'pro' in m.lower()]
-        priority_models += available_models # Catch-all
-        
-        # Remove duplicates while preserving order
-        models_to_try = []
-        for m in priority_models:
-            if m not in models_to_try:
-                models_to_try.append(m)
+        models_info = genai.list_models()
 
-        print(f"DEBUG: Found {len(models_to_try)} available AI models. Trying best match...")
+        # Collect candidates that explicitly support generateContent
+        candidates = []
+        for m in models_info:
+            methods = getattr(m, "supported_generation_methods", None) or []
+            methods_lower = [str(x).lower() for x in methods]
 
+            # Accept both possible spellings that may show up in SDKs
+            supports_generate_content = (
+                "generatecontent" in methods_lower or
+                "generate_content" in methods_lower
+            )
+
+            if supports_generate_content:
+                candidates.append((m.name, methods))
+
+        # If none matched, fail with a helpful diagnostic showing what is available
+        if not candidates:
+            available = [(m.name, getattr(m, "supported_generation_methods", None) or []) for m in models_info]
+            debug_list = "\n".join([f"- {name}: {methods}" for name, methods in available[:50]])
+            raise Exception(
+                "No available Gemini models support generateContent/generate_content for this SDK.\n"
+                f"Available models (sample):\n{debug_list}"
+            )
+
+        # Prioritize flash/pro by name, then keep the rest
+        priority = []
+        for keyword in ["flash", "pro"]:
+            for name, methods in candidates:
+                if keyword in name.lower() and (name, methods) not in priority:
+                    priority.append((name, methods))
+        for item in candidates:
+            if item not in priority:
+                priority.append(item)
+
+        models_to_try = [name for name, _ in priority]
+
+        print(f"DEBUG: Found {len(models_to_try)} eligible AI models. Trying best match...")
         last_error = None
+
         for model_name in models_to_try:
             try:
                 print(f"DEBUG: Attempting AI call with discovered model: {model_name}")
                 model = genai.GenerativeModel(model_name)
-                response = model.generate_content(prompt)
+                response = model.generate_content(prompt)  # python SDK uses snake_case
                 print(f"DEBUG: Success with model: {model_name}")
                 return response.text
             except Exception as e:
                 print(f"DEBUG: Model {model_name} failed: {e}")
                 last_error = str(e)
                 continue
-                
-        raise Exception(f"All {len(models_to_try)} discovered models failed. Last error: {last_error}")
+
+        raise Exception(f"All {len(models_to_try)} eligible Gemini models failed. Last error: {last_error}")
+
     except Exception as e:
         print(f"DEBUG: Discovery/Call failure: {e}")
         raise e
