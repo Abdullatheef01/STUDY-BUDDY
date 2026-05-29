@@ -544,29 +544,48 @@ async function runGeminiAnalysis(resumeText) {
     Return ONLY raw JSON. No markdown formatting.
     `;
 
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }]
-            })
-        });
+    const modelsToTry = [
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-flash-latest',
+        'gemini-pro-latest'
+    ];
 
-        const data = await response.json();
-        if (data.error) throw new Error(data.error.message);
-        
-        let jsonText = data.candidates[0].content.parts[0].text;
-        // Clean markdown
-        jsonText = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
-        
-        return JSON.parse(jsonText);
-    } catch (err) {
-        if (err.message.includes('API_KEY_INVALID')) {
-            localStorage.removeItem('GEMINI_API_KEY');
-            throw new Error('Invalid API Key. Please try again.');
+    let lastError = null;
+
+    for (const modelName of modelsToTry) {
+        try {
+            console.log(`Attempting Gemini API call with model: ${modelName}`);
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: promptText }] }]
+                })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                if (data.error.message.includes('API_KEY_INVALID')) {
+                    localStorage.removeItem('GEMINI_API_KEY');
+                    throw new Error('Invalid API Key. Please try again.');
+                }
+                throw new Error(data.error.message);
+            }
+            
+            let jsonText = data.candidates[0].content.parts[0].text;
+            jsonText = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
+            
+            return JSON.parse(jsonText);
+        } catch (err) {
+            console.warn(`Model ${modelName} failed:`, err);
+            lastError = err;
+            if (err.message.includes('Invalid API Key')) {
+                throw err;
+            }
         }
-        throw err;
     }
+
+    throw lastError || new Error('All Gemini models failed. Please try again later.');
 }
 
