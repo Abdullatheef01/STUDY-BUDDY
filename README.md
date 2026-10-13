@@ -151,3 +151,35 @@ pytest tests/ -q            # 17 tests: auth flow, persistence, goals,
   with the next schema change.
 - **Saved research sessions in the sidebar UI** — sessions are persisted
   server-side; rendering history in the research sidebar is Phase 2 UI work.
+
+## 🔐 Social Login + Profile Integrations
+
+Students can sign in with Google and connect their GitHub / LeetCode profiles
+from the new **/profile** page (login required).
+
+### What was added
+- **Google sign-in (OAuth 2.0, Authlib)** — `/auth/google/login` →
+  `/auth/google/callback`. Identity scopes only (`openid email profile`).
+  Existing password accounts with the same email are **linked, never duplicated**.
+  The button and routes appear only when `GOOGLE_CLIENT_ID` /
+  `GOOGLE_CLIENT_SECRET` are set; otherwise they're hidden automatically.
+- **GitHub connection** — username-based (public API, no credentials needed).
+  The profile analyzer scores 0–100 (profile completeness, repos, stars,
+  language diversity, README quality, recent activity) with concrete
+  suggestions. Optional `GITHUB_TOKEN` raises API rate limits.
+- **LeetCode connection** — username-based (public GraphQL). Shows solved
+  counts, contest rating/rank, and an embeddable SVG stat card at
+  `/cards/leetcode/<username>.svg` (github-readme-stats style, public).
+- **Caching** — snapshots stored per user in `ProfileSnapshot` (24h freshness).
+- **Schema evolution** — new `User` columns (`google_sub`, `avatar_url`,
+  `github_username`, `leetcode_username`) are backfilled with `ALTER TABLE`
+  on boot, so existing databases upgrade without migrations.
+
+### Google Console setup
+1. https://console.cloud.google.com/apis/credentials → Create Credentials →
+   OAuth client ID → Web application.
+2. Authorized redirect URIs — add both:
+   - `http://localhost:5000/auth/google/callback`
+   - `https://ai-career-research-assistant-resume.onrender.com/auth/google/callback`
+3. Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` in `.env` (local) or the
+   Render dashboard (production).

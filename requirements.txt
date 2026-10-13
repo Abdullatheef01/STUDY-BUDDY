@@ -16,3 +16,5 @@ flask-sqlalchemy
 flask-login
 # --- Phase 1: testing ---
 pytest
+# --- Social login + profile integrations ---
+Authlib

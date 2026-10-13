@@ -21,7 +21,7 @@ import logging
 from datetime import datetime, date, timedelta, timezone
 
 import requests
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (LoginManager, UserMixin, login_user, logout_user,
                          login_required, current_user)
@@ -29,9 +29,16 @@ from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+
+from github_integration import (analyze_github_profile, GithubAPIError,
+                                validate_github_username)
+from leetcode_integration import (fetch_leetcode_stats, get_card_stats,
+                                  render_leetcode_card_svg, render_error_svg,
+                                  LeetCodeAPIError, validate_leetcode_username)
 
 log = logging.getLogger("acra")
 
@@ -229,6 +236,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address, default_limits=[])
+oauth = OAuth()  # social login clients (registered per-app in create_app)
 
 
 # ========================================================
@@ -242,6 +250,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    # --- Social login + profile integrations (added post-Phase-1) ---
+    # google_sub is unique but enforced via a manual unique index (see
+    # _ensure_schema) so pre-Phase-2 databases can adopt it without a rebuild.
+    google_sub = db.Column(db.String(255), nullable=True)
+    avatar_url = db.Column(db.String(512), nullable=True)
+    github_username = db.Column(db.String(39), nullable=True)
+    leetcode_username = db.Column(db.String(39), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -307,6 +322,29 @@ class AnonymousAnalysis(db.Model):
 _ANON_TTL_SECONDS = 24 * 3600
 
 
+class ProfileSnapshot(db.Model):
+    """Cached third-party profile snapshot (GitHub / LeetCode).
+
+    One row per (user, provider); refreshed on demand with 24h freshness so
+    we stay kind to the upstream APIs. The payload in `data` is whatever the
+    integration module returned (analyzer result or stats dict)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    provider = db.Column(db.String(20), nullable=False)  # "github" | "leetcode"
+    username = db.Column(db.String(80), nullable=False)
+    data = db.Column(db.JSON)
+    fetched_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("profile_snapshots", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+    __table_args__ = (db.UniqueConstraint("user_id", "provider",
+                                          name="uq_snapshot_user_provider"),)
+
+
+_SNAPSHOT_TTL_SECONDS = 24 * 3600
+
+
 def _utcnow_naive():
     """UTC now without tzinfo (SQLite returns naive datetimes)."""
     return datetime.now(timezone.utc).replace(tzinfo=None)
@@ -362,6 +400,132 @@ def is_safe_next(target):
     return target and target.startswith("/") and not target.startswith("//")
 
 
+def _ensure_schema():
+    """Backfill social/integration columns on pre-existing databases.
+
+    Phase 1 used db.create_all() with no migrations, and create_all() never
+    adds columns to an existing table. This inspects the `user` table and
+    ALTERs in any missing columns (SQLite + Postgres compatible), plus a
+    unique index on google_sub (NULLs stay non-conflicting on both dialects).
+    Safe to run on every boot; a no-op when the schema is current.
+    """
+    from sqlalchemy import inspect, text
+    insp = inspect(db.engine)
+    if "user" not in insp.get_table_names():
+        return
+    existing = {c["name"] for c in insp.get_columns("user")}
+    wanted = {
+        "google_sub": "VARCHAR(255)",
+        "avatar_url": "VARCHAR(512)",
+        "github_username": "VARCHAR(39)",
+        "leetcode_username": "VARCHAR(39)",
+    }
+    have_index = any(i["name"] == "ix_user_google_sub"
+                     for i in insp.get_indexes("user"))
+    missing = [(col, ddl) for col, ddl in wanted.items() if col not in existing]
+    if not missing and have_index:
+        return
+    with db.engine.begin() as conn:
+        for col, ddl in missing:
+            conn.execute(text('ALTER TABLE "user" ADD COLUMN {} {}'.format(col, ddl)))
+            log.info("Schema evolution: added user.%s", col)
+        conn.execute(text(
+            'CREATE UNIQUE INDEX IF NOT EXISTS ix_user_google_sub ON "user" (google_sub)'))
+
+
+# ========================================================
+# --- GOOGLE OAUTH (Authlib) ---
+# ========================================================
+
+def _google_configured():
+    """True when Google OAuth credentials are present in the environment."""
+    return bool((os.getenv("GOOGLE_CLIENT_ID") or "").strip()
+                and (os.getenv("GOOGLE_CLIENT_SECRET") or "").strip())
+
+
+def _register_google_oauth(app):
+    """Register the Google OpenID client (identity scopes only)."""
+    oauth.register(
+        "google",
+        client_id=os.getenv("GOOGLE_CLIENT_ID").strip(),
+        client_secret=os.getenv("GOOGLE_CLIENT_SECRET").strip(),
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        # Identity only: we never read Drive, Gmail, Calendar, etc.
+        client_kwargs={"scope": "openid email profile"},
+    )
+
+
+def _process_google_login(userinfo):
+    """Find-or-create the user for a verified Google identity.
+
+    Never creates a duplicate account for the same email: an existing
+    password user with the same email gets their Google identity linked.
+    Returns (user, is_new). Raises ValueError on unverifiable identity.
+    """
+    sub = (userinfo.get("sub") or "").strip()
+    email = (userinfo.get("email") or "").strip().lower()
+    if not sub or not email or "@" not in email:
+        raise ValueError("Google did not return a verifiable identity. Please try again.")
+    if userinfo.get("email_verified") is False:
+        raise ValueError("Your Google email is not verified. Please verify it and try again.")
+
+    user = User.query.filter_by(google_sub=sub).first()
+    if user:
+        return user, False
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.google_sub = sub
+        if not user.avatar_url:
+            user.avatar_url = (userinfo.get("picture") or "")[:512] or None
+        db.session.commit()
+        log.info("Linked Google identity to existing account %s", email)
+        return user, False
+    # Brand-new account. The password hash is a random secret that can never
+    # validate, so this account is Google-sign-in-only (password_hash stays
+    # NOT NULL, no schema change needed).
+    user = User(
+        name=(userinfo.get("name") or email.split("@")[0])[:120],
+        email=email,
+        google_sub=sub,
+        avatar_url=(userinfo.get("picture") or "")[:512] or None,
+    )
+    user.set_password(secrets.token_hex(32))
+    db.session.add(user)
+    db.session.commit()
+    log.info("Created account via Google sign-in: %s", email)
+    return user, True
+
+
+# ========================================================
+# --- PROFILE SNAPSHOT CACHE ---
+# ========================================================
+
+def _fresh_snapshot(user_id, provider, max_age_seconds=_SNAPSHOT_TTL_SECONDS):
+    """Return the user's cached snapshot for a provider, or None if stale."""
+    row = ProfileSnapshot.query.filter_by(user_id=user_id, provider=provider).first()
+    if not row or not row.fetched_at:
+        return None
+    age = (datetime.now(timezone.utc).replace(tzinfo=None)
+           - row.fetched_at.replace(tzinfo=None)).total_seconds()
+    return row if age < max_age_seconds else None
+
+
+def _store_snapshot(user_id, provider, username, data):
+    """Upsert the cached snapshot for a (user, provider)."""
+    row = ProfileSnapshot.query.filter_by(user_id=user_id, provider=provider).first()
+    payload = json_safe(data)
+    if row:
+        row.username = username
+        row.data = payload
+        row.fetched_at = datetime.now(timezone.utc)
+    else:
+        row = ProfileSnapshot(user_id=user_id, provider=provider,
+                              username=username, data=payload)
+        db.session.add(row)
+    db.session.commit()
+    return row
+
+
 # ========================================================
 # --- APP FACTORY ---
 # ========================================================
@@ -404,6 +568,9 @@ def create_app(config_overrides=None):
     login_manager.login_message_category = "info"
     csrf.init_app(app)
     limiter.init_app(app)
+    oauth.init_app(app)
+    if _google_configured():
+        _register_google_oauth(app)
     if app.config.get("TESTING"):
         limiter.enabled = False
 
@@ -412,6 +579,7 @@ def create_app(config_overrides=None):
 
     with app.app_context():
         db.create_all()
+        _ensure_schema()
 
     return app
 
@@ -516,7 +684,8 @@ def register_routes(app):
                 return redirect(nxt if is_safe_next(nxt) else url_for('dashboard'))
             error = 'Invalid email or password.'
         return render_template('login.html', error=error,
-                               next=request.args.get('next', ''))
+                               next=request.args.get('next', ''),
+                               google_configured=_google_configured())
 
     @app.route('/logout', methods=['GET', 'POST'])
     def logout():
@@ -527,6 +696,155 @@ def register_routes(app):
         logout_user()
         flash('You have been logged out.', 'info')
         return redirect(url_for('index'))
+
+    # ---------- GOOGLE SIGN-IN (OAuth 2.0, only when configured) ----------
+    if _google_configured():
+        @app.route('/auth/google/login')
+        def google_login():
+            if current_user.is_authenticated:
+                return redirect(url_for('dashboard'))
+            nxt = request.args.get('next', '')
+            if is_safe_next(nxt):
+                session['google_next'] = nxt
+            redirect_uri = url_for('google_callback', _external=True)
+            return oauth.google.authorize_redirect(redirect_uri)
+
+        @app.route('/auth/google/callback')
+        def google_callback():
+            # Authlib validates the `state` parameter by default, which
+            # defeats CSRF/login-CSRF on the OAuth flow.
+            try:
+                oauth.google.authorize_access_token()
+            except Exception as e:
+                log.warning("Google OAuth token exchange failed: %r", e)
+                flash('Google sign-in failed. Please try again.', 'error')
+                return redirect(url_for('login'))
+            try:
+                userinfo = oauth.google.userinfo()
+            except Exception:
+                try:
+                    userinfo = oauth.google.parse_id_token()
+                except Exception as e:
+                    log.warning("Google userinfo fetch failed: %r", e)
+                    flash('Could not read your Google profile. Please try again.', 'error')
+                    return redirect(url_for('login'))
+            try:
+                user, is_new = _process_google_login(userinfo or {})
+            except ValueError as e:
+                flash(str(e), 'error')
+                return redirect(url_for('login'))
+            login_user(user, remember=True)
+            flash('Welcome{}!'.format(
+                ', {}'.format(user.name) if is_new else ' back, {}'.format(user.name)),
+                'success')
+            nxt = session.pop('google_next', None)
+            return redirect(nxt if is_safe_next(nxt) else url_for('dashboard'))
+
+    # ---------- CONNECTED PROFILE (/profile) ----------
+    @app.route('/profile')
+    @login_required
+    def profile():
+        """Connected accounts: Google sign-in, GitHub, LeetCode."""
+        github_snap = ProfileSnapshot.query.filter_by(
+            user_id=current_user.id, provider='github').first()
+        leetcode_snap = ProfileSnapshot.query.filter_by(
+            user_id=current_user.id, provider='leetcode').first()
+        return render_template(
+            'profile.html',
+            google_configured=_google_configured(),
+            google_connected=bool(current_user.google_sub),
+            github_username=current_user.github_username,
+            github_snapshot=(github_snap.data if github_snap else None),
+            leetcode_username=current_user.leetcode_username,
+            leetcode_snapshot=(leetcode_snap.data if leetcode_snap else None))
+
+    @app.route('/profile/connect/github', methods=['POST'])
+    @login_required
+    @limiter.limit("10 per hour")
+    def profile_connect_github():
+        username = (request.form.get('username') or '').strip()
+        try:
+            validate_github_username(username)
+        except GithubAPIError as e:
+            flash(str(e), 'error')
+            return redirect(url_for('profile'))
+        fresh = _fresh_snapshot(current_user.id, 'github')
+        if fresh and (fresh.username or '').lower() == username.lower():
+            current_user.github_username = fresh.username
+            db.session.commit()
+            flash('GitHub reconnected: @{}'.format(fresh.username), 'success')
+            return redirect(url_for('profile'))
+        try:
+            result = analyze_github_profile(username)
+        except GithubAPIError as e:
+            flash(str(e), 'error')
+            return redirect(url_for('profile'))
+        current_user.github_username = result['username']
+        _store_snapshot(current_user.id, 'github', result['username'], result)
+        db.session.commit()
+        flash('GitHub connected: @{} — profile score {}/100'.format(
+            result['username'], result['score']), 'success')
+        return redirect(url_for('profile'))
+
+    @app.route('/profile/unlink/github', methods=['POST'])
+    @login_required
+    def profile_unlink_github():
+        current_user.github_username = None
+        ProfileSnapshot.query.filter_by(
+            user_id=current_user.id, provider='github').delete()
+        db.session.commit()
+        flash('GitHub disconnected.', 'info')
+        return redirect(url_for('profile'))
+
+    @app.route('/profile/connect/leetcode', methods=['POST'])
+    @login_required
+    @limiter.limit("10 per hour")
+    def profile_connect_leetcode():
+        username = (request.form.get('username') or '').strip()
+        try:
+            validate_leetcode_username(username)
+        except LeetCodeAPIError as e:
+            flash(str(e), 'error')
+            return redirect(url_for('profile'))
+        fresh = _fresh_snapshot(current_user.id, 'leetcode')
+        if fresh and (fresh.username or '').lower() == username.lower():
+            current_user.leetcode_username = fresh.username
+            db.session.commit()
+            flash('LeetCode reconnected: {}'.format(fresh.username), 'success')
+            return redirect(url_for('profile'))
+        try:
+            stats = fetch_leetcode_stats(username)
+        except LeetCodeAPIError as e:
+            flash(str(e), 'error')
+            return redirect(url_for('profile'))
+        current_user.leetcode_username = stats['username']
+        _store_snapshot(current_user.id, 'leetcode', stats['username'], stats)
+        db.session.commit()
+        flash('LeetCode connected: {} ({} solved)'.format(
+            stats['username'], stats['solved']['total']), 'success')
+        return redirect(url_for('profile'))
+
+    @app.route('/profile/unlink/leetcode', methods=['POST'])
+    @login_required
+    def profile_unlink_leetcode():
+        current_user.leetcode_username = None
+        ProfileSnapshot.query.filter_by(
+            user_id=current_user.id, provider='leetcode').delete()
+        db.session.commit()
+        flash('LeetCode disconnected.', 'info')
+        return redirect(url_for('profile'))
+
+    # ---------- PUBLIC LEETCODE STAT CARD ----------
+    @app.route('/cards/leetcode/<username>.svg')
+    @limiter.limit("60 per hour")
+    def leetcode_card(username):
+        """Embeddable SVG stat card (github-readme-stats style). Public, since
+        cards are meant to be embedded in READMEs and portfolio pages."""
+        try:
+            stats = get_card_stats(username)
+        except LeetCodeAPIError as e:
+            return Response(render_error_svg(str(e)), mimetype='image/svg+xml')
+        return Response(render_leetcode_card_svg(stats), mimetype='image/svg+xml')
 
     # ---------- RESUME ANALYZER ----------
     @app.route('/resume')

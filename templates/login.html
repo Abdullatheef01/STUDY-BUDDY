@@ -42,6 +42,15 @@
             <label class="remember"><input type="checkbox" name="remember" checked> Keep me logged in</label>
             <button type="submit" class="btn-glass btn-primary submit-btn">Log In</button>
         </form>
+        {% if google_configured %}
+        <div style="display:flex;align-items:center;gap:1rem;margin:1.4rem 0 0;color:var(--text-muted);font-size:0.85rem;">
+            <span style="flex:1;border-top:1px solid var(--glass-border);"></span> or <span style="flex:1;border-top:1px solid var(--glass-border);"></span>
+        </div>
+        <a href="{{ url_for('google_login', next=next) }}" class="btn-glass submit-btn" style="display:flex;align-items:center;justify-content:center;gap:0.7rem;margin-top:1.2rem;background:#ffffff;color:#1f2937;text-decoration:none;font-weight:600;">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><text x="12" y="17.5" text-anchor="middle" font-size="16" font-weight="800" font-family="Inter,Arial,sans-serif"><tspan fill="#4285F4">G</tspan></text></svg>
+            Continue with Google
+        </a>
+        {% endif %}
         <p class="auth-alt">New here? <a href="{{ url_for('register') }}">Create an account</a></p>
     </div>
 </div>

@@ -16,6 +16,10 @@ services:
         value: production
       - key: GEMINI_API_KEY
         sync: false # set in the Render dashboard (from Google AI Studio)
+      - key: GOOGLE_CLIENT_ID
+        sync: false # set in the Render dashboard (Google Cloud Console OAuth client)
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false # set in the Render dashboard (Google Cloud Console OAuth client)
       - key: GITHUB_TOKEN
         sync: false # optional: raises GitHub API rate limits for the paper constructor
       - key: DATABASE_URL
