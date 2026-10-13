@@ -2,7 +2,7 @@
    Fully inline-styled so it matches the midnight-neon theme in every template. #}
 {% if current_user.is_authenticated %}
     <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-    <li><span title="{{ current_user.email }}" style="color: #f8fafc; font-weight: 600; font-size: 0.9rem;">&#128075; {{ current_user.name }}</span></li>
+    <li><span title="{{ current_user.email }}" style="color: #f8fafc; font-weight: 600; font-size: 0.9rem;">{{ current_user.name }}</span></li>
     <li><a href="{{ url_for('logout') }}" style="padding: 0.45rem 1.1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #f8fafc; text-decoration: none; font-weight: 600; font-size: 0.85rem;">Logout</a></li>
 {% else %}
     <li><a href="{{ url_for('login') }}">Login</a></li>
