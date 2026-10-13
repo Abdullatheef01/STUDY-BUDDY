@@ -221,6 +221,8 @@ from parser.section_extractor import extract_sections, extract_education_details
 from models.skill_extractor import extract_skills, get_skills_by_category, get_skill_names
 from models.ats_scorer import calculate_ats_score
 from models.resume_feedback import generate_feedback, get_overall_summary
+from jd_matcher import (score_jd_match, generate_rule_based_suggestions,
+                        JD_MIN_CHARS, JD_MAX_CHARS)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -272,9 +274,25 @@ class ResumeAnalysis(db.Model):
     filename = db.Column(db.String(255))
     ats_score = db.Column(db.Float)
     result_json = db.Column(db.JSON)  # full analysis payload (dashboard rendering)
+    # Cleaned resume text (truncated) so Wave-1 JD matching can reuse the
+    # latest saved analysis without a re-upload. Backfilled via _ensure_schema.
+    resume_text = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("analyses", lazy="dynamic",
+                                                     cascade="all, delete-orphan"))
+
+
+class JDMatchReport(db.Model):
+    """A JD-matched ATS scoring report belonging to a user (Wave 1 #1)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    job_title = db.Column(db.String(255))
+    score = db.Column(db.Float)
+    report_json = db.Column(db.JSON)  # full match report payload
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("jd_match_reports", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
 
 
@@ -423,14 +441,21 @@ def _ensure_schema():
     have_index = any(i["name"] == "ix_user_google_sub"
                      for i in insp.get_indexes("user"))
     missing = [(col, ddl) for col, ddl in wanted.items() if col not in existing]
-    if not missing and have_index:
-        return
-    with db.engine.begin() as conn:
-        for col, ddl in missing:
-            conn.execute(text('ALTER TABLE "user" ADD COLUMN {} {}'.format(col, ddl)))
-            log.info("Schema evolution: added user.%s", col)
-        conn.execute(text(
-            'CREATE UNIQUE INDEX IF NOT EXISTS ix_user_google_sub ON "user" (google_sub)'))
+    if missing or not have_index:
+        with db.engine.begin() as conn:
+            for col, ddl in missing:
+                conn.execute(text('ALTER TABLE "user" ADD COLUMN {} {}'.format(col, ddl)))
+                log.info("Schema evolution: added user.%s", col)
+            conn.execute(text(
+                'CREATE UNIQUE INDEX IF NOT EXISTS ix_user_google_sub ON "user" (google_sub)'))
+    # Wave-1: resume_text on resume_analysis (TEXT works on SQLite + Postgres).
+    # Independent of the user-table backfill above (no shared early return).
+    if "resume_analysis" in insp.get_table_names():
+        ra_existing = {c["name"] for c in insp.get_columns("resume_analysis")}
+        if "resume_text" not in ra_existing:
+            with db.engine.begin() as conn:
+                conn.execute(text('ALTER TABLE "resume_analysis" ADD COLUMN resume_text TEXT'))
+            log.info("Schema evolution: added resume_analysis.resume_text")
 
 
 # ========================================================
@@ -627,6 +652,59 @@ def register_error_handlers(app):
 # ========================================================
 # --- ROUTES ---
 # ========================================================
+
+def _jd_match_suggestions(report, jd_text):
+    """Qualitative fix suggestions via Gemini, with a rule-based fallback.
+
+    Returns (suggestions, ai_powered). The numeric score never depends on
+    the LLM, so a Gemini outage degrades suggestions only - never the
+    report itself.
+    """
+    fallback = generate_rule_based_suggestions(report)
+    prompt = (
+        "You are a senior career coach. A resume was scored against the "
+        "job description below. Resume experience: ~{} years. "
+        "Match score: {}/100. Missing skills/keywords (most important "
+        "first): {}. Matched skills: {}.\n\n"
+        "JOB DESCRIPTION (truncated):\n{}\n\n"
+        'Return ONLY a JSON object like {{"suggestions": [{{"section": "...", '
+        '"issue": "...", "fix": "..."}}]}} with at most 6 concrete, '
+        "section-by-section fixes (Summary, Experience, Skills, Education, "
+        "Formatting). Each fix must reference the actual JD above - no "
+        "generic advice."
+    ).format(
+        report.get("resume_experience_years") or 0,
+        report.get("score"),
+        ", ".join((report.get("missing_keywords") or [])[:12]) or "none",
+        ", ".join((report.get("matched_skills") or [])[:8]) or "none",
+        (jd_text or "")[:4000],
+    )
+    # Robust JSON parsing: strip fences, retry once (constructor pattern).
+    for _attempt in range(2):
+        try:
+            raw = call_gemini_ai(prompt)
+        except GeminiError as e:
+            log.warning("JD-match suggestions: Gemini unavailable: %s", e)
+            return fallback, False
+        try:
+            parsed = _parse_json_safely(raw)
+            items = parsed.get("suggestions") if isinstance(parsed, dict) else None
+            cleaned = []
+            for it in (items or [])[:6]:
+                if not isinstance(it, dict):
+                    continue
+                section = str(it.get("section") or "Overall")[:60]
+                issue = str(it.get("issue") or "").strip()[:300]
+                fix = str(it.get("fix") or "").strip()[:600]
+                if issue and fix:
+                    cleaned.append({"section": section, "issue": issue, "fix": fix})
+            if cleaned:
+                return cleaned, True
+            log.warning("JD-match suggestions: model returned no usable items")
+        except (ValueError, json.JSONDecodeError):
+            log.warning("JD-match suggestions: non-JSON model output, retrying")
+    return fallback, False
+
 
 def register_routes(app):
 
@@ -861,7 +939,15 @@ def register_routes(app):
     @app.route('/resume')
     def resume_home():
         """Resume Analyzer upload page."""
-        return render_template('resume_index.html')
+        has_saved_resume = False
+        if current_user.is_authenticated:
+            has_saved_resume = db.session.query(
+                ResumeAnalysis.query
+                .filter_by(user_id=current_user.id)
+                .filter(ResumeAnalysis.resume_text.isnot(None))
+                .exists()).scalar()
+        return render_template('resume_index.html',
+                               has_saved_resume=has_saved_resume)
 
     @app.route('/analyze', methods=['POST'])
     @limiter.limit("20 per hour")
@@ -952,6 +1038,7 @@ def register_routes(app):
                     ats_score=(ats_result.get('total_score')
                                if isinstance(ats_result, dict) else None),
                     result_json=json_safe(result),
+                    resume_text=cleaned_text[:20000],
                 )
                 db.session.add(row)
                 db.session.commit()
@@ -984,6 +1071,128 @@ def register_routes(app):
 
     csrf.exempt(analyze)
 
+    # ---------- JD-MATCHED ATS SCORING (Wave 1 #1) ----------
+    @app.route('/jd-match', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def jd_match():
+        """Score the user's resume against a pasted job description.
+
+        Login required (reports are persisted per user). Accepts JSON or
+        multipart form: jd_text + resume_source ("upload"|"latest"), with an
+        optional "resume" file for the upload path. The page sends the CSRF
+        token in the X-CSRFToken header, so this route is NOT CSRF-exempt.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to match your resume against a job description.'}), 401
+
+        if request.is_json:
+            payload = request.get_json(silent=True) or {}
+            jd_text = (payload.get('jd_text') or '').strip()
+            resume_source = (payload.get('resume_source') or 'upload').strip()
+        else:
+            jd_text = (request.form.get('jd_text') or '').strip()
+            resume_source = (request.form.get('resume_source') or 'upload').strip()
+
+        # --- Server-side JD validation ---
+        if not jd_text:
+            return jsonify({'error': 'Please paste a job description first.'}), 400
+        if len(jd_text) < JD_MIN_CHARS:
+            return jsonify({'error': 'The job description looks too short '
+                                     '(minimum {} characters). Please paste the full posting.'
+                                     .format(JD_MIN_CHARS)}), 400
+        if len(jd_text) > JD_MAX_CHARS:
+            return jsonify({'error': 'The job description is too long '
+                                     '(maximum {:,} characters). Please trim it and try again.'
+                                     .format(JD_MAX_CHARS)}), 400
+
+        # --- Resolve resume text ---
+        resume_text = None
+        filename = None
+        uploaded_path = None
+        try:
+            if resume_source == 'latest':
+                row = (ResumeAnalysis.query
+                       .filter_by(user_id=current_user.id)
+                       .filter(ResumeAnalysis.resume_text.isnot(None))
+                       .order_by(ResumeAnalysis.created_at.desc()).first())
+                if not row:
+                    return jsonify({'error': 'No saved resume with extractable text found. '
+                                             'Please upload your resume instead.'}), 400
+                resume_text = row.resume_text
+                filename = row.filename
+            else:
+                if 'resume' not in request.files:
+                    return jsonify({'error': 'No file uploaded.'}), 400
+                file = request.files['resume']
+                if not file or file.filename == '':
+                    return jsonify({'error': 'No file selected.'}), 400
+                if not allowed_file(file.filename):
+                    return jsonify({'error': 'Invalid file type. Please upload PDF or DOCX.'}), 400
+                filename = "{}_{}".format(uuid.uuid4().hex[:8], secure_filename(file.filename))
+                uploaded_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(uploaded_path)
+                ext = filename.rsplit('.', 1)[1].lower()
+                if ext == 'pdf':
+                    raw_text = extract_text_from_pdf(file_path=uploaded_path)
+                elif ext in ('docx', 'doc'):
+                    raw_text = extract_text_from_docx(file_path=uploaded_path)
+                else:
+                    return jsonify({'error': 'Unsupported file format.'}), 400
+                if not raw_text or len(raw_text.strip()) < 50:
+                    return jsonify({'error': 'Could not extract enough text from the resume.'}), 400
+                resume_text = clean_text(raw_text)
+        finally:
+            if uploaded_path:
+                try:
+                    os.remove(uploaded_path)
+                except OSError:
+                    pass
+
+        # --- Deterministic server-side scoring ---
+        cleaned = resume_text or ''
+        sections = extract_sections(cleaned)
+        skills = extract_skills(cleaned)
+        skill_names = get_skill_names(skills)
+        experience_years = extract_experience_years(cleaned)
+        contact = {'email': extract_email(cleaned), 'phone': extract_phone(cleaned)}
+        report = score_jd_match(cleaned, skill_names, experience_years,
+                                sections, contact, jd_text)
+        suggestions, ai_powered = _jd_match_suggestions(report, jd_text)
+        report['suggestions'] = suggestions
+        report['ai_powered'] = ai_powered
+        report['filename'] = filename
+
+        # --- Persist per user ---
+        try:
+            match_row = JDMatchReport(
+                user_id=current_user.id,
+                job_title=(report.get('job_title') or '')[:255],
+                score=report.get('score'),
+                report_json=json_safe(report),
+            )
+            db.session.add(match_row)
+            db.session.commit()
+        except Exception:
+            log.exception("JD-match report persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your report. Please try again.'}), 500
+
+        return jsonify({
+            'success': True,
+            'report_id': match_row.id,
+            'report': json_safe(report),
+            'saved_url': url_for('view_jd_match', report_id=match_row.id),
+        })
+
+    @app.route('/jd-match/<int:report_id>')
+    @login_required
+    def view_jd_match(report_id):
+        """Render a saved JD-match report (owner only)."""
+        row = JDMatchReport.query.filter_by(id=report_id,
+                                            user_id=current_user.id).first_or_404()
+        return render_template('jd_match_report.html', report=row.report_json,
+                               report_id=row.id, created_at=row.created_at)
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -1010,9 +1219,13 @@ def register_routes(app):
         analyses = (ResumeAnalysis.query
                     .filter_by(user_id=current_user.id)
                     .order_by(ResumeAnalysis.created_at.desc()).all())
+        jd_matches = (JDMatchReport.query
+                      .filter_by(user_id=current_user.id)
+                      .order_by(JDMatchReport.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
-        return render_template('history.html', analyses=analyses, goals=goals)
+        return render_template('history.html', analyses=analyses, goals=goals,
+                               jd_matches=jd_matches)
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])

@@ -2064,3 +2064,150 @@ h1 svg { width: 1em; height: 1em; vertical-align: -0.12em; margin-right: 0.2em; 
 
 .remove-file svg { width: 1em; height: 1em; vertical-align: -0.15em; }
 .job-skill-tag svg { width: 0.95em; height: 0.95em; vertical-align: -0.12em; margin-right: 0.3em; }
+
+/* ================================================================
+   JD-Matched ATS Scoring (Wave 1, feature #1)
+   Deep navy/teal career theme, mobile-safe, reduced-motion respected.
+   ================================================================ */
+.jd-section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem;
+}
+.jd-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+.jd-card h2 {
+    font-size: 1.7rem;
+    margin-bottom: 0.4rem;
+}
+.jd-card h2 .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.jd-card > p { color: var(--text-muted, #94a3b8); margin-bottom: 1.5rem; }
+.jd-label { display: block; font-weight: 600; margin: 1.2rem 0 0.5rem; }
+.jd-textarea {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: #f8fafc;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+.jd-textarea:focus { outline: none; border-color: var(--accent-primary); }
+.jd-source-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin: 0.4rem 0; }
+.jd-radio { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; }
+.jd-radio input { accent-color: var(--accent-primary); width: 1.1rem; height: 1.1rem; }
+.jd-file {
+    display: block;
+    margin-top: 0.6rem;
+    color: #f8fafc;
+    font-size: 0.9rem;
+}
+.jd-error {
+    margin-top: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 10px;
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
+    font-size: 0.92rem;
+}
+.jd-submit {
+    margin-top: 1.4rem;
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    background: var(--gradient-primary);
+    color: #03222d;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.jd-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35); }
+.jd-submit:disabled { opacity: 0.6; cursor: wait; }
+.jd-saved-link { margin-top: 1rem; text-align: center; }
+.jd-saved-link a { color: var(--accent-secondary); font-weight: 600; }
+
+/* --- Report --- */
+.jd-report { margin-top: 2rem; }
+.jd-score-head { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.8rem; }
+.jd-ring { position: relative; width: 120px; height: 120px; flex: none; }
+.jd-ring-label {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.jd-ring-label strong { font-size: 1.7rem; }
+.jd-ring-label span { font-size: 0.8rem; color: var(--text-muted, #94a3b8); }
+.jd-score-meta h3 { font-size: 1.4rem; margin-bottom: 0.3rem; }
+.jd-job-title { font-weight: 600; color: #f8fafc; }
+.jd-file, .jd-ai-note { font-size: 0.85rem; color: var(--text-muted, #94a3b8); }
+.jd-breakdown { display: grid; gap: 1rem; margin-bottom: 1.8rem; }
+.jd-bar-head { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 0.35rem; }
+.jd-bar { height: 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.jd-bar-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+.jd-bar-detail { font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin-top: 0.3rem; }
+.jd-kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.8rem; }
+.jd-kw-col h4 { font-size: 1rem; margin-bottom: 0.7rem; }
+.jd-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.jd-chip {
+    font-size: 0.82rem; padding: 0.3rem 0.75rem; border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.jd-chip-ok { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.45); color: #a7f3d0; }
+.jd-chip-miss { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.45); color: #fcd34d; }
+.jd-none { font-size: 0.85rem; color: var(--text-muted, #94a3b8); }
+.jd-sugg h4 { font-size: 1.1rem; margin-bottom: 0.9rem; }
+.jd-sugg-item {
+    display: flex; gap: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+}
+.jd-sugg-num {
+    flex: none; width: 2rem; height: 2rem; border-radius: 50%;
+    background: var(--gradient-primary); color: #03222d;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.jd-sugg-sec { font-weight: 700; color: var(--accent-secondary); font-size: 0.9rem; margin-bottom: 0.2rem; }
+.jd-sugg-issue { font-size: 0.92rem; margin-bottom: 0.3rem; }
+.jd-sugg-fix { font-size: 0.9rem; color: #cbd5e1; }
+.jd-loading { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted, #94a3b8); }
+.jd-spinner {
+    width: 44px; height: 44px; margin: 0 auto 1rem;
+    border: 4px solid rgba(16, 185, 129, 0.2); border-top-color: var(--accent-primary);
+    border-radius: 50%; animation: jdSpin 0.9s linear infinite;
+}
+@keyframes jdSpin { to { transform: rotate(360deg); } }
+.jd-login-cta { text-align: center; padding: 1rem 0; }
+.jd-login-cta a {
+    display: inline-block; margin-top: 1rem; padding: 0.9rem 2rem; border-radius: 12px;
+    background: var(--gradient-primary); color: #03222d; font-weight: 700; text-decoration: none;
+}
+
+@media (max-width: 640px) {
+    .jd-card { padding: 1.3rem; }
+    .jd-kw-grid { grid-template-columns: 1fr; }
+    .jd-score-head { gap: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .jd-spinner { animation: none; border-top-color: rgba(16, 185, 129, 0.2); }
+    .jd-bar-fill { transition: none; }
+    .jd-submit:hover:not(:disabled) { transform: none; box-shadow: none; }
+}

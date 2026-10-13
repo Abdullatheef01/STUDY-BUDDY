@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="AI-powered resume analyzer with ATS scoring, semantic job matching, skill gap detection, and interview preparation. Upload your resume and get instant career guidance.">
     <title>AI Resume Analyzer | Intelligent Career Guidance Platform</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 </head>
@@ -84,6 +85,42 @@
         </div>
     </section>
 
+    <!-- JD-Matched ATS Scoring (Wave 1, feature #1) -->
+    <section class="jd-section" id="jd-match">
+        <div class="jd-card">
+            <h2>Match My Resume <span class="gradient-text">to a Job Description</span></h2>
+            <p>Paste any job posting and get a transparent 0&ndash;100 ATS-style match score: keyword coverage, required-skills hit rate, experience alignment, and formatting checks &mdash; plus exactly what's missing and how to fix it.</p>
+            {% if current_user.is_authenticated %}
+            <form id="jdMatchForm" enctype="multipart/form-data" novalidate>
+                <label class="jd-label" for="jdText">Job description</label>
+                <textarea class="jd-textarea" id="jdText" name="jd_text" maxlength="20000"
+                    placeholder="Paste the full job description here (role, responsibilities, required skills…)"></textarea>
+
+                <span class="jd-label">Resume to score</span>
+                <div class="jd-source-row">
+                    <label class="jd-radio"><input type="radio" name="resume_source" value="upload" checked> Upload a resume</label>
+                    {% if has_saved_resume %}
+                    <label class="jd-radio"><input type="radio" name="resume_source" value="latest"> Use my latest saved analysis</label>
+                    {% endif %}
+                </div>
+                <div id="jdFileWrap">
+                    <input class="jd-file" type="file" id="jdMatchFile" name="resume" accept=".pdf,.docx,.doc">
+                </div>
+
+                <div class="jd-error" id="jdError" hidden></div>
+                <button type="submit" class="jd-submit" id="jdMatchBtn"><span>Check My Match</span></button>
+                <p class="jd-saved-link" id="jdSavedLink" hidden>Report saved &mdash; <a href="#">view it anytime</a></p>
+            </form>
+            <div id="jdMatchResult" aria-live="polite"></div>
+            {% else %}
+            <div class="jd-login-cta">
+                <p>Log in to score your resume against any job description. Your match reports are saved to your dashboard.</p>
+                <a href="{{ url_for('login', next=url_for('resume_home')) }}">Log in to start matching</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
@@ -158,5 +195,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/resume_script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jd_match.js') }}"></script>
 </body>
 </html>

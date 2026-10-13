@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JD Match Report | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
+            <span>ResumeAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            {% include "_auth_links.html" %}
+        </ul>
+    </nav>
+
+    <section class="jd-section">
+        <div class="jd-card">
+            <p style="margin-bottom:1rem;"><a href="{{ url_for('dashboard') }}" style="color:var(--accent-secondary);font-weight:600;text-decoration:none;">&larr; Back to dashboard</a></p>
+            <h2>JD Match <span class="gradient-text">Report</span></h2>
+            <p>Saved {{ created_at.strftime('%d %b %Y, %I:%M %p') if created_at else '' }} &middot; only visible to you.</p>
+            <div id="jdSavedReport" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Built with AI for students | AI Resume Analyzer &amp; Job Recommendation System</p>
+    </footer>
+
+    <script>
+        window.__JD_REPORT__ = {{ report|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/jd_match.js') }}"></script>
+</body>
+</html>
