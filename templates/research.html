@@ -43,6 +43,7 @@
                 <li><a href="#home" class="nav-link active" data-section="home">Home</a></li>
                 <li><a href="#constructor" class="nav-link" data-section="constructor">Constructor</a></li>
                 <li><a href="#deconstructor" class="nav-link" data-section="deconstructor">Deconstructor</a></li>
+                {% include "_auth_links.html" %}
             </ul>
         </nav>
         <button class="btn btn-primary" id="btn-cta">Get Started</button>
@@ -228,6 +229,7 @@
     </footer>
 
     <!-- App Script -->
+    <script>window.ACRA_AUTH = {{ 'true' if current_user.is_authenticated else 'false' }};</script>
     <script src="/static/js/research_app.js"></script>
 </body>
 </html>

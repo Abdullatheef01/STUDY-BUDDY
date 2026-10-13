@@ -189,6 +189,19 @@ function getIEEEHeader(title, author, institution) {
     const btnNewSession = document.getElementById('btn-new-session');
     const sessionList = document.getElementById('session-list');
 
+    // --- Persisted research sessions (logged-in users only) ---
+    // The backend saves each chat exchange to a per-user ResearchSession and
+    // returns its id; we keep it in localStorage so follow-up questions land
+    // in the same server-side session.
+    const ACRA_SESSION_KEY = 'acra_research_session_id';
+    let researchSessionId = (window.ACRA_AUTH === true)
+        ? localStorage.getItem(ACRA_SESSION_KEY)
+        : null;
+    const resetResearchSession = () => {
+        researchSessionId = null;
+        try { localStorage.removeItem(ACRA_SESSION_KEY); } catch (e) { /* ignore */ }
+    };
+
     // --- Extract Full Text & Sections from PDF ---
     async function analyzePDF(file) {
         const arrayBuffer = await file.arrayBuffer();
@@ -451,7 +464,8 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
                 body: JSON.stringify({
                     message: text,
                     document_text: currentPaperContext.fullText || '',
-                    history: [] 
+                    history: [],
+                    research_session_id: researchSessionId
                 })
             });
 
@@ -464,6 +478,10 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
             }
 
             const data = await response.json();
+            if (data.research_session_id) {
+                researchSessionId = String(data.research_session_id);
+                try { localStorage.setItem(ACRA_SESSION_KEY, researchSessionId); } catch (e) { /* ignore */ }
+            }
             addMessage('system', data.response);
         } catch (err) {
             hideTyping();
@@ -504,6 +522,7 @@ I've loaded the context for **"${sessionName}"**. How can I help you explore thi
         btnNewSession.addEventListener('click', () => {
             sessionCounter++;
             currentPaperContext = null;
+            resetResearchSession(); // start a fresh server-side session too
 
             // Create new session item
             const newItem = document.createElement('li');

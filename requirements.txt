@@ -8,3 +8,8 @@ werkzeug==3.0.1
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
+# --- Phase 1 (Foundation): persistence + auth ---
+flask-sqlalchemy
+flask-login
+# --- Phase 1: testing ---
+pytest

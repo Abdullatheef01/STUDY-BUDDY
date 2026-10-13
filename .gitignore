@@ -4,7 +4,13 @@ __pycache__/
 *$py.class
 .env
 venv/
+.venv/
 ENV/
+
+# SQLite dev database (created automatically; Postgres in production)
+*.db
+*.sqlite
+*.sqlite3
 
 # Distribution / packaging
 dist/

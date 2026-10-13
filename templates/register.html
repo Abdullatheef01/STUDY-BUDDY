@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Create Account | Unified AI Excellence Platform{% endblock %}
+{% block head %}
+<style>
+    .auth-wrap { max-width: 480px; margin: 2rem auto; }
+    .auth-wrap h1 { font-family: 'Outfit', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; }
+    .auth-wrap h1 span { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .auth-wrap p.sub { color: var(--text-muted); margin-bottom: 1.8rem; }
+    .field { margin-bottom: 1.2rem; }
+    .field label { display: block; margin-bottom: 0.45rem; font-weight: 600; font-size: 0.9rem; }
+    .field input {
+        width: 100%; padding: 0.8rem 1rem; border-radius: 10px;
+        border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3);
+        color: var(--text-main); font-size: 1rem; font-family: 'Inter', sans-serif;
+    }
+    .field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 14px rgba(99,102,241,0.35); }
+    .auth-error { background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.4); color: #fbcfe8; padding: 0.9rem 1.2rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: 0.95rem; }
+    .auth-alt { margin-top: 1.4rem; color: var(--text-muted); font-size: 0.92rem; text-align: center; }
+    .auth-alt a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .submit-btn { width: 100%; padding: 0.9rem; font-size: 1rem; margin-top: 0.4rem; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="glass-card">
+        <h1>Create your <span>account</span></h1>
+        <p class="sub">Save resume analyses, track career goals, and keep research sessions — free for students.</p>
+        {% if error %}<div class="auth-error">{{ error }}</div>{% endif %}
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="field">
+                <label for="name">Full name</label>
+                <input type="text" id="name" name="name" placeholder="Aarav Sharma" required value="{{ request.form.get('name', '') }}">
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@college.edu" required value="{{ request.form.get('email', '') }}">
+            </div>
+            <div class="field">
+                <label for="password">Password <span style="color: var(--text-muted); font-weight: 400;">(min 8 characters)</span></label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required minlength="8">
+            </div>
+            <button type="submit" class="btn-glass btn-primary submit-btn">Create Account</button>
+        </form>
+        <p class="auth-alt">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+    </div>
+</div>
+{% endblock %}
