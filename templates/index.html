@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="hub">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,10 +60,10 @@
             to { transform: translate(60px, 40px) scale(1.12); }
         }
 
-        #hero-3d {
+        #code-bg {
             position: fixed; inset: 0; z-index: -1;
             width: 100%; height: 100%;
-            pointer-events: none; opacity: 0.9;
+            pointer-events: none; opacity: 0.85;
         }
 
         .grid-overlay {
@@ -483,7 +483,7 @@
     </style>
 </head>
 <body>
-    <canvas id="hero-3d" aria-hidden="true"></canvas>
+    <canvas id="code-bg" aria-hidden="true"></canvas>
     <div class="bg-container" aria-hidden="true">
         <div class="glow glow-1"></div>
         <div class="glow glow-2"></div>
@@ -867,123 +867,75 @@
         }
     })();
     </script>
-    <script type="module">
-    /* Three.js hero background — pinned build, graceful fallback to CSS glows. */
+    <script>
+    /* Coding-rain background — lightweight canvas 2D, subtle and decent.
+       Graceful fallback: CSS glow orbs + grid overlay remain when JS is off,
+       the CDN-free page needs no network, and reduced-motion skips it. */
     (function () {
-        var canvas = document.getElementById('hero-3d');
+        var canvas = document.getElementById('code-bg');
         if (!canvas) { return; }
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
 
-        function boot(THREE) {
-            var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x000000, 0);
+        var ctx = canvas.getContext('2d');
+        var glyphs = '{}();<>/=#$01'.split('');
+        var cols = [];
+        var fontSize = 15;
+        var W = 0, H = 0;
+        var palette = ['99,102,241', '34,211,238', '236,72,153']; /* indigo, cyan, pink */
 
-            var scene = new THREE.Scene();
-            var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-            camera.position.set(0, 0, 14);
-
-            var PALETTE = [0x6366f1, 0xec4899, 0x22d3ee];
-
-            /* Particle field */
-            var COUNT = 420;
-            var pos = new Float32Array(COUNT * 3);
-            var col = new Float32Array(COUNT * 3);
-            var tmp = new THREE.Color();
-            for (var i = 0; i < COUNT; i++) {
-                pos[i * 3] = (Math.random() - 0.5) * 44;
-                pos[i * 3 + 1] = (Math.random() - 0.5) * 26;
-                pos[i * 3 + 2] = (Math.random() - 0.5) * 22 - 2;
-                tmp.setHex(PALETTE[i % PALETTE.length]);
-                col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+        function resize() {
+            var dpr = Math.min(window.devicePixelRatio || 1, 2);
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            var n = Math.max(8, Math.floor(W / 36));
+            cols = [];
+            for (var i = 0; i < n; i++) {
+                cols.push({ x: i * 36 + 14, y: Math.random() * -H, speed: 0.35 + Math.random() * 0.7, hue: i % 3 });
             }
-            var pGeo = new THREE.BufferGeometry();
-            pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            pGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-            var pMat = new THREE.PointsMaterial({
-                size: 0.09, vertexColors: true, transparent: true, opacity: 0.85,
-                blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
-            });
-            var particles = new THREE.Points(pGeo, pMat);
-            scene.add(particles);
+        }
+        resize();
+        window.addEventListener('resize', resize);
 
-            /* Floating neon wireframe geometries */
-            function wire(geo, color, x, y, z, scale) {
-                var m = new THREE.LineSegments(
-                    new THREE.WireframeGeometry(geo),
-                    new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.55 })
-                );
-                m.position.set(x, y, z);
-                m.scale.setScalar(scale);
-                scene.add(m);
-                return m;
+        /* Faint perspective grid, very low alpha — a calm engineering feel. */
+        function drawGrid(t) {
+            ctx.strokeStyle = 'rgba(99,102,241,0.055)';
+            ctx.lineWidth = 1;
+            var horizon = H * 0.62;
+            var off = (t * 10) % 48;
+            var x, y, yy;
+            ctx.beginPath();
+            for (y = horizon; y < H + 48; y += 48) {
+                yy = y - off * 0.4;
+                ctx.moveTo(0, yy); ctx.lineTo(W, yy);
             }
-            var shapes = [
-                { o: wire(new THREE.IcosahedronGeometry(2.4, 1), PALETTE[0], -8.5, 2.2, -5, 1), rs: 0.0016, fs: 0.5, fa: 0.7, fy: 2.2 },
-                { o: wire(new THREE.TorusKnotGeometry(1.5, 0.45, 110, 14), PALETTE[1], 8.6, -1.4, -6, 1), rs: 0.0022, fs: 0.4, fa: 0.6, fy: -1.4 },
-                { o: wire(new THREE.OctahedronGeometry(1.7, 0), PALETTE[2], 0.5, -4.2, -7, 1), rs: 0.0019, fs: 0.45, fa: 0.8, fy: -4.2 },
-                { o: wire(new THREE.DodecahedronGeometry(1.1, 0), PALETTE[0], -4.5, -3.4, -4, 1), rs: 0.0026, fs: 0.6, fa: 0.5, fy: -3.4 }
-            ];
-
-            /* Mouse parallax */
-            var mx = 0, my = 0, tx = 0, ty = 0;
-            window.addEventListener('pointermove', function (ev) {
-                tx = (ev.clientX / window.innerWidth - 0.5) * 2;
-                ty = (ev.clientY / window.innerHeight - 0.5) * 2;
-            }, { passive: true });
-
-            window.addEventListener('resize', function () {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            var clock = new THREE.Clock();
-            var heroVisible = true;
-            if ('IntersectionObserver' in window) {
-                var hero = document.querySelector('.hero');
-                if (hero) {
-                    new IntersectionObserver(function (entries) {
-                        heroVisible = entries[0].isIntersecting;
-                    }).observe(hero);
-                }
+            for (x = -W; x < W * 2; x += 76) {
+                ctx.moveTo(W / 2 + (x - W / 2) * 1.6, horizon);
+                ctx.lineTo(W / 2 + (x - W / 2) * 2.7, H);
             }
-
-            (function tick() {
-                window.requestAnimationFrame(tick);
-                if (document.hidden || !heroVisible) { return; }
-                var t = clock.getElapsedTime();
-
-                particles.rotation.y = t * 0.018;
-                particles.rotation.x = Math.sin(t * 0.08) * 0.06;
-
-                for (var s = 0; s < shapes.length; s++) {
-                    var sh = shapes[s];
-                    sh.o.rotation.x = t * sh.rs * 2.2;
-                    sh.o.rotation.y = t * sh.rs * 3.1;
-                    sh.o.position.y = sh.fy + Math.sin(t * sh.fs + s * 1.7) * sh.fa;
-                }
-
-                mx += (tx - mx) * 0.045;
-                my += (ty - my) * 0.045;
-                camera.position.x = mx * 1.6;
-                camera.position.y = -my * 1.0;
-                camera.lookAt(0, 0, 0);
-
-                renderer.render(scene, camera);
-            })();
+            ctx.stroke();
         }
 
-        (async function () {
-            try {
-                var THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
-                boot(THREE);
-            } catch (err) {
-                /* CDN failed — CSS glow orbs remain as the fallback background. */
-                canvas.style.display = 'none';
+        var last = 0;
+        function tick(now) {
+            window.requestAnimationFrame(tick);
+            if (document.hidden) { return; }
+            if (now - last < 55) { return; } /* ~18fps: calm, cheap, decent */
+            last = now;
+            ctx.clearRect(0, 0, W, H);
+            drawGrid(now / 1000);
+            ctx.font = fontSize + 'px "JetBrains Mono", ui-monospace, SFMono-Regular, monospace';
+            for (var i = 0; i < cols.length; i++) {
+                var c = cols[i];
+                var ch = glyphs[(Math.random() * glyphs.length) | 0];
+                ctx.fillStyle = 'rgba(' + palette[c.hue] + ',0.15)';
+                ctx.fillText(ch, c.x, c.y);
+                c.y += c.speed * 2.4;
+                if (c.y > H + 24) { c.y = -24; c.speed = 0.35 + Math.random() * 0.7; }
             }
-        })();
+        }
+        window.requestAnimationFrame(tick);
     })();
     </script>
 </body>

@@ -7,35 +7,35 @@
 
 /* ---- CSS Custom Properties ---- */
 :root {
-    /* Colors - Vibrant Dark Theme */
-    --bg-primary: #0a0a1a;
-    --bg-secondary: #111128;
-    --bg-tertiary: #1a1a3e;
-    --bg-card: rgba(25, 25, 60, 0.6);
-    --bg-card-hover: rgba(35, 35, 80, 0.8);
+    /* Colors - Career Theme: deep navy-teal base */
+    --bg-primary: #03222d;
+    --bg-secondary: #062f3b;
+    --bg-tertiary: #0b3d4b;
+    --bg-card: rgba(6, 47, 59, 0.6);
+    --bg-card-hover: rgba(11, 61, 75, 0.8);
     --bg-glass: rgba(255, 255, 255, 0.03);
     --bg-glass-hover: rgba(255, 255, 255, 0.06);
 
-    /* Accent Colors */
-    --accent-primary: #7c5cfc;
-    --accent-secondary: #00d4aa;
-    --accent-tertiary: #ff6b9d;
-    --accent-warning: #ffb347;
-    --accent-danger: #ff4757;
-    --accent-info: #54a0ff;
+    /* Accent Colors — emerald + amber career identity */
+    --accent-primary: #10b981;
+    --accent-secondary: #14b8a6;
+    --accent-tertiary: #f59e0b;
+    --accent-warning: #f59e0b;
+    --accent-danger: #f87171;
+    --accent-info: #38bdf8;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #7c5cfc 0%, #00d4aa 100%);
-    --gradient-secondary: linear-gradient(135deg, #ff6b9d 0%, #ffb347 100%);
-    --gradient-dark: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
-    --gradient-card: linear-gradient(145deg, rgba(124, 92, 252, 0.1), rgba(0, 212, 170, 0.05));
-    --gradient-hero: radial-gradient(ellipse at 50% 0%, rgba(124, 92, 252, 0.15) 0%, transparent 60%);
+    --gradient-primary: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+    --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    --gradient-dark: linear-gradient(135deg, #03222d 0%, #0b3d4b 100%);
+    --gradient-card: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(245, 158, 11, 0.05));
+    --gradient-hero: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.15) 0%, transparent 60%);
 
     /* Text Colors */
-    --text-primary: #e8e8ff;
-    --text-secondary: #a0a0cc;
-    --text-muted: #6b6b99;
-    --text-accent: #7c5cfc;
+    --text-primary: #ecfdf5;
+    --text-secondary: #a7c4bc;
+    --text-muted: #6b8f86;
+    --text-accent: #10b981;
 
     /* Borders */
     --border-subtle: rgba(124, 92, 252, 0.15);
@@ -1929,27 +1929,27 @@ body {
 }
 
 .grade-A {
-    background: rgba(0, 212, 170, 0.15);
-    color: #00d4aa;
-    border: 1px solid rgba(0, 212, 170, 0.4);
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 .grade-B {
-    background: rgba(124, 92, 252, 0.15);
-    color: #7c5cfc;
-    border: 1px solid rgba(124, 92, 252, 0.4);
+    background: rgba(20, 184, 166, 0.15);
+    color: #14b8a6;
+    border: 1px solid rgba(20, 184, 166, 0.4);
 }
 
 .grade-C {
-    background: rgba(255, 179, 71, 0.15);
-    color: #ffb347;
-    border: 1px solid rgba(255, 179, 71, 0.4);
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
 .grade-D {
-    background: rgba(255, 107, 157, 0.15);
-    color: #ff6b9d;
-    border: 1px solid rgba(255, 107, 157, 0.4);
+    background: rgba(249, 115, 22, 0.15);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.4);
 }
 
 .grade-F {
@@ -2015,3 +2015,52 @@ body {
     animation-fill-mode: both;
 }
 
+
+/* ================================================================
+   Career theme motif — soft grid + slow drifting scan beam.
+   Pure CSS: visible with JS disabled; calmed under reduced motion.
+   ================================================================ */
+.career-grid {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.6;
+    background-image:
+        linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, black 15%, transparent 72%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, black 15%, transparent 72%);
+}
+.scan-beam {
+    position: fixed; left: 0; right: 0; top: -24%; height: 24%; z-index: -1;
+    pointer-events: none; opacity: 0.55; filter: blur(8px);
+    background: linear-gradient(to bottom,
+        transparent,
+        rgba(16, 185, 129, 0.08) 42%,
+        rgba(16, 185, 129, 0.15) 50%,
+        rgba(16, 185, 129, 0.08) 58%,
+        transparent);
+    animation: scanDrift 16s linear infinite;
+}
+@keyframes scanDrift { from { top: -24%; } to { top: 104%; } }
+@media (prefers-reduced-motion: reduce) {
+    .scan-beam { animation: none; opacity: 0.15; top: 32%; }
+}
+
+/* ================================================================
+   Inline SVG icon system (emoji-free) — icons inherit container size.
+   ================================================================ */
+.brand-icon svg, .upload-icon svg, .file-icon svg, .feature-icon svg,
+.card-icon svg, .feedback-icon svg, .career-icon svg, .empty-icon svg,
+.step-icon svg {
+    width: 1.4em; height: 1.4em; vertical-align: -0.25em;
+}
+.upload-icon svg, .feature-icon svg, .empty-icon svg { width: 2.1rem; height: 2.1rem; }
+.brand-icon svg { width: 1.6rem; height: 1.6rem; }
+.job-meta svg, .job-company svg, .roadmap-time svg, .career-demand svg {
+    width: 1em; height: 1em; vertical-align: -0.15em; margin-right: 0.3em;
+}
+.question-category h4 svg { width: 1.15em; height: 1.15em; vertical-align: -0.2em; margin-right: 0.35em; }
+.btn-analyze svg { width: 1.15em; height: 1.15em; vertical-align: -0.2em; margin-right: 0.45em; }
+h1 svg { width: 1em; height: 1em; vertical-align: -0.12em; margin-right: 0.2em; }
+
+.remove-file svg { width: 1em; height: 1em; vertical-align: -0.15em; }
+.job-skill-tag svg { width: 0.95em; height: 0.95em; vertical-align: -0.12em; margin-right: 0.3em; }

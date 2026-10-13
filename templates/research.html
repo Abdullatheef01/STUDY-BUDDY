@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="research">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,6 +21,7 @@
 <body>
     <!-- Animated Background -->
     <div class="bg-container">
+        <canvas id="cite-net" aria-hidden="true"></canvas>
         <div class="glow glow-1"></div>
         <div class="glow glow-2"></div>
         <div class="glow glow-3"></div>
@@ -34,7 +35,7 @@
     <!-- Navigation -->
     <header class="navbar">
         <div class="logo">
-            <span class="icon">⚛️</span>
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/></svg></span>
             <span class="text">Paper<span class="gradient-text">AI</span></span>
         </div>
         <nav>
@@ -63,17 +64,17 @@
             
             <div class="features-grid">
                 <div class="feature-card stagger-entry">
-                    <div class="feature-icon">🚀</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c3 2 5 6 5 10l3 3-4 1c-1 2-2 3-4 4-2-1-3-2-4-4l-4-1 3-3c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.6"/></svg></div>
                     <h3>Constructor</h3>
                     <p>Transform technical repositories into structured IEEE research documents autonomously.</p>
                 </div>
                 <div class="feature-card stagger-entry">
-                    <div class="feature-icon">🔍</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
                     <h3>Deconstructor</h3>
                     <p>Upload complex papers and interact with them using Retrieval-Augmented Generation.</p>
                 </div>
                 <div class="feature-card stagger-entry">
-                    <div class="feature-icon">💾</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
                     <h3>Persistent</h3>
                     <p>Secure multi-session storage for all your academic and technical workflows.</p>
                 </div>
@@ -195,7 +196,7 @@
                     <!-- Upload State -->
                     <div id="upload-screen" class="upload-container">
                         <div class="upload-zone" id="drop-zone">
-                            <div class="upload-icon">📄</div>
+                            <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg></div>
                             <h3>Upload Research Papers</h3>
                             <p>Drag and drop PDF files or click to browse</p>
                             <input type="file" id="file-input" multiple accept=".pdf" class="hidden">
@@ -207,7 +208,7 @@
                     <div id="chat-screen" class="chat-container hidden">
                         <div class="message-feed" id="message-feed">
                             <div class="message system">
-                                <div class="avatar">🤖</div>
+                                <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="11" rx="2"/><path d="M12 9V4M8 4h8"/><circle cx="9.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><path d="M9.5 17h5"/></svg></div>
                                 <div class="bubble" id="initial-message">I've analyzed your papers. Ask me anything about the methodology, results, or data.</div>
                             </div>
                         </div>
@@ -216,7 +217,7 @@
                         </div>
                         <div class="chat-input-area">
                             <input type="text" id="chat-input" placeholder="Ask a question about the papers...">
-                            <button class="btn btn-gradient btn-icon" id="btn-send">➤</button>
+                            <button class="btn btn-gradient btn-icon" id="btn-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
                         </div>
                     </div>
                 </div>
@@ -231,5 +232,73 @@
     <!-- App Script -->
     <script>window.ACRA_AUTH = {{ 'true' if current_user.is_authenticated else 'false' }};</script>
     <script src="/static/js/research_app.js"></script>
+    <script>
+    /* Citation-network background — drifting knowledge-graph nodes in the
+       scholar violet/cyan palette. Canvas 2D, pauses when tab hidden,
+       skipped entirely under prefers-reduced-motion. */
+    (function () {
+        var canvas = document.getElementById('cite-net');
+        if (!canvas) { return; }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+        var ctx = canvas.getContext('2d');
+        var W = 0, H = 0, nodes = [];
+        var COLORS = ['139,92,246', '34,211,238', '168,85,247'];
+        var LINK_DIST = 130;
+
+        function resize() {
+            var dpr = Math.min(window.devicePixelRatio || 1, 2);
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            var n = Math.max(24, Math.min(90, Math.floor(W * H / 22000)));
+            nodes = [];
+            for (var i = 0; i < n; i++) {
+                nodes.push({
+                    x: Math.random() * W, y: Math.random() * H,
+                    vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+                    r: 1.4 + Math.random() * 2.2, c: COLORS[i % 3]
+                });
+            }
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        var last = 0, i, j, a, b, dx, dy, dist, alpha;
+        function tick(now) {
+            window.requestAnimationFrame(tick);
+            if (document.hidden) { return; }
+            if (now - last < 66) { return; } /* ~15fps: slow scholarly drift */
+            last = now;
+            ctx.clearRect(0, 0, W, H);
+            for (i = 0; i < nodes.length; i++) {
+                a = nodes[i];
+                a.x += a.vx; a.y += a.vy;
+                if (a.x < -20) { a.x = W + 20; } else if (a.x > W + 20) { a.x = -20; }
+                if (a.y < -20) { a.y = H + 20; } else if (a.y > H + 20) { a.y = -20; }
+            }
+            for (i = 0; i < nodes.length; i++) {
+                a = nodes[i];
+                for (j = i + 1; j < nodes.length; j++) {
+                    b = nodes[j];
+                    dx = a.x - b.x; dy = a.y - b.y;
+                    dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < LINK_DIST) {
+                        alpha = (1 - dist / LINK_DIST) * 0.22;
+                        ctx.strokeStyle = 'rgba(' + a.c + ',' + alpha.toFixed(3) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+                    }
+                }
+            }
+            for (i = 0; i < nodes.length; i++) {
+                a = nodes[i];
+                ctx.fillStyle = 'rgba(' + a.c + ',0.55)';
+                ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 6.2832); ctx.fill();
+            }
+        }
+        window.requestAnimationFrame(tick);
+    })();
+    </script>
 </body>
 </html>

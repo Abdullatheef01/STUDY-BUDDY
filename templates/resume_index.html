@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="resume">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="AI-powered resume analyzer with ATS scoring, semantic job matching, skill gap detection, and interview preparation. Upload your resume and get instant career guidance.">
     <title>AI Resume Analyzer | Intelligent Career Guidance Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 </head>
 <body>
     <!-- Animated Background -->
@@ -17,11 +17,13 @@
     
     <!-- Particles -->
     <div class="particles" id="particles"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+    <div class="scan-beam" aria-hidden="true"></div>
 
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <a href="/" class="nav-brand">
-            <div class="brand-icon">🧠</div>
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
             <span>ResumeAI</span>
         </a>
         <ul class="nav-links">
@@ -50,7 +52,7 @@
             <div class="upload-container">
                 <form id="uploadForm" enctype="multipart/form-data">
                     <div class="upload-card" id="uploadCard">
-                        <div class="upload-icon">📄</div>
+                        <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg></div>
                         <h3>Drop your resume here</h3>
                         <p>or click to browse files</p>
                         <div class="file-types">
@@ -60,22 +62,22 @@
                         <input type="file" class="file-input" id="fileInput" name="resume" accept=".pdf,.docx,.doc">
                         
                         <div class="file-selected" id="fileSelected">
-                            <span class="file-icon">📎</span>
+                            <span class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.5l-8.5 8.5a5.5 5.5 0 0 1-7.8-7.8L13 5a3.5 3.5 0 0 1 5 5l-8.5 8.5a1.5 1.5 0 0 1-2.1-2.1L15 9"/></svg></span>
                             <div class="file-info">
                                 <div class="file-name" id="fileName"></div>
                                 <div class="file-size" id="fileSize"></div>
                             </div>
-                            <button type="button" class="remove-file" id="removeFile" title="Remove file">✕</button>
+                            <button type="button" class="remove-file" id="removeFile" title="Remove file" aria-label="Remove file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
                         </div>
 
                         <div class="error-message" id="errorMessage">
-                            <span>⚠️</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 17H2z"/><path d="M12 10v4M12 17.5v.5"/></svg></span>
                             <span id="errorText"></span>
                         </div>
                     </div>
                     
                     <button type="submit" class="btn-analyze" id="analyzeBtn">
-                        <span>🚀 Analyze My Resume</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c3 2 5 6 5 10l3 3-4 1c-1 2-2 3-4 4-2-1-3-2-4-4l-4-1 3-3c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.6"/></svg><span>Analyze My Resume</span>
                     </button>
                 </form>
             </div>
@@ -90,32 +92,32 @@
         </div>
         <div class="features-grid">
             <div class="feature-card">
-                <div class="feature-icon">📊</div>
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg></div>
                 <h3>ATS Score Analysis</h3>
                 <p>Get a detailed ATS compatibility score with breakdown across sections, skills, content quality, and formatting.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🧠</div>
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></div>
                 <h3>BERT Semantic Matching</h3>
                 <p>AI-powered job matching using BERT embeddings to find roles that truly fit your experience, not just keywords.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🎯</div>
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></div>
                 <h3>Skill Gap Detection</h3>
                 <p>Instantly identify missing skills for your target roles, prioritized by demand across top matching jobs.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">✨</div>
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></div>
                 <h3>Resume Improvement</h3>
                 <p>Receive AI-generated suggestions to enhance your resume's impact, from structure to content to keywords.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🛤️</div>
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg></div>
                 <h3>Career Path Guidance</h3>
                 <p>Discover career paths aligned with your skills, with progression roadmaps and growth recommendations.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🎤</div>
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg></div>
                 <h3>Interview Preparation</h3>
                 <p>Practice with role-specific and company-specific interview questions plus curated coding challenges.</p>
             </div>
@@ -124,7 +126,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>Built with 🧠 AI &amp; ❤️ | AI Resume Analyzer &amp; Job Recommendation System</p>
+        <p>Built with AI for students | AI Resume Analyzer &amp; Job Recommendation System</p>
     </footer>
 
     <!-- Loading Overlay -->
@@ -133,23 +135,23 @@
         <div class="loading-text">Analyzing your resume...</div>
         <div class="loading-steps" id="loadingSteps">
             <div class="loading-step" data-step="1">
-                <span class="step-icon">⏳</span>
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 2h12M6 22h12M7 2v4l5 5 5-5V2M7 22v-4l5-5 5 5v4"/></svg></span>
                 <span>Extracting text from document</span>
             </div>
             <div class="loading-step" data-step="2">
-                <span class="step-icon">⏳</span>
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 2h12M6 22h12M7 2v4l5 5 5-5V2M7 22v-4l5-5 5 5v4"/></svg></span>
                 <span>Identifying skills &amp; experience</span>
             </div>
             <div class="loading-step" data-step="3">
-                <span class="step-icon">⏳</span>
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 2h12M6 22h12M7 2v4l5 5 5-5V2M7 22v-4l5-5 5 5v4"/></svg></span>
                 <span>Running BERT semantic analysis</span>
             </div>
             <div class="loading-step" data-step="4">
-                <span class="step-icon">⏳</span>
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 2h12M6 22h12M7 2v4l5 5 5-5V2M7 22v-4l5-5 5 5v4"/></svg></span>
                 <span>Calculating ATS score</span>
             </div>
             <div class="loading-step" data-step="5">
-                <span class="step-icon">⏳</span>
+                <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 2h12M6 22h12M7 2v4l5 5 5-5V2M7 22v-4l5-5 5 5v4"/></svg></span>
                 <span>Generating recommendations</span>
             </div>
         </div>

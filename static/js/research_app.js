@@ -424,7 +424,7 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
         const renderedText = (role === 'system') ? marked.parse(text) : text;
 
         msgDiv.innerHTML = `
-            <div class="avatar">${role === 'user' ? '👤' : '🤖'}</div>
+            <div class="avatar">${role === 'user' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="11" rx="2"/><path d="M12 9V4M8 4h8"/><circle cx="9.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><path d="M9.5 17h5"/></svg>'}</div>
             <div class="bubble">${renderedText}</div>
         `;
         messageFeed.appendChild(msgDiv);
@@ -544,7 +544,7 @@ I've loaded the context for **"${sessionName}"**. How can I help you explore thi
             uploadScreen.classList.remove('hidden');
             uploadScreen.innerHTML = `
                 <div class="upload-zone" id="drop-zone">
-                    <div class="upload-icon">📄</div>
+                    <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg></div>
                     <h3>Upload Research Papers</h3>
                     <p>Drag and drop PDF files or click to browse</p>
                     <input type="file" id="file-input" multiple accept=".pdf" class="hidden">

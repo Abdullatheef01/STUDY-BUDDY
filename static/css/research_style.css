@@ -1,11 +1,11 @@
 :root {
-    /* Color Palette - Midnight Neon */
-    --bg-dark: #0a0b1e;
-    --bg-darker: #050612;
-    --primary: #6366f1;
-    --primary-glow: rgba(99, 102, 241, 0.5);
-    --secondary: #ec4899;
-    --secondary-glow: rgba(236, 72, 153, 0.4);
+    /* Color Palette - Scholar Violet */
+    --bg-dark: #0e0722;
+    --bg-darker: #070310;
+    --primary: #8b5cf6;
+    --primary-glow: rgba(139, 92, 246, 0.5);
+    --secondary: #a855f7;
+    --secondary-glow: rgba(168, 85, 247, 0.4);
     --accent: #22d3ee;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
@@ -878,3 +878,22 @@ input:focus {
         display: none;
     }
 }
+
+/* ================================================================
+   Scholar theme motif — citation-network canvas (knowledge graph).
+   Pure canvas 2D: drifting nodes, edges between near nodes.
+   Calm under reduced motion (JS skips boot); fine without JS.
+   ================================================================ */
+#cite-net {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; opacity: 0.85;
+}
+
+/* Inline SVG icon sizing (emoji-free) */
+.logo .icon svg, .feature-icon svg, .upload-icon svg {
+    width: 1.35em; height: 1.35em; vertical-align: -0.25em;
+}
+.feature-icon svg, .upload-icon svg { width: 2rem; height: 2rem; }
+
+#btn-send svg { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }
