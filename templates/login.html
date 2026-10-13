@@ -29,6 +29,7 @@
         <p class="sub">Log in to pick up your analyses, goals and research sessions.</p>
         {% if error %}<div class="auth-error">{{ error }}</div>{% endif %}
         <form method="POST" action="{{ url_for('login', next=next) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="next" value="{{ next }}">
             <div class="field">
                 <label for="email">Email</label>

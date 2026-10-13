@@ -51,7 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Global State for Analysis ---
     let currentPaperAnalysis = null;
-    let currentPaperContext = null; 
+    let currentPaperContext = null;
+    // P0#1: session counter for the "New Session" button (was used but never declared).
+    let sessionCounter = 0;
+    // Client-side chat history (last exchanges sent to the backend for context).
+    const chatHistory = [];
 
     // --- Constructor Logic ---
     const constructorForm = document.getElementById('form-constructor');
@@ -60,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const formContainer = constructorForm.closest('.form-container');
 
     const steps = [
-        { id: 'step-fetch', text: 'Fetching Repository Source', duration: 1500 },
-        { id: 'step-vector', text: 'Building Vector Knowledge Base', duration: 2000 },
+        { id: 'step-fetch', text: 'Fetching live repository data from GitHub', duration: 1500 },
+        { id: 'step-vector', text: 'Analyzing file tree & languages', duration: 2000 },
         { id: 'step-analyze', text: 'AI Architecture Analysis', duration: 1800 },
         { id: 'step-generate', text: 'Drafting IEEE Paper', duration: 2500 }
     ];
@@ -233,6 +237,9 @@ function getIEEEHeader(title, author, institution) {
         words.forEach(w => freq[w] = (freq[w] || 0) + 1);
         const keywords = Object.keys(freq).sort((a, b) => freq[b] - freq[a]).slice(0, 12);
 
+        // P2#15: honest citation-marker count (never fabricated).
+        const citationMarkers = fullText.match(/\[\d+\]|\(\w+,\s\d{4}\)/g) || [];
+
         return {
             topic,
             fileName: file.name,
@@ -240,7 +247,7 @@ function getIEEEHeader(title, author, institution) {
             sections,
             keywords,
             pageCount: pdf.numPages,
-            citationCount: (fullText.match(/\[\d+\]|\(\w+,\s\d{4}\)/g) || []).length || Math.floor(Math.random() * 20) + 10,
+            citationCount: citationMarkers.length,
             timestamp: new Date().toLocaleTimeString()
         };
     }
@@ -273,67 +280,9 @@ function getIEEEHeader(title, author, institution) {
         return text.substring(startIdx, endIdx).trim();
     }
 
-    // --- Live Response Engine (Document-Grounded) ---
-    function generateDeconstructorResponse(query, context) {
-        if (!context) return "Please upload a research paper first.";
-
-        const q = query.toLowerCase();
-        const { sections, topic, keywords } = context;
-
-        // 1. Check for specific section queries
-        if (q.includes('summary') || q.includes('abstract') || q.includes('overview')) {
-            return formatResponse("Summary & Overview", sections.summary || findBestMatch(query, context.fullText, 600), topic);
-        }
-        if (q.includes('method') || q.includes('how') || q.includes('approach')) {
-            return formatResponse("Methodology Analysis", sections.methodology || findBestMatch(query, context.fullText, 800), topic);
-        }
-        if (q.includes('result') || q.includes('finding') || q.includes('performance') || q.includes('show')) {
-            return formatResponse("Key Results & Findings", sections.results || findBestMatch(query, context.fullText, 800), topic);
-        }
-        if (q.includes('conclusion') || q.includes('future') || q.includes('limit') || q.includes('discussion')) {
-            return formatResponse("Conclusion & Future Work", sections.conclusion || findBestMatch(query, context.fullText, 600), topic);
-        }
-        if (q.includes('cite') || q.includes('reference') || q.includes('who') || q.includes('bibli')) {
-            return formatResponse("Citations & References", sections.citations || "I've detected multiple references throughout the paper. Most citations are found in the bibliography section at the end.", topic);
-        }
-
-        // 2. Multi-Keyword Semantic Search (Fallback)
-        const bestContent = findBestMatch(query, context.fullText);
-        return formatResponse("Contextual Analysis", bestContent, topic);
-    }
-
-    function findBestMatch(query, text, length = 500) {
-        const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-        const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-        
-        let bestSentenceIdx = 0;
-        let maxScore = -1;
-
-        for (let i = 0; i < sentences.length; i++) {
-            let score = 0;
-            const s = sentences[i].toLowerCase();
-            queryWords.forEach(word => { if (s.includes(word)) score++; });
-            
-            if (score > maxScore) {
-                maxScore = score;
-                bestSentenceIdx = i;
-            }
-        }
-
-        // Return a window of sentences around the best match
-        const start = Math.max(0, bestSentenceIdx - 1);
-        const end = Math.min(sentences.length, bestSentenceIdx + 4);
-        let result = sentences.slice(start, end).join(' ').trim();
-        
-        return result.length > length ? result.substring(0, length) + "..." : result;
-    }
-
-    function formatResponse(title, content, topic) {
-        if (!content || content.length < 20) {
-            return `<strong>${title} — ${topic}</strong><br><br>The paper does not explicitly label this section, but the general context suggest a focus on <em>${topic}</em>. For deeper details, please ask about a specific technical aspect mentioned in the document.`;
-        }
-        return `<strong>${title} — ${topic}</strong><br><br>${content}`;
-    }
+    // NOTE (P2#16): the old mock Q&A engine (generateDeconstructorResponse /
+    // findBestMatch / formatResponse) was dead code - all chat goes through
+    // /api/chat_research now - so it has been removed.
 
     // --- File Upload Handler (Context-Aware) ---
     const handleFileUpload = async (files) => {
@@ -366,11 +315,14 @@ function getIEEEHeader(title, author, institution) {
 
                 // Show initial analysis message
                 messageFeed.innerHTML = '';
+                const citePhrase = currentPaperContext.citationCount > 0
+                    ? `detected **${currentPaperContext.citationCount} citation markers**`
+                    : 'found no bracketed citation markers';
                 addMessage('system', `
 **${currentPaperContext.topic}**
 
 ### Document Grounded Successfully
-I've verified the document **"${file.name}"** with **${currentPaperContext.pageCount} pages** and detected **${currentPaperContext.citationCount} citations**.
+I've verified the document **"${file.name}"** with **${currentPaperContext.pageCount} pages** and ${citePhrase}.
 
 **Extracted Keywords:** ${currentPaperContext.keywords.slice(0, 5).join(', ')}...
 
@@ -416,12 +368,16 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
     });
 
     // --- Message System ---
+    const escapeHtml = (s) => String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
     const addMessage = (role, text) => {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${role} stagger-entry`;
-        
-        // Parse markdown if it's from the system/assistant
-        const renderedText = (role === 'system') ? marked.parse(text) : text;
+
+        // Parse markdown if it's from the system/assistant; escape user input (XSS).
+        const renderedText = (role === 'system') ? marked.parse(text) : escapeHtml(text);
 
         msgDiv.innerHTML = `
             <div class="avatar">${role === 'user' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="11" rx="2"/><path d="M12 9V4M8 4h8"/><circle cx="9.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><path d="M9.5 17h5"/></svg>'}</div>
@@ -452,19 +408,20 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
 
         addMessage('user', text);
         chatInput.value = '';
+        chatHistory.push({ role: 'user', content: text });
 
         // Show typing indicator
         showTyping();
 
         try {
-            // Call the new Gemini-powered backend
+            // Call the Gemini-powered backend with real conversation history (P1#4).
             const response = await fetch('/api/chat_research', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: text,
-                    document_text: currentPaperContext.fullText || '',
-                    history: [],
+                    document_text: (currentPaperContext && currentPaperContext.fullText) || '',
+                    history: chatHistory.slice(-12),
                     research_session_id: researchSessionId
                 })
             });
@@ -482,6 +439,7 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
                 researchSessionId = String(data.research_session_id);
                 try { localStorage.setItem(ACRA_SESSION_KEY, researchSessionId); } catch (e) { /* ignore */ }
             }
+            chatHistory.push({ role: 'assistant', content: data.response || '' });
             addMessage('system', data.response);
         } catch (err) {
             hideTyping();
@@ -501,8 +459,9 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
         item.addEventListener('click', () => {
             sessionItems.forEach(s => s.classList.remove('active'));
             item.classList.add('active');
-            
+
             messageFeed.innerHTML = '';
+            chatHistory.length = 0; // switching sessions starts a fresh context
             const sessionName = item.textContent.trim();
             
             if (sessionName === 'Current Session' && !currentPaperContext) {
@@ -522,6 +481,7 @@ I've loaded the context for **"${sessionName}"**. How can I help you explore thi
         btnNewSession.addEventListener('click', () => {
             sessionCounter++;
             currentPaperContext = null;
+            chatHistory.length = 0;
             resetResearchSession(); // start a fresh server-side session too
 
             // Create new session item

@@ -2,7 +2,7 @@
 import io
 import re
 
-from unified_app import db, User, ResumeAnalysis, ResearchSession, Goal
+from unified_app import db, User, ResumeAnalysis, ResearchSession, Goal, AnonymousAnalysis
 from conftest import register, login, sample_pdf  # noqa: F401  (fixtures)
 
 
@@ -52,8 +52,8 @@ def test_register_login_logout_flow(client, app):
     assert resp.status_code == 200
     assert b"Aarav Sharma" in resp.data
 
-    # logout
-    resp = client.get("/logout", follow_redirects=False)
+    # logout (POST-only; GET /logout is 405 by design)
+    resp = client.post("/logout", follow_redirects=False)
     assert resp.status_code == 302
     assert client.get("/dashboard").status_code == 302  # locked again
 
@@ -69,9 +69,17 @@ def test_register_login_logout_flow(client, app):
     assert client.get("/dashboard").status_code == 200
 
 
+def test_logout_get_is_rejected(client):
+    # P2#11: sign-out must be a POST; a GET can never log the user out.
+    register(client)
+    resp = client.get("/logout")
+    assert resp.status_code == 405
+    assert client.get("/dashboard").status_code == 200  # still logged in
+
+
 def test_register_duplicate_email_rejected(client, app):
     assert register(client).status_code == 302
-    client.get("/logout")  # register page redirects logged-in users; test as anonymous
+    client.post("/logout")  # register page redirects logged-in users; test as anonymous
     resp = register(client)
     assert resp.status_code == 200
     assert b"already exists" in resp.data
@@ -106,7 +114,9 @@ def upload_resume(client, pdf_bytes, filename="resume.pdf"):
     }, content_type="multipart/form-data")
 
 
-def test_anonymous_analysis_works_and_not_persisted(client, app, sample_pdf):
+def test_anonymous_analysis_persists_with_ttl_not_in_user_history(client, app, sample_pdf):
+    # P1#8: anonymous results live in the DB (24h TTL), not per-process memory,
+    # and never leak into any user's history.
     resp = upload_resume(client, sample_pdf)
     assert resp.status_code == 200, resp.data[:500]
     payload = resp.get_json()
@@ -120,7 +130,13 @@ def test_anonymous_analysis_works_and_not_persisted(client, app, sample_pdf):
     assert b"ATS" in page.data or b"ats" in page.data
 
     with app.app_context():
-        assert ResumeAnalysis.query.count() == 0
+        assert ResumeAnalysis.query.count() == 0  # nothing in user history
+        rows = AnonymousAnalysis.query.all()
+        assert len(rows) == 1
+        assert rows[0].expires_at is not None
+
+    # unknown/expired ids bounce back to the resume page
+    assert client.get("/results/" + "0" * 32).status_code == 302
 
 
 def test_logged_in_analysis_persists_and_renders(client, app, sample_pdf):
@@ -134,7 +150,7 @@ def test_logged_in_analysis_persists_and_renders(client, app, sample_pdf):
         rows = ResumeAnalysis.query.all()
         assert len(rows) == 1
         row = rows[0]
-        assert row.filename == "resume.pdf"
+        assert row.filename.endswith("resume.pdf")  # uuid-prefixed (P2#13)
         assert row.ats_score is not None and row.ats_score > 0
         assert isinstance(row.result_json, dict)
         assert "skills" in row.result_json
@@ -156,7 +172,7 @@ def test_users_cannot_see_each_others_results(client, app, sample_pdf):
     payload = upload_resume(client, sample_pdf).get_json()
     other_result_url = payload["redirect"]
 
-    client.get("/logout")
+    client.post("/logout")
     register(client, name="User Two", email="user2@example.com")
     resp = client.get(other_result_url)
     assert resp.status_code == 404  # not theirs
@@ -215,8 +231,7 @@ def test_research_chat_without_key_returns_gracefully(client, app):
 
 def test_research_chat_saves_session_when_logged_in(client, app, monkeypatch):
     import unified_app
-    monkeypatch.setattr(unified_app, "GENAI_AVAILABLE", True)
-    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     monkeypatch.setattr(unified_app, "call_gemini_ai",
                         lambda prompt: "## Summary\nThis is a test answer.")
 
@@ -242,7 +257,7 @@ def test_research_chat_saves_session_when_logged_in(client, app, monkeypatch):
         assert msgs[0]["role"] == "user"
 
     # anonymous users get no persistence
-    client.get("/logout")
+    client.post("/logout")
     r3 = client.post("/api/chat_research",
                      json={"message": "hello?", "document_text": doc})
     assert "research_session_id" not in r3.get_json()
@@ -250,8 +265,7 @@ def test_research_chat_saves_session_when_logged_in(client, app, monkeypatch):
 
 def test_research_session_new_doc_starts_new_session(client, app, monkeypatch):
     import unified_app
-    monkeypatch.setattr(unified_app, "GENAI_AVAILABLE", True)
-    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     monkeypatch.setattr(unified_app, "call_gemini_ai", lambda prompt: "answer")
 
     register(client)

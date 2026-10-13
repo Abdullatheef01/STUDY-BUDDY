@@ -1,0 +1,28 @@
+# Render deployment for the AI Career & Research Assistant (Flask + gunicorn).
+# Replaces dashboard-only manual config (P2#19).
+services:
+  - type: web
+    name: acra
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    # 2 workers + threads handle concurrent uploads; 120s timeout covers the
+    # resume pipeline and Gemini calls (which fail fast at 30s per attempt).
+    startCommand: gunicorn unified_app:app --workers 2 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
+    healthCheckPath: /health
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false # set in the Render dashboard (from Google AI Studio)
+      - key: GITHUB_TOKEN
+        sync: false # optional: raises GitHub API rate limits for the paper constructor
+      - key: DATABASE_URL
+        fromDatabase:
+          name: acra-db
+          property: connectionString
+
+databases:
+  - name: acra-db
+    plan: free

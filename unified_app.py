@@ -9,40 +9,199 @@ Phase 1 (Foundation): Flask-SQLAlchemy + Flask-Login persistence.
 - Research chat sessions are saved per-user when logged in.
 """
 import os
+import re
 import sys
+import time
 import uuid
 import json
 import hashlib
-from datetime import datetime, date, timezone
+import secrets
+import logging
 
+from datetime import datetime, date, timedelta, timezone
+
+import requests
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (LoginManager, UserMixin, login_user, logout_user,
                          login_required, current_user)
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import CSRFError
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
+log = logging.getLogger("acra")
+
 # Load environment variables (.env for local dev, platform env vars in prod)
 load_dotenv()
 
-# google-generativeai is optional: the app must boot and serve everything
+# google-genai (new SDK) is optional: the app must boot and serve everything
 # except live Gemini calls even if the package / API key is missing.
 try:
-    import google.generativeai as genai
+    from google import genai as genai_client
+    from google.genai import types as genai_types
     _GENAI_IMPORTED = True
 except Exception:  # pragma: no cover - defensive
-    genai = None
+    genai_client = None
+    genai_types = None
     _GENAI_IMPORTED = False
 
-if _GENAI_IMPORTED and os.getenv("GEMINI_API_KEY"):
+# Sentinel API-key values that mean "not configured" (must stay in sync with
+# .env.example so a fresh setup always shows the friendly missing-key message).
+_GEMINI_KEY_SENTINELS = frozenset({
+    "", "your_actual_api_key_here", "<redacted>", "change-me",
+    "YOUR_GEMINI_API_KEY", "paste-your-key-here",
+})
+
+
+def _gemini_api_key():
+    """Return the configured Gemini key, or None when missing/placeholder."""
+    key = (os.getenv("GEMINI_API_KEY") or "").strip().strip('"').strip("'")
+    return key if key and key not in _GEMINI_KEY_SENTINELS else None
+
+
+def _ai_ready():
+    return _GENAI_IMPORTED and _gemini_api_key() is not None
+
+
+class GeminiError(Exception):
+    """A Gemini failure with a user-safe message (safe to return to clients)."""
+
+
+class GithubRepoError(Exception):
+    """A GitHub repository fetch failure with a user-safe message."""
+
+
+# --- Gemini model discovery cache (module level, refreshed hourly) ---
+_MODEL_CACHE = {"names": [], "fetched_at": 0.0}
+_MODEL_CACHE_TTL = 3600
+
+
+def _make_gemini_client():
+    """Build a genai client with a 30s HTTP timeout, or None when unusable.
+
+    The HTTP client is constructed explicitly (proxy + CA bundle from env)
+    because httpx's env parsing chokes on bracketed IPv6 entries that some
+    sandboxes put in no_proxy (e.g. "[::1]" -> "Invalid port" crash).
+    """
+    key = _gemini_api_key()
+    if not _GENAI_IMPORTED or not key:
+        return None
+    import httpx
+    proxy = (os.getenv("HTTPS_PROXY") or os.getenv("https_proxy")
+             or os.getenv("HTTP_PROXY") or os.getenv("http_proxy"))
+    verify = os.getenv("SSL_CERT_FILE") or True
+    # NB: both sync AND async clients must be supplied - the SDK builds an
+    # async client unconditionally, which would hit the same env bug.
+    http_client = httpx.Client(proxy=proxy, timeout=30.0,
+                               trust_env=False, verify=verify)
+    async_client = httpx.AsyncClient(proxy=proxy, timeout=30.0,
+                                     trust_env=False, verify=verify)
+    return genai_client.Client(
+        api_key=key,
+        http_options=genai_types.HttpOptions(
+            timeout=30_000,  # ms
+            httpx_client=http_client,
+            httpx_async_client=async_client),
+    )
+
+
+def _discover_model_names(client):
+    """Return cached generateContent-capable model names (hourly refresh)."""
+    now = time.monotonic()
+    if _MODEL_CACHE["names"] and now - _MODEL_CACHE["fetched_at"] < _MODEL_CACHE_TTL:
+        return list(_MODEL_CACHE["names"])
+    names = []
+    for m in client.models.list():
+        actions = [str(a).lower() for a in (getattr(m, "supported_actions", None) or [])]
+        if "generatecontent" in actions or "generate_content" in actions:
+            names.append(m.name)
+    # Prefer flash/pro variants first, keep the rest as fallbacks.
+    priority = [n for kw in ("flash", "pro") for n in names if kw in n.lower()]
+    ordered = priority + [n for n in names if n not in priority]
+    _MODEL_CACHE.update({"names": ordered, "fetched_at": now})
+    return list(ordered)
+
+
+def _github_get(path):
+    """GET a GitHub REST API path with timeout; raises GithubRepoError."""
+    headers = {"Accept": "application/vnd.github+json",
+               "User-Agent": "acra-student-platform"}
+    token = os.getenv("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = "Bearer {}".format(token.strip())
     try:
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        GENAI_AVAILABLE = True
-    except Exception:
-        GENAI_AVAILABLE = False
-else:
-    GENAI_AVAILABLE = False
+        resp = requests.get("https://api.github.com" + path, headers=headers, timeout=10)
+    except requests.RequestException as e:
+        raise GithubRepoError(
+            "Could not reach GitHub right now. Check your connection and try again."
+        ) from e
+    if resp.status_code == 404:
+        raise GithubRepoError("Repository not found on GitHub. Check the URL and try again.")
+    if resp.status_code == 403 and "rate limit" in resp.text.lower():
+        raise GithubRepoError("GitHub's API rate limit was hit. Please try again in a few minutes.")
+    if not resp.ok:
+        raise GithubRepoError("GitHub returned an unexpected response ({}).".format(resp.status_code))
+    return resp.json()
+
+
+def _fetch_repo_data(owner, repo):
+    """Fetch real repository facts from the GitHub API for the constructor."""
+    meta = _github_get("/repos/{}/{}".format(owner, repo))
+    languages = _github_get("/repos/{}/{}/languages".format(owner, repo)) or {}
+    readme_text = ""
+    try:
+        readme = _github_get("/repos/{}/{}/readme".format(owner, repo))
+        import base64
+        readme_text = base64.b64decode(readme.get("content", "") or "").decode(
+            "utf-8", "ignore")[:4000]
+    except GithubRepoError:
+        readme_text = ""
+    files, dirs = [], set()
+    try:
+        tree = _github_get("/repos/{}/{}/git/trees/HEAD?recursive=1".format(owner, repo))
+        for entry in (tree.get("tree") or [])[:3000]:
+            if entry.get("type") == "blob":
+                files.append(entry.get("path", ""))
+                if "/" in entry.get("path", ""):
+                    dirs.add(entry["path"].split("/")[0])
+    except GithubRepoError:
+        pass
+    total_lang_bytes = sum(languages.values()) or 1
+    top_languages = sorted(languages.items(), key=lambda kv: kv[1], reverse=True)[:5]
+    file_count = len(files)
+    complexity = ("High" if file_count > 200 or len(languages) > 6
+                  else "Moderate" if file_count > 50 else "Focused")
+    return {
+        "full_name": meta.get("full_name", "{}/{}".format(owner, repo)),
+        "description": (meta.get("description") or "No description provided.")[:500],
+        "stars": meta.get("stargazers_count", 0),
+        "forks": meta.get("forks_count", 0),
+        "primary_language": meta.get("language") or "Unknown",
+        "topics": (meta.get("topics") or [])[:10],
+        "top_languages": [(lang, round(100.0 * n / total_lang_bytes, 1))
+                          for lang, n in top_languages],
+        "file_count": file_count,
+        "top_dirs": sorted(dirs)[:12],
+        "sample_files": files[:40],
+        "has_tests": any("test" in f.lower() for f in files),
+        "has_docker": any(f.lower().endswith("dockerfile") or "docker-compose" in f.lower()
+                          for f in files),
+        "has_ci": any(".github/workflows" in f for f in files),
+        "readme": readme_text,
+        "complexity": complexity,
+    }
+
+
+def _parse_json_safely(text):
+    """Strip code fences and parse JSON; raises ValueError on failure."""
+    t = (text or "").strip()
+    t = re.sub(r"^```(?:json)?\s*", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\s*```$", "", t)
+    return json.loads(t.strip())
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -68,6 +227,8 @@ from preparation.coding_practice import (
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+csrf = CSRFProtect()
+limiter = Limiter(key_func=get_remote_address, default_limits=[])
 
 
 # ========================================================
@@ -109,7 +270,8 @@ class ResearchSession(db.Model):
     title = db.Column(db.String(255))
     data = db.Column(db.JSON)  # {"messages": [{"role":..., "content":...}], "doc_hash": ...}
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("research_sessions", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -128,6 +290,39 @@ class Goal(db.Model):
                                                      cascade="all, delete-orphan"))
 
 
+class AnonymousAnalysis(db.Model):
+    """A resume analysis for an anonymous visitor.
+
+    Replaces the old per-process RESULTS_CACHE dict so results survive
+    restarts and work across multiple gunicorn workers. Rows expire after
+    24h and are cleaned up opportunistically on each new analysis.
+    """
+    id = db.Column(db.String(36), primary_key=True)  # uuid4 hex
+    filename = db.Column(db.String(255))
+    result_json = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False, index=True)
+
+
+_ANON_TTL_SECONDS = 24 * 3600
+
+
+def _utcnow_naive():
+    """UTC now without tzinfo (SQLite returns naive datetimes)."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def _purge_expired_anonymous():
+    """Delete expired anonymous analyses (best-effort, never raises)."""
+    try:
+        AnonymousAnalysis.query.filter(
+            AnonymousAnalysis.expires_at < _utcnow_naive()).delete()
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        log.exception("Failed to purge expired anonymous analyses")
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
@@ -137,9 +332,9 @@ def load_user(user_id):
 # --- HELPERS ---
 # ========================================================
 
-# Server-side results storage for anonymous Resume Analyzer sessions
-# (logged-in users get their results persisted in the DB instead).
-RESULTS_CACHE = {}
+# Anonymous results now live in the AnonymousAnalysis table (P1#8).
+# (The old per-process RESULTS_CACHE dict was removed: it lost data on
+# every restart and broke under multiple gunicorn workers.)
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc'}
 
@@ -173,7 +368,25 @@ def is_safe_next(target):
 
 def create_app(config_overrides=None):
     app = Flask(__name__)
-    app.secret_key = os.getenv("SECRET_KEY", "unified-ai-platform-secret-2026")
+
+    # --- SECRET_KEY policy (P1#7) ---
+    # Refuse to boot in production without a real secret; in local dev use
+    # an ephemeral key with a loud warning (sessions won't survive restarts).
+    secret = os.getenv("SECRET_KEY")
+    _insecure = {None, "", "change-me-to-a-long-random-secret",
+                 "unified-ai-platform-secret-2026"}
+    if secret in _insecure:
+        is_prod = (os.getenv("FLASK_ENV") == "production"
+                   or os.getenv("RENDER") or os.getenv("DYNO"))
+        if is_prod:
+            raise RuntimeError(
+                "SECRET_KEY is not set (or is still the placeholder). "
+                "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\" "
+                "and set it as an environment variable.")
+        secret = secrets.token_hex(32)
+        print("WARNING: SECRET_KEY is not set - using an ephemeral key for this "
+              "local dev run. Set SECRET_KEY in .env for real use.")
+    app.secret_key = secret
 
     app.config["SQLALCHEMY_DATABASE_URI"] = get_db_url()
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -189,13 +402,58 @@ def create_app(config_overrides=None):
     login_manager.init_app(app)
     login_manager.login_view = "login"
     login_manager.login_message_category = "info"
+    csrf.init_app(app)
+    limiter.init_app(app)
+    if app.config.get("TESTING"):
+        limiter.enabled = False
 
     register_routes(app)
+    register_error_handlers(app)
 
     with app.app_context():
         db.create_all()
 
     return app
+
+
+def _error_payload(code, message):
+    """JSON for API routes, styled page otherwise (P2#10)."""
+    if request.path.startswith("/api/"):
+        return jsonify({"error": message}), code
+    return render_template("error.html", code=code, message=message), code
+
+
+def register_error_handlers(app):
+    @app.errorhandler(400)
+    def bad_request(e):
+        return _error_payload(400, getattr(e, "description", None)
+                              or "That request wasn't quite right. Please try again.")
+
+    @app.errorhandler(CSRFError)
+    def csrf_error(e):
+        log.warning("CSRF validation failed: %s", e.description)
+        return _error_payload(400, "Security check failed (expired form). "
+                                   "Please reload the page and try again.")
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return _error_payload(404, "The page you asked for doesn't exist.")
+
+    @app.errorhandler(405)
+    def method_not_allowed(e):
+        return _error_payload(405, getattr(e, "description", None)
+                              or "That action isn't allowed with this method.")
+
+    @app.errorhandler(429)
+    def rate_limited(e):
+        return _error_payload(429, "You're moving a bit fast. "
+                                   "Please wait a moment and try again.")
+
+    @app.errorhandler(500)
+    def server_error(e):
+        log.exception("Unhandled 500 error")
+        return _error_payload(500, "Something went wrong on our side. "
+                                   "Please try again in a moment.")
 
 
 # ========================================================
@@ -260,8 +518,12 @@ def register_routes(app):
         return render_template('login.html', error=error,
                                next=request.args.get('next', ''))
 
-    @app.route('/logout')
+    @app.route('/logout', methods=['GET', 'POST'])
     def logout():
+        # Sign-out must be a POST (CSRF-protected form) so a stray GET —
+        # e.g. a prefetched link — can never log the user out (P2#11).
+        if request.method == 'GET':
+            abort(405, description="Please use the Log out button to sign out.")
         logout_user()
         flash('You have been logged out.', 'info')
         return redirect(url_for('index'))
@@ -273,9 +535,13 @@ def register_routes(app):
         return render_template('resume_index.html')
 
     @app.route('/analyze', methods=['POST'])
+    @limiter.limit("20 per hour")
     def analyze():
         """Handle resume upload and analysis. Works anonymously; when logged in
-        the result is also persisted as a ResumeAnalysis row."""
+        the result is also persisted as a ResumeAnalysis row.
+
+        Note: fetch-based upload (resume_script.js); CSRF-exempt like the
+        other JSON APIs. Login/register/goals forms carry CSRF tokens."""
         if 'resume' not in request.files:
             return jsonify({'error': 'No file uploaded'}), 400
 
@@ -286,9 +552,11 @@ def register_routes(app):
         if not allowed_file(file.filename):
             return jsonify({'error': 'Invalid file type. Please upload PDF or DOCX.'}), 400
 
+        # P2#13: uuid prefix prevents filename collisions between uploads.
+        filename = "{}_{}".format(uuid.uuid4().hex[:8], secure_filename(file.filename))
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
         try:
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
             # Step 1: Extract text
@@ -326,12 +594,6 @@ def register_routes(app):
             top_role = recommendations[0]['title'] if recommendations else 'Software Engineer'
             interview_qs = generate_interview_questions(top_role, skill_names[:5])
 
-            # Clean up
-            try:
-                os.remove(filepath)
-            except OSError:
-                pass
-
             result = {
                 'contact': {'email': email, 'phone': phone, 'links': links},
                 'sections_found': list(sections.keys()),
@@ -352,7 +614,8 @@ def register_routes(app):
                 'filename': filename
             }
 
-            # Persist for logged-in users; anonymous users use the memory cache.
+            # Persist for logged-in users; anonymous users get a DB row with
+            # a 24h TTL (survives restarts, works across workers).
             if current_user.is_authenticated:
                 row = ResumeAnalysis(
                     user_id=current_user.id,
@@ -363,21 +626,38 @@ def register_routes(app):
                 )
                 db.session.add(row)
                 db.session.commit()
+                _purge_expired_anonymous()
                 return jsonify({'success': True,
                                 'redirect': url_for('view_result', analysis_id='db-{}'.format(row.id))})
 
-            analysis_id = str(uuid.uuid4())
-            RESULTS_CACHE[analysis_id] = result
-            session['last_analysis_id'] = analysis_id
+            analysis_id = uuid.uuid4().hex
+            anon = AnonymousAnalysis(
+                id=analysis_id,
+                filename=filename,
+                result_json=json_safe(result),
+                expires_at=_utcnow_naive() + timedelta(seconds=_ANON_TTL_SECONDS),
+            )
+            db.session.add(anon)
+            db.session.commit()
+            _purge_expired_anonymous()
             return jsonify({'success': True,
                             'redirect': url_for('view_result', analysis_id=analysis_id)})
 
-        except Exception as e:
-            return jsonify({'error': 'Analysis failed: {}'.format(str(e))}), 500
+        except Exception:
+            log.exception("Resume analysis failed")
+            return jsonify({'error': 'Analysis failed. Please try again with a different file.'}), 500
+        finally:
+            # P2#14: failed analyses must not leak uploaded files.
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
+
+    csrf.exempt(analyze)
 
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
-        """Render a single analysis result (anonymous cache or saved DB row)."""
+        """Render a single analysis result (anonymous DB row or saved DB row)."""
         if analysis_id.startswith('db-'):
             if not current_user.is_authenticated:
                 return redirect(url_for('login', next=request.path))
@@ -389,10 +669,10 @@ def register_routes(app):
             if not row or row.user_id != current_user.id:
                 abort(404)
             return render_template('dashboard.html', result=row.result_json)
-        result = RESULTS_CACHE.get(analysis_id)
-        if not result:
+        anon = db.session.get(AnonymousAnalysis, analysis_id)
+        if not anon or anon.expires_at < _utcnow_naive():
             return redirect(url_for('resume_home'))
-        return render_template('dashboard.html', result=result)
+        return render_template('dashboard.html', result=anon.result_json)
 
     @app.route('/dashboard')
     @login_required
@@ -485,24 +765,58 @@ def register_routes(app):
         return jsonify(get_available_topics())
 
     @app.route('/api/chat_research', methods=['POST'])
+    @limiter.limit("30 per hour")
     def api_chat_research():
         """Gemini-powered Document Intelligence Chat with Resilience.
 
-        When the caller is logged in, the conversation is appended to a
-        per-user ResearchSession (returned as research_session_id)."""
+        Accepts the frontend's `history` (last exchanges) and merges it with
+        the server-side ResearchSession when logged in, so follow-up
+        questions keep context. When the caller is logged in, the
+        conversation is appended to a per-user ResearchSession (returned as
+        research_session_id)."""
         try:
             data = request.get_json(silent=True) or {}
-            user_msg = data.get('message')
+            # P2#17: never send the literal string "None" to the model.
+            user_msg = (data.get('message') or '').strip()
+            if not user_msg:
+                return jsonify({'error': 'Please type a question first.'}), 400
             doc_text = data.get('document_text', '') or ''
-            client_session_id = data.get('research_session_id')
 
-            if not GENAI_AVAILABLE or not os.getenv("GEMINI_API_KEY") \
-                    or os.getenv("GEMINI_API_KEY") == "your_actual_api_key_here":
+            if not _ai_ready():
                 return jsonify({'response': "<strong>API Key Missing</strong><br><br>Please add your Gemini API Key to the .env file."}), 200
+
+            # --- Conversation history (P1#4) ---
+            # Prefer the server-side session (authoritative, tamper-proof);
+            # fall back to the client-supplied history for anonymous users.
+            history_lines = []
+            server_session = None
+            client_session_id = data.get('research_session_id')
+            if current_user.is_authenticated and client_session_id:
+                try:
+                    server_session = ResearchSession.query.filter_by(
+                        id=int(client_session_id),
+                        user_id=current_user.id).first()
+                except (ValueError, TypeError):
+                    server_session = None
+            if server_session and (server_session.data or {}).get("messages"):
+                for m in (server_session.data["messages"])[-12:]:
+                    role = "User" if m.get("role") == "user" else "Assistant"
+                    history_lines.append("{}: {}".format(
+                        role, str(m.get("content", ""))[:1500]))
+            else:
+                client_history = data.get('history') or []
+                if isinstance(client_history, list):
+                    for h in client_history[-12:]:
+                        if isinstance(h, dict) and str(h.get('content') or '').strip():
+                            role = "User" if h.get('role') == 'user' else "Assistant"
+                            history_lines.append("{}: {}".format(
+                                role, str(h['content'])[:1500]))
+            history_block = ("\nCONVERSATION SO FAR (for context):\n" + "\n".join(history_lines)
+                             if history_lines else "")
 
             prompt = """
             You are a PhD-level Research Assistant. You are grounded 100% in the following document text.
-
+            {history}
             DOCUMENT TEXT:
             {doc}
 
@@ -515,13 +829,17 @@ def register_routes(app):
             3. Structure your response with Markdown (use bolding for key terms, bullet points for lists, and headers if appropriate).
             4. If the answer is directly in the text, cite the context professionally.
             5. If the answer is not present, state so clearly in a formal manner.
-            """.format(doc=doc_text[:15000], q=user_msg)
+            6. Use the conversation history above to resolve follow-up references like "it", "that section", or "the second point".
+            """.format(history=history_block, doc=doc_text[:15000], q=user_msg)
 
-            response_text = call_gemini_ai(prompt)
+            try:
+                response_text = call_gemini_ai(prompt)
+            except GeminiError as e:
+                return jsonify({'error': str(e)}), 502
 
             # Persist the exchange for logged-in users.
             saved_session_id = None
-            if current_user.is_authenticated and user_msg:
+            if current_user.is_authenticated:
                 saved_session_id = _save_research_exchange(
                     current_user.id, client_session_id, user_msg, response_text, doc_text)
 
@@ -530,59 +848,118 @@ def register_routes(app):
                 payload['research_session_id'] = saved_session_id
             return jsonify(payload)
 
-        except Exception as e:
-            print("DEBUG: Global AI Error: {}".format(e))
-            return jsonify({'error': str(e)}), 500
+        except Exception:
+            log.exception("Research chat failed")
+            return jsonify({'error': 'The research assistant hit an unexpected error. Please try again.'}), 500
+
+    csrf.exempt(api_chat_research)
 
     @app.route('/api/constructor_generate', methods=['POST'])
+    @limiter.limit("10 per hour")
     def api_constructor_generate():
-        """Real AI-powered IEEE Research Paper Generation."""
+        """AI-powered IEEE Research Paper Generation from a REAL repository.
+
+        Fetches live repository facts from the GitHub API and grounds the
+        prompt in them, so statistics reflect the actual repo (P1#3)."""
         try:
             data = request.get_json(silent=True) or {}
-            repo_url = data.get('repo_url')
-            author = data.get('author')
-            institution = data.get('institution')
+            # P2#20: reject empty input server-side (never generate about "None").
+            repo_url = (data.get('repo_url') or '').strip()
+            if not repo_url:
+                return jsonify({'error': 'Please paste a GitHub repository URL first.'}), 400
+            author = (data.get('author') or 'Anonymous').strip() or 'Anonymous'
+            institution = (data.get('institution') or 'Independent Research').strip() \
+                or 'Independent Research'
 
-            print("DEBUG: Generating AI Paper for: {}".format(repo_url))
+            if not _ai_ready():
+                return jsonify({'error': 'API Key Missing. Add GEMINI_API_KEY to use the constructor.'}), 400
 
-            if not GENAI_AVAILABLE or not os.getenv("GEMINI_API_KEY") \
-                    or os.getenv("GEMINI_API_KEY") == "your_actual_api_key_here":
-                return jsonify({'error': 'API Key Missing'}), 400
+            match = re.match(
+                r'https?://github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?/?$', repo_url, re.IGNORECASE)
+            if not match:
+                return jsonify({'error': 'That doesn\u2019t look like a GitHub repository URL '
+                                         '(expected https://github.com/owner/repo).'}), 400
+            owner, repo = match.group(1), match.group(2)
 
-            prompt = """
-            Generate a strictly professional IEEE Research Paper draft based on the repository: {repo}
-            Author: {author}
-            Institution: {inst}
+            try:
+                repo_data = _fetch_repo_data(owner, repo)
+            except GithubRepoError as e:
+                return jsonify({'error': str(e)}), 502
 
-            You are a PhD-level architect. Provide an EXTREMELY IN-DEPTH technical response in JSON format.
+            lang_lines = "\n".join(
+                "- {}: {}%".format(lang, pct)
+                for lang, pct in repo_data["top_languages"]) or "- Unknown"
+            prompt = (
+                "Generate a strictly professional IEEE Research Paper draft based on the REAL "
+                "repository data below. Author: {author}. Institution: {inst}.\n\n"
+                "REPOSITORY FACTS (from the live GitHub API - base EVERY statistic on these, "
+                "never invent numbers):\n"
+                "- Repository: {full_name}\n"
+                "- Description: {desc}\n"
+                "- Stars: {stars} | Forks: {forks}\n"
+                "- Primary language: {primary_lang}\n"
+                "- Language breakdown:\n{langs}\n"
+                "- Files indexed: {files}\n"
+                "- Top-level directories: {dirs}\n"
+                "- Representative files: {sample}\n"
+                "- Has automated tests: {tests}\n"
+                "- Has Docker: {docker}\n"
+                "- Has CI workflows: {ci}\n"
+                "- README excerpt: {readme}\n\n"
+                "You are a PhD-level architect. Provide an EXTREMELY IN-DEPTH technical response "
+                "in JSON format.\n\n"
+                "REQUIRED JSON KEYS (Must be exactly these):\n"
+                "- title: Academic Title\n"
+                "- abstract: 200 word technical summary\n"
+                "- introduction: 250+ word technical introduction\n"
+                "- lit_review: 200+ word literature review\n"
+                "- architecture: 300+ word architecture breakdown\n"
+                "- implementation: 250+ word technical implementation details\n"
+                "- results: 200+ word results/analysis\n"
+                "- conclusion: Formal conclusion\n"
+                "- stats: {{\"files\": {files}, \"complexity\": \"{complexity}\", "
+                "\"confidence\": \"High - grounded in live repository data\"}}\n\n"
+                "STRICTION: Return ONLY raw JSON. No conversational filler. Use exactly the keys "
+                "listed above."
+            ).format(
+                author=author, inst=institution,
+                full_name=repo_data["full_name"], desc=repo_data["description"],
+                stars=repo_data["stars"], forks=repo_data["forks"],
+                primary_lang=repo_data["primary_language"], langs=lang_lines,
+                files=repo_data["file_count"],
+                dirs=", ".join(repo_data["top_dirs"]) or "flat layout",
+                sample=", ".join(repo_data["sample_files"][:15]) or "n/a",
+                tests=repo_data["has_tests"], docker=repo_data["has_docker"],
+                ci=repo_data["has_ci"],
+                readme=repo_data["readme"] or "No README found.",
+                complexity=repo_data["complexity"],
+            )
 
-            REQUIRED JSON KEYS (Must be exactly these):
-            - title: Academic Title
-            - abstract: 200 word technical summary
-            - introduction: 250+ word technical introduction
-            - lit_review: 200+ word literature review
-            - architecture: 300+ word architecture breakdown
-            - implementation: 250+ word technical implementation details
-            - results: 200+ word results/analysis
-            - conclusion: Formal conclusion
-            - stats: {{ "files": number, "complexity": "Extreme/High/Moderate", "confidence": "percentage" }}
-
-            STRICTION: Return ONLY raw JSON. No conversational filler. Use exactly the keys listed above.
-            """.format(repo=repo_url, author=author, inst=institution)
-
-            response_text = call_gemini_ai(prompt)
-            # Clean potential markdown from AI response
-            if "```json" in response_text:
-                response_text = response_text.split("```json")[1].split("```")[0].strip()
-            elif "```" in response_text:
-                response_text = response_text.split("```")[1].split("```")[0].strip()
-
-            analysis = json.loads(response_text)
+            # P1#5: robust JSON parsing - strip fences, retry once, then fail
+            # gracefully with 502 (never 500 on model deviation).
+            analysis = None
+            attempts = 0
+            while attempts < 2 and analysis is None:
+                attempts += 1
+                try:
+                    response_text = call_gemini_ai(prompt)
+                except GeminiError as e:
+                    return jsonify({'error': str(e)}), 502
+                try:
+                    analysis = _parse_json_safely(response_text)
+                except (ValueError, json.JSONDecodeError):
+                    log.warning("Constructor: model returned non-JSON (attempt %d)", attempts)
+                    analysis = None
+            if analysis is None:
+                return jsonify({'error': 'The AI returned an unreadable draft. '
+                                         'Please try again in a moment.'}), 502
             return jsonify({'success': True, 'analysis': analysis})
 
-        except Exception as e:
-            print("DEBUG: Constructor Error: {}".format(e))
-            return jsonify({'error': str(e)}), 500
+        except Exception:
+            log.exception("Constructor failed")
+            return jsonify({'error': 'Paper generation hit an unexpected error. Please try again.'}), 500
+
+    csrf.exempt(api_constructor_generate)
 
 
 def _save_research_exchange(user_id, client_session_id, user_msg, ai_response, doc_text):
@@ -620,72 +997,53 @@ def _save_research_exchange(user_id, client_session_id, user_msg, ai_response, d
     return sess.id
 
 
-# --- AI Resiliency Helper ---
-def call_gemini_ai(prompt):
-    """Dynamically discover and call the best available Gemini model."""
-    if not GENAI_AVAILABLE:
-        raise Exception("google-generativeai is not installed or no GEMINI_API_KEY is set. "
-                        "Add it to use AI features.")
+# --- AI Resiliency Helper (google-genai SDK, P1#9) ---
+def call_gemini_ai(prompt, max_attempts=4):
+    """Call the best available Gemini model with fail-fast semantics (P0#2).
+
+    - Model discovery hits the API at most once per hour (module-level cache).
+    - The HTTP client carries a 30s timeout: no more 30-60s hangs.
+    - Any failure raises GeminiError with a user-safe message (never leaks
+      SDK/proxy internals); endpoints translate it to HTTP 502.
+    """
+    client = _make_gemini_client()
+    if client is None:
+        raise GeminiError(
+            "AI features need a Gemini API key. Add GEMINI_API_KEY to your "
+            ".env file (free at Google AI Studio) and restart.")
+
     try:
-        models_info = genai.list_models()
-
-        # Collect candidates that explicitly support generateContent
-        candidates = []
-        for m in models_info:
-            methods = getattr(m, "supported_generation_methods", None) or []
-            methods_lower = [str(x).lower() for x in methods]
-
-            # Accept both possible spellings that may show up in SDKs
-            supports_generate_content = (
-                "generatecontent" in methods_lower or
-                "generate_content" in methods_lower
-            )
-
-            if supports_generate_content:
-                candidates.append((m.name, methods))
-
-        # If none matched, fail with a helpful diagnostic showing what is available
-        if not candidates:
-            available = [(m.name, getattr(m, "supported_generation_methods", None) or []) for m in models_info]
-            debug_list = "\n".join(["- {}: {}".format(name, methods) for name, methods in available[:50]])
-            raise Exception(
-                "No available Gemini models support generateContent/generate_content for this SDK.\n"
-                "Available models (sample):\n{}".format(debug_list)
-            )
-
-        # Prioritize flash/pro by name, then keep the rest
-        priority = []
-        for keyword in ["flash", "pro"]:
-            for name, methods in candidates:
-                if keyword in name.lower() and (name, methods) not in priority:
-                    priority.append((name, methods))
-        for item in candidates:
-            if item not in priority:
-                priority.append(item)
-
-        models_to_try = [name for name, _ in priority]
-
-        print("DEBUG: Found {} eligible AI models. Trying best match...".format(len(models_to_try)))
-        last_error = None
-
-        for model_name in models_to_try:
-            try:
-                print("DEBUG: Attempting AI call with discovered model: {}".format(model_name))
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(prompt)  # python SDK uses snake_case
-                print("DEBUG: Success with model: {}".format(model_name))
-                return response.text
-            except Exception as e:
-                print("DEBUG: Model {} failed: {}".format(model_name, e))
-                last_error = str(e)
-                continue
-
-        raise Exception("All {} eligible Gemini models failed. Last error: {}".format(
-            len(models_to_try), last_error))
-
+        model_names = _discover_model_names(client)
     except Exception as e:
-        print("DEBUG: Discovery/Call failure: {}".format(e))
-        raise e
+        log.warning("Gemini model discovery failed: %r", e)
+        msg = str(e)
+        if ("API_KEY_INVALID" in msg or "API key not valid" in msg
+                or "API_KEY_EXPIRED" in msg):
+            raise GeminiError(
+                "Your Gemini API key was rejected. Check GEMINI_API_KEY "
+                "in your .env file and try again.")
+        raise GeminiError(
+            "Could not reach the AI service. Please try again in a moment.")
+    if not model_names:
+        raise GeminiError(
+            "No usable AI models are available for this API key right now.")
+
+    log.info("Gemini: %d eligible models, trying up to %d",
+             len(model_names), max_attempts)
+    for model_name in model_names[:max_attempts]:
+        try:
+            response = client.models.generate_content(
+                model=model_name, contents=prompt)
+            text = (getattr(response, "text", "") or "").strip()
+            if text:
+                return text
+            log.warning("Gemini model %s returned empty text", model_name)
+        except Exception as e:
+            log.warning("Gemini model %s failed: %r", model_name, e)
+            continue
+
+    raise GeminiError(
+        "The AI service is temporarily unavailable. Please try again shortly.")
 
 
 app = create_app()

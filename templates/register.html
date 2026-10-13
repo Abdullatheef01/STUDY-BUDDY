@@ -27,6 +27,7 @@
         <p class="sub">Save resume analyses, track career goals, and keep research sessions — free for students.</p>
         {% if error %}<div class="auth-error">{{ error }}</div>{% endif %}
         <form method="POST" action="{{ url_for('register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="field">
                 <label for="name">Full name</label>
                 <input type="text" id="name" name="name" placeholder="Aarav Sharma" required value="{{ request.form.get('name', '') }}">
