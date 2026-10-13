@@ -636,6 +636,16 @@ def register_routes(app):
         """Unified Platform Landing Page (The Hub)."""
         return render_template('index.html')
 
+    @app.route('/privacy')
+    def privacy():
+        """Privacy Policy page."""
+        return render_template('privacy.html')
+
+    @app.route('/terms')
+    def terms():
+        """Terms of Service page."""
+        return render_template('terms.html')
+
     @app.route('/health')
     def health():
         return jsonify({'status': 'ok'})
@@ -666,7 +676,8 @@ def register_routes(app):
                 login_user(user)
                 flash('Welcome, {}! Your account is ready.'.format(user.name), 'success')
                 return redirect(url_for('dashboard'))
-        return render_template('register.html', error=error)
+        return render_template('register.html', error=error,
+                               google_configured=_google_configured())
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():

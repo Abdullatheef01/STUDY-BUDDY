@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="hub">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Unified AI Excellence Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050612;
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #22d3ee;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(circle at 50% 0%, #0a0b1e, #050612);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+        .wrap { max-width: 820px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+        .back { display: inline-block; margin-bottom: 2rem; color: var(--accent); text-decoration: none; font-weight: 600; }
+        .back:hover { text-decoration: underline; }
+        h1 { font-family: 'Outfit', sans-serif; font-size: 2.4rem; margin-bottom: 0.4rem;
+             background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+             -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .updated { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2.5rem; }
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(12px);
+        }
+        h2 { font-family: 'Outfit', sans-serif; font-size: 1.25rem; margin-bottom: 0.8rem; color: var(--accent); }
+        p, li { color: #cbd5e1; font-size: 0.98rem; }
+        p { margin-bottom: 0.9rem; }
+        ul { padding-left: 1.3rem; margin-bottom: 0.9rem; }
+        li { margin-bottom: 0.4rem; }
+        a { color: var(--accent); }
+        footer { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2rem; }
+        footer a { color: var(--text-muted); margin: 0 0.6rem; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a class="back" href="{{ url_for('index') }}">&larr; Back to home</a>
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: 13 October 2026</p>
+
+        <div class="card">
+            <h2>1. What we collect</h2>
+            <p>To provide career and research intelligence, we collect:</p>
+            <ul>
+                <li><strong>Account information:</strong> your name, email address, and a securely hashed password — or your Google profile (name, email, avatar) when you sign in with Google.</li>
+                <li><strong>Content you upload:</strong> resumes, research papers, and other documents you choose to analyze.</li>
+                <li><strong>Connected profiles:</strong> GitHub and LeetCode usernames you link, plus the public profile data fetched from those services.</li>
+                <li><strong>Usage data:</strong> your saved analyses, research sessions, goals, and application tracking activity within the platform.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>2. How we use it</h2>
+            <p>Your data is used solely to operate the platform: authenticating you, running resume and research analyses, saving your history, and improving the relevance of recommendations. We do not sell your personal data, and we do not use your resumes or documents for advertising.</p>
+        </div>
+
+        <div class="card">
+            <h2>3. Third-party services</h2>
+            <ul>
+                <li><strong>Google:</strong> identity verification when you choose Google sign-in (we request only basic profile scopes).</li>
+                <li><strong>Google Gemini API:</strong> document text you submit for analysis is processed by the AI model to generate results.</li>
+                <li><strong>GitHub / LeetCode:</strong> public profile data is fetched only for usernames you explicitly connect.</li>
+            </ul>
+            <p>Each of these services processes data under its own privacy policy.</p>
+        </div>
+
+        <div class="card">
+            <h2>4. Data storage &amp; security</h2>
+            <p>Data is stored in the application's secured database. Passwords are stored only as irreversible hashes. Uploaded files are processed and removed after analysis. We apply industry-standard safeguards, though no online service can guarantee absolute security.</p>
+        </div>
+
+        <div class="card">
+            <h2>5. Your rights</h2>
+            <p>You may review your saved data on your dashboard at any time. To request correction or deletion of your account and all associated data, contact us and we will action it promptly.</p>
+        </div>
+
+        <div class="card">
+            <h2>6. Changes</h2>
+            <p>We may update this policy as the platform evolves. Material changes will be reflected in the "Last updated" date above.</p>
+        </div>
+    </div>
+    <footer>
+        <a href="{{ url_for('privacy') }}">Privacy</a> · <a href="{{ url_for('terms') }}">Terms</a> · <a href="{{ url_for('index') }}">Home</a>
+    </footer>
+</body>
+</html>
