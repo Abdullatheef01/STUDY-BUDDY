@@ -1,0 +1,2467 @@
+{
+  "meta": {
+    "last_updated": "2026-10-01",
+    "currency": "INR",
+    "unit": "LPA",
+    "disclaimer": "Indicative market ranges curated for student guidance (October 2026). Not live-scraped; actual offers vary by company, skills, and negotiation."
+  },
+  "roles": [
+    "Software Development Engineer",
+    "Data Analyst",
+    "Data Scientist / ML Engineer",
+    "UI/UX Designer",
+    "DevOps Engineer",
+    "Cloud Engineer",
+    "Cybersecurity Analyst",
+    "QA Engineer",
+    "Business Analyst",
+    "Product Manager",
+    "Digital Marketing Specialist",
+    "Content Writer"
+  ],
+  "tiers": {
+    "tier1": {
+      "label": "Tier 1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ]
+    },
+    "tier2": {
+      "label": "Tier 2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ]
+    },
+    "tier3": {
+      "label": "Tier 3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ]
+    }
+  },
+  "experience_bands": [
+    "0-1",
+    "1-3",
+    "3-5",
+    "5+"
+  ],
+  "entries": [
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.0,
+      "median_lpa": 8.0,
+      "max_lpa": 14.0
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 7.0,
+      "median_lpa": 12.0,
+      "max_lpa": 22.0
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 12.0,
+      "median_lpa": 20.0,
+      "max_lpa": 35.0
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 18.0,
+      "median_lpa": 30.0,
+      "max_lpa": 55.0
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.2,
+      "median_lpa": 6.4,
+      "max_lpa": 11.2
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 5.6,
+      "median_lpa": 9.6,
+      "max_lpa": 17.6
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 9.6,
+      "median_lpa": 16.0,
+      "max_lpa": 28.0
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 14.4,
+      "median_lpa": 24.0,
+      "max_lpa": 44.0
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.6,
+      "median_lpa": 5.1,
+      "max_lpa": 9.0
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.5,
+      "median_lpa": 7.7,
+      "max_lpa": 14.1
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 7.7,
+      "median_lpa": 12.8,
+      "max_lpa": 22.4
+    },
+    {
+      "role": "Software Development Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 11.5,
+      "median_lpa": 19.2,
+      "max_lpa": 35.2
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.0,
+      "median_lpa": 6.5,
+      "max_lpa": 11.0
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 6.0,
+      "median_lpa": 9.0,
+      "max_lpa": 15.0
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 9.0,
+      "median_lpa": 14.0,
+      "max_lpa": 22.0
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 13.0,
+      "median_lpa": 20.0,
+      "max_lpa": 32.0
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.2,
+      "median_lpa": 5.2,
+      "max_lpa": 8.8
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.8,
+      "median_lpa": 7.2,
+      "max_lpa": 12.0
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 7.2,
+      "median_lpa": 11.2,
+      "max_lpa": 17.6
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 10.4,
+      "median_lpa": 16.0,
+      "max_lpa": 25.6
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.6,
+      "median_lpa": 4.2,
+      "max_lpa": 7.0
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 3.8,
+      "median_lpa": 5.8,
+      "max_lpa": 9.6
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 5.8,
+      "median_lpa": 9.0,
+      "max_lpa": 14.1
+    },
+    {
+      "role": "Data Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 8.3,
+      "median_lpa": 12.8,
+      "max_lpa": 20.5
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 6.0,
+      "median_lpa": 10.0,
+      "max_lpa": 18.0
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 9.0,
+      "median_lpa": 14.0,
+      "max_lpa": 24.0
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 14.0,
+      "median_lpa": 22.0,
+      "max_lpa": 36.0
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 20.0,
+      "median_lpa": 32.0,
+      "max_lpa": 55.0
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.8,
+      "median_lpa": 8.0,
+      "max_lpa": 14.4
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 7.2,
+      "median_lpa": 11.2,
+      "max_lpa": 19.2
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 11.2,
+      "median_lpa": 17.6,
+      "max_lpa": 28.8
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 16.0,
+      "median_lpa": 25.6,
+      "max_lpa": 44.0
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.8,
+      "median_lpa": 6.4,
+      "max_lpa": 11.5
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 5.8,
+      "median_lpa": 9.0,
+      "max_lpa": 15.4
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 9.0,
+      "median_lpa": 14.1,
+      "max_lpa": 23.0
+    },
+    {
+      "role": "Data Scientist / ML Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 12.8,
+      "median_lpa": 20.5,
+      "max_lpa": 35.2
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.5,
+      "median_lpa": 6.0,
+      "max_lpa": 10.0
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 5.5,
+      "median_lpa": 9.0,
+      "max_lpa": 15.0
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 9.0,
+      "median_lpa": 14.0,
+      "max_lpa": 22.0
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 13.0,
+      "median_lpa": 20.0,
+      "max_lpa": 32.0
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.8,
+      "median_lpa": 4.8,
+      "max_lpa": 8.0
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.4,
+      "median_lpa": 7.2,
+      "max_lpa": 12.0
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 7.2,
+      "median_lpa": 11.2,
+      "max_lpa": 17.6
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 10.4,
+      "median_lpa": 16.0,
+      "max_lpa": 25.6
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.2,
+      "median_lpa": 3.8,
+      "max_lpa": 6.4
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 3.5,
+      "median_lpa": 5.8,
+      "max_lpa": 9.6
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 5.8,
+      "median_lpa": 9.0,
+      "max_lpa": 14.1
+    },
+    {
+      "role": "UI/UX Designer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 8.3,
+      "median_lpa": 12.8,
+      "max_lpa": 20.5
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.5,
+      "median_lpa": 7.5,
+      "max_lpa": 13.0
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 7.0,
+      "median_lpa": 11.0,
+      "max_lpa": 19.0
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 11.0,
+      "median_lpa": 17.0,
+      "max_lpa": 29.0
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 16.0,
+      "median_lpa": 26.0,
+      "max_lpa": 45.0
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.6,
+      "median_lpa": 6.0,
+      "max_lpa": 10.4
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 5.6,
+      "median_lpa": 8.8,
+      "max_lpa": 15.2
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 8.8,
+      "median_lpa": 13.6,
+      "max_lpa": 23.2
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 12.8,
+      "median_lpa": 20.8,
+      "max_lpa": 36.0
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.9,
+      "median_lpa": 4.8,
+      "max_lpa": 8.3
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.5,
+      "median_lpa": 7.0,
+      "max_lpa": 12.2
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 7.0,
+      "median_lpa": 10.9,
+      "max_lpa": 18.6
+    },
+    {
+      "role": "DevOps Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 10.2,
+      "median_lpa": 16.6,
+      "max_lpa": 28.8
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.5,
+      "median_lpa": 7.0,
+      "max_lpa": 12.0
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 7.0,
+      "median_lpa": 11.0,
+      "max_lpa": 18.0
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 11.0,
+      "median_lpa": 17.0,
+      "max_lpa": 28.0
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 16.0,
+      "median_lpa": 25.0,
+      "max_lpa": 44.0
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.6,
+      "median_lpa": 5.6,
+      "max_lpa": 9.6
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 5.6,
+      "median_lpa": 8.8,
+      "max_lpa": 14.4
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 8.8,
+      "median_lpa": 13.6,
+      "max_lpa": 22.4
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 12.8,
+      "median_lpa": 20.0,
+      "max_lpa": 35.2
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.9,
+      "median_lpa": 4.5,
+      "max_lpa": 7.7
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.5,
+      "median_lpa": 7.0,
+      "max_lpa": 11.5
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 7.0,
+      "median_lpa": 10.9,
+      "max_lpa": 17.9
+    },
+    {
+      "role": "Cloud Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 10.2,
+      "median_lpa": 16.0,
+      "max_lpa": 28.2
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.0,
+      "median_lpa": 7.0,
+      "max_lpa": 12.0
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 6.5,
+      "median_lpa": 10.5,
+      "max_lpa": 18.0
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 10.0,
+      "median_lpa": 16.0,
+      "max_lpa": 27.0
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 15.0,
+      "median_lpa": 24.0,
+      "max_lpa": 42.0
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.2,
+      "median_lpa": 5.6,
+      "max_lpa": 9.6
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 5.2,
+      "median_lpa": 8.4,
+      "max_lpa": 14.4
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 8.0,
+      "median_lpa": 12.8,
+      "max_lpa": 21.6
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 12.0,
+      "median_lpa": 19.2,
+      "max_lpa": 33.6
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.6,
+      "median_lpa": 4.5,
+      "max_lpa": 7.7
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.2,
+      "median_lpa": 6.7,
+      "max_lpa": 11.5
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 6.4,
+      "median_lpa": 10.2,
+      "max_lpa": 17.3
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 9.6,
+      "median_lpa": 15.4,
+      "max_lpa": 26.9
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.0,
+      "median_lpa": 5.0,
+      "max_lpa": 9.0
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.5,
+      "median_lpa": 7.5,
+      "max_lpa": 13.0
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 7.0,
+      "median_lpa": 11.0,
+      "max_lpa": 18.0
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 10.0,
+      "median_lpa": 16.0,
+      "max_lpa": 28.0
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.4,
+      "median_lpa": 4.0,
+      "max_lpa": 7.2
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 3.6,
+      "median_lpa": 6.0,
+      "max_lpa": 10.4
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 5.6,
+      "median_lpa": 8.8,
+      "max_lpa": 14.4
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 8.0,
+      "median_lpa": 12.8,
+      "max_lpa": 22.4
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 1.9,
+      "median_lpa": 3.2,
+      "max_lpa": 5.8
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 2.9,
+      "median_lpa": 4.8,
+      "max_lpa": 8.3
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 4.5,
+      "median_lpa": 7.0,
+      "max_lpa": 11.5
+    },
+    {
+      "role": "QA Engineer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 6.4,
+      "median_lpa": 10.2,
+      "max_lpa": 17.9
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.0,
+      "median_lpa": 7.0,
+      "max_lpa": 12.0
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 6.5,
+      "median_lpa": 10.0,
+      "max_lpa": 17.0
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 10.0,
+      "median_lpa": 15.0,
+      "max_lpa": 24.0
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 14.0,
+      "median_lpa": 22.0,
+      "max_lpa": 36.0
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.2,
+      "median_lpa": 5.6,
+      "max_lpa": 9.6
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 5.2,
+      "median_lpa": 8.0,
+      "max_lpa": 13.6
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 8.0,
+      "median_lpa": 12.0,
+      "max_lpa": 19.2
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 11.2,
+      "median_lpa": 17.6,
+      "max_lpa": 28.8
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.6,
+      "median_lpa": 4.5,
+      "max_lpa": 7.7
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.2,
+      "median_lpa": 6.4,
+      "max_lpa": 10.9
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 6.4,
+      "median_lpa": 9.6,
+      "max_lpa": 15.4
+    },
+    {
+      "role": "Business Analyst",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 9.0,
+      "median_lpa": 14.1,
+      "max_lpa": 23.0
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 6.0,
+      "median_lpa": 10.0,
+      "max_lpa": 18.0
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 10.0,
+      "median_lpa": 16.0,
+      "max_lpa": 28.0
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 16.0,
+      "median_lpa": 25.0,
+      "max_lpa": 42.0
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 24.0,
+      "median_lpa": 38.0,
+      "max_lpa": 65.0
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 4.8,
+      "median_lpa": 8.0,
+      "max_lpa": 14.4
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 8.0,
+      "median_lpa": 12.8,
+      "max_lpa": 22.4
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 12.8,
+      "median_lpa": 20.0,
+      "max_lpa": 33.6
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 19.2,
+      "median_lpa": 30.4,
+      "max_lpa": 52.0
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 3.8,
+      "median_lpa": 6.4,
+      "max_lpa": 11.5
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 6.4,
+      "median_lpa": 10.2,
+      "max_lpa": 17.9
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 10.2,
+      "median_lpa": 16.0,
+      "max_lpa": 26.9
+    },
+    {
+      "role": "Product Manager",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 15.4,
+      "median_lpa": 24.3,
+      "max_lpa": 41.6
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.5,
+      "median_lpa": 4.5,
+      "max_lpa": 8.0
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 4.0,
+      "median_lpa": 6.5,
+      "max_lpa": 11.0
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 6.5,
+      "median_lpa": 10.0,
+      "max_lpa": 16.0
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 9.0,
+      "median_lpa": 14.0,
+      "max_lpa": 24.0
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.0,
+      "median_lpa": 3.6,
+      "max_lpa": 6.4
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 3.2,
+      "median_lpa": 5.2,
+      "max_lpa": 8.8
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 5.2,
+      "median_lpa": 8.0,
+      "max_lpa": 12.8
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 7.2,
+      "median_lpa": 11.2,
+      "max_lpa": 19.2
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 1.6,
+      "median_lpa": 2.9,
+      "max_lpa": 5.1
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 2.6,
+      "median_lpa": 4.2,
+      "max_lpa": 7.0
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 4.2,
+      "median_lpa": 6.4,
+      "max_lpa": 10.2
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 5.8,
+      "median_lpa": 9.0,
+      "max_lpa": 15.4
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 2.2,
+      "median_lpa": 3.8,
+      "max_lpa": 6.5
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 3.5,
+      "median_lpa": 5.5,
+      "max_lpa": 9.0
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 5.5,
+      "median_lpa": 8.5,
+      "max_lpa": 13.0
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier1",
+      "cities": [
+        "Bengaluru",
+        "Mumbai",
+        "Delhi NCR",
+        "Hyderabad",
+        "Chennai",
+        "Pune"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 8.0,
+      "median_lpa": 12.0,
+      "max_lpa": 20.0
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 1.8,
+      "median_lpa": 3.0,
+      "max_lpa": 5.2
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 2.8,
+      "median_lpa": 4.4,
+      "max_lpa": 7.2
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 4.4,
+      "median_lpa": 6.8,
+      "max_lpa": 10.4
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier2",
+      "cities": [
+        "Ahmedabad",
+        "Jaipur",
+        "Kochi",
+        "Coimbatore",
+        "Indore",
+        "Lucknow",
+        "Chandigarh",
+        "Surat"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 6.4,
+      "median_lpa": 9.6,
+      "max_lpa": 16.0
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "0-1",
+      "min_lpa": 1.4,
+      "median_lpa": 2.4,
+      "max_lpa": 4.2
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "1-3",
+      "min_lpa": 2.2,
+      "median_lpa": 3.5,
+      "max_lpa": 5.8
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "3-5",
+      "min_lpa": 3.5,
+      "median_lpa": 5.4,
+      "max_lpa": 8.3
+    },
+    {
+      "role": "Content Writer",
+      "tier": "tier3",
+      "cities": [
+        "Dehradun",
+        "Nagpur",
+        "Bhopal",
+        "Patna",
+        "Guwahati",
+        "Mysuru"
+      ],
+      "experience_band": "5+",
+      "min_lpa": 5.1,
+      "median_lpa": 7.7,
+      "max_lpa": 12.8
+    }
+  ]
+}

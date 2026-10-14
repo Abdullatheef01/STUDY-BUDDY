@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>India Salary Explorer | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>₹</text></svg>">
+    <style>
+        .sal-wrap { max-width: 1100px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .sal-head h1 { font-size: 1.9rem; }
+        .sal-head h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sal-head p { color: var(--text-muted, #94a3b8); margin-top: 0.3rem; max-width: 640px; }
+        .sal-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin: 1.6rem 0 1.2rem; background: var(--bg-card); border: 1px solid rgba(16,185,129,0.22); border-radius: 16px; padding: 1.1rem; }
+        .sal-filters label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-muted, #94a3b8); }
+        .sal-filters select, .sal-compare input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; color: var(--text-main, #f8fafc); padding: 0.6rem 0.7rem; font-size: 0.9rem; }
+        .sal-filters select:focus, .sal-compare input:focus { outline: none; border-color: var(--accent-primary); }
+        .sal-filters select option { color: #0f172a; }
+        .sal-compare { display: flex; gap: 0.7rem; align-items: end; flex-wrap: wrap; margin-bottom: 1.4rem; }
+        .sal-compare .fld { min-width: 220px; }
+        .sal-compare label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-muted, #94a3b8); }
+        .sal-btn { background: var(--gradient-primary); color: #fff; border: none; border-radius: 12px; padding: 0.65rem 1.3rem; font-weight: 700; cursor: pointer; font-size: 0.92rem; }
+        .sal-btn:hover { filter: brightness(1.1); }
+        .sal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+        .sal-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.2rem; }
+        .sal-card h3 { font-size: 1.05rem; margin-bottom: 0.15rem; }
+        .sal-card .sal-sub { font-size: 0.8rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.9rem; }
+        .sal-bar { position: relative; height: 10px; border-radius: 999px; background: rgba(255,255,255,0.08); margin: 1.6rem 0 0.4rem; }
+        .sal-bar .fill { position: absolute; top: 0; bottom: 0; border-radius: 999px; background: var(--gradient-primary); opacity: 0.85; }
+        .sal-bar .med { position: absolute; top: -4px; bottom: -4px; width: 3px; background: var(--accent-tertiary); border-radius: 2px; }
+        .sal-bar .you { position: absolute; top: -8px; width: 2px; bottom: -8px; background: #fff; border-radius: 2px; }
+        .sal-bar .you::after { content: "you"; position: absolute; top: -1.25rem; left: 50%; transform: translateX(-50%); font-size: 0.68rem; font-weight: 700; color: #fff; background: rgba(0,0,0,0.55); padding: 0 0.35rem; border-radius: 6px; }
+        .sal-nums { display: flex; justify-content: space-between; font-size: 0.82rem; margin-top: 0.3rem; }
+        .sal-nums .lo { color: var(--text-muted, #94a3b8); }
+        .sal-nums .md { color: var(--accent-tertiary); font-weight: 700; }
+        .sal-nums .hi { color: var(--accent-primary); font-weight: 700; }
+        .sal-note { margin-top: 2rem; background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); border-radius: 14px; padding: 1rem 1.2rem; font-size: 0.85rem; color: #fcd9a0; }
+        .sal-empty { text-align: center; color: var(--text-muted, #94a3b8); padding: 2.5rem 1rem; border: 1px dashed rgba(255,255,255,0.12); border-radius: 14px; }
+        .sal-login-cta { font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin-bottom: 1.4rem; }
+        .sal-login-cta a { color: var(--accent-primary); font-weight: 700; }
+        .sal-count { font-size: 0.82rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.8rem; }
+        @media (prefers-reduced-motion: reduce) { .sal-btn:hover { filter: none; } }
+    </style>
+</head>
+<body>
+    <div class="sal-wrap">
+        <div class="sal-head">
+            <h1>India <span class="gradient-text">Salary Explorer</span></h1>
+            <p>What do roles like yours pay across Indian cities? Explore indicative salary ranges by role, city tier and experience.</p>
+        </div>
+
+        <div class="sal-filters">
+            <div>
+                <label for="fRole">Role</label>
+                <select id="fRole"></select>
+            </div>
+            <div>
+                <label for="fTier">City tier</label>
+                <select id="fTier"></select>
+            </div>
+            <div>
+                <label for="fBand">Experience</label>
+                <select id="fBand"></select>
+            </div>
+        </div>
+
+        {% if is_authed %}
+        <div class="sal-compare">
+            <div class="fld">
+                <label for="cmpVal">Compare: your expected salary (LPA)</label>
+                <input id="cmpVal" type="number" min="0.5" max="200" step="0.5" placeholder="e.g. 9.5">
+            </div>
+            <button class="sal-btn" id="cmpBtn" type="button">Compare</button>
+            <button class="sal-btn" id="cmpClear" type="button" style="background:transparent;border:1px solid rgba(255,255,255,0.18);">Clear</button>
+        </div>
+        {% else %}
+        <p class="sal-login-cta"><a href="{{ url_for('login', next='/salary') }}">Log in</a> to compare your expected salary against these ranges.</p>
+        {% endif %}
+
+        <p class="sal-count" id="salCount"></p>
+        <div class="sal-grid" id="salGrid"></div>
+
+        <div class="sal-note">Indicative market ranges — curated for student guidance, last updated {{ options.meta.last_updated }}. These are not live-scraped figures; actual offers vary by company, skills, and negotiation.</div>
+    </div>
+    <script>
+        window.SALARY_OPTIONS = {{ options|tojson }};
+        window.SALARY_AUTHED = {{ 'true' if is_authed else 'false' }};
+    </script>
+    <script src="{{ url_for('static', filename='js/salary.js') }}"></script>
+</body>
+</html>

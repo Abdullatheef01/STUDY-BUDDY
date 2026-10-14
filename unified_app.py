@@ -231,6 +231,8 @@ from linkedin_grader import (grade_linkedin_profile, generate_rule_based_summary
 from career_assessment import (score_assessment, rule_based_why,
                                validate_assessment_inputs, public_questions,
                                QUESTIONS, TOP_N_CLUSTERS)
+from salary_data import (get_options as salary_options, query as salary_query,
+                          SalaryDataError)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -2156,6 +2158,31 @@ def register_routes(app):
                                jd_matches=jd_matches, rewrites=rewrites,
                                cover_docs=cover_docs, linkedin_reports=linkedin_reports,
                                tracker_stats=tracker_stats, assessments=assessments)
+
+    # ---------- INDIA SALARY EXPLORER (Wave 1 #8) ----------
+    @app.route('/salary')
+    def salary_explorer():
+        """Role x city-tier x experience salary explorer (curated indicative ranges)."""
+        try:
+            options = salary_options()
+        except SalaryDataError:
+            return render_template('error.html',
+                                   message="Salary data is temporarily unavailable. Please try again later."), 503
+        return render_template('salary.html', options=options,
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/salary/data')
+    @limiter.limit("60 per hour")
+    def salary_data_api():
+        """JSON feed of salary ranges. Unknown filter values yield empty results."""
+        try:
+            entries = salary_query(role=request.args.get('role') or None,
+                                   tier=request.args.get('tier') or None,
+                                   band=request.args.get('band') or None)
+        except SalaryDataError:
+            return jsonify({'success': False,
+                            'error': 'Salary data is temporarily unavailable.'}), 503
+        return jsonify({'success': True, 'entries': entries})
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])
