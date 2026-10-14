@@ -1,9 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="resume">
+<html lang="en" class="no-js" data-theme="resume">
 <head>
     <meta charset="UTF-8">
+    <footer class="b-footer">
+        <div class="b-wrap b-foot-in">
+            <span>&copy; 2026 Unified AI Excellence Platform</span>
+            <span>
+                <a href="{{ url_for('privacy') }}">Privacy</a>
+                <a href="{{ url_for('terms') }}">Terms</a>
+                <a href="{{ url_for('index') }}">Home</a>
+            </span>
+        </div>
+    </footer>
+
+    <script>document.documentElement.classList.replace('no-js', 'js');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weak-Topic Diagnosis | DSA Practice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bento.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <style>
@@ -32,24 +48,34 @@
     </style>
 </head>
 <body>
-    <div class="bg-animated"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="career-grid" aria-hidden="true"></div>
+    <div class="b-scroll-progress" data-scroll-progress aria-hidden="true"></div>
+    <div class="b-ambient" aria-hidden="true">
+        <div class="b-blob b-b1"></div>
+        <div class="b-blob b-b2"></div>
+        <div class="b-blob b-b3"></div>
+        <div class="b-gridlines"></div>
+    </div>
 
-    <nav class="navbar" id="navbar">
-        <a href="/resume" class="logo">Resume<span>AI</span></a>
-        <ul class="nav-links">
-            <li><a href="/">Hub</a></li>
-            <li><a href="/resume">Home</a></li>
-            <li><a href="/dsa">DSA</a></li>
-            <li><a href="/dsa/diagnosis" class="active">Diagnosis</a></li>
-        </ul>
-    </nav>
+    <header class="b-nav" id="navbar">
+        <div class="b-wrap b-nav-in">
+            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
+                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#14b8a6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#14b8a6"/><circle cx="31" cy="10" r="3.4" fill="#fbbf24"/></svg>
+                Unified<span class="b-grad">AI</span>
+            </a>
+            <nav aria-label="Primary">
+                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
+                    <li><a href="/">Hub</a></li>
+                    <li><a href="/resume">Home</a></li>
+                    <li><a href="/dsa">DSA</a></li>
+                    <li><a href="/dsa/diagnosis" class="b-active">Diagnosis</a></li>
+                    {% include "_auth_links.html" %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
     <div class="dg-wrap">
-        <div class="dg-card">
+        <div class="dg-card b-card b-reveal">
             <h1 style="font-size:1.6rem;margin-bottom:0.4rem;">Weak-Topic <span style="background:var(--gradient-primary);-webkit-background-clip:text;background-clip:text;color:transparent;">Diagnosis</span></h1>
             <p style="color:var(--text-muted,#94a3b8);font-size:0.9rem;">Based on the problems you've attempted, solved, and marked stuck.</p>
         </div>
@@ -59,7 +85,7 @@
             <p>No practice data yet. <a href="{{ url_for('dsa_home') }}">Solve your first problem</a> and your diagnosis will appear here.</p>
         </div>
         {% else %}
-        <div class="dg-card">
+        <div class="dg-card b-card b-reveal">
             <h3 class="dg-h3">Overall</h3>
             <div class="dg-overall">
                 <div class="dg-stat"><div class="v">{{ report.overall.attempted }}</div><div class="l">Attempted</div></div>
@@ -69,7 +95,7 @@
             </div>
         </div>
 
-        <div class="dg-card">
+        <div class="dg-card b-card b-reveal">
             <h3 class="dg-h3">Per-topic performance</h3>
             {% for t in report.topics %}
             <div class="dg-row">
@@ -84,7 +110,7 @@
         </div>
 
         {% if report.recommendations %}
-        <div class="dg-card">
+        <div class="dg-card b-card b-reveal">
             <h3 class="dg-h3">Recommended next</h3>
             {% for rec in report.recommendations %}
             <a class="dg-rec" href="{{ url_for('dsa_problem_page', problem_id=rec.problem_id) }}">
@@ -96,5 +122,6 @@
         {% endif %}
         {% endif %}
     </div>
+    <script src="{{ url_for('static', filename='js/bento.js') }}" defer></script>
 </body>
 </html>

@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="resume">
+<html lang="en" class="no-js" data-theme="resume">
 <head>
     <meta charset="UTF-8">
+    <script>document.documentElement.classList.replace('no-js', 'js');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Aptitude Report | AI Resume Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bento.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%2310b981' stroke-width='10'/><path d='M50 28v22l16 10' stroke='%2310b981' stroke-width='10' fill='none' stroke-linecap='round'/></svg>">
     <style>
@@ -34,26 +39,32 @@
     </style>
 </head>
 <body>
-    <div class="bg-animated"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="career-grid" aria-hidden="true"></div>
+    <div class="b-scroll-progress" data-scroll-progress aria-hidden="true"></div>
+    <div class="b-ambient" aria-hidden="true">
+        <div class="b-blob b-b1"></div>
+        <div class="b-blob b-b2"></div>
+        <div class="b-blob b-b3"></div>
+        <div class="b-gridlines"></div>
+    </div>
 
-    <nav class="navbar" id="navbar">
-        <a href="/" class="nav-brand">
-            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
-            <span>ResumeAI</span>
-        </a>
-        <ul class="nav-links">
-            <li><a href="/">Hub</a></li>
-            <li><a href="/resume">Home</a></li>
-            <li><a href="/practice">Practice</a></li>
-            <li><a href="/aptitude" class="active">Aptitude</a></li>
-            <li><a href="/dashboard">Dashboard</a></li>
-            {% include "_auth_links.html" %}
-        </ul>
-    </nav>
+    <header class="b-nav" id="navbar">
+        <div class="b-wrap b-nav-in">
+            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
+                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#14b8a6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#14b8a6"/><circle cx="31" cy="10" r="3.4" fill="#fbbf24"/></svg>
+                Unified<span class="b-grad">AI</span>
+            </a>
+            <nav aria-label="Primary">
+                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
+                    <li><a href="/">Hub</a></li>
+                    <li><a href="/resume">Home</a></li>
+                    <li><a href="/practice">Practice</a></li>
+                    <li><a href="/aptitude" class="b-active">Aptitude</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    {% include "_auth_links.html" %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
     <div class="ap-wrap">
         <div class="ap-meta">
@@ -66,6 +77,18 @@
         <script type="application/json" id="saved-data">{{ {'summary': summary, 'results': results}|tojson }}</script>
     </div>
 
+    <footer class="b-footer">
+        <div class="b-wrap b-foot-in">
+            <span>&copy; 2026 Unified AI Excellence Platform</span>
+            <span>
+                <a href="{{ url_for('privacy') }}">Privacy</a>
+                <a href="{{ url_for('terms') }}">Terms</a>
+                <a href="{{ url_for('index') }}">Home</a>
+            </span>
+        </div>
+    </footer>
+
     <script src="{{ url_for('static', filename='js/aptitude.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bento.js') }}" defer></script>
 </body>
 </html>

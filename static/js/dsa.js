@@ -37,7 +37,7 @@
             }
             problems.forEach(function (p) {
                 var a = document.createElement("a");
-                a.className = "dsa-prob";
+                a.className = "dsa-prob b-card b-card--lite";
                 a.href = "/dsa/" + encodeURIComponent(p.id);
                 var left = el("div");
                 left.appendChild(el("div", "t", p.title));
