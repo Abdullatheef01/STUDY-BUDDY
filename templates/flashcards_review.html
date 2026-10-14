@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block theme %}research{% endblock %}
+{% set nav_active = 'research' %}
+{% block title %}Review Deck — {{ doc_title }} | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Deck #{{ set_id }}</span>
+            <h1>{{ doc_title }}</h1>
+            <p class="b-lede" id="fc-stats-line">Mastery: {{ stats.mastery_pct }}% &middot; {{ stats.known }}/{{ stats.total }} known</p>
+            <div class="b-cta-row">
+                <button class="b-btn b-btn--primary b-magnet" id="fc-mode-cards" type="button">Flashcards</button>
+                <button class="b-btn b-btn--ghost b-magnet" id="fc-mode-quiz" type="button">Quiz mode</button>
+                <a class="b-btn b-btn--ghost" href="{{ url_for('flashcards_home') }}">All decks</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Review area">
+    <div class="b-card b-card--form b-reveal" style="max-width:640px;">
+        <!-- Flashcard mode -->
+        <div id="fc-cards-mode">
+            <div class="b-sec-head" style="margin-top:0;"><h2 id="fc-progress">Card 1</h2><p id="fc-kind"></p></div>
+            <div id="fc-card" class="b-card b-card--lite" style="min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;text-align:center;" role="button" tabindex="0" aria-label="Flip card">
+                <p id="fc-q" style="font-size:1.1rem;margin:0;"></p>
+                <p id="fc-a" style="display:none;color:var(--b-a3);font-size:1.05rem;margin:1rem 0 0;"></p>
+                <p id="fc-src" style="display:none;color:var(--b-muted);font-size:.78rem;margin:.8rem 0 0;"></p>
+            </div>
+            <div class="b-cta-row" style="margin-top:1.2rem;justify-content:center;">
+                <button class="b-btn b-btn--ghost" id="fc-prev" type="button">← Prev</button>
+                <button class="b-btn b-btn--primary" id="fc-flip" type="button">Flip</button>
+                <button class="b-btn b-btn--ghost" id="fc-next" type="button">Next →</button>
+            </div>
+            <div class="b-cta-row" style="margin-top:.8rem;justify-content:center;">
+                <button class="b-btn b-btn--sm" id="fc-unknown" type="button" style="border:1px solid var(--b-danger-border);color:var(--b-danger);background:transparent;">Still learning</button>
+                <button class="b-btn b-btn--sm" id="fc-known" type="button" style="border:1px solid rgba(52,211,153,.4);color:#a7f3d0;background:transparent;">I know this</button>
+            </div>
+        </div>
+        <!-- Quiz mode -->
+        <div id="fc-quiz-mode" style="display:none;">
+            <div class="b-sec-head" style="margin-top:0;"><h2 id="fq-progress">Question 1</h2><p>MCQs generated from this paper.</p></div>
+            <p id="fq-q" style="font-size:1.05rem;"></p>
+            <div id="fq-options" style="display:grid;gap:.5rem;"></div>
+            <p class="b-form-error" id="fq-feedback" style="display:none;"></p>
+            <div class="b-cta-row" style="margin-top:1rem;">
+                <button class="b-btn b-btn--primary" id="fq-submit" type="button">Submit quiz</button>
+                <span class="b-pill" id="fq-score" style="display:none;"></span>
+            </div>
+        </div>
+        <p class="b-form-error" id="fc-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+<script id="fc-data" type="application/json">{{ cards_json|safe }}</script>
+<script src="{{ url_for('static', filename='js/flashcards.js') }}"></script>
+{% endblock %}

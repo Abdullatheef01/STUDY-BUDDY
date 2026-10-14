@@ -4372,12 +4372,145 @@ def register_routes(app):
         return jsonify({'success': True, 'report': gr.data or {},
                         'doc_ids': gr.doc_ids or []})
 
+    # ================= Wave 4 #26: flashcards & paper quizzes =================
     @app.route('/research/flashcards')
     @login_required
     def flashcards_home():
-        """Flashcards & quizzes (stub until feature #26 lands)."""
-        return render_template('study_stub.html', title='Flashcards & Quizzes',
-                               blurb='Auto-generated flashcards and MCQs from your papers, with spaced-repetition review. This section is being built right now — check back soon.')
+        """Flashcards & quizzes hub (replaces stub)."""
+        docs = StudyDoc.query.filter_by(user_id=current_user.id).order_by(
+            StudyDoc.created_at.desc()).all()
+        sets = FlashcardSet.query.filter_by(user_id=current_user.id).order_by(
+            FlashcardSet.created_at.desc()).all()
+        return render_template('flashcards_home.html',
+                               documents=[{'id': d.id, 'title': d.title,
+                                           'chunks': d.num_chunks} for d in docs],
+                               sets=[{'id': s.id, 'doc_id': s.doc_id,
+                                      'cards': s.card_count,
+                                      'created': s.created_at.strftime('%Y-%m-%d')}
+                                     for s in sets])
+
+    @app.route('/research/api/flashcards/generate', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def flashcards_generate():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Generate a flashcard/MCQ deck from one document.
+
+        JSON body: {"doc_id": int}. CSRF via X-CSRFToken header (not exempt)."""
+        payload = request.get_json(silent=True) or {}
+        try:
+            doc_id = int(payload.get('doc_id') or 0)
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid document.'}), 400
+        try:
+            doc = StudyDoc.query.filter_by(id=doc_id,
+                                           user_id=current_user.id).first()
+            if not doc:
+                return jsonify({'error': 'Document not found.'}), 404
+            deck = fc_generate_deck(doc)
+            cards = (deck or {}).get('cards') or []
+            if not cards:
+                return jsonify({'error': 'No extractable study content found in this document.'}), 400
+            fs = FlashcardSet(user_id=current_user.id, doc_id=doc.id,
+                              card_count=len(cards), data=deck)
+            db.session.add(fs)
+            db.session.commit()
+        except Exception:
+            log.exception("Flashcard generation failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not generate flashcards. Please try again.'}), 500
+        return jsonify({'success': True, 'id': fs.id, 'cards': len(cards)})
+
+    @app.route('/research/flashcards/<int:sid>')
+    @login_required
+    def flashcards_review(sid):
+        """Spaced-repetition review + quiz UI for one deck."""
+        fs = FlashcardSet.query.filter_by(id=sid,
+                                          user_id=current_user.id).first_or_404()
+        doc = StudyDoc.query.filter_by(id=fs.doc_id).first()
+        cards = (fs.data or {}).get('cards') or []
+        # Strip nothing: the UI needs questions/options; answers stay in the
+        # payload but quiz grading is server-side, so no leak concern here.
+        return render_template('flashcards_review.html', set_id=fs.id,
+                               doc_title=doc.title if doc else 'Document',
+                               stats=fc_mastery_stats(fs.data or {}),
+                               cards_json=json.dumps(cards))
+
+    @app.route('/research/api/flashcards/<int:sid>/progress', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def flashcards_progress(sid):
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Mark a card known/unknown. JSON: {"card_id": str, "known": bool}."""
+        payload = request.get_json(silent=True) or {}
+        card_id = str(payload.get('card_id') or '')
+        known = bool(payload.get('known'))
+        if not card_id:
+            return jsonify({'error': 'Missing card_id.'}), 400
+        try:
+            fs = FlashcardSet.query.filter_by(id=sid,
+                                              user_id=current_user.id).first()
+            if not fs:
+                return jsonify({'error': 'Deck not found.'}), 404
+            data = fs.data or {}
+            cards = {c.get('id') for c in data.get('cards') or []}
+            if card_id not in cards:
+                return jsonify({'error': 'Unknown card.'}), 400
+            progress = data.setdefault('progress', {})
+            entry = progress.setdefault(card_id, {'known': False, 'reviews': 0})
+            entry['known'] = known
+            entry['reviews'] = int(entry.get('reviews') or 0) + 1
+            from sqlalchemy.orm.attributes import flag_modified
+            flag_modified(fs, 'data')
+            db.session.commit()
+        except Exception:
+            log.exception("Flashcard progress failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save progress.'}), 500
+        return jsonify({'success': True,
+                        'stats': fc_mastery_stats(fs.data or {})})
+
+    @app.route('/research/api/flashcards/<int:sid>/quiz', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def flashcards_quiz(sid):
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Submit MCQ answers. JSON: {"answers": {card_id: chosen_index}}."""
+        payload = request.get_json(silent=True) or {}
+        answers = payload.get('answers') or {}
+        if not isinstance(answers, dict):
+            return jsonify({'error': 'Invalid answers.'}), 400
+        try:
+            fs = FlashcardSet.query.filter_by(id=sid,
+                                              user_id=current_user.id).first()
+            if not fs:
+                return jsonify({'error': 'Deck not found.'}), 404
+            cards = [c for c in (fs.data or {}).get('cards') or []
+                     if c.get('kind') == 'mcq']
+            if not cards:
+                return jsonify({'error': 'This deck has no quiz questions.'}), 400
+            result = fc_grade_mcq(cards, answers)
+            attempt = PaperQuizAttempt(
+                user_id=current_user.id, set_id=fs.id,
+                score=int(result.get('score') or 0),
+                total=int(result.get('total') or 0), data=result)
+            db.session.add(attempt)
+            db.session.commit()
+        except Exception:
+            log.exception("Paper quiz grading failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not grade the quiz.'}), 500
+        return jsonify({'success': True, 'score': attempt.score,
+                        'total': attempt.total, 'details': result.get('details') or []})
+
+    @app.route('/research/api/flashcards/<int:sid>/stats')
+    @login_required
+    def flashcards_stats(sid):
+        """Mastery stats for a deck."""
+        fs = FlashcardSet.query.filter_by(id=sid,
+                                          user_id=current_user.id).first_or_404()
+        return jsonify({'success': True,
+                        'stats': fc_mastery_stats(fs.data or {})})
 
     @app.route('/api/cite/format', methods=['POST'])
     @limiter.limit("60 per hour")
