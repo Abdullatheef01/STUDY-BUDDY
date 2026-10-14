@@ -1,317 +1,268 @@
 {% extends "base.html" %}
 {% block title %}Dashboard | Unified AI Excellence Platform{% endblock %}
-{% block head %}
-<style>
-    .dash-head { margin-bottom: 2rem; }
-    .dash-head h1 { font-family: 'Outfit', sans-serif; font-size: 2.2rem; }
-    .dash-head h1 span { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .dash-head p { color: var(--text-muted); margin-top: 0.4rem; }
-    .section { margin-bottom: 2.5rem; }
-    .section h2 { font-family: 'Outfit', sans-serif; font-size: 1.35rem; margin-bottom: 1.1rem; }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
-    .hist-card {
-        background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px;
-        padding: 1.4rem; backdrop-filter: blur(10px); transition: transform 0.2s, border-color 0.2s;
-        text-decoration: none; color: var(--text-main); display: block;
-    }
-    .hist-card:hover { transform: translateY(-3px); border-color: var(--primary); }
-    .hist-card .fname { font-weight: 700; margin-bottom: 0.4rem; word-break: break-all; }
-    .hist-card .meta { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem; }
-    .score-pill {
-        display: inline-block; padding: 0.3rem 0.9rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;
-        background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(34,211,238,0.25));
-        border: 1px solid var(--glass-border);
-    }
-    .empty {
-        background: var(--glass); border: 1px dashed var(--glass-border); border-radius: 14px;
-        padding: 2rem; text-align: center; color: var(--text-muted);
-    }
-    .empty a { color: var(--accent); font-weight: 600; text-decoration: none; }
-    .goal-row {
-        display: flex; align-items: center; gap: 1rem;
-        background: var(--glass); border: 1px solid var(--glass-border);
-        border-radius: 12px; padding: 1rem 1.3rem; margin-bottom: 0.8rem;
-    }
-    .goal-row.done { opacity: 0.55; }
-    .goal-row.done .gtitle { text-decoration: line-through; }
-    .goal-row .gtitle { flex: 1; font-weight: 600; }
-    .goal-row .gdate { color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; }
-    .goal-row form { display: inline; }
-    .icon-btn {
-        background: none; border: 1px solid var(--glass-border); color: var(--text-main);
-        border-radius: 8px; padding: 0.35rem 0.7rem; cursor: pointer; font-size: 0.85rem;
-    }
-    .icon-btn:hover { border-color: var(--primary); }
-    .goal-form { display: flex; gap: 0.8rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
-    .goal-form input[type="text"] {
-        flex: 2; min-width: 200px; padding: 0.75rem 1rem; border-radius: 10px;
-        border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3);
-        color: var(--text-main); font-size: 0.95rem; font-family: 'Inter', sans-serif;
-    }
-    .goal-form input[type="date"] {
-        flex: 1; min-width: 150px; padding: 0.75rem 1rem; border-radius: 10px;
-        border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3);
-        color: var(--text-main); font-family: 'Inter', sans-serif; color-scheme: dark;
-    }
-    .goal-form input:focus { outline: none; border-color: var(--primary); }
-</style>
-{% endblock %}
 {% block content %}
-<div class="dash-head">
-    <h1>Your <span>Dashboard</span></h1>
-    <p>Every analysis you run while logged in is saved here. Keep building, {{ current_user.name }}.</p>
+<div class="b-card b-card--hero b-reveal" style="margin-top:2rem;padding:40px 36px;">
+    <span class="b-pill"><span class="b-pulse"></span>Your workspace</span>
+    <h1 style="font-family:'Outfit',sans-serif;font-size:2.2rem;margin:.6rem 0 .4rem;">Your <span class="b-grad">Dashboard</span></h1>
+    <p class="b-lede" style="font-size:1rem;">Every analysis you run while logged in is saved here. Keep building, {{ current_user.name }}.</p>
 </div>
 
-<div class="section">
-    <h2>Connected Accounts</h2>
-    <div style="display:flex;gap:0.7rem;flex-wrap:wrap;align-items:center;">
+<div class="b-bento" style="margin-top:var(--b-gap);">
+    <div class="b-card b-card--stat b-reveal"><div class="b-stat-num" data-count="{{ analyses|length }}">{{ analyses|length }}</div><div class="b-stat-label">Resume analyses</div></div>
+    <div class="b-card b-card--stat b-reveal b-d1"><div class="b-stat-num" data-count="{{ jd_matches|length }}">{{ jd_matches|length }}</div><div class="b-stat-label">JD match reports</div></div>
+    <div class="b-card b-card--stat b-reveal b-d2"><div class="b-stat-num" data-count="{{ interviews|length }}">{{ interviews|length }}</div><div class="b-stat-label">Mock interviews</div></div>
+    <div class="b-card b-card--stat b-reveal b-d3"><div class="b-stat-num" data-count="{{ goals|length }}">{{ goals|length }}</div><div class="b-stat-label">Career goals</div></div>
+</div>
+
+<div class="b-card b-reveal" style="margin-top:var(--b-gap);">
+    <div class="b-sec-head" style="margin:0 0 1rem;">
+        <h2 style="font-size:1.3rem;">Connected Accounts</h2>
+    </div>
+    <div style="display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;">
         {% if current_user.google_sub %}
-        <span class="score-pill" style="background:rgba(16,185,129,0.12);">Google connected</span>
+        <span class="b-tag">Google connected</span>
         {% endif %}
         {% if current_user.github_username %}
-        <span class="score-pill" style="background:rgba(16,185,129,0.12);">GitHub · @{{ current_user.github_username }}</span>
+        <span class="b-tag">GitHub · @{{ current_user.github_username }}</span>
         {% endif %}
         {% if current_user.leetcode_username %}
-        <span class="score-pill" style="background:rgba(16,185,129,0.12);">LeetCode · {{ current_user.leetcode_username }}</span>
+        <span class="b-tag">LeetCode · {{ current_user.leetcode_username }}</span>
         {% endif %}
         {% if not current_user.google_sub and not current_user.github_username and not current_user.leetcode_username %}
-        <span style="color:var(--text-muted);font-size:0.9rem;">Nothing connected yet.</span>
+        <span style="color:var(--b-muted);font-size:.9rem;">Nothing connected yet.</span>
         {% endif %}
-        <a href="{{ url_for('profile') }}" class="btn-glass" style="text-decoration:none;font-size:0.85rem;">Manage connections</a>
+        <a href="{{ url_for('profile') }}" class="b-btn b-btn--ghost b-btn--sm" style="text-decoration:none;">Manage connections</a>
     </div>
 </div>
 
-<div class="section">
-    <h2>&#128202; Resume Analysis History</h2>
-    {% if analyses %}
-    <div class="card-grid">
-        {% for a in analyses %}
-        <a class="hist-card" href="{{ url_for('view_result', analysis_id='db-' ~ a.id) }}">
-            <div class="fname">&#128196; {{ a.filename or 'Resume' }}</div>
-            <div class="meta">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-            <span class="score-pill">ATS {{ a.ats_score if a.ats_score is not none else '—' }}</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No saved analyses yet. <a href="{{ url_for('resume_home') }}">Analyze your resume</a> while logged in and it will appear here.
-    </div>
-    {% endif %}
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Resume Analysis History</h2>
+    <p>Your saved resume reports and ATS scores.</p>
 </div>
-
-<div class="section">
-    <h2>&#129309; JD Match Reports</h2>
-    {% if jd_matches %}
-    <div class="card-grid">
-        {% for m in jd_matches %}
-        <a class="hist-card" href="{{ url_for('view_jd_match', report_id=m.id) }}">
-            <div class="fname">&#128196; {{ m.job_title or 'Job description' }}</div>
-            <div class="meta">{{ m.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-            <span class="score-pill">Match {{ m.score if m.score is not none else '—' }}</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No JD match reports yet. <a href="{{ url_for('resume_home') }}#jd-match">Match your resume to a job description</a> and it will appear here.
-    </div>
-    {% endif %}
+{% if analyses %}
+<div class="b-bento">
+    {% for a in analyses %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('view_result', analysis_id='db-' ~ a.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ a.filename or 'Resume' }}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+        <span class="b-tag">ATS {{ a.ats_score if a.ats_score is not none else '—' }}</span>
+    </a>
+    {% endfor %}
 </div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No saved analyses yet. <a href="{{ url_for('resume_home') }}" style="color:var(--b-a3);">Analyze your resume</a> while logged in and it will appear here.</p></div>
+{% endif %}
 
-<div class="section">
-    <h2>&#128188; LinkedIn Grading Reports</h2>
-    {% if linkedin_reports %}
-    <div class="card-grid">
-        {% for r in linkedin_reports %}
-        <a class="hist-card" href="{{ url_for('view_linkedin_report', report_id=r.id) }}">
-            <div class="fname">&#128188; LinkedIn profile grade</div>
-            <div class="meta">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-            <span class="score-pill">Grade {{ r.score if r.score is not none else '—' }}</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No LinkedIn grading reports yet. <a href="{{ url_for('resume_home') }}#linkedin-grader">Grade your LinkedIn profile</a> and it will appear here.
-    </div>
-    {% endif %}
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>JD Match Reports</h2>
+    <p>How your resume stacks up against job descriptions.</p>
 </div>
-
-<div class="section">
-    <h2>&#128203; Application Tracker</h2>
-    {% if tracker_stats and tracker_stats.total %}
-    <div class="card-grid">
-        <a class="hist-card" href="{{ url_for('tracker_board') }}">
-            <div class="fname">&#128203; {{ tracker_stats.total }} applications tracked</div>
-            <div class="meta">Response rate {{ tracker_stats.response_rate }}%</div>
-            <span class="score-pill">Open board</span>
-        </a>
-    </div>
-    {% else %}
-    <div class="empty">
-        No applications tracked yet. <a href="{{ url_for('tracker_board') }}">Open the Kanban board</a> and add your first application.
-    </div>
-    {% endif %}
+{% if jd_matches %}
+<div class="b-bento">
+    {% for m in jd_matches %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('view_jd_match', report_id=m.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ m.job_title or 'Job description' }}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ m.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+        <span class="b-tag">Match {{ m.score if m.score is not none else '—' }}</span>
+    </a>
+    {% endfor %}
 </div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No JD match reports yet. <a href="{{ url_for('resume_home') }}#jd-match" style="color:var(--b-a3);">Match your resume to a job description</a> and it will appear here.</p></div>
+{% endif %}
 
-<div class="section">
-    <h2>&#127919; Career Assessments</h2>
-    {% if assessments %}
-    <div class="card-grid">
-        {% for a in assessments %}
-        <a class="hist-card" href="{{ url_for('view_assessment', assessment_id=a.id) }}">
-            <div class="fname">&#127919; Career discovery result</div>
-            <div class="meta">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-            <span class="score-pill">View matches</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No assessments yet. <a href="{{ url_for('assessment_quiz') }}">Take the career-discovery quiz</a> and your results will appear here.
-    </div>
-    {% endif %}
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>LinkedIn Grading Reports</h2>
+    <p>Profile scores and prioritized fixes.</p>
 </div>
-
-<div class="section">
-    <h2>&#9998;&#65039; Bullet Rewrites</h2>
-    {% if rewrites %}
-    <div class="card-grid">
-        {% for r in rewrites %}
-        <div class="hist-card">
-            <div class="fname">&#9998;&#65039; {{ r.original[:80] }}{% if r.original|length > 80 %}…{% endif %}</div>
-            <div class="meta">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}{% if r.ai_powered %} · AI-polished{% endif %}</div>
-            <span class="score-pill">{{ r.rewrites|length }} variants</span>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No bullet rewrites yet. <a href="{{ url_for('resume_home') }}#bullet-rewriter">Rewrite a resume bullet</a> and it will appear here.
-    </div>
-    {% endif %}
+{% if linkedin_reports %}
+<div class="b-bento">
+    {% for r in linkedin_reports %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('view_linkedin_report', report_id=r.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">LinkedIn profile grade</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+        <span class="b-tag">Grade {{ r.score if r.score is not none else '—' }}</span>
+    </a>
+    {% endfor %}
 </div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No LinkedIn grading reports yet. <a href="{{ url_for('resume_home') }}#linkedin-grader" style="color:var(--b-a3);">Grade your LinkedIn profile</a> and it will appear here.</p></div>
+{% endif %}
 
-<div class="section">
-    <h2>&#128195; Cover Letters & Outreach</h2>
-    {% if cover_docs %}
-    <div class="card-grid">
-        {% for d in cover_docs %}
-        <div class="hist-card">
-            <div class="fname">&#128195; {{ d.title or d.doc_type|replace('_', ' ')|title }}</div>
-            <div class="meta">{{ d.created_at.strftime('%d %b %Y, %I:%M %p') }} · {{ d.tone|title }}{% if d.ai_powered %} · AI{% endif %}</div>
-            <span class="score-pill">{{ 'Cover letter' if d.doc_type == 'cover_letter' else 'Outreach' }}</span>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No generated documents yet. <a href="{{ url_for('resume_home') }}#cover-generator">Generate a cover letter</a> and it will appear here.
-    </div>
-    {% endif %}
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Application Tracker</h2>
+    <p>Your pipeline at a glance.</p>
 </div>
-
-<div class="section">
-    <h2>&#127908; Mock Interviews</h2>
-    {% if interviews %}
-    <div class="card-grid">
-        {% for s in interviews %}
-        <a class="hist-card" href="{{ url_for('view_interview', session_id=s.id) }}">
-            <div class="fname">&#127908; {{ s.company }} &middot; {{ s.category.replace('_', ' ').title() }}</div>
-            <div class="meta">{{ s.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-            <span class="score-pill">Score {{ s.total_score if s.total_score is not none else '—' }}</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No mock interviews yet. <a href="{{ url_for('interview_home') }}">Start a mock interview</a> and your scored sessions will appear here.
-    </div>
-    {% endif %}
+{% if tracker_stats and tracker_stats.total %}
+<div class="b-bento">
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('tracker_board') }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ tracker_stats.total }} applications tracked</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">Response rate {{ tracker_stats.response_rate }}%</div>
+        <span class="b-tag">Open board</span>
+    </a>
 </div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No applications tracked yet. <a href="{{ url_for('tracker_board') }}" style="color:var(--b-a3);">Open the Kanban board</a> and add your first application.</p></div>
+{% endif %}
 
-<div class="section">
-    <h2>&#127908; Communication Coach</h2>
-    {% if coach_reports %}
-    <div class="card-grid">
-        {% for r in coach_reports %}
-        <a class="hist-card" href="{{ url_for('view_coach_report', analysis_id=r.id) }}">
-            <div class="fname">&#127908; Clarity {{ '%.0f' % r.clarity_score if r.clarity_score is not none else '—' }}/100</div>
-            <div class="meta">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-            <span class="score-pill">{{ (r.analysis_json.metrics.word_count if r.analysis_json and r.analysis_json.metrics else '—') }} words</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No coach analyses yet. <a href="{{ url_for('coach_home') }}">Analyze an answer</a> for filler words, pacing, and clarity.
-    </div>
-    {% endif %}
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Career Assessments</h2>
+    <p>Your discovery quiz results.</p>
 </div>
-
-<div class="section">
-    <h2>&#9201; Aptitude Tests</h2>
-    {% if aptitude_attempts %}
-    <div class="card-grid">
-        {% for a in aptitude_attempts %}
-        <a class="hist-card" href="{{ url_for('aptitude_report', attempt_id=a.id) }}">
-            <div class="fname">&#9201; {{ a.category|title }} &mdash; {{ '%.1f' % (a.summary_json.score_pct if a.summary_json and a.summary_json.score_pct is not none else 0) }}%</div>
-            <div class="meta">{{ a.num_questions }} questions &middot; {{ (a.summary_json.correct if a.summary_json else 0) }}/{{ a.num_questions }} correct{% if a.expired %} &middot; time expired{% endif %}</div>
-            <div class="meta">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No aptitude attempts yet. <a href="{{ url_for('aptitude_home') }}">Take a timed test</a> and your scores will appear here.
-    </div>
-    {% endif %}
+{% if assessments %}
+<div class="b-bento">
+    {% for a in assessments %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('view_assessment', assessment_id=a.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">Career discovery result</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+        <span class="b-tag">View matches</span>
+    </a>
+    {% endfor %}
 </div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No assessments yet. <a href="{{ url_for('assessment_quiz') }}" style="color:var(--b-a3);">Take the career-discovery quiz</a> and your results will appear here.</p></div>
+{% endif %}
 
-<div class="section">
-    <h2>&#11088; STAR Answer Drafts</h2>
-    {% if star_drafts %}
-    <div class="card-grid">
-        {% for d in star_drafts %}
-        <a class="hist-card" href="{{ url_for('star_drafts', _anchor='draft-' ~ d.id) }}">
-            <div class="fname">&#11088; {{ star_competencies.get(d.competency, d.competency)|title }}{% if d.scores_json and d.scores_json.overall is not none %} &mdash; {{ d.scores_json.overall }}/100{% endif %}</div>
-            <div class="meta">{{ (d.situation or '')[:90] }}{% if d.situation and d.situation|length > 90 %}&hellip;{% endif %}</div>
-            <div class="meta">{{ d.updated_at.strftime('%d %b %Y, %I:%M %p') if d.updated_at else '' }}</div>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-        No STAR drafts yet. <a href="{{ url_for('star_home') }}">Build a STAR answer</a> and your drafts will appear here.
-    </div>
-    {% endif %}
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Bullet Rewrites</h2>
+    <p>Stronger resume bullets, saved.</p>
 </div>
+{% if rewrites %}
+<div class="b-bento">
+    {% for r in rewrites %}
+    <div class="b-card b-card--lite b-reveal">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ r.original[:80] }}{% if r.original|length > 80 %}…{% endif %}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}{% if r.ai_powered %} · AI-polished{% endif %}</div>
+        <span class="b-tag">{{ r.rewrites|length }} variants</span>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No bullet rewrites yet. <a href="{{ url_for('resume_home') }}#bullet-rewriter" style="color:var(--b-a3);">Rewrite a resume bullet</a> and it will appear here.</p></div>
+{% endif %}
 
-<div class="section">
-    <h2>&#127919; Career Goals</h2>    <form class="goal-form" method="POST" action="{{ url_for('goal_add') }}">
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Cover Letters &amp; Outreach</h2>
+    <p>Generated documents, ready to copy.</p>
+</div>
+{% if cover_docs %}
+<div class="b-bento">
+    {% for d in cover_docs %}
+    <div class="b-card b-card--lite b-reveal">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ d.title or d.doc_type|replace('_', ' ')|title }}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ d.created_at.strftime('%d %b %Y, %I:%M %p') }} · {{ d.tone|title }}{% if d.ai_powered %} · AI{% endif %}</div>
+        <span class="b-tag">{{ 'Cover letter' if d.doc_type == 'cover_letter' else 'Outreach' }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No generated documents yet. <a href="{{ url_for('resume_home') }}#cover-generator" style="color:var(--b-a3);">Generate a cover letter</a> and it will appear here.</p></div>
+{% endif %}
+
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Mock Interviews</h2>
+    <p>Scored practice sessions.</p>
+</div>
+{% if interviews %}
+<div class="b-bento">
+    {% for s in interviews %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('view_interview', session_id=s.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ s.company }} · {{ s.category.replace('_', ' ').title() }}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ s.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+        <span class="b-tag">Score {{ s.total_score if s.total_score is not none else '—' }}</span>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No mock interviews yet. <a href="{{ url_for('interview_home') }}" style="color:var(--b-a3);">Start a mock interview</a> and your scored sessions will appear here.</p></div>
+{% endif %}
+
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Communication Coach</h2>
+    <p>Clarity, pacing, and filler-word analyses.</p>
+</div>
+{% if coach_reports %}
+<div class="b-bento">
+    {% for r in coach_reports %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('view_coach_report', analysis_id=r.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">Clarity {{ '%.0f' % r.clarity_score if r.clarity_score is not none else '—' }}/100</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+        <span class="b-tag">{{ (r.analysis_json.metrics.word_count if r.analysis_json and r.analysis_json.metrics else '—') }} words</span>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No coach analyses yet. <a href="{{ url_for('coach_home') }}" style="color:var(--b-a3);">Analyze an answer</a> for filler words, pacing, and clarity.</p></div>
+{% endif %}
+
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Aptitude Tests</h2>
+    <p>Timed drills and scores.</p>
+</div>
+{% if aptitude_attempts %}
+<div class="b-bento">
+    {% for a in aptitude_attempts %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('aptitude_report', attempt_id=a.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ a.category|title }} — {{ '%.1f' % (a.summary_json.score_pct if a.summary_json and a.summary_json.score_pct is not none else 0) }}%</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ a.num_questions }} questions · {{ (a.summary_json.correct if a.summary_json else 0) }}/{{ a.num_questions }} correct{% if a.expired %} · time expired{% endif %}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No aptitude attempts yet. <a href="{{ url_for('aptitude_home') }}" style="color:var(--b-a3);">Take a timed test</a> and your scores will appear here.</p></div>
+{% endif %}
+
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>STAR Answer Drafts</h2>
+    <p>Behavioral stories in progress.</p>
+</div>
+{% if star_drafts %}
+<div class="b-bento">
+    {% for d in star_drafts %}
+    <a class="b-card b-card--lite b-reveal" href="{{ url_for('star_drafts', _anchor='draft-' ~ d.id) }}" style="text-decoration:none;">
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ star_competencies.get(d.competency, d.competency)|title }}{% if d.scores_json and d.scores_json.overall is not none %} — {{ d.scores_json.overall }}/100{% endif %}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ (d.situation or '')[:90] }}{% if d.situation and d.situation|length > 90 %}&hellip;{% endif %}</div>
+        <div style="color:var(--b-muted);font-size:.82rem;">{{ d.updated_at.strftime('%d %b %Y, %I:%M %p') if d.updated_at else '' }}</div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No STAR drafts yet. <a href="{{ url_for('star_home') }}" style="color:var(--b-a3);">Build a STAR answer</a> and your drafts will appear here.</p></div>
+{% endif %}
+
+<div class="b-sec-head b-reveal" style="margin-top:2.5rem;">
+    <h2>Career Goals</h2>
+    <p>Targets you're working toward.</p>
+</div>
+<div class="b-card b-reveal" style="margin-bottom:var(--b-gap);">
+    <form method="POST" action="{{ url_for('goal_add') }}" style="display:flex;gap:.7rem;flex-wrap:wrap;">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="text" name="title" placeholder="e.g. Crack SDE-1 interviews by March" maxlength="255" required>
-        <input type="date" name="target_date" aria-label="Target date">
-        <button type="submit" class="btn-glass btn-primary">Add Goal</button>
+        <input class="b-input" type="text" name="title" placeholder="e.g. Crack SDE-1 interviews by March" maxlength="255" required style="flex:2;min-width:200px;">
+        <input class="b-input" type="date" name="target_date" aria-label="Target date" style="flex:1;min-width:150px;">
+        <button type="submit" class="b-btn b-btn--primary">Add Goal</button>
     </form>
-    {% if goals %}
-        {% for g in goals %}
-        <div class="goal-row {% if g.status == 'done' %}done{% endif %}">
-            <span class="gtitle">{{ g.title }}</span>
-            {% if g.target_date %}<span class="gdate">&#128197; {{ g.target_date.strftime('%d %b %Y') }}</span>{% endif %}
+</div>
+{% if goals %}
+<div class="b-bento">
+    {% for g in goals %}
+    <div class="b-card b-card--lite b-reveal" {% if g.status == 'done' %}style="opacity:.65;"{% endif %}>
+        <div style="font-weight:600;margin-bottom:.3rem;">{{ g.title }}</div>
+        {% if g.target_date %}<div style="color:var(--b-muted);font-size:.82rem;margin-bottom:.6rem;">{{ g.target_date.strftime('%d %b %Y') }}</div>{% endif %}
+        <div style="display:flex;gap:.5rem;margin-top:.4rem;">
             <form method="POST" action="{{ url_for('goal_toggle', goal_id=g.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button class="icon-btn" type="submit">{% if g.status == 'done' %}&#8630; Reopen{% else %}&#10003; Done{% endif %}</button>
+                <button class="b-btn b-btn--ghost b-btn--sm" type="submit">{% if g.status == 'done' %}Reopen{% else %}Done{% endif %}</button>
             </form>
             <form method="POST" action="{{ url_for('goal_delete', goal_id=g.id) }}" onsubmit="return confirm('Delete this goal?');">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button class="icon-btn" type="submit">&#128465;</button>
+                <button class="b-btn b-btn--danger b-btn--sm" type="submit">Delete</button>
             </form>
         </div>
-        {% endfor %}
-    {% else %}
-    <div class="empty">No goals yet — set your first career target above.</div>
-    {% endif %}
+    </div>
+    {% endfor %}
 </div>
+{% else %}
+<div class="b-card b-reveal"><p style="color:var(--b-muted);">No goals yet — set your first career target above.</p></div>
+{% endif %}
 {% endblock %}
