@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block theme %}resume{% endblock %}
+{% block title %}Skill Quizzes | AI Career & Research Assistant{% endblock %}
+{% block nav_learn %}b-active{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+
+{% block content %}
+<section style="padding-top:2.6rem;">
+    <div class="b-sec-head b-reveal">
+        <span class="b-pill"><span class="b-pulse"></span>Feature 19 &mdash; Quizzes</span>
+        <h1>Skill <span class="b-grad">quizzes</span></h1>
+        <p class="b-lede">Pick a skill, set your difficulty mix, and test yourself. Every answer comes with an instant explanation, and your final report diagnoses weak topics.</p>
+    </div>
+    {% if not is_authed %}
+    <div class="b-flash b-flash--info b-reveal"><a href="{{ url_for('login') }}">Sign in</a> to take quizzes — your history and best scores are saved to your account.</div>
+    {% endif %}
+</section>
+
+<section class="b-section" id="quiz-setup" style="padding-top:0;" aria-label="Quiz setup">
+    <div class="b-card b-reveal">
+        <h2 style="margin-top:0;">Set up your quiz</h2>
+        <div class="b-bento" style="grid-template-columns:repeat(2,1fr);">
+            <div class="b-field">
+                <label class="b-label" for="quiz-skill">Skill</label>
+                <select class="b-select" id="quiz-skill">
+                    {% for s in skills %}
+                    <option value="{{ s.id }}">{{ s.id|replace('-',' ')|title }} ({{ s.count }} questions)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="b-field">
+                <label class="b-label" for="quiz-n">Questions</label>
+                <select class="b-select" id="quiz-n">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                </select>
+            </div>
+        </div>
+        <div class="b-field">
+            <span class="b-label">Difficulty mix <span style="color:var(--b-muted);font-weight:400;">(leave all on for a balanced quiz)</span></span>
+            <div style="display:flex;gap:1.2rem;flex-wrap:wrap;">
+                {% for d in ['easy','medium','hard'] %}
+                <label style="display:flex;gap:.45rem;align-items:center;cursor:pointer;">
+                    <input type="checkbox" class="b-check quiz-diff" value="{{ d }}" checked> {{ d|title }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="b-field">
+            <label style="display:flex;gap:.6rem;align-items:center;cursor:pointer;">
+                <input type="checkbox" class="b-check" id="quiz-timed"> Timed mode
+            </label>
+            <div id="quiz-time-wrap" style="display:none;max-width:220px;margin-top:.6rem;">
+                <label class="b-label" for="quiz-time">Time limit (minutes)</label>
+                <select class="b-select" id="quiz-time">
+                    <option value="5">5</option><option value="10" selected>10</option>
+                    <option value="15">15</option><option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+        </div>
+        <button class="b-btn b-btn--primary b-magnet" id="quiz-start" {% if not is_authed %}disabled title="Sign in to take a quiz"{% endif %}>Start quiz</button>
+        <span id="quiz-status" role="status" style="margin-left:1rem;color:var(--b-muted);"></span>
+    </div>
+</section>
+
+<section class="b-section" id="quiz-run" style="padding-top:0;display:none;" aria-label="Quiz runner">
+    <div class="b-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+            <div><strong id="quiz-progress-label">Question 1 of 10</strong></div>
+            <div id="quiz-timer" class="b-tag" style="display:none;">10:00</div>
+        </div>
+        <div class="b-bar" style="margin-bottom:1.4rem;"><i id="quiz-progress-bar" style="width:0%;"></i></div>
+        <div id="quiz-question"></div>
+        <div id="quiz-feedback" style="margin-top:1rem;"></div>
+        <div class="b-cta-row" style="margin-top:1.2rem;">
+            <button class="b-btn b-btn--primary" id="quiz-check">Check answer</button>
+            <button class="b-btn b-btn--ghost" id="quiz-next" disabled>Next</button>
+            <button class="b-btn b-btn--ghost" id="quiz-finish" style="display:none;">Finish &amp; see results</button>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" id="quiz-done" style="padding-top:0;display:none;" aria-label="Quiz results">
+    <div class="b-card">
+        <h2 style="margin-top:0;">Your <span class="b-grad">results</span></h2>
+        <div id="quiz-summary"></div>
+        <div id="quiz-review" style="margin-top:1.4rem;"></div>
+        <div class="b-cta-row" style="margin-top:1.4rem;">
+            <a class="b-btn b-btn--primary" id="quiz-report-link" href="#">Full report</a>
+            <button class="b-btn b-btn--ghost" id="quiz-again">Take another quiz</button>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Skills and best scores">
+    <div class="b-sec-head">
+        <h2>Skills &amp; <span class="b-grad">your best scores</span></h2>
+    </div>
+    <div class="b-bento">
+        {% for s in skills %}
+        <div class="b-card b-card--lite b-reveal">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;">
+                <h3 style="margin:0;">{{ s.id|replace('-',' ')|title }}</h3>
+                {% if best.get(s.id) %}
+                <span class="b-tag" style="color:var(--b-ok);border-color:rgba(52,211,153,.4);">Best {{ best[s.id].pct }}%</span>
+                {% else %}
+                <span class="b-tag">{{ s.count }} Qs</span>
+                {% endif %}
+            </div>
+            <div style="color:var(--b-muted);font-size:.85rem;margin-top:.5rem;">{{ s.topics|map(attribute=0)|join(' · ') }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if is_authed %}
+    <div style="margin-top:1.4rem;"><a class="b-btn b-btn--ghost" href="{{ url_for('quizzes_history') }}">View quiz history</a></div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/learn_quizzes.js') }}"></script>
+{% endblock %}

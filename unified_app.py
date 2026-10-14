@@ -260,6 +260,10 @@ from learning_roadmaps import (list_skills as roadmap_skills,
                                analyze_gap, build_personal_roadmap,
                                validate_progress_payload, validate_gap_payload,
                                progress_summary as roadmap_progress_summary)
+from skill_quizzes import (quiz_skills, skill_topics, public_question,
+                           build_quiz, check_answer, grade_quiz,
+                           validate_start_payload, best_scores as quiz_best_scores,
+                           get_question as get_quiz_question)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -532,6 +536,28 @@ class RoadmapProgress(db.Model):
                                           name="uq_roadmap_user_skill_stage"),)
 
     user = db.relationship("User", backref=db.backref("roadmap_progress", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class QuizAttempt(db.Model):
+    """A skill-quiz attempt belonging to a user (Wave 3 #19)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    skill = db.Column(db.String(50), nullable=False, index=True)
+    num_questions = db.Column(db.Integer, nullable=False)
+    difficulty_mix = db.Column(db.JSON)   # list of difficulties or []
+    timed = db.Column(db.Boolean, default=False, nullable=False)
+    time_limit_sec = db.Column(db.Integer, default=0, nullable=False)
+    question_ids = db.Column(db.JSON)     # ordered question ids (server-picked)
+    checks_json = db.Column(db.JSON)      # per-question instant-check records
+    answers_json = db.Column(db.JSON)     # {qid: chosen_index}
+    results_json = db.Column(db.JSON)     # per-question review payload
+    summary_json = db.Column(db.JSON)     # score + topic/difficulty analytics
+    started_at = db.Column(db.DateTime, nullable=False)  # server timestamp
+    submitted_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("quiz_attempts", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -3047,6 +3073,175 @@ def register_routes(app):
         return render_template('roadmaps_dashboard.html',
                                summary=roadmap_progress_summary(rows),
                                skills={s["id"]: s for s in roadmap_skills()})
+
+    # ----- Feature #19: skill quizzes -----
+    @app.route('/learn/quizzes')
+    def quizzes_home():
+        """Pick a skill and quiz configuration."""
+        skills = [{"id": s, "count": n, "topics": skill_topics(s)[:8]}
+                  for s, n in quiz_skills()]
+        best = {}
+        if current_user.is_authenticated:
+            attempts = QuizAttempt.query.filter(
+                QuizAttempt.user_id == current_user.id,
+                QuizAttempt.submitted_at.isnot(None)).all()
+            best = quiz_best_scores(attempts)
+        return render_template('quizzes.html', skills=skills, best=best,
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/learn/quizzes/start', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def quizzes_start():
+        """Start a quiz attempt. Login required (history + best scores).
+
+        JSON body: {"skill": "...", "num_questions": 10,
+                    "difficulties": ["easy","medium"], "timed": false,
+                    "time_limit_sec": 600}.
+        CSRF token via X-CSRFToken header (not exempt).
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to take a quiz.'}), 401
+        payload = request.get_json(silent=True) or {}
+        cleaned, error = validate_start_payload(payload)
+        if error:
+            return jsonify({'error': error}), 400
+        questions = build_quiz(cleaned["skill"], n=cleaned["num_questions"],
+                               difficulties=cleaned["difficulties"] or None)
+        if not questions:
+            return jsonify({'error': 'No questions available for that skill.'}), 400
+        try:
+            row = QuizAttempt(
+                user_id=current_user.id, skill=cleaned["skill"],
+                num_questions=len(questions),
+                difficulty_mix=cleaned["difficulties"],
+                timed=cleaned["timed"], time_limit_sec=cleaned["time_limit_sec"],
+                question_ids=[q["id"] for q in questions],
+                checks_json=[],
+                started_at=datetime.now(timezone.utc))
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Quiz attempt creation failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not start the quiz. Please try again.'}), 500
+        return jsonify({'success': True, 'attempt_id': row.id,
+                        'skill': cleaned["skill"],
+                        'timed': cleaned["timed"],
+                        'time_limit_sec': cleaned["time_limit_sec"],
+                        'questions': [public_question(q) for q in questions]})
+
+    @app.route('/learn/quizzes/<int:attempt_id>/check', methods=['POST'])
+    @limiter.limit("120 per hour")
+    def quizzes_check(attempt_id):
+        """Instant per-question feedback. Login + owner only.
+
+        JSON body: {"question_id": "...", "answer": 2}.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        row = QuizAttempt.query.filter_by(id=attempt_id,
+                                          user_id=current_user.id).first()
+        if not row or row.submitted_at is not None:
+            return jsonify({'error': 'Quiz attempt not found.'}), 404
+        payload = request.get_json(silent=True) or {}
+        qid = str(payload.get("question_id") or "")
+        if qid not in (row.question_ids or []):
+            return jsonify({'error': 'Question is not part of this quiz.'}), 400
+        question = get_quiz_question(qid)
+        if not question:
+            return jsonify({'error': 'Unknown question.'}), 400
+        if row.timed and row.time_limit_sec:
+            elapsed = (datetime.now(timezone.utc) -
+                       row.started_at.replace(tzinfo=timezone.utc)).total_seconds()
+            if elapsed > row.time_limit_sec + SUBMIT_GRACE_SEC:
+                return jsonify({'error': 'Time is up for this quiz.'}), 400
+        raw_answer = payload.get("answer")
+        try:
+            chosen = int(raw_answer)
+        except (TypeError, ValueError):
+            chosen = None
+        result = check_answer(question, chosen if chosen is not None else -1)
+        try:
+            checks = list(row.checks_json or [])
+            checks = [c for c in checks if c.get("question_id") != qid]
+            checks.append({"question_id": qid, "chosen_index": chosen,
+                           "correct": result["correct"]})
+            row.checks_json = json_safe(checks)
+            db.session.commit()
+        except Exception:
+            log.exception("Quiz check save failed")
+            db.session.rollback()
+        return jsonify({'success': True, 'correct': result["correct"],
+                        'correct_index': result["correct_index"],
+                        'explanation': result["explanation"]})
+
+    @app.route('/learn/quizzes/<int:attempt_id>/submit', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def quizzes_submit(attempt_id):
+        """Grade the attempt server-side and persist the full review.
+
+        JSON body: {"answers": {"<qid>": <index>}}. Timing validated
+        server-side for timed quizzes.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        row = QuizAttempt.query.filter_by(id=attempt_id,
+                                          user_id=current_user.id).first()
+        if not row or row.submitted_at is not None:
+            return jsonify({'error': 'Quiz attempt not found.'}), 404
+        payload = request.get_json(silent=True) or {}
+        answers = payload.get("answers")
+        if not isinstance(answers, dict):
+            return jsonify({'error': 'Provide an answers object.'}), 400
+        questions = [get_quiz_question(qid) for qid in (row.question_ids or [])]
+        questions = [q for q in questions if q]
+        if not questions:
+            return jsonify({'error': 'This quiz has no questions.'}), 400
+        expired = False
+        if row.timed and row.time_limit_sec:
+            elapsed = (datetime.now(timezone.utc) -
+                       row.started_at.replace(tzinfo=timezone.utc)).total_seconds()
+            if elapsed > row.time_limit_sec + SUBMIT_GRACE_SEC:
+                expired = True
+        results, summary = grade_quiz(questions, answers)
+        summary["expired"] = expired
+        # Weak-topic study links: point at the roadmap skill page.
+        summary["roadmap_url"] = url_for('roadmap_detail', skill_id=row.skill)
+        try:
+            row.answers_json = json_safe({str(k): v for k, v in answers.items()})
+            row.results_json = json_safe(results)
+            row.summary_json = json_safe(summary)
+            row.submitted_at = datetime.now(timezone.utc)
+            db.session.commit()
+        except Exception:
+            log.exception("Quiz submit save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your results. Please try again.'}), 500
+        return jsonify({'success': True, 'summary': json_safe(summary),
+                        'report_url': url_for('view_quiz_result', attempt_id=row.id)})
+
+    @app.route('/learn/quizzes/<int:attempt_id>')
+    @login_required
+    def view_quiz_result(attempt_id):
+        """Full review of a submitted quiz attempt (owner only)."""
+        row = QuizAttempt.query.filter_by(id=attempt_id,
+                                          user_id=current_user.id).first()
+        if not row or row.submitted_at is None:
+            abort(404)
+        return render_template('quiz_result.html', attempt=row,
+                               summary=row.summary_json or {},
+                               results=row.results_json or [])
+
+    @app.route('/learn/quizzes/history')
+    @login_required
+    def quizzes_history():
+        """The user's quiz attempts + per-skill best scores."""
+        attempts = (QuizAttempt.query
+                    .filter(QuizAttempt.user_id == current_user.id,
+                            QuizAttempt.submitted_at.isnot(None))
+                    .order_by(QuizAttempt.submitted_at.desc()).all())
+        return render_template('quiz_history.html', attempts=attempts,
+                               best=quiz_best_scores(attempts))
 
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):

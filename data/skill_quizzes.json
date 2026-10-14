@@ -1,0 +1,4802 @@
+[
+ {
+  "id": "py-020",
+  "skill": "python",
+  "topic": "Generators",
+  "difficulty": "hard",
+  "question": "For processing a very large sequence, why is a generator expression preferred over a list comprehension?",
+  "options": [
+   "List comprehensions are slower at every size",
+   "It yields items lazily, using constant memory instead of building the whole list",
+   "It caches results automatically",
+   "It runs in parallel"
+  ],
+  "answer": 1,
+  "explanation": "Generators produce one item at a time, so memory stays flat even for huge sequences."
+ },
+ {
+  "id": "py-006",
+  "skill": "python",
+  "topic": "OOP",
+  "difficulty": "medium",
+  "question": "Which special method runs automatically when a class instance is created?",
+  "options": [
+   "__start__",
+   "__init__",
+   "__create__",
+   "__build__"
+  ],
+  "answer": 1,
+  "explanation": "__init__ is the initializer called right after an object is created to set up its state."
+ },
+ {
+  "id": "py-015",
+  "skill": "python",
+  "topic": "Data Types",
+  "difficulty": "easy",
+  "question": "Which of the following types is immutable?",
+  "options": [
+   "list",
+   "dict",
+   "tuple",
+   "set"
+  ],
+  "answer": 2,
+  "explanation": "Tuples cannot be changed after creation; lists, dicts, and sets are mutable."
+ },
+ {
+  "id": "py-005",
+  "skill": "python",
+  "topic": "Dictionaries",
+  "difficulty": "medium",
+  "question": "Given `d = {'a': 1, 'b': 2}`, what does `d.get('c', 'missing')` return?",
+  "options": [
+   "It raises KeyError",
+   "None",
+   "'missing'",
+   "0"
+  ],
+  "answer": 2,
+  "explanation": "dict.get() returns the default value instead of raising when the key is absent."
+ },
+ {
+  "id": "py-010",
+  "skill": "python",
+  "topic": "Strings",
+  "difficulty": "easy",
+  "question": "What does `'hello'.upper()` return?",
+  "options": [
+   "'hello'",
+   "'HELLO'",
+   "'Hello'",
+   "A TypeError"
+  ],
+  "answer": 1,
+  "explanation": "upper() returns a new string with all characters converted to uppercase."
+ },
+ {
+  "id": "py-014",
+  "skill": "python",
+  "topic": "stdlib",
+  "difficulty": "hard",
+  "question": "Which standard-library module provides regular expression support in Python?",
+  "options": [
+   "regex",
+   "re",
+   "pattern",
+   "matchlib"
+  ],
+  "answer": 1,
+  "explanation": "The re module implements regular expressions (re.search, re.findall, re.sub, ...)."
+ },
+ {
+  "id": "py-016",
+  "skill": "python",
+  "topic": "Modules",
+  "difficulty": "medium",
+  "question": "How do you import only the `sqrt` function from the `math` module?",
+  "options": [
+   "import math.sqrt",
+   "from math import sqrt",
+   "require('math').sqrt",
+   "using math: sqrt"
+  ],
+  "answer": 1,
+  "explanation": "from X import Y brings just the named attribute into the current namespace."
+ },
+ {
+  "id": "py-019",
+  "skill": "python",
+  "topic": "OOP",
+  "difficulty": "medium",
+  "question": "What is the main purpose of inheritance in OOP?",
+  "options": [
+   "Copy-pasting code between files",
+   "Letting a class reuse and extend another class's behavior",
+   "Making code run faster",
+   "Hiding all methods from subclasses"
+  ],
+  "answer": 1,
+  "explanation": "Inheritance lets a subclass reuse the parent's attributes/methods and override or extend them."
+ },
+ {
+  "id": "py-007",
+  "skill": "python",
+  "topic": "Decorators",
+  "difficulty": "hard",
+  "question": "What does a decorator fundamentally do?",
+  "options": [
+   "Takes a function or class and returns a (usually modified) version of it",
+   "Only wraps built-in functions",
+   "Rewrites the module's namespace",
+   "Declares variables in global scope"
+  ],
+  "answer": 0,
+  "explanation": "A decorator is a callable that receives a function/class and returns a replacement for it."
+ },
+ {
+  "id": "py-013",
+  "skill": "python",
+  "topic": "File I/O",
+  "difficulty": "medium",
+  "question": "What does opening a file with mode 'w' do?",
+  "options": [
+   "Opens it for reading",
+   "Opens it for writing, truncating any existing content",
+   "Appends to the end of the file",
+   "Opens it in binary mode only"
+  ],
+  "answer": 1,
+  "explanation": "'w' opens for writing and empties the file first; use 'a' to append instead."
+ },
+ {
+  "id": "py-018",
+  "skill": "python",
+  "topic": "Control Flow",
+  "difficulty": "easy",
+  "question": "What sequence does `range(5)` produce?",
+  "options": [
+   "1 to 5",
+   "0 to 4",
+   "0 to 5",
+   "5 down to 0"
+  ],
+  "answer": 1,
+  "explanation": "range(5) starts at 0 and stops before 5, giving 0, 1, 2, 3, 4."
+ },
+ {
+  "id": "py-011",
+  "skill": "python",
+  "topic": "Lists",
+  "difficulty": "easy",
+  "question": "Which list method adds a single item to the end of the list?",
+  "options": [
+   "add()",
+   "append()",
+   "push()",
+   "insert(-1, x)"
+  ],
+  "answer": 1,
+  "explanation": "append() adds one element at the end; push() does not exist in Python."
+ },
+ {
+  "id": "py-002",
+  "skill": "python",
+  "topic": "Control Flow",
+  "difficulty": "easy",
+  "question": "Which keyword skips the rest of the current loop iteration and jumps to the next one?",
+  "options": [
+   "skip",
+   "continue",
+   "pass",
+   "next"
+  ],
+  "answer": 1,
+  "explanation": "continue ends the current iteration immediately and moves the loop to the next item."
+ },
+ {
+  "id": "py-012",
+  "skill": "python",
+  "topic": "Functions",
+  "difficulty": "hard",
+  "question": "Given `def f(a, b=[]): b.append(a); return b` — after calling f(1), what does a call to f(2) return?",
+  "options": [
+   "[2]",
+   "[1]",
+   "[1, 2]",
+   "TypeError"
+  ],
+  "answer": 2,
+  "explanation": "Default arguments are evaluated once at def time, so the same list accumulates across calls."
+ },
+ {
+  "id": "py-003",
+  "skill": "python",
+  "topic": "Functions",
+  "difficulty": "easy",
+  "question": "What does a Python function return if it has no `return` statement?",
+  "options": [
+   "0",
+   "None",
+   "An empty string",
+   "undefined"
+  ],
+  "answer": 1,
+  "explanation": "Functions without an explicit return implicitly return None."
+ },
+ {
+  "id": "py-017",
+  "skill": "python",
+  "topic": "Scope",
+  "difficulty": "hard",
+  "question": "What does the `nonlocal` keyword do?",
+  "options": [
+   "Makes the variable global",
+   "Lets a nested function rebind a variable in the enclosing (non-global) scope",
+   "Deletes the variable",
+   "Imports it from another module"
+  ],
+  "answer": 1,
+  "explanation": "nonlocal targets the nearest enclosing function scope, unlike global which targets module scope."
+ },
+ {
+  "id": "py-008",
+  "skill": "python",
+  "topic": "Generators",
+  "difficulty": "medium",
+  "question": "What does the `yield` keyword do inside a function?",
+  "options": [
+   "Immediately returns and exits the function",
+   "Pauses the function and lazily produces one value per request",
+   "Raises StopIteration at once",
+   "Stops the whole program"
+  ],
+  "answer": 1,
+  "explanation": "yield turns the function into a generator that pauses, emits a value, and resumes on next()."
+ },
+ {
+  "id": "py-009",
+  "skill": "python",
+  "topic": "Exceptions",
+  "difficulty": "medium",
+  "question": "In a try/except statement, which block always runs whether or not an exception occurred?",
+  "options": [
+   "except",
+   "else",
+   "finally",
+   "try"
+  ],
+  "answer": 2,
+  "explanation": "finally executes no matter what, making it ideal for cleanup like closing files."
+ },
+ {
+  "id": "py-001",
+  "skill": "python",
+  "topic": "Data Types",
+  "difficulty": "easy",
+  "question": "What does the `len()` function return for an empty list?",
+  "options": [
+   "0",
+   "None",
+   "An error",
+   "-1"
+  ],
+  "answer": 0,
+  "explanation": "len() returns the number of items in a sequence; an empty list has 0 items."
+ },
+ {
+  "id": "py-004",
+  "skill": "python",
+  "topic": "List Comprehensions",
+  "difficulty": "medium",
+  "question": "What does `[x * 2 for x in range(3)]` evaluate to?",
+  "options": [
+   "[2, 4, 6]",
+   "[1, 2, 3]",
+   "[0, 2, 4]",
+   "A generator object"
+  ],
+  "answer": 2,
+  "explanation": "range(3) gives 0, 1, 2; doubling each produces [0, 2, 4]."
+ },
+ {
+  "id": "js-015",
+  "skill": "javascript",
+  "topic": "Operators",
+  "difficulty": "medium",
+  "question": "Compare `0 == '0'` and `0 === '0'`. Which statement is true?",
+  "options": [
+   "Both are true",
+   "== is true but === is false, because strict equality also checks type",
+   "== is false but === is true",
+   "Both are false"
+  ],
+  "answer": 1,
+  "explanation": "Loose == coerces types before comparing; strict === requires the same type and value."
+ },
+ {
+  "id": "js-009",
+  "skill": "javascript",
+  "topic": "ES6",
+  "difficulty": "easy",
+  "question": "Which of these is valid arrow-function syntax?",
+  "options": [
+   "function(x) { return x; }",
+   "x => x",
+   "(x) -> x",
+   "lambda x: x"
+  ],
+  "answer": 1,
+  "explanation": "Arrow functions use => ; `(x) -> x` is not JavaScript syntax."
+ },
+ {
+  "id": "js-004",
+  "skill": "javascript",
+  "topic": "Array Methods",
+  "difficulty": "easy",
+  "question": "What does `[1, 2, 3].map(x => x * 2)` return?",
+  "options": [
+   "[1, 2, 3]",
+   "[2, 4, 6]",
+   "[2, 4]",
+   "undefined"
+  ],
+  "answer": 1,
+  "explanation": "map applies the callback to every element and returns a new array of the results."
+ },
+ {
+  "id": "js-012",
+  "skill": "javascript",
+  "topic": "Array Methods",
+  "difficulty": "easy",
+  "question": "Which array method removes and returns the LAST element?",
+  "options": [
+   "shift()",
+   "pop()",
+   "slice()",
+   "splice()"
+  ],
+  "answer": 1,
+  "explanation": "pop() removes the final element; shift() removes the first one."
+ },
+ {
+  "id": "js-011",
+  "skill": "javascript",
+  "topic": "Variables",
+  "difficulty": "medium",
+  "question": "What happens when you try to reassign a `const` variable?",
+  "options": [
+   "Nothing changes",
+   "A TypeError is thrown",
+   "The value silently stays the same",
+   "Only a warning is logged"
+  ],
+  "answer": 1,
+  "explanation": "const bindings cannot be reassigned; attempting it throws a TypeError at runtime."
+ },
+ {
+  "id": "js-017",
+  "skill": "javascript",
+  "topic": "ES6",
+  "difficulty": "easy",
+  "question": "What does `` `Hello ${1 + 1}` `` (backticks) evaluate to?",
+  "options": [
+   "'Hello ${1 + 1}'",
+   "'Hello 2'",
+   "'Hello 1 + 1'",
+   "A SyntaxError"
+  ],
+  "answer": 1,
+  "explanation": "Template literals interpolate ${} expressions; 1 + 1 becomes 2."
+ },
+ {
+  "id": "js-002",
+  "skill": "javascript",
+  "topic": "Hoisting",
+  "difficulty": "easy",
+  "question": "What is hoisting in JavaScript?",
+  "options": [
+   "var declarations and function declarations are moved to the top of their scope before execution",
+   "Variables are deleted at runtime",
+   "Code is compressed before running",
+   "Functions execute in reverse order"
+  ],
+  "answer": 0,
+  "explanation": "During compilation, declarations are registered first, so they appear usable before their line."
+ },
+ {
+  "id": "js-013",
+  "skill": "javascript",
+  "topic": "DOM",
+  "difficulty": "medium",
+  "question": "How do you select the element with id=\"main\" in vanilla JavaScript?",
+  "options": [
+   "document.querySelector('#main')",
+   "document.querySelector('main')",
+   "document.getClass('main')",
+   "document.findById('main')"
+  ],
+  "answer": 0,
+  "explanation": "querySelector takes a CSS selector, and IDs are prefixed with #."
+ },
+ {
+  "id": "js-006",
+  "skill": "javascript",
+  "topic": "async/await",
+  "difficulty": "medium",
+  "question": "What does the `await` keyword do?",
+  "options": [
+   "Pauses the entire program",
+   "Pauses the async function until the promise settles, then resumes with its value",
+   "Makes asynchronous code fully synchronous",
+   "Cancels the promise"
+  ],
+  "answer": 1,
+  "explanation": "await suspends only that async function, yielding control back to the event loop meanwhile."
+ },
+ {
+  "id": "js-019",
+  "skill": "javascript",
+  "topic": "Promises",
+  "difficulty": "hard",
+  "question": "When does `Promise.all([...])` reject?",
+  "options": [
+   "As soon as the first input promise rejects",
+   "Only after every promise has rejected",
+   "It never rejects",
+   "Only when a timeout occurs"
+  ],
+  "answer": 0,
+  "explanation": "Promise.all short-circuits: the first rejection rejects the combined promise immediately."
+ },
+ {
+  "id": "js-003",
+  "skill": "javascript",
+  "topic": "Closures",
+  "difficulty": "medium",
+  "question": "What is a closure?",
+  "options": [
+   "A function bundled together with references to its surrounding lexical state",
+   "A syntax error in strict mode",
+   "A special kind of loop",
+   "An object literal with methods"
+  ],
+  "answer": 0,
+  "explanation": "An inner function keeps access to its outer scope's variables even after the outer function returns."
+ },
+ {
+  "id": "js-001",
+  "skill": "javascript",
+  "topic": "Variables",
+  "difficulty": "easy",
+  "question": "Which declaration creates a block-scoped variable that CAN be reassigned?",
+  "options": [
+   "var",
+   "let",
+   "const",
+   "static"
+  ],
+  "answer": 1,
+  "explanation": "let is block-scoped and reassignable; const forbids reassignment, var is function-scoped."
+ },
+ {
+  "id": "js-005",
+  "skill": "javascript",
+  "topic": "Promises",
+  "difficulty": "medium",
+  "question": "What is the initial state of a newly created Promise?",
+  "options": [
+   "resolved",
+   "pending",
+   "rejected",
+   "settled"
+  ],
+  "answer": 1,
+  "explanation": "A promise starts as pending and later becomes either fulfilled or rejected."
+ },
+ {
+  "id": "js-010",
+  "skill": "javascript",
+  "topic": "Prototypes",
+  "difficulty": "hard",
+  "question": "How does one object inherit behavior from another in JavaScript?",
+  "options": [
+   "Through the prototype chain, set up via Object.create or class extends",
+   "By deep-copying all properties at creation",
+   "JavaScript has no inheritance mechanism",
+   "Only built-in objects can inherit"
+  ],
+  "answer": 0,
+  "explanation": "Property lookup walks the prototype chain, so shared behavior lives on the prototype."
+ },
+ {
+  "id": "js-016",
+  "skill": "javascript",
+  "topic": "Closures",
+  "difficulty": "hard",
+  "question": "What does this log? `for (var i = 0; i < 3; i++) { setTimeout(() => console.log(i), 0); }`",
+  "options": [
+   "0, 1, 2",
+   "3, 3, 3",
+   "undefined three times",
+   "A ReferenceError"
+  ],
+  "answer": 1,
+  "explanation": "var is function-scoped, so all three callbacks share one binding whose final value is 3."
+ },
+ {
+  "id": "js-008",
+  "skill": "javascript",
+  "topic": "this",
+  "difficulty": "medium",
+  "question": "In a regular function invoked as `obj.method()`, what does `this` refer to?",
+  "options": [
+   "The global object",
+   "obj",
+   "Always undefined",
+   "The function itself"
+  ],
+  "answer": 1,
+  "explanation": "When called as a method, this is bound to the object before the dot at call time."
+ },
+ {
+  "id": "js-014",
+  "skill": "javascript",
+  "topic": "Operators",
+  "difficulty": "easy",
+  "question": "What does `typeof []` evaluate to?",
+  "options": [
+   "'array'",
+   "'object'",
+   "'list'",
+   "'undefined'"
+  ],
+  "answer": 1,
+  "explanation": "Arrays are objects in JavaScript, so typeof reports 'object'; use Array.isArray to check."
+ },
+ {
+  "id": "js-020",
+  "skill": "javascript",
+  "topic": "this",
+  "difficulty": "hard",
+  "question": "What is special about `this` inside an arrow function?",
+  "options": [
+   "It always refers to the global object",
+   "It has no own binding and inherits `this` from the enclosing lexical scope",
+   "It is always undefined",
+   "It refers to the DOM element that triggered the event"
+  ],
+  "answer": 1,
+  "explanation": "Arrow functions capture this lexically, which is why they are popular for callbacks."
+ },
+ {
+  "id": "js-007",
+  "skill": "javascript",
+  "topic": "Event Loop",
+  "difficulty": "hard",
+  "question": "Given `console.log(1); setTimeout(() => console.log(2), 0); Promise.resolve().then(() => console.log(3));` — what prints?",
+  "options": [
+   "1, 2, 3",
+   "1, 3, 2",
+   "3, 1, 2",
+   "2, 1, 3"
+  ],
+  "answer": 1,
+  "explanation": "Microtasks (promise callbacks) run before macrotasks (setTimeout), so 3 prints before 2."
+ },
+ {
+  "id": "js-018",
+  "skill": "javascript",
+  "topic": "ES6",
+  "difficulty": "medium",
+  "question": "What does `[...a, ...b]` do when a and b are arrays?",
+  "options": [
+   "Concatenates a and b into one new array",
+   "Creates a nested array [a, b]",
+   "Mutates a in place",
+   "Compares a and b"
+  ],
+  "answer": 0,
+  "explanation": "The spread operator expands each array's elements into the new array literal."
+ },
+ {
+  "id": "hc-010",
+  "skill": "html-css",
+  "topic": "Box Model",
+  "difficulty": "hard",
+  "question": "With `box-sizing: border-box`, an element with width:200px and padding:20px has what total width?",
+  "options": [
+   "240px",
+   "200px — padding and border are included inside the declared width",
+   "160px",
+   "Padding is ignored"
+  ],
+  "answer": 1,
+  "explanation": "border-box makes width cover content + padding + border, simplifying layout math."
+ },
+ {
+  "id": "hc-001",
+  "skill": "html-css",
+  "topic": "Semantic HTML",
+  "difficulty": "easy",
+  "question": "Which tag is meant to wrap the primary content of a page?",
+  "options": [
+   "<div>",
+   "<main>",
+   "<span>",
+   "<section>"
+  ],
+  "answer": 1,
+  "explanation": "The <main> element identifies the dominant content, helping assistive tech and SEO."
+ },
+ {
+  "id": "hc-020",
+  "skill": "html-css",
+  "topic": "Accessibility",
+  "difficulty": "hard",
+  "question": "What does the `aria-label` attribute do?",
+  "options": [
+   "Changes the element's visual style",
+   "Provides an accessible name for assistive technology when no visible text exists",
+   "Hides the element from everyone",
+   "Validates the HTML document"
+  ],
+  "answer": 1,
+  "explanation": "aria-label gives screen readers a name for icon buttons and other text-less controls."
+ },
+ {
+  "id": "hc-003",
+  "skill": "html-css",
+  "topic": "Flexbox",
+  "difficulty": "medium",
+  "question": "Which flexbox property centers items along the MAIN axis?",
+  "options": [
+   "align-items",
+   "justify-content",
+   "align-content",
+   "place-content"
+  ],
+  "answer": 1,
+  "explanation": "justify-content distributes space along the main axis; align-items handles the cross axis."
+ },
+ {
+  "id": "hc-014",
+  "skill": "html-css",
+  "topic": "Flexbox",
+  "difficulty": "medium",
+  "question": "What does `flex-direction: column` do to a flex container?",
+  "options": [
+   "Stacks flex items vertically, top to bottom",
+   "Stacks flex items horizontally",
+   "Reverses the whole page",
+   "Centers all items automatically"
+  ],
+  "answer": 0,
+  "explanation": "It makes the main axis vertical, so items flow down the column."
+ },
+ {
+  "id": "hc-006",
+  "skill": "html-css",
+  "topic": "Specificity",
+  "difficulty": "medium",
+  "question": "Which selector has the HIGHEST specificity?",
+  "options": [
+   "p",
+   ".note",
+   "#note",
+   "p.note"
+  ],
+  "answer": 2,
+  "explanation": "ID selectors outrank classes, which outrank element selectors: #note wins."
+ },
+ {
+  "id": "hc-011",
+  "skill": "html-css",
+  "topic": "Accessibility",
+  "difficulty": "easy",
+  "question": "Why should images have meaningful alt text?",
+  "options": [
+   "It makes images load faster",
+   "Screen readers announce it, and it displays if the image fails to load",
+   "It increases image resolution",
+   "It is only useful for SEO"
+  ],
+  "answer": 1,
+  "explanation": "Alt text is the accessible fallback that conveys the image's meaning non-visually."
+ },
+ {
+  "id": "hc-005",
+  "skill": "html-css",
+  "topic": "Selectors",
+  "difficulty": "easy",
+  "question": "Which CSS selector targets elements with class=\"btn\"?",
+  "options": [
+   "#btn",
+   ".btn",
+   "btn",
+   "*btn"
+  ],
+  "answer": 1,
+  "explanation": "A leading dot selects by class; # selects by id."
+ },
+ {
+  "id": "hc-013",
+  "skill": "html-css",
+  "topic": "Semantic HTML",
+  "difficulty": "easy",
+  "question": "Which element is designed to wrap a set of navigation links?",
+  "options": [
+   "<nav>",
+   "<menu>",
+   "<links>",
+   "<header>"
+  ],
+  "answer": 0,
+  "explanation": "<nav> marks major navigation blocks so assistive tech can jump to them."
+ },
+ {
+  "id": "hc-015",
+  "skill": "html-css",
+  "topic": "Grid",
+  "difficulty": "hard",
+  "question": "What does the `grid-area` shorthand set on a grid item?",
+  "options": [
+   "Only the column",
+   "row-start / column-start / row-end / column-end",
+   "The gap between tracks",
+   "The size of the grid container"
+  ],
+  "answer": 1,
+  "explanation": "grid-area places an item by naming its four bounding grid lines in one declaration."
+ },
+ {
+  "id": "hc-007",
+  "skill": "html-css",
+  "topic": "Positioning",
+  "difficulty": "hard",
+  "question": "How does `position: sticky` behave?",
+  "options": [
+   "It fixes the element to the viewport permanently",
+   "It acts like relative until the element crosses a threshold, then sticks in place",
+   "It removes the element from document flow",
+   "It centers the element in its parent"
+  ],
+  "answer": 1,
+  "explanation": "Sticky is a hybrid: normal flow first, then fixed-like within its scroll container."
+ },
+ {
+  "id": "hc-016",
+  "skill": "html-css",
+  "topic": "CSS Basics",
+  "difficulty": "easy",
+  "question": "What is the correct way to link an external stylesheet?",
+  "options": [
+   "<link rel=\"stylesheet\" href=\"style.css\">",
+   "<style src=\"style.css\">",
+   "<css href=\"style.css\">",
+   "<a href=\"style.css\">"
+  ],
+  "answer": 0,
+  "explanation": "The link element with rel=\"stylesheet\" in <head> loads external CSS."
+ },
+ {
+  "id": "hc-017",
+  "skill": "html-css",
+  "topic": "Selectors",
+  "difficulty": "medium",
+  "question": "What does the selector `ul > li` match?",
+  "options": [
+   "Every li anywhere inside a ul",
+   "Only li elements that are direct children of a ul",
+   "The first li inside each ul",
+   "li elements inside any list type"
+  ],
+  "answer": 1,
+  "explanation": "The child combinator (>) matches only one level down, not deeper descendants."
+ },
+ {
+  "id": "hc-008",
+  "skill": "html-css",
+  "topic": "Forms",
+  "difficulty": "easy",
+  "question": "Which input type gives built-in email-format validation?",
+  "options": [
+   "type=\"text\"",
+   "type=\"email\"",
+   "type=\"mail\"",
+   "type=\"address\""
+  ],
+  "answer": 1,
+  "explanation": "type=\"email\" validates the value against an email pattern on form submission."
+ },
+ {
+  "id": "hc-018",
+  "skill": "html-css",
+  "topic": "Positioning",
+  "difficulty": "hard",
+  "question": "Which position value takes an element out of normal flow and positions it relative to its nearest positioned ancestor?",
+  "options": [
+   "relative",
+   "absolute",
+   "static",
+   "sticky"
+  ],
+  "answer": 1,
+  "explanation": "absolute removes the element from flow and anchors it to the closest non-static ancestor."
+ },
+ {
+  "id": "hc-002",
+  "skill": "html-css",
+  "topic": "Box Model",
+  "difficulty": "easy",
+  "question": "What is the correct order of the CSS box model from inside out?",
+  "options": [
+   "content, padding, border, margin",
+   "margin, border, padding, content",
+   "content, margin, border, padding",
+   "padding, content, margin, border"
+  ],
+  "answer": 0,
+  "explanation": "An element is content, wrapped by padding, then border, then margin."
+ },
+ {
+  "id": "hc-009",
+  "skill": "html-css",
+  "topic": "Responsive",
+  "difficulty": "medium",
+  "question": "What does `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">` do?",
+  "options": [
+   "Disables pinch zoom",
+   "Makes the layout viewport match the device width for proper mobile scaling",
+   "Speeds up page loading",
+   "Hides the browser address bar"
+  ],
+  "answer": 1,
+  "explanation": "Without it, mobile browsers render pages at a desktop width and shrink them."
+ },
+ {
+  "id": "hc-019",
+  "skill": "html-css",
+  "topic": "Responsive",
+  "difficulty": "medium",
+  "question": "Which CSS unit is relative to the viewport width?",
+  "options": [
+   "px",
+   "em",
+   "vw",
+   "pt"
+  ],
+  "answer": 2,
+  "explanation": "1vw equals 1% of the viewport width, so layouts scale with the browser window."
+ },
+ {
+  "id": "hc-012",
+  "skill": "html-css",
+  "topic": "Forms",
+  "difficulty": "medium",
+  "question": "Which attribute makes a form input mandatory before submission?",
+  "options": [
+   "validate",
+   "required",
+   "mandatory",
+   "check"
+  ],
+  "answer": 1,
+  "explanation": "The required boolean attribute blocks submission until the field has a value."
+ },
+ {
+  "id": "hc-004",
+  "skill": "html-css",
+  "topic": "Grid",
+  "difficulty": "medium",
+  "question": "What does `grid-template-columns: 1fr 2fr;` create?",
+  "options": [
+   "Two equal columns",
+   "Two columns where the second is twice as wide as the first",
+   "Columns fixed at 12px and 22px",
+   "One row split into fractions"
+  ],
+  "answer": 1,
+  "explanation": "fr units divide free space proportionally, so the columns share space 1:2."
+ },
+ {
+  "id": "dsa-011",
+  "skill": "dsa",
+  "topic": "Hashing",
+  "difficulty": "medium",
+  "question": "What is the average-case lookup time in a well-designed hash table?",
+  "options": [
+   "O(n)",
+   "O(log n)",
+   "O(1)",
+   "O(n^2)"
+  ],
+  "answer": 2,
+  "explanation": "Hashing maps keys directly to buckets, so average lookup is constant time."
+ },
+ {
+  "id": "dsa-001",
+  "skill": "dsa",
+  "topic": "Big-O",
+  "difficulty": "easy",
+  "question": "What is the time complexity of accessing an array element by its index?",
+  "options": [
+   "O(n)",
+   "O(1)",
+   "O(log n)",
+   "O(n^2)"
+  ],
+  "answer": 1,
+  "explanation": "Array elements sit at computable memory offsets, so index access is constant time."
+ },
+ {
+  "id": "dsa-015",
+  "skill": "dsa",
+  "topic": "Graphs",
+  "difficulty": "hard",
+  "question": "What problem does Dijkstra's algorithm solve?",
+  "options": [
+   "Finding a minimum spanning tree",
+   "Shortest paths from a source node with non-negative edge weights",
+   "Listing all topological orderings",
+   "Computing maximum flow"
+  ],
+  "answer": 1,
+  "explanation": "Dijkstra greedily finalizes the closest unsettled node, which is correct only for non-negative weights."
+ },
+ {
+  "id": "dsa-009",
+  "skill": "dsa",
+  "topic": "Sorting",
+  "difficulty": "medium",
+  "question": "When does quicksort hit its O(n^2) worst case?",
+  "options": [
+   "With a naive pivot choice on an already-sorted array",
+   "When the array is empty",
+   "When all elements are equal and pivot is random",
+   "Only on arrays larger than memory"
+  ],
+  "answer": 0,
+  "explanation": "A bad pivot repeatedly creates maximally unbalanced partitions, degrading to quadratic time."
+ },
+ {
+  "id": "dsa-013",
+  "skill": "dsa",
+  "topic": "Graphs",
+  "difficulty": "medium",
+  "question": "Breadth-first search (BFS) is typically implemented with which data structure?",
+  "options": [
+   "Stack",
+   "Queue",
+   "Heap",
+   "Priority queue"
+  ],
+  "answer": 1,
+  "explanation": "BFS explores level by level, and a queue naturally processes nodes in discovery order."
+ },
+ {
+  "id": "dsa-012",
+  "skill": "dsa",
+  "topic": "Big-O",
+  "difficulty": "easy",
+  "question": "Which function grows the SLOWEST as n gets large?",
+  "options": [
+   "n^2",
+   "n log n",
+   "2^n",
+   "n"
+  ],
+  "answer": 3,
+  "explanation": "Linear growth is outpaced by n log n, quadratic, and exponential functions."
+ },
+ {
+  "id": "dsa-017",
+  "skill": "dsa",
+  "topic": "DP",
+  "difficulty": "medium",
+  "question": "What is the key idea behind dynamic programming?",
+  "options": [
+   "Divide into independent subproblems",
+   "Solve each overlapping subproblem once and reuse the results",
+   "Always take the locally greedy choice",
+   "Use recursion without any memoization"
+  ],
+  "answer": 1,
+  "explanation": "Memoization or tabulation avoids recomputing shared subproblems, turning exponential into polynomial time."
+ },
+ {
+  "id": "dsa-016",
+  "skill": "dsa",
+  "topic": "Searching",
+  "difficulty": "easy",
+  "question": "What precondition does binary search require on the array?",
+  "options": [
+   "It must be large",
+   "It must be sorted",
+   "All elements must be unique",
+   "It must be a linked list"
+  ],
+  "answer": 1,
+  "explanation": "Binary search halves the search range by comparing against the middle, which needs sorted order."
+ },
+ {
+  "id": "dsa-006",
+  "skill": "dsa",
+  "topic": "Trees",
+  "difficulty": "medium",
+  "question": "In a binary tree with the root at level 0, what is the maximum number of nodes at level k?",
+  "options": [
+   "k",
+   "2^k",
+   "n - k",
+   "k^2"
+  ],
+  "answer": 1,
+  "explanation": "Each level can hold twice the nodes of the previous one, so level k holds at most 2^k nodes."
+ },
+ {
+  "id": "dsa-018",
+  "skill": "dsa",
+  "topic": "Trees",
+  "difficulty": "hard",
+  "question": "What is the height of a complete binary tree with n nodes?",
+  "options": [
+   "O(n)",
+   "O(log n)",
+   "O(1)",
+   "O(sqrt(n))"
+  ],
+  "answer": 1,
+  "explanation": "A complete tree is as balanced as possible, so its height grows logarithmically with n."
+ },
+ {
+  "id": "dsa-005",
+  "skill": "dsa",
+  "topic": "Queues",
+  "difficulty": "easy",
+  "question": "Which ordering principle does a queue follow?",
+  "options": [
+   "LIFO",
+   "FIFO",
+   "Sorted order",
+   "Heap order"
+  ],
+  "answer": 1,
+  "explanation": "A queue is first-in-first-out: elements leave in the order they arrived."
+ },
+ {
+  "id": "dsa-007",
+  "skill": "dsa",
+  "topic": "BST",
+  "difficulty": "hard",
+  "question": "What is the search time complexity in a BALANCED binary search tree with n nodes?",
+  "options": [
+   "O(n)",
+   "O(log n)",
+   "O(1)",
+   "O(n log n)"
+  ],
+  "answer": 1,
+  "explanation": "Each comparison discards half the remaining tree, giving logarithmic search."
+ },
+ {
+  "id": "dsa-019",
+  "skill": "dsa",
+  "topic": "Stacks",
+  "difficulty": "easy",
+  "question": "Which everyday operation is most naturally modeled with a stack?",
+  "options": [
+   "A print job queue",
+   "Undo in a text editor",
+   "Round-robin CPU scheduling",
+   "Level-order tree traversal"
+  ],
+  "answer": 1,
+  "explanation": "Undo reverses the most recent action first, which is exactly LIFO stack behavior."
+ },
+ {
+  "id": "dsa-004",
+  "skill": "dsa",
+  "topic": "Stacks",
+  "difficulty": "medium",
+  "question": "Which ordering principle does a stack follow?",
+  "options": [
+   "FIFO",
+   "LIFO",
+   "Priority order",
+   "Random access"
+  ],
+  "answer": 1,
+  "explanation": "A stack is last-in-first-out: push adds to the top, pop removes from the top."
+ },
+ {
+  "id": "dsa-014",
+  "skill": "dsa",
+  "topic": "Graphs",
+  "difficulty": "medium",
+  "question": "Depth-first search (DFS) is typically implemented with which data structure?",
+  "options": [
+   "Queue",
+   "Stack (or recursion)",
+   "Heap",
+   "Linked list"
+  ],
+  "answer": 1,
+  "explanation": "DFS goes deep before backtracking, which a stack (or the call stack via recursion) provides."
+ },
+ {
+  "id": "dsa-020",
+  "skill": "dsa",
+  "topic": "Hashing",
+  "difficulty": "hard",
+  "question": "What is a hash collision?",
+  "options": [
+   "Two distinct keys mapping to the same bucket",
+   "A corrupted hash function",
+   "Two identical keys in the table",
+   "Deleting from a full table"
+  ],
+  "answer": 0,
+  "explanation": "Collisions are resolved with chaining or open addressing when different keys hash alike."
+ },
+ {
+  "id": "dsa-010",
+  "skill": "dsa",
+  "topic": "Heaps",
+  "difficulty": "hard",
+  "question": "What is the time complexity of extracting the maximum from a binary max-heap of n elements?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 1,
+  "explanation": "Removing the root requires sifting the replacement down the heap's height, which is log n."
+ },
+ {
+  "id": "dsa-008",
+  "skill": "dsa",
+  "topic": "Sorting",
+  "difficulty": "easy",
+  "question": "Which of these sorting algorithms runs in O(n log n) average time?",
+  "options": [
+   "Bubble sort",
+   "Merge sort",
+   "Selection sort",
+   "Insertion sort"
+  ],
+  "answer": 1,
+  "explanation": "Merge sort divides the array in half recursively and merges in linear time per level."
+ },
+ {
+  "id": "dsa-002",
+  "skill": "dsa",
+  "topic": "Arrays",
+  "difficulty": "easy",
+  "question": "In a dynamic array (like Python's list), appending at the end is usually:",
+  "options": [
+   "O(n)",
+   "O(1) amortized",
+   "O(log n)",
+   "O(n^2)"
+  ],
+  "answer": 1,
+  "explanation": "Appends are constant time except occasional resizing, which averages out to O(1)."
+ },
+ {
+  "id": "dsa-003",
+  "skill": "dsa",
+  "topic": "Linked Lists",
+  "difficulty": "medium",
+  "question": "What is the main advantage of a linked list over an array?",
+  "options": [
+   "Faster random access",
+   "O(1) insertion/deletion at a known node",
+   "Less memory per element",
+   "Better cache locality"
+  ],
+  "answer": 1,
+  "explanation": "Relinking pointers is constant time, while arrays must shift elements to insert or delete."
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "DISTINCT removes duplicate rows from the result set.",
+  "id": "sql-001",
+  "options": [
+   "UNIQUE",
+   "DISTINCT",
+   "ONLY",
+   "SINGLE"
+  ],
+  "question": "Which keyword returns only unique values in a result set?",
+  "skill": "sql",
+  "topic": "SELECT"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "BETWEEN checks if a value lies within an inclusive range.",
+  "id": "sql-002",
+  "options": [
+   "RANGE",
+   "BETWEEN",
+   "INSIDE",
+   "FROM"
+  ],
+  "question": "Which operator tests whether a value falls inside a range?",
+  "skill": "sql",
+  "topic": "WHERE"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "HAVING filters grouped rows; WHERE filters rows before grouping.",
+  "id": "sql-003",
+  "options": [
+   "WHERE",
+   "HAVING",
+   "FILTER",
+   "GROUP"
+  ],
+  "question": "Which clause filters rows AFTER grouping?",
+  "skill": "sql",
+  "topic": "GROUP BY/HAVING"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "LEFT JOIN keeps every left row and fills NULLs where there is no right match.",
+  "id": "sql-004",
+  "options": [
+   "INNER JOIN",
+   "LEFT JOIN",
+   "RIGHT JOIN",
+   "FULL JOIN"
+  ],
+  "question": "Which JOIN returns all rows from the left table plus matching rows from the right?",
+  "skill": "sql",
+  "topic": "JOINs"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "INNER JOIN keeps only rows that have a matching key in both tables.",
+  "id": "sql-005",
+  "options": [
+   "All rows from both tables",
+   "Only rows with matches in both tables",
+   "All rows from the left table",
+   "No rows at all"
+  ],
+  "question": "An INNER JOIN returns which rows?",
+  "skill": "sql",
+  "topic": "JOINs"
+ },
+ {
+  "answer": 2,
+  "difficulty": "medium",
+  "explanation": "GROUP BY forms groups first; aggregates like COUNT then run per group.",
+  "id": "sql-006",
+  "options": [
+   "HAVING",
+   "ORDER BY",
+   "GROUP BY",
+   "WHERE"
+  ],
+  "question": "In a query with COUNT(*), which clause groups rows before counting?",
+  "skill": "sql",
+  "topic": "GROUP BY/HAVING"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "> ALL compares against every subquery value and requires beating all of them.",
+  "id": "sql-007",
+  "options": [
+   "= ANY",
+   "> ALL",
+   "> SOME",
+   "IN"
+  ],
+  "question": "Which pattern returns rows whose value is greater than ALL subquery values?",
+  "skill": "sql",
+  "topic": "subqueries"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "A correlated subquery depends on the outer query and re-runs per outer row.",
+  "id": "sql-008",
+  "options": [
+   "Runs once before the outer query",
+   "References columns from the outer query",
+   "Never returns any data",
+   "Only works with aggregates"
+  ],
+  "question": "A correlated subquery is one that...",
+  "skill": "sql",
+  "topic": "subqueries"
+ },
+ {
+  "answer": 0,
+  "difficulty": "easy",
+  "explanation": "Indexes let the engine locate rows without scanning the whole table.",
+  "id": "sql-009",
+  "options": [
+   "Faster data retrieval",
+   "Smaller storage use",
+   "Automatic backups",
+   "Data encryption"
+  ],
+  "question": "What is the main benefit of an index?",
+  "skill": "sql",
+  "topic": "indexes"
+ },
+ {
+  "answer": 2,
+  "difficulty": "medium",
+  "explanation": "PRIMARY KEY enforces uniqueness and rejects NULLs, identifying each row.",
+  "id": "sql-010",
+  "options": [
+   "UNIQUE",
+   "NOT NULL",
+   "PRIMARY KEY",
+   "FOREIGN KEY"
+  ],
+  "question": "Which constraint guarantees every row has a unique, non-null identifier?",
+  "skill": "sql",
+  "topic": "constraints"
+ },
+ {
+  "answer": 2,
+  "difficulty": "medium",
+  "explanation": "Atomicity means either all statements commit or the whole transaction rolls back.",
+  "id": "sql-011",
+  "options": [
+   "Consistency",
+   "Isolation",
+   "Atomicity",
+   "Durability"
+  ],
+  "question": "Which ACID property guarantees all-or-nothing execution of a transaction?",
+  "skill": "sql",
+  "topic": "transactions"
+ },
+ {
+  "answer": 2,
+  "difficulty": "easy",
+  "explanation": "DELETE removes rows while keeping the table; DROP removes the table itself.",
+  "id": "sql-012",
+  "options": [
+   "DROP",
+   "TRUNCATE only",
+   "DELETE",
+   "REMOVE TABLE"
+  ],
+  "question": "Which statement removes rows from a table but keeps the table structure?",
+  "skill": "sql",
+  "topic": "INSERT/UPDATE/DELETE"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "PARTITION BY splits rows into windows; numbering restarts inside each window.",
+  "id": "sql-013",
+  "options": [
+   "Sorts the final output",
+   "Restarts numbering for each dept",
+   "Filters rows by dept",
+   "Collapses each dept into one row"
+  ],
+  "question": "In ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC), what does PARTITION BY do?",
+  "skill": "sql",
+  "topic": "window functions"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "3NF removes transitive dependencies so non-key columns depend only on the key.",
+  "id": "sql-014",
+  "options": [
+   "Has no NULL values",
+   "Has no transitive dependencies",
+   "Has a composite key",
+   "Has exactly two columns"
+  ],
+  "question": "A table is in 3NF when it is in 2NF and...",
+  "skill": "sql",
+  "topic": "normalization"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "LIKE compares strings against a pattern where % means any sequence and _ means one char.",
+  "id": "sql-015",
+  "options": [
+   "MATCH",
+   "LIKE",
+   "PATTERN",
+   "FIND"
+  ],
+  "question": "Which keyword matches a pattern using wildcards like % and _?",
+  "skill": "sql",
+  "topic": "WHERE"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "CROSS JOIN pairs every row of one table with every row of the other.",
+  "id": "sql-016",
+  "options": [
+   "Only matching rows",
+   "Cartesian product of both tables",
+   "Left rows plus matches",
+   "An error if no ON clause"
+  ],
+  "question": "What does a CROSS JOIN produce?",
+  "skill": "sql",
+  "topic": "JOINs"
+ },
+ {
+  "answer": 2,
+  "difficulty": "medium",
+  "explanation": "READ UNCOMMITTED lets a transaction read uncommitted changes from others.",
+  "id": "sql-017",
+  "options": [
+   "READ COMMITTED",
+   "REPEATABLE READ",
+   "READ UNCOMMITTED",
+   "SERIALIZABLE"
+  ],
+  "question": "Which isolation level allows dirty reads?",
+  "skill": "sql",
+  "topic": "transactions"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "ORDER BY sorts rows, ascending by default or DESC for descending.",
+  "id": "sql-018",
+  "options": [
+   "SORT BY",
+   "ORDER BY",
+   "GROUP BY",
+   "ARRANGE"
+  ],
+  "question": "Which clause sorts query results?",
+  "skill": "sql",
+  "topic": "SELECT"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Every selected column must appear in GROUP BY or inside an aggregate function.",
+  "id": "sql-019",
+  "options": [
+   "Aggregates cannot mix with columns",
+   "salary is neither grouped nor aggregated",
+   "COUNT needs DISTINCT",
+   "name must come last"
+  ],
+  "question": "Why is SELECT name, salary, COUNT(*) FROM emp GROUP BY name invalid in standard SQL?",
+  "skill": "sql",
+  "topic": "GROUP BY/HAVING"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Leftmost-prefix rule: the index serves queries filtering on last_name, optionally also first_name.",
+  "id": "sql-020",
+  "options": [
+   "WHERE first_name = 'A'",
+   "WHERE last_name = 'B' AND first_name = 'C'",
+   "WHERE first_name = 'C' AND last_name = 'B'",
+   "ORDER BY first_name"
+  ],
+  "question": "A composite index on (last_name, first_name) speeds up which query best?",
+  "skill": "sql",
+  "topic": "indexes"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "int is a primitive; String, Integer and ArrayList are reference types.",
+  "id": "jv-001",
+  "options": [
+   "String",
+   "int",
+   "Integer",
+   "ArrayList"
+  ],
+  "question": "Which of these is a primitive type in Java?",
+  "skill": "java",
+  "topic": "primitives vs objects"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Primitives are copied by value, so changing y does not affect x.",
+  "id": "jv-002",
+  "options": [
+   "10",
+   "5",
+   "0",
+   "It does not compile"
+  ],
+  "question": "After int x = 5; int y = x; y = 10; what is the value of x?",
+  "skill": "java",
+  "topic": "primitives vs objects"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "extends declares that a class inherits from a superclass.",
+  "id": "jv-003",
+  "options": [
+   "inherits",
+   "extends",
+   "implements",
+   "super"
+  ],
+  "question": "Which keyword is used for inheritance in Java?",
+  "skill": "java",
+  "topic": "OOP"
+ },
+ {
+  "answer": 0,
+  "difficulty": "medium",
+  "explanation": "Overriding needs an identical signature so the subclass replaces the parent method.",
+  "id": "jv-004",
+  "options": [
+   "Same name, same parameters, compatible return type",
+   "Same name only",
+   "Different parameters",
+   "A static method"
+  ],
+  "question": "Method overriding requires...",
+  "skill": "java",
+  "topic": "OOP"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Java uses dynamic dispatch: the actual object's method runs, not the reference type's.",
+  "id": "jv-005",
+  "options": [
+   "Parent's version, always",
+   "Child's version, decided at runtime",
+   "It is a compile error",
+   "Whichever was written first"
+  ],
+  "question": "Given Parent p = new Child(); p.foo(); which version of foo() runs?",
+  "skill": "java",
+  "topic": "OOP"
+ },
+ {
+  "answer": 0,
+  "difficulty": "medium",
+  "explanation": "Abstract classes can hold state and constructors; interfaces only describe behavior.",
+  "id": "jv-006",
+  "options": [
+   "It can have constructors and instance state",
+   "It runs faster",
+   "It allows multiple inheritance",
+   "It cannot declare methods"
+  ],
+  "question": "An abstract class differs from an interface mainly because...",
+  "skill": "java",
+  "topic": "OOP"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "finally executes regardless of exceptions, ideal for cleanup code.",
+  "id": "jv-007",
+  "options": [
+   "final",
+   "finally",
+   "last",
+   "done"
+  ],
+  "question": "Which block always runs after try/catch, even if an exception occurs?",
+  "skill": "java",
+  "topic": "exceptions"
+ },
+ {
+  "answer": 0,
+  "difficulty": "medium",
+  "explanation": "The compiler forces checked exceptions to be handled or declared.",
+  "id": "jv-008",
+  "options": [
+   "Caught or declared with throws",
+   "Ignored safely",
+   "Only caught in main",
+   "Always wrapped in RuntimeException"
+  ],
+  "question": "Checked exceptions must be...",
+  "skill": "java",
+  "topic": "exceptions"
+ },
+ {
+  "answer": 2,
+  "difficulty": "easy",
+  "explanation": "HashSet stores only unique elements; lists allow duplicates.",
+  "id": "jv-009",
+  "options": [
+   "ArrayList",
+   "LinkedList",
+   "HashSet",
+   "Vector"
+  ],
+  "question": "Which collection does NOT allow duplicate elements?",
+  "skill": "java",
+  "topic": "collections"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "ArrayList is array-backed, so get(i) is O(1); LinkedList must traverse nodes.",
+  "id": "jv-010",
+  "options": [
+   "Insertions in the middle",
+   "Random access by index",
+   "Deletions at the head",
+   "All operations"
+  ],
+  "question": "ArrayList vs LinkedList: ArrayList is faster for...",
+  "skill": "java",
+  "topic": "collections"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Arrays need a reifiable component type at runtime, but T is erased.",
+  "id": "jv-011",
+  "options": [
+   "Arrays are too slow",
+   "Type erasure removes T at runtime, so the JVM cannot check the array's component type",
+   "Generics forbid array syntax",
+   "It actually compiles fine"
+  ],
+  "question": "Why can't you write new T[10] for a generic type parameter T?",
+  "skill": "java",
+  "topic": "generics"
+ },
+ {
+  "answer": 2,
+  "difficulty": "medium",
+  "explanation": "collect produces a result and ends the pipeline; map, filter and peek are intermediate.",
+  "id": "jv-012",
+  "options": [
+   "map",
+   "filter",
+   "collect",
+   "peek"
+  ],
+  "question": "Which stream operation is terminal?",
+  "skill": "java",
+  "topic": "streams"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "Streams chain operations like filter and map into a declarative pipeline.",
+  "id": "jv-013",
+  "options": [
+   "Imperative loops only",
+   "Functional pipeline of operations",
+   "Recursion only",
+   "Goto-based jumps"
+  ],
+  "question": "Streams process data in which style?",
+  "skill": "java",
+  "topic": "streams"
+ },
+ {
+  "answer": 0,
+  "difficulty": "medium",
+  "explanation": "start() spawns a new thread that calls run(); calling run() executes inline.",
+  "id": "jv-014",
+  "options": [
+   "Runs the code on a new thread",
+   "Runs on the current thread",
+   "Does nothing",
+   "Throws an error"
+  ],
+  "question": "Calling thread.start() instead of thread.run() directly...",
+  "skill": "java",
+  "topic": "threads basics"
+ },
+ {
+  "answer": 0,
+  "difficulty": "easy",
+  "explanation": "The JVM executes bytecode; the JRE bundles JVM plus libraries, the JDK adds dev tools.",
+  "id": "jv-015",
+  "options": [
+   "JVM",
+   "JDK",
+   "JRE",
+   "JIT"
+  ],
+  "question": "Which component actually runs Java bytecode?",
+  "skill": "java",
+  "topic": "JVM/JDK/JRE"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "The JIT optimizes frequently executed bytecode into native code while the program runs.",
+  "id": "jv-016",
+  "options": [
+   "Compiles Java source to bytecode",
+   "Compiles hot bytecode to native machine code at runtime",
+   "Checks syntax errors",
+   "Loads class files"
+  ],
+  "question": "What does the JIT compiler do?",
+  "skill": "java",
+  "topic": "JVM/JDK/JRE"
+ },
+ {
+  "answer": 2,
+  "difficulty": "easy",
+  "explanation": "public grants unrestricted access to the member.",
+  "id": "jv-017",
+  "options": [
+   "private",
+   "protected",
+   "public",
+   "default"
+  ],
+  "question": "Which modifier makes a member visible from everywhere?",
+  "skill": "java",
+  "topic": "access modifiers"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "With no modifier, access is limited to classes in the same package.",
+  "id": "jv-018",
+  "options": [
+   "Visible everywhere",
+   "Visible only within the same package",
+   "Visible only inside the class",
+   "Visible only to subclasses"
+  ],
+  "question": "Default (package-private) access means the member is...",
+  "skill": "java",
+  "topic": "access modifiers"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Each + on a String allocates a new object; StringBuilder appends in place.",
+  "id": "jv-019",
+  "options": [
+   "It is thread-safe",
+   "String is immutable, so + in a loop creates many temporary objects",
+   "StringBuilder code is shorter",
+   "Strings cannot be concatenated"
+  ],
+  "question": "Why is StringBuilder preferred over String concatenation inside a loop?",
+  "skill": "java",
+  "topic": "String handling"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "== checks identity; equals() checks character-by-character equality.",
+  "id": "jv-020",
+  "options": [
+   "Both compare contents",
+   "== compares references, equals compares contents",
+   "== compares contents",
+   "equals compares references"
+  ],
+  "question": "For Strings, s1 == s2 versus s1.equals(s2):",
+  "skill": "java",
+  "topic": "String handling"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "Dereferencing with * follows the pointer to the value it points at.",
+  "id": "cp-001",
+  "options": [
+   "Declares it",
+   "Dereferences it to access the pointed-to value",
+   "Deletes it",
+   "Copies the address"
+  ],
+  "question": "What does the * operator do when applied to a pointer?",
+  "skill": "cpp",
+  "topic": "pointers"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Dereferencing nullptr is undefined behavior and typically segfaults.",
+  "id": "cp-002",
+  "options": [
+   "p becomes 5",
+   "Undefined behavior, likely a crash",
+   "Compiles to a no-op",
+   "Automatic memory allocation"
+  ],
+  "question": "int* p = nullptr; *p = 5; results in...",
+  "skill": "cpp",
+  "topic": "pointers"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Pointer arithmetic steps by element size, so p+2 points at arr[2].",
+  "id": "cp-003",
+  "options": [
+   "arr[1]",
+   "arr[2]",
+   "arr[3]",
+   "Out of bounds"
+  ],
+  "question": "Given int arr[5]; int* p = arr; which element does *(p+2) access?",
+  "skill": "cpp",
+  "topic": "pointers"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "A reference binds once at initialization and always aliases the same object.",
+  "id": "cp-004",
+  "options": [
+   "Reassigned at any time",
+   "Initialized when declared and never reseated",
+   "Null by default",
+   "Deleted manually"
+  ],
+  "question": "A C++ reference must be...",
+  "skill": "cpp",
+  "topic": "references"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Passing by reference lets the function mutate the original argument.",
+  "id": "cp-005",
+  "options": [
+   "Only read x",
+   "Modify the caller's variable",
+   "Copy x cheaply",
+   "Return a pointer"
+  ],
+  "question": "A parameter declared as void f(int& x) allows the function to...",
+  "skill": "cpp",
+  "topic": "references"
+ },
+ {
+  "answer": 0,
+  "difficulty": "easy",
+  "explanation": "C++ inheritance uses a colon followed by the access specifier and base class.",
+  "id": "cp-006",
+  "options": [
+   "class D : public Base",
+   "class D extends Base",
+   "class D inherits Base",
+   "class D -> Base"
+  ],
+  "question": "Which syntax makes class D publicly inherit from Base?",
+  "skill": "cpp",
+  "topic": "OOP"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "virtual dispatches the call to the most-derived override at runtime.",
+  "id": "cp-007",
+  "options": [
+   "Faster function calls",
+   "Runtime polymorphism through overriding",
+   "Multiple inheritance",
+   "Friend-class access"
+  ],
+  "question": "A virtual function enables...",
+  "skill": "cpp",
+  "topic": "OOP"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "std::map keeps keys sorted and unique with logarithmic lookup.",
+  "id": "cp-008",
+  "options": [
+   "vector",
+   "std::map",
+   "list",
+   "deque"
+  ],
+  "question": "Which container stores unique sorted keys with fast lookup?",
+  "skill": "cpp",
+  "topic": "STL"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Geometric growth keeps push_back amortized O(1) by copying to a bigger buffer.",
+  "id": "cp-009",
+  "options": [
+   "Grows one element at a time",
+   "Reallocates to a larger capacity, usually 1.5x to 2x",
+   "Switches to linked nodes",
+   "Never grows"
+  ],
+  "question": "When a std::vector outgrows its capacity, it...",
+  "skill": "cpp",
+  "topic": "STL"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Vector erase shifts later elements, invalidating iterators; set nodes stay put.",
+  "id": "cp-010",
+  "options": [
+   "Sets are slower",
+   "Node-based containers do not move other elements; vector shifts elements in memory",
+   "Iterators are always safe",
+   "Vectors lack an erase function"
+  ],
+  "question": "Why is erasing from a std::set while iterating safe, but v.erase(it) on a vector invalidates iterators?",
+  "skill": "cpp",
+  "topic": "STL"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "new pairs with delete (and new[] with delete[]); free is for malloc.",
+  "id": "cp-011",
+  "options": [
+   "free",
+   "delete",
+   "release",
+   "The garbage collector"
+  ],
+  "question": "Memory allocated with new must be released with...",
+  "skill": "cpp",
+  "topic": "memory management"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Leaked heap blocks stay reserved until the process ends, wasting memory.",
+  "id": "cp-012",
+  "options": [
+   "Stack overflow",
+   "Heap memory that is allocated but never freed",
+   "Slow RAM",
+   "A null pointer"
+  ],
+  "question": "What is a memory leak?",
+  "skill": "cpp",
+  "topic": "memory management"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "The compiler generates a separate specialization per type the template is used with.",
+  "id": "cp-013",
+  "options": [
+   "At runtime",
+   "At compile time for each used type",
+   "By the linker",
+   "Never automatically"
+  ],
+  "question": "C++ templates are instantiated...",
+  "skill": "cpp",
+  "topic": "templates"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "T is a type parameter filled in with a concrete type at instantiation.",
+  "id": "cp-014",
+  "options": [
+   "T must be a number",
+   "T is a placeholder for any type",
+   "T is a variable",
+   "T is a macro"
+  ],
+  "question": "In template<typename T>, the T means...",
+  "skill": "cpp",
+  "topic": "templates"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "std::move marks x as movable, enabling the move constructor or move assignment.",
+  "id": "cp-015",
+  "options": [
+   "Copies x",
+   "Casts x to an rvalue so its resources can be transferred",
+   "Deletes x",
+   "Changes the memory address"
+  ],
+  "question": "What does std::move(x) do?",
+  "skill": "cpp",
+  "topic": "move semantics basics"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "const binds left: the pointed-to value cannot change through p, but p can be repointed.",
+  "id": "cp-016",
+  "options": [
+   "The pointer p",
+   "The int pointed to, accessed through p",
+   "Both the pointer and the int",
+   "Nothing is const"
+  ],
+  "question": "In const int* p, what is const?",
+  "skill": "cpp",
+  "topic": "const"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "const member functions promise not to mutate the object (except mutable members).",
+  "id": "cp-017",
+  "options": [
+   "Cannot be called at all",
+   "Cannot modify non-mutable data members",
+   "Is always static",
+   "Must return a const value"
+  ],
+  "question": "A const member function...",
+  "skill": "cpp",
+  "topic": "const"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Scope resolution ::, along with . and ?:, cannot be overloaded.",
+  "id": "cp-018",
+  "options": [
+   "+",
+   "::",
+   "==",
+   "[]"
+  ],
+  "question": "Which operator CANNOT be overloaded in C++?",
+  "skill": "cpp",
+  "topic": "operator overloading"
+ },
+ {
+  "answer": 0,
+  "difficulty": "easy",
+  "explanation": "Operator overloading defines what + means for user-defined types.",
+  "id": "cp-019",
+  "options": [
+   "Add two objects using custom logic",
+   "Change how int addition works",
+   "Overload keywords",
+   "Skip writing constructors"
+  ],
+  "question": "Overloading operator+ for a class lets you...",
+  "skill": "cpp",
+  "topic": "operator overloading"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Linking merges object files, resolves external symbols, and produces the binary.",
+  "id": "cp-020",
+  "options": [
+   "Expand macros",
+   "Combine object files and resolve symbols into an executable",
+   "Compile source to assembly",
+   "Run the program"
+  ],
+  "question": "The linker's job is to...",
+  "skill": "cpp",
+  "topic": "compilation"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "Components render one root node; fragments group children without extra DOM.",
+  "id": "rx-001",
+  "options": [
+   "A string",
+   "A single root element or fragment",
+   "Always an array",
+   "Nothing"
+  ],
+  "question": "A React component must return...",
+  "skill": "react",
+  "topic": "components"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Hooks like useState and useEffect replace this.state and lifecycle methods.",
+  "id": "rx-002",
+  "options": [
+   "They are slower",
+   "They use hooks instead of lifecycle methods and this.state",
+   "They cannot render UI",
+   "They need no imports"
+  ],
+  "question": "Functional components differ from class components mainly because...",
+  "skill": "react",
+  "topic": "components"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "Props flow down from parent to child and must not be mutated by the child.",
+  "id": "rx-003",
+  "options": [
+   "Mutable internal data",
+   "Read-only inputs passed from a parent",
+   "Global variables",
+   "Always numbers"
+  ],
+  "question": "Props are...",
+  "skill": "react",
+  "topic": "props/state"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "State updates batch; each call reads the same stale count. Use the updater form for +3.",
+  "id": "rx-004",
+  "options": [
+   "An increase of 3",
+   "An increase of 1, because updates batch on the same stale value",
+   "An error",
+   "No change"
+  ],
+  "question": "Calling setCount(count + 1) three times in one event handler results in...",
+  "skill": "react",
+  "topic": "props/state"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "useState returns the current state and a function to update it.",
+  "id": "rx-005",
+  "options": [
+   "Just the value",
+   "An array of [value, setter function]",
+   "Just the setter",
+   "A promise"
+  ],
+  "question": "The useState hook returns...",
+  "skill": "react",
+  "topic": "hooks (useState/useEffect)"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "An empty dependency array means the effect runs once after the initial render.",
+  "id": "rx-006",
+  "options": [
+   "On every render",
+   "Only once after mount",
+   "Never",
+   "Before the first render"
+  ],
+  "question": "useEffect(() => {...}, []) runs...",
+  "skill": "react",
+  "topic": "hooks (useState/useEffect)"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "The effect closes over old values, so it reads state or props from a previous render.",
+  "id": "rx-007",
+  "options": [
+   "Faster code",
+   "Stale closures reading outdated values",
+   "An immediate crash",
+   "No observable effect"
+  ],
+  "question": "A missing dependency in a useEffect dependency array typically causes...",
+  "skill": "react",
+  "topic": "hooks (useState/useEffect)"
+ },
+ {
+  "answer": 0,
+  "difficulty": "hard",
+  "explanation": "Cleanup runs before each re-run of the effect and when the component unmounts.",
+  "id": "rx-008",
+  "options": [
+   "Before the effect re-runs and on unmount",
+   "Never automatically",
+   "Only on mount",
+   "After every keystroke"
+  ],
+  "question": "The cleanup function returned from useEffect runs...",
+  "skill": "react",
+  "topic": "hooks (useState/useEffect)"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "Curly braces mark JS expressions inside JSX markup.",
+  "id": "rx-009",
+  "options": [
+   "{{ }}",
+   "{ }",
+   "< >",
+   "( )"
+  ],
+  "question": "In JSX, JavaScript expressions are embedded using...",
+  "skill": "react",
+  "topic": "JSX"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "class is reserved in JS, so JSX uses className to set the HTML class attribute.",
+  "id": "rx-010",
+  "options": [
+   "class is slower",
+   "class is a reserved JavaScript keyword",
+   "React renames all attributes",
+   "There is no reason"
+  ],
+  "question": "Why do you write className instead of class in JSX?",
+  "skill": "react",
+  "topic": "JSX"
+ },
+ {
+  "answer": 0,
+  "difficulty": "easy",
+  "explanation": "Logical && renders the element only when the condition is truthy.",
+  "id": "rx-011",
+  "options": [
+   "{isOn && <Lamp/>}",
+   "{isOn || <Lamp/>}",
+   "An if statement inline in JSX",
+   "<Lamp?>"
+  ],
+  "question": "Which pattern conditionally renders a component when isOn is true?",
+  "skill": "react",
+  "topic": "conditional rendering"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "JSX only accepts expressions, so ternaries or variables computed outside are used.",
+  "id": "rx-012",
+  "options": [
+   "if statements written inline",
+   "A ternary operator or extracted variables",
+   "switch directly in JSX",
+   "goto labels"
+  ],
+  "question": "For if/else logic inside JSX you typically use...",
+  "skill": "react",
+  "topic": "conditional rendering"
+ },
+ {
+  "answer": 1,
+  "difficulty": "easy",
+  "explanation": "Stable keys let React match old and new elements during reconciliation.",
+  "id": "rx-013",
+  "options": [
+   "Style list items",
+   "Identify which items changed for efficient updates",
+   "Sort the data",
+   "Fetch more data"
+  ],
+  "question": "Keys in a rendered list help React...",
+  "skill": "react",
+  "topic": "lists/keys"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Indexes shift on reorder or insert, so React may reuse the wrong component state.",
+  "id": "rx-014",
+  "options": [
+   "The list never changes",
+   "Items can reorder or be inserted, causing state mismatches",
+   "The list is very long",
+   "Keys are strings"
+  ],
+  "question": "Using the array index as a key is risky when...",
+  "skill": "react",
+  "topic": "lists/keys"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Refs hold a mutable .current value and attach to DOM nodes via the ref attribute.",
+  "id": "rx-015",
+  "options": [
+   "Trigger re-renders",
+   "Access a DOM node directly without causing a re-render",
+   "Memoize computed values",
+   "Fetch data"
+  ],
+  "question": "useRef is commonly used to...",
+  "skill": "react",
+  "topic": "useRef/useMemo"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "useMemo recomputes only when its dependencies change, skipping costly work.",
+  "id": "rx-016",
+  "options": [
+   "Remembering previous props",
+   "Caching an expensive computed value between renders",
+   "Storing DOM nodes",
+   "Delaying effects"
+  ],
+  "question": "useMemo is used for...",
+  "skill": "react",
+  "topic": "useRef/useMemo"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Context avoids prop drilling for widely shared values such as theme or user.",
+  "id": "rx-017",
+  "options": [
+   "Every piece of state",
+   "Data needed by many nested components, like theme or auth",
+   "DOM manipulation",
+   "Client-side routing"
+  ],
+  "question": "React Context is best used for...",
+  "skill": "react",
+  "topic": "context"
+ },
+ {
+  "answer": 0,
+  "difficulty": "easy",
+  "explanation": "An effect with [] runs once after the component first renders, like componentDidMount.",
+  "id": "rx-018",
+  "options": [
+   "useEffect with an empty dependency array",
+   "The return statement",
+   "The useState call",
+   "The render output alone"
+  ],
+  "question": "In a functional component, the mount phase corresponds to...",
+  "skill": "react",
+  "topic": "component lifecycle"
+ },
+ {
+  "answer": 1,
+  "difficulty": "medium",
+  "explanation": "Controlled inputs bind value to state and update it through onChange.",
+  "id": "rx-019",
+  "options": [
+   "The DOM owns the value",
+   "React state owns the value via value plus onChange",
+   "It cannot be edited",
+   "It uses refs exclusively"
+  ],
+  "question": "A controlled input means...",
+  "skill": "react",
+  "topic": "forms"
+ },
+ {
+  "answer": 1,
+  "difficulty": "hard",
+  "explanation": "Submitting a form reloads the page by default; preventDefault keeps the SPA alive.",
+  "id": "rx-020",
+  "options": [
+   "To validate the fields",
+   "To stop the browser's default page reload",
+   "To clear the inputs",
+   "To focus the form"
+  ],
+  "question": "Why call e.preventDefault() in a form's onSubmit handler?",
+  "skill": "react",
+  "topic": "forms"
+ },
+ {
+  "id": "nj-020",
+  "skill": "nodejs",
+  "topic": "Environment Variables",
+  "difficulty": "hard",
+  "question": "Why should secrets come from environment variables instead of being hardcoded?",
+  "options": [
+   "Hardcoded secrets leak into version control, logs, and builds",
+   "Environment variables are faster to read",
+   "Environment variables cannot be read by attackers",
+   "Node.js forbids hardcoded strings"
+  ],
+  "answer": 0,
+  "explanation": "Code gets committed, shared, and logged; env vars keep secrets out of the codebase entirely."
+ },
+ {
+  "id": "nj-006",
+  "skill": "nodejs",
+  "topic": "Environment Variables",
+  "difficulty": "easy",
+  "question": "How do you read an environment variable named PORT in Node.js?",
+  "options": [
+   "process.env.PORT",
+   "env.PORT",
+   "process.getEnv('PORT')",
+   "require('PORT')"
+  ],
+  "answer": 0,
+  "explanation": "Node exposes environment variables on the process.env object."
+ },
+ {
+  "id": "nj-015",
+  "skill": "nodejs",
+  "topic": "Async Patterns",
+  "difficulty": "medium",
+  "question": "What does Promise.all() do when one of its promises rejects?",
+  "options": [
+   "Rejects immediately with that rejection reason",
+   "Waits for all, then resolves",
+   "Returns an array of the errors",
+   "Retries the failed promise once"
+  ],
+  "answer": 0,
+  "explanation": "Promise.all short-circuits: the first rejection rejects the whole combined promise."
+ },
+ {
+  "id": "nj-005",
+  "skill": "nodejs",
+  "topic": "REST",
+  "difficulty": "easy",
+  "question": "Which HTTP method is typically used to create a new resource in a REST API?",
+  "options": [
+   "GET",
+   "DELETE",
+   "POST",
+   "HEAD"
+  ],
+  "answer": 2,
+  "explanation": "POST to a collection resource is the conventional way to create a new resource in REST."
+ },
+ {
+  "id": "nj-010",
+  "skill": "nodejs",
+  "topic": "Middleware",
+  "difficulty": "medium",
+  "question": "In Express, what must middleware call to pass control to the next middleware?",
+  "options": [
+   "next()",
+   "continue()",
+   "proceed()",
+   "return true"
+  ],
+  "answer": 0,
+  "explanation": "Calling next() hands the request to the next matching middleware or route handler in the stack."
+ },
+ {
+  "id": "nj-014",
+  "skill": "nodejs",
+  "topic": "Streams",
+  "difficulty": "medium",
+  "question": "Why use streams instead of fs.readFile for a 5GB file?",
+  "options": [
+   "Streams process data in chunks with near-constant memory",
+   "Streams are always faster",
+   "readFile cannot open large files at all",
+   "Streams compress the file automatically"
+  ],
+  "answer": 0,
+  "explanation": "Streams emit data piece by piece, so memory stays flat instead of buffering the whole file."
+ },
+ {
+  "id": "nj-016",
+  "skill": "nodejs",
+  "topic": "Event Loop",
+  "difficulty": "hard",
+  "question": "In which event-loop phase do setImmediate() callbacks run relative to I/O callbacks?",
+  "options": [
+   "Check phase, right after the poll phase",
+   "Before the poll phase",
+   "Inside the timers phase",
+   "After the process exits"
+  ],
+  "answer": 0,
+  "explanation": "setImmediate callbacks run in the check phase, which follows the poll phase where I/O callbacks execute."
+ },
+ {
+  "id": "nj-019",
+  "skill": "nodejs",
+  "topic": "Modules",
+  "difficulty": "hard",
+  "question": "What is the key difference between require() and ES `import` in Node.js?",
+  "options": [
+   "require is synchronous and dynamic; import is static and hoisted",
+   "import is synchronous",
+   "require works only in browsers",
+   "They behave identically"
+  ],
+  "answer": 0,
+  "explanation": "require() can be called conditionally at runtime, while import statements are static and evaluated before execution."
+ },
+ {
+  "id": "nj-007",
+  "skill": "nodejs",
+  "topic": "Modules",
+  "difficulty": "easy",
+  "question": "What is the purpose of module.exports in CommonJS?",
+  "options": [
+   "Defines what a module exposes to other files",
+   "Installs the module",
+   "Runs the module only once",
+   "Clears the module cache"
+  ],
+  "answer": 0,
+  "explanation": "Assigning to module.exports sets the value other files receive when they require() the module."
+ },
+ {
+  "id": "nj-013",
+  "skill": "nodejs",
+  "topic": "npm",
+  "difficulty": "medium",
+  "question": "What is the difference between dependencies and devDependencies?",
+  "options": [
+   "devDependencies are needed only for development/build, not production runtime",
+   "dependencies are only used for tests",
+   "There is no difference",
+   "devDependencies install globally"
+  ],
+  "answer": 0,
+  "explanation": "Build tools, linters, and test frameworks go in devDependencies so production installs stay lean."
+ },
+ {
+  "id": "nj-018",
+  "skill": "nodejs",
+  "topic": "Error Handling",
+  "difficulty": "hard",
+  "question": "Why can an unhandled 'error' event on an EventEmitter crash a Node process?",
+  "options": [
+   "Node throws the error if no 'error' listener is attached",
+   "Emitters call process.exit on errors",
+   "It corrupts the event loop queue",
+   "It only logs a warning, never crashes"
+  ],
+  "answer": 0,
+  "explanation": "Emitting 'error' with no listener makes Node throw, which crashes the process if uncaught."
+ },
+ {
+  "id": "nj-011",
+  "skill": "nodejs",
+  "topic": "Express Routing",
+  "difficulty": "medium",
+  "question": "What does `app.use('/api', router)` do?",
+  "options": [
+   "Mounts the router for all HTTP methods under /api",
+   "Only handles GET /api",
+   "Registers a 404 handler",
+   "Starts the server on /api"
+  ],
+  "answer": 0,
+  "explanation": "app.use mounts middleware/router for every method on paths starting with the given prefix."
+ },
+ {
+  "id": "nj-002",
+  "skill": "nodejs",
+  "topic": "Modules",
+  "difficulty": "easy",
+  "question": "How do you import a local module named utils.js using CommonJS?",
+  "options": [
+   "import utils from 'utils'",
+   "require('./utils')",
+   "load('utils.js')",
+   "include 'utils'"
+  ],
+  "answer": 1,
+  "explanation": "require() with a relative path loads a CommonJS module; './' means look in the current directory."
+ },
+ {
+  "id": "nj-012",
+  "skill": "nodejs",
+  "topic": "Error Handling",
+  "difficulty": "medium",
+  "question": "How should an async Express route handler forward an error?",
+  "options": [
+   "Catch it and call next(err)",
+   "console.log it and continue",
+   "Call process.exit(1)",
+   "Return the error object from the handler"
+  ],
+  "answer": 0,
+  "explanation": "Passing the error to next(err) routes it to Express error-handling middleware."
+ },
+ {
+  "id": "nj-003",
+  "skill": "nodejs",
+  "topic": "npm",
+  "difficulty": "easy",
+  "question": "What does running `npm install` with no arguments do?",
+  "options": [
+   "Uninstalls all packages",
+   "Installs the dependencies listed in package.json",
+   "Updates npm itself",
+   "Creates a new package.json"
+  ],
+  "answer": 1,
+  "explanation": "With no arguments, npm reads package.json and installs everything under dependencies and devDependencies."
+ },
+ {
+  "id": "nj-017",
+  "skill": "nodejs",
+  "topic": "Streams",
+  "difficulty": "hard",
+  "question": "What is backpressure in Node.js streams?",
+  "options": [
+   "The consumer cannot keep up, so the producer must pause writing",
+   "Extra memory reserved for buffers",
+   "A special stream error type",
+   "Compression applied to stream data"
+  ],
+  "answer": 0,
+  "explanation": "Backpressure signals a fast producer to slow down via write() returning false and the 'drain' event."
+ },
+ {
+  "id": "nj-008",
+  "skill": "nodejs",
+  "topic": "Async Patterns",
+  "difficulty": "medium",
+  "question": "What does `await` do inside an async function?",
+  "options": [
+   "Pauses the function until the promise settles, then resumes with its value",
+   "Spawns a new OS thread",
+   "Blocks the entire event loop permanently",
+   "Converts a promise into a callback"
+  ],
+  "answer": 0,
+  "explanation": "await suspends only that async function's execution; the event loop keeps handling other work meanwhile."
+ },
+ {
+  "id": "nj-009",
+  "skill": "nodejs",
+  "topic": "Event Loop",
+  "difficulty": "medium",
+  "question": "Which callback runs first: process.nextTick() or setTimeout(..., 0)?",
+  "options": [
+   "setTimeout(..., 0)",
+   "process.nextTick()",
+   "They run in parallel threads",
+   "Neither runs on modern Node"
+  ],
+  "answer": 1,
+  "explanation": "nextTick callbacks run before the event loop advances to its next phase; setTimeout waits for the timers phase."
+ },
+ {
+  "id": "nj-001",
+  "skill": "nodejs",
+  "topic": "Event Loop",
+  "difficulty": "easy",
+  "question": "What is the event loop in Node.js?",
+  "options": [
+   "A mechanism that handles async operations without blocking",
+   "A loop that blocks until I/O completes",
+   "A built-in database engine",
+   "A package manager"
+  ],
+  "answer": 0,
+  "explanation": "The event loop lets Node.js perform non-blocking I/O by offloading operations and processing callbacks when they complete."
+ },
+ {
+  "id": "nj-004",
+  "skill": "nodejs",
+  "topic": "Express Routing",
+  "difficulty": "easy",
+  "question": "Which Express statement handles GET requests to /users?",
+  "options": [
+   "app.get('/users', handler)",
+   "app.fetch('/users', handler)",
+   "app.route.get('/users')",
+   "app.post('/users', handler)"
+  ],
+  "answer": 0,
+  "explanation": "app.get(path, handler) registers a route that responds to HTTP GET requests at that path."
+ },
+ {
+  "id": "gg-015",
+  "skill": "git-github",
+  "topic": "Stashing",
+  "difficulty": "medium",
+  "question": "Which command restores the most recently stashed changes?",
+  "options": [
+   "git stash pop",
+   "git stash undo",
+   "git unstash",
+   "git stash back"
+  ],
+  "answer": 0,
+  "explanation": "pop applies the latest stash entry and drops it from the stash list."
+ },
+ {
+  "id": "gg-009",
+  "skill": "git-github",
+  "topic": "Stashing",
+  "difficulty": "medium",
+  "question": "What does `git stash` do?",
+  "options": [
+   "Temporarily shelves uncommitted changes so you can switch branches",
+   "Deletes uncommitted changes permanently",
+   "Commits changes without a message",
+   "Pushes changes to a stash remote"
+  ],
+  "answer": 0,
+  "explanation": "Stash saves your dirty working tree aside so the branch becomes clean, restorable later."
+ },
+ {
+  "id": "gg-004",
+  "skill": "git-github",
+  "topic": "Pull & Push",
+  "difficulty": "easy",
+  "question": "What does `git push origin main` do?",
+  "options": [
+   "Uploads local main commits to the origin remote",
+   "Downloads main from origin",
+   "Deletes the remote main branch",
+   "Merges origin into local main"
+  ],
+  "answer": 0,
+  "explanation": "push sends your local commits to the named remote's branch."
+ },
+ {
+  "id": "gg-012",
+  "skill": "git-github",
+  "topic": "Branches",
+  "difficulty": "medium",
+  "question": "How do you delete a local branch named old-feature?",
+  "options": [
+   "git branch -d old-feature",
+   "git remove old-feature",
+   "git delete-branch old-feature",
+   "git branch --kill old-feature"
+  ],
+  "answer": 0,
+  "explanation": "-d deletes the branch safely, refusing if its commits are not fully merged."
+ },
+ {
+  "id": "gg-011",
+  "skill": "git-github",
+  "topic": "Pull & Push",
+  "difficulty": "medium",
+  "question": "What does `git pull` do?",
+  "options": [
+   "Fetches remote changes and merges them into the current branch",
+   "Only downloads without merging",
+   "Deletes local commits",
+   "Opens a pull request"
+  ],
+  "answer": 0,
+  "explanation": "pull is fetch plus merge: it brings remote commits in and integrates them locally."
+ },
+ {
+  "id": "gg-017",
+  "skill": "git-github",
+  "topic": "GitHub Actions",
+  "difficulty": "hard",
+  "question": "Where do workflow files live in a GitHub repository?",
+  "options": [
+   ".github/workflows/",
+   ".workflows/",
+   "ci/actions/",
+   "github/actions/"
+  ],
+  "answer": 0,
+  "explanation": "GitHub discovers YAML workflow definitions only under .github/workflows/ at the repo root."
+ },
+ {
+  "id": "gg-002",
+  "skill": "git-github",
+  "topic": "Add & Commit",
+  "difficulty": "easy",
+  "question": "Which command stages all modified and new files for commit?",
+  "options": [
+   "git stage *",
+   "git add .",
+   "git commit --stage-all",
+   "git push ."
+  ],
+  "answer": 1,
+  "explanation": "git add . stages everything in the current directory and below for the next commit."
+ },
+ {
+  "id": "gg-013",
+  "skill": "git-github",
+  "topic": "GitHub Actions",
+  "difficulty": "medium",
+  "question": "What triggers a GitHub Actions workflow?",
+  "options": [
+   "Events like push or pull_request listed in the workflow file",
+   "Manual server restarts only",
+   "Any file save on your computer",
+   "A fixed daily timer only"
+  ],
+  "answer": 0,
+  "explanation": "The `on:` block declares events; a matching event on GitHub starts a workflow run."
+ },
+ {
+  "id": "gg-006",
+  "skill": "git-github",
+  "topic": "Pull Requests",
+  "difficulty": "easy",
+  "question": "What is a pull request on GitHub?",
+  "options": [
+   "A proposal to merge changes from one branch into another",
+   "A request to download the code",
+   "A billing invoice",
+   "A code search query"
+  ],
+  "answer": 0,
+  "explanation": "A pull request opens review and discussion around merging one branch's changes into another."
+ },
+ {
+  "id": "gg-019",
+  "skill": "git-github",
+  "topic": "Add & Commit",
+  "difficulty": "hard",
+  "question": "What does `git commit --amend` do?",
+  "options": [
+   "Folds new staged changes or a new message into the most recent commit",
+   "Creates an empty commit",
+   "Rewrites the entire history",
+   "Splits one commit into two"
+  ],
+  "answer": 0,
+  "explanation": "--amend replaces the tip commit; use it only before that commit is shared."
+ },
+ {
+  "id": "gg-003",
+  "skill": "git-github",
+  "topic": "Branches",
+  "difficulty": "easy",
+  "question": "How do you create a branch called feature and switch to it in one command?",
+  "options": [
+   "git branch feature",
+   "git checkout -b feature",
+   "git new feature",
+   "git switch --create-only feature"
+  ],
+  "answer": 1,
+  "explanation": "checkout -b creates the branch and moves HEAD to it in a single step."
+ },
+ {
+  "id": "gg-001",
+  "skill": "git-github",
+  "topic": "Init & Clone",
+  "difficulty": "easy",
+  "question": "What does `git init` do?",
+  "options": [
+   "Creates a new empty Git repository in the current directory",
+   "Clones a remote repository",
+   "Deletes the .git folder",
+   "Commits all files"
+  ],
+  "answer": 0,
+  "explanation": "git init creates the .git directory that turns the current folder into a repository."
+ },
+ {
+  "id": "gg-005",
+  "skill": "git-github",
+  "topic": ".gitignore",
+  "difficulty": "easy",
+  "question": "What is the purpose of a .gitignore file?",
+  "options": [
+   "Lists files and patterns Git should not track",
+   "Lists files to delete from disk",
+   "Configures the remote URL",
+   "Stores default commit messages"
+  ],
+  "answer": 0,
+  "explanation": "Patterns in .gitignore keep build output, secrets, and dependencies out of version control."
+ },
+ {
+  "id": "gg-010",
+  "skill": "git-github",
+  "topic": "Resolving Conflicts",
+  "difficulty": "medium",
+  "question": "When does a merge conflict occur?",
+  "options": [
+   "Two branches changed the same lines in different ways",
+   "The remote server is offline",
+   "A branch name is too long",
+   "The .gitignore file is missing"
+  ],
+  "answer": 0,
+  "explanation": "Git cannot auto-merge overlapping edits, so it marks the conflict for you to resolve manually."
+ },
+ {
+  "id": "gg-016",
+  "skill": "git-github",
+  "topic": "Merge vs Rebase",
+  "difficulty": "hard",
+  "question": "Why is rebasing a shared or public branch discouraged?",
+  "options": [
+   "It rewrites commit hashes, breaking collaborators' history",
+   "It runs slower than merge",
+   "It deletes the remote branch",
+   "GitHub blocks rebased pushes"
+  ],
+  "answer": 0,
+  "explanation": "Rewritten hashes diverge from what others pulled, forcing everyone into painful reconciliations."
+ },
+ {
+  "id": "gg-008",
+  "skill": "git-github",
+  "topic": "Merge vs Rebase",
+  "difficulty": "medium",
+  "question": "What is the main difference between merge and rebase?",
+  "options": [
+   "Merge preserves history with a merge commit; rebase rewrites commits onto the target",
+   "Rebase deletes the source branch",
+   "Merge only works on local branches",
+   "They produce identical history"
+  ],
+  "answer": 0,
+  "explanation": "Merge keeps both histories joined by a merge commit; rebase replays commits linearly on top of the target."
+ },
+ {
+  "id": "gg-014",
+  "skill": "git-github",
+  "topic": "Resolving Conflicts",
+  "difficulty": "medium",
+  "question": "After editing a conflicted file, how do you mark the conflict resolved?",
+  "options": [
+   "git add the file, then commit",
+   "Run git resolve on the file",
+   "Delete the file",
+   "Run git push --resolve"
+  ],
+  "answer": 0,
+  "explanation": "Staging the fixed file tells Git the conflict is resolved; the merge commit finalizes it."
+ },
+ {
+  "id": "gg-020",
+  "skill": "git-github",
+  "topic": "Branches",
+  "difficulty": "hard",
+  "question": "What is a detached HEAD state?",
+  "options": [
+   "HEAD points directly at a commit instead of a branch",
+   "The repository has no commits",
+   "HEAD was deleted",
+   "The repository is corrupted"
+  ],
+  "answer": 0,
+  "explanation": "Checking out a commit or tag detaches HEAD; new commits there are orphaned unless you create a branch."
+ },
+ {
+  "id": "gg-007",
+  "skill": "git-github",
+  "topic": "Add & Commit",
+  "difficulty": "easy",
+  "question": "What does `git commit -m \"add login\"` do?",
+  "options": [
+   "Saves staged changes to history with that message",
+   "Stages all files",
+   "Pushes to the remote",
+   "Shows the commit log"
+  ],
+  "answer": 0,
+  "explanation": "commit records the staged snapshot into history; -m supplies the message inline."
+ },
+ {
+  "id": "gg-018",
+  "skill": "git-github",
+  "topic": "Pull & Push",
+  "difficulty": "hard",
+  "question": "How does `git push --force-with-lease` differ from `--force`?",
+  "options": [
+   "It overwrites the remote only if it still matches your last fetch",
+   "It pushes twice as fast",
+   "It creates a merge commit",
+   "It deletes remote tags first"
+  ],
+  "answer": 0,
+  "explanation": "--force-with-lease refuses when someone else pushed since you fetched, preventing lost work."
+ },
+ {
+  "id": "lx-010",
+  "skill": "linux",
+  "topic": "grep/sed/awk",
+  "difficulty": "medium",
+  "question": "What does `grep -r \"TODO\" .` do?",
+  "options": [
+   "Recursively searches for TODO in files under the current directory",
+   "Replaces TODO with a dot",
+   "Deletes lines containing TODO",
+   "Counts files named TODO"
+  ],
+  "answer": 0,
+  "explanation": "-r makes grep descend into subdirectories, searching every file's contents."
+ },
+ {
+  "id": "lx-001",
+  "skill": "linux",
+  "topic": "Navigation",
+  "difficulty": "easy",
+  "question": "Which command lists files in the current directory?",
+  "options": [
+   "ls",
+   "list",
+   "dir",
+   "show"
+  ],
+  "answer": 0,
+  "explanation": "ls lists directory contents; common flags are -l (long) and -a (include hidden)."
+ },
+ {
+  "id": "lx-020",
+  "skill": "linux",
+  "topic": "Processes",
+  "difficulty": "hard",
+  "question": "What is a zombie process?",
+  "options": [
+   "A terminated process whose parent has not read its exit status",
+   "A process using 100% CPU",
+   "A process that cannot be killed",
+   "A background daemon"
+  ],
+  "answer": 0,
+  "explanation": "Zombies linger in the process table until the parent calls wait() to reap the exit code."
+ },
+ {
+  "id": "lx-003",
+  "skill": "linux",
+  "topic": "Navigation",
+  "difficulty": "easy",
+  "question": "Which command copies a.txt to b.txt?",
+  "options": [
+   "cp a.txt b.txt",
+   "copy a.txt b.txt",
+   "mv a.txt b.txt",
+   "clone a.txt b.txt"
+  ],
+  "answer": 0,
+  "explanation": "cp copies; mv would move (rename) instead of duplicating the file."
+ },
+ {
+  "id": "lx-014",
+  "skill": "linux",
+  "topic": "grep/sed/awk",
+  "difficulty": "medium",
+  "question": "What does `sed 's/foo/bar/g' file.txt` do?",
+  "options": [
+   "Replaces every foo with bar in the output",
+   "Deletes lines containing foo",
+   "Sorts the file alphabetically",
+   "Counts foo occurrences"
+  ],
+  "answer": 0,
+  "explanation": "s/// is the substitute command and the g flag applies it globally on each line."
+ },
+ {
+  "id": "lx-006",
+  "skill": "linux",
+  "topic": "Package Managers",
+  "difficulty": "easy",
+  "question": "Which command installs a package on Ubuntu or Debian?",
+  "options": [
+   "sudo apt install <pkg>",
+   "sudo yum install <pkg>",
+   "pkg-add <pkg>",
+   "install-pkg <pkg>"
+  ],
+  "answer": 0,
+  "explanation": "Debian-based systems use APT; yum/dnf belongs to Red Hat-based systems."
+ },
+ {
+  "id": "lx-011",
+  "skill": "linux",
+  "topic": "Processes",
+  "difficulty": "medium",
+  "question": "What is the difference between `kill PID` and `kill -9 PID`?",
+  "options": [
+   "kill sends SIGTERM (graceful); -9 sends SIGKILL (forceful)",
+   "-9 restarts the process",
+   "There is no difference",
+   "kill -9 pauses the process"
+  ],
+  "answer": 0,
+  "explanation": "SIGTERM asks the process to clean up and exit; SIGKILL terminates it immediately without cleanup."
+ },
+ {
+  "id": "lx-005",
+  "skill": "linux",
+  "topic": "Processes",
+  "difficulty": "easy",
+  "question": "Which command shows currently running processes?",
+  "options": [
+   "ps",
+   "proc",
+   "lsproc",
+   "showproc"
+  ],
+  "answer": 0,
+  "explanation": "ps reports a snapshot of processes; `ps aux` shows all with details."
+ },
+ {
+  "id": "lx-013",
+  "skill": "linux",
+  "topic": "Environment Variables",
+  "difficulty": "medium",
+  "question": "How do you make an environment variable persist for future shells?",
+  "options": [
+   "Add `export VAR=value` to ~/.bashrc or ~/.profile",
+   "Run VAR=value once in the terminal",
+   "Store it in /tmp",
+   "Use env --temporary"
+  ],
+  "answer": 0,
+  "explanation": "Shell startup files are sourced on login, so exports placed there apply to every new session."
+ },
+ {
+  "id": "lx-015",
+  "skill": "linux",
+  "topic": "Shell Scripting",
+  "difficulty": "medium",
+  "question": "What does the shebang line `#!/bin/bash` do?",
+  "options": [
+   "Tells the OS to run the script with /bin/bash",
+   "Comments out the whole script",
+   "Installs bash automatically",
+   "Prints /bin/bash to the terminal"
+  ],
+  "answer": 0,
+  "explanation": "The kernel reads #! and execs the script with the named interpreter."
+ },
+ {
+  "id": "lx-007",
+  "skill": "linux",
+  "topic": "Pipes & Redirection",
+  "difficulty": "easy",
+  "question": "What does the pipe do in `ls | grep txt`?",
+  "options": [
+   "Sends ls output as input to grep",
+   "Runs both commands on two files",
+   "Deletes the ls output",
+   "Merges two files"
+  ],
+  "answer": 0,
+  "explanation": "A pipe connects one command's stdout to the next command's stdin."
+ },
+ {
+  "id": "lx-016",
+  "skill": "linux",
+  "topic": "Permissions",
+  "difficulty": "hard",
+  "question": "What does the setuid bit do on an executable file?",
+  "options": [
+   "Runs the program with the file owner's privileges",
+   "Makes the file impossible to delete",
+   "Hides the file from ls",
+   "Always runs it as root"
+  ],
+  "answer": 0,
+  "explanation": "setuid elevates the process to the owner's identity, which is why it demands careful auditing."
+ },
+ {
+  "id": "lx-017",
+  "skill": "linux",
+  "topic": "Pipes & Redirection",
+  "difficulty": "hard",
+  "question": "In `cmd1 | cmd2 | cmd3`, how do the commands execute?",
+  "options": [
+   "All three run concurrently, connected by pipes",
+   "Strictly one after another",
+   "Only cmd1 and cmd3 run",
+   "Only cmd3 runs"
+  ],
+  "answer": 0,
+  "explanation": "The shell launches the whole pipeline at once; data streams through as each stage produces it."
+ },
+ {
+  "id": "lx-008",
+  "skill": "linux",
+  "topic": "Permissions",
+  "difficulty": "medium",
+  "question": "What is the octal form of the permission string rwxr-xr--?",
+  "options": [
+   "754",
+   "777",
+   "644",
+   "755"
+  ],
+  "answer": 0,
+  "explanation": "rwx=7, r-x=5, r--=4, so the bits map to 754 for user, group, and others."
+ },
+ {
+  "id": "lx-018",
+  "skill": "linux",
+  "topic": "grep/sed/awk",
+  "difficulty": "hard",
+  "question": "What does `awk -F: '{print $1}' /etc/passwd` print?",
+  "options": [
+   "The first colon-separated field (usernames)",
+   "The entire file unchanged",
+   "The file with field 1 deleted",
+   "A count of the lines"
+  ],
+  "answer": 0,
+  "explanation": "-F: sets the field separator to a colon, and $1 is the first field of each record."
+ },
+ {
+  "id": "lx-002",
+  "skill": "linux",
+  "topic": "Navigation",
+  "difficulty": "easy",
+  "question": "What does `cd ..` do?",
+  "options": [
+   "Moves up to the parent directory",
+   "Deletes the current directory",
+   "Creates a directory named ..",
+   "Prints the working directory"
+  ],
+  "answer": 0,
+  "explanation": "`..` always refers to the parent directory, so cd .. goes one level up."
+ },
+ {
+  "id": "lx-009",
+  "skill": "linux",
+  "topic": "Pipes & Redirection",
+  "difficulty": "medium",
+  "question": "What does `command > out.txt 2>&1` do?",
+  "options": [
+   "Redirects both stdout and stderr to out.txt",
+   "Appends stdout only to out.txt",
+   "Redirects stdin from out.txt",
+   "Prints output to the terminal twice"
+  ],
+  "answer": 0,
+  "explanation": "2>&1 merges stderr into stdout, so both streams land in the file."
+ },
+ {
+  "id": "lx-019",
+  "skill": "linux",
+  "topic": "Shell Scripting",
+  "difficulty": "hard",
+  "question": "What does `set -e` do in a bash script?",
+  "options": [
+   "Exits the script immediately if any command fails",
+   "Echoes each command before running it",
+   "Sets a variable named e",
+   "Ignores all errors silently"
+  ],
+  "answer": 0,
+  "explanation": "With errexit, a non-zero status aborts the script, failing fast instead of continuing broken."
+ },
+ {
+  "id": "lx-012",
+  "skill": "linux",
+  "topic": "SSH",
+  "difficulty": "medium",
+  "question": "What does `ssh user@host` do?",
+  "options": [
+   "Opens an encrypted shell session on the remote host",
+   "Copies files to the host",
+   "Starts an SSH server locally",
+   "Encrypts the local disk"
+  ],
+  "answer": 0,
+  "explanation": "SSH gives you a secure remote terminal, tunneling all traffic with encryption."
+ },
+ {
+  "id": "lx-004",
+  "skill": "linux",
+  "topic": "Permissions",
+  "difficulty": "easy",
+  "question": "What does `chmod +x script.sh` do?",
+  "options": [
+   "Makes script.sh executable",
+   "Deletes script.sh",
+   "Opens script.sh in an editor",
+   "Compresses script.sh"
+  ],
+  "answer": 0,
+  "explanation": "+x adds the execute bit so the file can be run as a program."
+ },
+ {
+  "id": "da-011",
+  "skill": "data-analysis",
+  "topic": "Filtering",
+  "difficulty": "medium",
+  "question": "How do you select just the 'name' and 'age' columns?",
+  "options": [
+   "df[['name', 'age']]",
+   "df['name', 'age']",
+   "df.select('name', 'age')",
+   "df.cols('name', 'age')"
+  ],
+  "answer": 0,
+  "explanation": "Passing a list of labels to [] returns a DataFrame with those columns."
+ },
+ {
+  "id": "da-001",
+  "skill": "data-analysis",
+  "topic": "DataFrames",
+  "difficulty": "easy",
+  "question": "How do you create a DataFrame from a dictionary in pandas?",
+  "options": [
+   "pd.DataFrame(data)",
+   "pd.create(data)",
+   "pd.frame(data)",
+   "DataFrame.new(data)"
+  ],
+  "answer": 0,
+  "explanation": "The DataFrame constructor accepts a dict of column names to lists or arrays."
+ },
+ {
+  "id": "da-015",
+  "skill": "data-analysis",
+  "topic": "CSV I/O",
+  "difficulty": "medium",
+  "question": "How do you write a DataFrame to CSV without the index column?",
+  "options": [
+   "df.to_csv('f.csv', index=False)",
+   "df.to_csv('f.csv', no_index=True)",
+   "df.write_csv('f.csv')",
+   "df.save('f.csv')"
+  ],
+  "answer": 0,
+  "explanation": "index=False omits the row labels so the file contains only data columns."
+ },
+ {
+  "id": "da-009",
+  "skill": "data-analysis",
+  "topic": "Merging",
+  "difficulty": "medium",
+  "question": "What does `pd.merge(df1, df2, on='id', how='left')` keep?",
+  "options": [
+   "All rows from df1, with matching df2 columns attached",
+   "Only rows matching in both",
+   "All rows from both frames",
+   "Only df2 rows"
+  ],
+  "answer": 0,
+  "explanation": "A left join preserves every left row, filling NaN where no right-side match exists."
+ },
+ {
+  "id": "da-013",
+  "skill": "data-analysis",
+  "topic": "NumPy",
+  "difficulty": "medium",
+  "question": "What is broadcasting in NumPy?",
+  "options": [
+   "Element-wise ops between arrays of different but compatible shapes",
+   "Sending arrays over the network",
+   "Copying arrays to the GPU",
+   "Converting lists to arrays"
+  ],
+  "answer": 0,
+  "explanation": "Broadcasting stretches the smaller array's dimensions so shapes align without copying data."
+ },
+ {
+  "id": "da-012",
+  "skill": "data-analysis",
+  "topic": "Data Cleaning",
+  "difficulty": "medium",
+  "question": "What does `df.drop_duplicates()` do?",
+  "options": [
+   "Removes duplicate rows",
+   "Removes duplicate columns",
+   "Drops rows with NaN",
+   "Resets the index"
+  ],
+  "answer": 0,
+  "explanation": "It keeps the first occurrence of each duplicated row and drops the rest."
+ },
+ {
+  "id": "da-017",
+  "skill": "data-analysis",
+  "topic": "Merging",
+  "difficulty": "hard",
+  "question": "When should you use pd.concat instead of pd.merge?",
+  "options": [
+   "Stacking frames with the same columns, or aligning along an axis",
+   "Joining on differently named keys",
+   "Filtering rows by condition",
+   "Always; they are interchangeable"
+  ],
+  "answer": 0,
+  "explanation": "concat glues frames along rows or columns; merge joins on key values like SQL."
+ },
+ {
+  "id": "da-016",
+  "skill": "data-analysis",
+  "topic": "GroupBy",
+  "difficulty": "hard",
+  "question": "How does `df.groupby('g').transform('mean')` differ from `.agg('mean')`?",
+  "options": [
+   "transform returns same-shaped output aligned to original rows; agg returns one row per group",
+   "They return identical results",
+   "transform is always faster",
+   "agg cannot compute a mean"
+  ],
+  "answer": 0,
+  "explanation": "transform broadcasts each group's result back to every member row; agg collapses each group to one row."
+ },
+ {
+  "id": "da-006",
+  "skill": "data-analysis",
+  "topic": "Matplotlib",
+  "difficulty": "easy",
+  "question": "Which call creates a simple line plot in matplotlib?",
+  "options": [
+   "plt.plot(x, y)",
+   "plt.line(x, y)",
+   "plt.draw(x, y)",
+   "plt.graph(x, y)"
+  ],
+  "answer": 0,
+  "explanation": "plt.plot draws lines through the points; call plt.show() to display the figure."
+ },
+ {
+  "id": "da-018",
+  "skill": "data-analysis",
+  "topic": "Data Cleaning",
+  "difficulty": "hard",
+  "question": "Why convert low-cardinality string columns with `astype('category')`?",
+  "options": [
+   "It reduces memory and speeds up groupby and merge operations",
+   "It changes the string values",
+   "It is required for plotting",
+   "It increases numeric precision"
+  ],
+  "answer": 0,
+  "explanation": "Categorical dtype stores each unique string once as an integer code instead of repeating it."
+ },
+ {
+  "id": "da-005",
+  "skill": "data-analysis",
+  "topic": "NumPy",
+  "difficulty": "easy",
+  "question": "How do you create a NumPy array from a Python list?",
+  "options": [
+   "np.array([1, 2, 3])",
+   "np.list([1, 2, 3])",
+   "np.create([1, 2, 3])",
+   "array.np([1, 2, 3])"
+  ],
+  "answer": 0,
+  "explanation": "np.array() converts a list (or nested lists) into an n-dimensional array."
+ },
+ {
+  "id": "da-007",
+  "skill": "data-analysis",
+  "topic": "Missing Data",
+  "difficulty": "easy",
+  "question": "How do you detect missing values in a DataFrame?",
+  "options": [
+   "df.isna()",
+   "df.find_null()",
+   "df.missing()",
+   "df.hasna()"
+  ],
+  "answer": 0,
+  "explanation": "isna() returns a boolean DataFrame marking every NaN or None entry as True."
+ },
+ {
+  "id": "da-019",
+  "skill": "data-analysis",
+  "topic": "NumPy",
+  "difficulty": "hard",
+  "question": "What does `arr.reshape(-1, 3)` do?",
+  "options": [
+   "Reshapes arr to 3 columns, inferring the row count",
+   "Deletes the array",
+   "Flattens the array to 1D",
+   "Adds 3 to every element"
+  ],
+  "answer": 0,
+  "explanation": "-1 tells reshape to compute that dimension from the total element count."
+ },
+ {
+  "id": "da-004",
+  "skill": "data-analysis",
+  "topic": "Descriptive Stats",
+  "difficulty": "easy",
+  "question": "What does `df.describe()` return?",
+  "options": [
+   "Summary statistics for numeric columns",
+   "The first five rows",
+   "Column data types",
+   "A plotted chart"
+  ],
+  "answer": 0,
+  "explanation": "describe() reports count, mean, std, min, quartiles, and max per numeric column."
+ },
+ {
+  "id": "da-014",
+  "skill": "data-analysis",
+  "topic": "Descriptive Stats",
+  "difficulty": "medium",
+  "question": "What does the median represent?",
+  "options": [
+   "The middle value of sorted data",
+   "The most frequent value",
+   "The arithmetic average",
+   "The range of the data"
+  ],
+  "answer": 0,
+  "explanation": "The median splits ordered data in half, making it robust to outliers."
+ },
+ {
+  "id": "da-020",
+  "skill": "data-analysis",
+  "topic": "Matplotlib",
+  "difficulty": "hard",
+  "question": "What is the difference between plt.subplots() and plt.figure()?",
+  "options": [
+   "subplots creates a figure plus Axes objects; figure creates only the canvas",
+   "figure is deprecated",
+   "subplots only makes bar charts",
+   "There is no difference"
+  ],
+  "answer": 0,
+  "explanation": "Axes are what you actually plot on; subplots hands you a ready grid of them."
+ },
+ {
+  "id": "da-010",
+  "skill": "data-analysis",
+  "topic": "Missing Data",
+  "difficulty": "medium",
+  "question": "What does `df.fillna(0)` do?",
+  "options": [
+   "Replaces all missing values with 0",
+   "Drops rows containing missing values",
+   "Counts missing values",
+   "Fills with each column's mean"
+  ],
+  "answer": 0,
+  "explanation": "fillna substitutes a value for every NaN; here the literal 0."
+ },
+ {
+  "id": "da-008",
+  "skill": "data-analysis",
+  "topic": "GroupBy",
+  "difficulty": "medium",
+  "question": "What does `df.groupby('dept')['salary'].mean()` compute?",
+  "options": [
+   "Mean salary per department",
+   "Overall mean salary",
+   "Mean of the dept column",
+   "Salaries sorted by department"
+  ],
+  "answer": 0,
+  "explanation": "groupby splits rows by dept, then the mean aggregation runs within each group."
+ },
+ {
+  "id": "da-002",
+  "skill": "data-analysis",
+  "topic": "Filtering",
+  "difficulty": "easy",
+  "question": "How do you select rows where the 'age' column is greater than 30?",
+  "options": [
+   "df[df['age'] > 30]",
+   "df.filter('age' > 30)",
+   "df.select(age > 30)",
+   "df.where(age > 30)"
+  ],
+  "answer": 0,
+  "explanation": "Boolean indexing keeps only rows where the condition Series is True."
+ },
+ {
+  "id": "da-003",
+  "skill": "data-analysis",
+  "topic": "CSV I/O",
+  "difficulty": "easy",
+  "question": "Which pandas function reads a CSV file?",
+  "options": [
+   "pd.read_csv('file.csv')",
+   "pd.open_csv('file.csv')",
+   "pd.load('file.csv')",
+   "pd.csv_read('file.csv')"
+  ],
+  "answer": 0,
+  "explanation": "read_csv parses the file into a DataFrame, inferring headers and dtypes."
+ },
+ {
+  "id": "ml-020",
+  "skill": "machine-learning",
+  "topic": "Decision Trees",
+  "difficulty": "hard",
+  "question": "Information gain in decision trees measures...",
+  "options": [
+   "The increase in tree depth",
+   "The reduction in entropy achieved by a split",
+   "The number of leaf nodes",
+   "The Gini impurity of the root only"
+  ],
+  "answer": 1,
+  "explanation": "Splits are chosen to maximize information gain: how much uncertainty about the label the split removes."
+ },
+ {
+  "id": "ml-006",
+  "skill": "machine-learning",
+  "topic": "Gradient Descent",
+  "difficulty": "easy",
+  "question": "Gradient descent updates model weights by moving...",
+  "options": [
+   "In the direction of increasing loss",
+   "Opposite to the gradient of the loss",
+   "Randomly at each step",
+   "Along the second derivative only"
+  ],
+  "answer": 1,
+  "explanation": "Stepping against the gradient descends the loss surface toward a local minimum."
+ },
+ {
+  "id": "ml-015",
+  "skill": "machine-learning",
+  "topic": "Train/Val/Test Split",
+  "difficulty": "medium",
+  "question": "The test set should be used...",
+  "options": [
+   "For early stopping",
+   "Only once, for a final unbiased evaluation",
+   "To tune the learning rate",
+   "During every training epoch"
+  ],
+  "answer": 1,
+  "explanation": "Touching the test set repeatedly leaks information; reserve it for one honest final measurement."
+ },
+ {
+  "id": "ml-005",
+  "skill": "machine-learning",
+  "topic": "Clustering",
+  "difficulty": "easy",
+  "question": "Which algorithm is commonly used for clustering?",
+  "options": [
+   "Logistic regression",
+   "K-means",
+   "Linear regression",
+   "Naive Bayes"
+  ],
+  "answer": 1,
+  "explanation": "K-means groups unlabeled data into k clusters by minimizing within-cluster distances."
+ },
+ {
+  "id": "ml-010",
+  "skill": "machine-learning",
+  "topic": "Decision Trees",
+  "difficulty": "medium",
+  "question": "Which technique controls decision-tree complexity to prevent overfitting?",
+  "options": [
+   "Limiting max depth or pruning",
+   "Raising the learning rate",
+   "Increasing the batch size",
+   "Adding momentum"
+  ],
+  "answer": 0,
+  "explanation": "Shallower trees generalize better; pruning removes splits that only fit training noise."
+ },
+ {
+  "id": "ml-014",
+  "skill": "machine-learning",
+  "topic": "Unsupervised Learning",
+  "difficulty": "medium",
+  "question": "Which task is unsupervised learning?",
+  "options": [
+   "Spam email classification",
+   "Customer segmentation with K-means",
+   "House price prediction",
+   "Sentiment analysis"
+  ],
+  "answer": 1,
+  "explanation": "Segmentation finds structure in unlabeled customer data without any target labels to learn from."
+ },
+ {
+  "id": "ml-016",
+  "skill": "machine-learning",
+  "topic": "Bias-Variance Tradeoff",
+  "difficulty": "hard",
+  "question": "High bias combined with low variance indicates...",
+  "options": [
+   "Overfitting",
+   "Underfitting",
+   "A perfect fit",
+   "Data leakage"
+  ],
+  "answer": 1,
+  "explanation": "The model is consistently wrong in the same way: too simple to capture the signal, hence underfitting."
+ },
+ {
+  "id": "ml-019",
+  "skill": "machine-learning",
+  "topic": "Logistic Regression",
+  "difficulty": "hard",
+  "question": "In standard logistic regression, the decision boundary is...",
+  "options": [
+   "Always non-linear",
+   "Linear in the feature space",
+   "A circle around the data",
+   "Determined by K-means"
+  ],
+  "answer": 1,
+  "explanation": "The sigmoid's 0.5 threshold corresponds to a linear equation, so the boundary is a hyperplane."
+ },
+ {
+  "id": "ml-007",
+  "skill": "machine-learning",
+  "topic": "Feature Scaling",
+  "difficulty": "easy",
+  "question": "Why is feature scaling useful?",
+  "options": [
+   "It adds more features",
+   "It helps gradient-based optimizers converge faster",
+   "It removes all outliers",
+   "It increases model capacity"
+  ],
+  "answer": 1,
+  "explanation": "Similarly scaled features keep the loss surface balanced so gradient steps are stable and quick."
+ },
+ {
+  "id": "ml-013",
+  "skill": "machine-learning",
+  "topic": "Precision and Recall",
+  "difficulty": "medium",
+  "question": "Raising the classification threshold typically...",
+  "options": [
+   "Increases recall and decreases precision",
+   "Increases precision and decreases recall",
+   "Increases both precision and recall",
+   "Decreases both precision and recall"
+  ],
+  "answer": 1,
+  "explanation": "A higher bar means fewer positive predictions, so those made are more often right but more true cases are missed."
+ },
+ {
+  "id": "ml-018",
+  "skill": "machine-learning",
+  "topic": "Cross-Validation",
+  "difficulty": "hard",
+  "question": "Stratified k-fold is preferred for classification because it...",
+  "options": [
+   "Runs faster than plain k-fold",
+   "Preserves class proportions in every fold",
+   "Shuffles the feature columns",
+   "Reduces the number of folds needed"
+  ],
+  "answer": 1,
+  "explanation": "Keeping each fold's class mix representative avoids folds missing minority classes entirely."
+ },
+ {
+  "id": "ml-011",
+  "skill": "machine-learning",
+  "topic": "Cross-Validation",
+  "difficulty": "medium",
+  "question": "In k-fold cross-validation, the data is...",
+  "options": [
+   "Copied k times for training",
+   "Split into k folds with each fold serving once as validation",
+   "Modeled by k different algorithms",
+   "Split by features into k groups"
+  ],
+  "answer": 1,
+  "explanation": "Rotating the validation fold gives a robust performance estimate using every sample for both training and validation."
+ },
+ {
+  "id": "ml-002",
+  "skill": "machine-learning",
+  "topic": "Overfitting",
+  "difficulty": "easy",
+  "question": "Which technique helps reduce overfitting?",
+  "options": [
+   "Adding more layers",
+   "Regularization",
+   "Training longer",
+   "Removing validation data"
+  ],
+  "answer": 1,
+  "explanation": "Regularization penalizes complexity, helping the model generalize instead of memorizing."
+ },
+ {
+  "id": "ml-012",
+  "skill": "machine-learning",
+  "topic": "Underfitting",
+  "difficulty": "medium",
+  "question": "Underfitting is best addressed by...",
+  "options": [
+   "Stronger regularization",
+   "A more expressive model or richer features",
+   "A smaller training set",
+   "Higher dropout rates"
+  ],
+  "answer": 1,
+  "explanation": "Underfit models are too simple, so added capacity or better features lets them capture the true pattern."
+ },
+ {
+  "id": "ml-003",
+  "skill": "machine-learning",
+  "topic": "Train/Val/Test Split",
+  "difficulty": "easy",
+  "question": "What is the validation set primarily used for?",
+  "options": [
+   "Reporting final performance",
+   "Tuning hyperparameters",
+   "Updating model weights",
+   "Augmenting training data"
+  ],
+  "answer": 1,
+  "explanation": "The validation set guides hyperparameter choices and early stopping without touching the final test set."
+ },
+ {
+  "id": "ml-017",
+  "skill": "machine-learning",
+  "topic": "Gradient Descent",
+  "difficulty": "hard",
+  "question": "Why can an excessively large learning rate cause divergence?",
+  "options": [
+   "It repeatedly overshoots the minimum",
+   "It gets trapped in saddle points",
+   "It underflows the gradients",
+   "It freezes batch normalization"
+  ],
+  "answer": 0,
+  "explanation": "Oversized steps bounce across the loss valley with ever-growing loss instead of settling into the minimum."
+ },
+ {
+  "id": "ml-008",
+  "skill": "machine-learning",
+  "topic": "Linear Regression",
+  "difficulty": "medium",
+  "question": "Ordinary least squares linear regression minimizes...",
+  "options": [
+   "Mean absolute error",
+   "Mean squared error",
+   "Hinge loss",
+   "Cross-entropy loss"
+  ],
+  "answer": 1,
+  "explanation": "OLS finds coefficients that minimize the sum of squared residuals between predictions and targets."
+ },
+ {
+  "id": "ml-009",
+  "skill": "machine-learning",
+  "topic": "Logistic Regression",
+  "difficulty": "medium",
+  "question": "Logistic regression produces...",
+  "options": [
+   "A class probability via the sigmoid function",
+   "An unbounded continuous value",
+   "A cluster assignment",
+   "A decision-tree path"
+  ],
+  "answer": 0,
+  "explanation": "The sigmoid squashes the linear output into (0, 1), interpreted as the probability of the positive class."
+ },
+ {
+  "id": "ml-001",
+  "skill": "machine-learning",
+  "topic": "Supervised Learning",
+  "difficulty": "easy",
+  "question": "Which of the following is a supervised learning task?",
+  "options": [
+   "K-means clustering",
+   "Linear regression on labeled house prices",
+   "PCA dimensionality reduction",
+   "DBSCAN clustering"
+  ],
+  "answer": 1,
+  "explanation": "Supervised learning trains on labeled input-output pairs; linear regression learns to map features to known target values."
+ },
+ {
+  "id": "ml-004",
+  "skill": "machine-learning",
+  "topic": "Precision and Recall",
+  "difficulty": "easy",
+  "question": "Precision measures...",
+  "options": [
+   "The fraction of actual positives found",
+   "The fraction of predicted positives that are truly positive",
+   "Overall classification accuracy",
+   "The true negative rate"
+  ],
+  "answer": 1,
+  "explanation": "Precision = true positives / predicted positives, i.e. how trustworthy a positive prediction is."
+ },
+ {
+  "id": "ts-015",
+  "skill": "typescript",
+  "topic": "Strict Mode",
+  "difficulty": "medium",
+  "question": "The noImplicitAny compiler option...",
+  "options": [
+   "Bans the any keyword entirely",
+   "Errors when an expression implicitly gets the any type",
+   "Turns on strictNullChecks",
+   "Disables type inference"
+  ],
+  "answer": 1,
+  "explanation": "It forces explicit annotations wherever inference would silently fall back to any."
+ },
+ {
+  "id": "ts-009",
+  "skill": "typescript",
+  "topic": "Utility Types",
+  "difficulty": "medium",
+  "question": "Pick<T, 'a' | 'b'> creates...",
+  "options": [
+   "T without the keys a and b",
+   "A type with only the keys a and b from T",
+   "A type with required keys a and b",
+   "A renamed-keys version of T"
+  ],
+  "answer": 1,
+  "explanation": "Pick selects a subset of properties, keeping their original types intact."
+ },
+ {
+  "id": "ts-004",
+  "skill": "typescript",
+  "topic": "Strict Mode",
+  "difficulty": "easy",
+  "question": "With strictNullChecks enabled...",
+  "options": [
+   "null is assignable to every type",
+   "null and undefined are only assignable to their own types",
+   "All variables become readonly",
+   "Implicit any is allowed"
+  ],
+  "answer": 1,
+  "explanation": "You must explicitly include null or undefined in a type, e.g. string | null, to allow those values."
+ },
+ {
+  "id": "ts-012",
+  "skill": "typescript",
+  "topic": "Types vs Interfaces",
+  "difficulty": "medium",
+  "question": "Unlike interfaces, type aliases can directly describe...",
+  "options": [
+   "Declaration merging",
+   "Unions, tuples, and primitives",
+   "Only object shapes",
+   "Class heritage"
+  ],
+  "answer": 1,
+  "explanation": "type X = string | number or type Pair = [number, string] have no interface equivalent."
+ },
+ {
+  "id": "ts-011",
+  "skill": "typescript",
+  "topic": "never Type",
+  "difficulty": "medium",
+  "question": "The never type represents...",
+  "options": [
+   "Values that never occur, e.g. a function that always throws",
+   "Any JSON value",
+   "Optional function parameters",
+   "Dynamically imported modules"
+  ],
+  "answer": 0,
+  "explanation": "never is assignable to every type but nothing is assignable to it except never itself."
+ },
+ {
+  "id": "ts-017",
+  "skill": "typescript",
+  "topic": "Type Narrowing",
+  "difficulty": "hard",
+  "question": "Inside `if (x !== null) { ... }`, TypeScript narrows x by...",
+  "options": [
+   "Reducing it to never",
+   "Excluding null from its declared type",
+   "Widening it to unknown",
+   "Leaving the type unchanged"
+  ],
+  "answer": 1,
+  "explanation": "Control-flow analysis subtracts the checked-away constituent from the union for that branch."
+ },
+ {
+  "id": "ts-002",
+  "skill": "typescript",
+  "topic": "any vs unknown",
+  "difficulty": "easy",
+  "question": "Which type forces you to narrow or check it before use?",
+  "options": [
+   "any",
+   "unknown",
+   "string",
+   "boolean"
+  ],
+  "answer": 1,
+  "explanation": "unknown is type-safe: the compiler rejects operations on it until you narrow it to something concrete."
+ },
+ {
+  "id": "ts-013",
+  "skill": "typescript",
+  "topic": "Generics",
+  "difficulty": "medium",
+  "question": "Array<T> means...",
+  "options": [
+   "An array of exactly T elements",
+   "An array whose elements are of type T",
+   "A fixed-length tuple",
+   "A readonly set of T"
+  ],
+  "answer": 1,
+  "explanation": "The generic parameter fills in the element type, e.g. Array<string> is string[]."
+ },
+ {
+  "id": "ts-006",
+  "skill": "typescript",
+  "topic": "Modules",
+  "difficulty": "easy",
+  "question": "How do you export a value from an ES module in TypeScript?",
+  "options": [
+   "module.exports = x",
+   "export const x = ...",
+   "exports.x = ...",
+   "global.x = ..."
+  ],
+  "answer": 1,
+  "explanation": "The export keyword marks module members for import by other files in the ES module system."
+ },
+ {
+  "id": "ts-019",
+  "skill": "typescript",
+  "topic": "any vs unknown",
+  "difficulty": "hard",
+  "question": "Assigning a value of type any to a string variable...",
+  "options": [
+   "Is a compile error",
+   "Is allowed without complaint",
+   "Requires an as-cast",
+   "Narrows the any value"
+  ],
+  "answer": 1,
+  "explanation": "any opts out of checking entirely, so the assignment compiles even if it fails at runtime."
+ },
+ {
+  "id": "ts-003",
+  "skill": "typescript",
+  "topic": "Enums",
+  "difficulty": "easy",
+  "question": "In `enum Color { Red, Green }`, what value does Red get?",
+  "options": [
+   "\"Red\"",
+   "0",
+   "1",
+   "undefined"
+  ],
+  "answer": 1,
+  "explanation": "Numeric enums auto-increment from 0, so Red is 0 and Green is 1."
+ },
+ {
+  "id": "ts-001",
+  "skill": "typescript",
+  "topic": "Types vs Interfaces",
+  "difficulty": "easy",
+  "question": "Which keyword declares an object shape that supports declaration merging?",
+  "options": [
+   "type",
+   "interface",
+   "enum",
+   "namespace"
+  ],
+  "answer": 1,
+  "explanation": "Multiple interface declarations with the same name merge; type aliases cannot be redeclared."
+ },
+ {
+  "id": "ts-005",
+  "skill": "typescript",
+  "topic": "Classes",
+  "difficulty": "easy",
+  "question": "Which modifier restricts a class member to access inside the class only?",
+  "options": [
+   "public",
+   "private",
+   "static",
+   "readonly"
+  ],
+  "answer": 1,
+  "explanation": "private members are a compile-time barrier: only code inside the class body may touch them."
+ },
+ {
+  "id": "ts-010",
+  "skill": "typescript",
+  "topic": "Type Narrowing",
+  "difficulty": "medium",
+  "question": "Which of these narrows a union type in TypeScript?",
+  "options": [
+   "A typeof type guard",
+   "JSON.stringify(x)",
+   "Object.keys(x)",
+   "String(x)"
+  ],
+  "answer": 0,
+  "explanation": "typeof guards let the compiler narrow e.g. string | number to just string inside the branch."
+ },
+ {
+  "id": "ts-016",
+  "skill": "typescript",
+  "topic": "Generics",
+  "difficulty": "hard",
+  "question": "In `function f<T extends string>(x: T)`, the constraint means...",
+  "options": [
+   "T must be exactly string",
+   "T must be assignable to string",
+   "T cannot be inferred",
+   "x must be a string literal type only"
+  ],
+  "answer": 1,
+  "explanation": "extends sets an upper bound: T can be string or any subtype, like a string literal type."
+ },
+ {
+  "id": "ts-008",
+  "skill": "typescript",
+  "topic": "Utility Types",
+  "difficulty": "medium",
+  "question": "Partial<T> produces a type where...",
+  "options": [
+   "All properties are required",
+   "All properties are optional",
+   "All properties are readonly",
+   "All properties are nullable"
+  ],
+  "answer": 1,
+  "explanation": "Partial maps every property of T to optional, handy for update payloads."
+ },
+ {
+  "id": "ts-014",
+  "skill": "typescript",
+  "topic": "Classes",
+  "difficulty": "medium",
+  "question": "What does the readonly modifier do on a class property?",
+  "options": [
+   "Makes it private",
+   "Prevents reassignment after initialization",
+   "Makes it static",
+   "Hides it from JSON output"
+  ],
+  "answer": 1,
+  "explanation": "readonly allows assignment only at declaration or in the constructor, then locks the property."
+ },
+ {
+  "id": "ts-020",
+  "skill": "typescript",
+  "topic": "Modules",
+  "difficulty": "hard",
+  "question": "What does `import type { Foo }` do?",
+  "options": [
+   "Imports only the type; it is erased at compile time",
+   "Lazily imports the value at runtime",
+   "Re-exports Foo",
+   "Imports the default export"
+  ],
+  "answer": 0,
+  "explanation": "Type-only imports guarantee no runtime dependency and are fully removed during compilation."
+ },
+ {
+  "id": "ts-007",
+  "skill": "typescript",
+  "topic": "Generics",
+  "difficulty": "easy",
+  "question": "What does `function id<T>(x: T): T` do?",
+  "options": [
+   "Returns x unchanged, preserving its type",
+   "Converts x to a string",
+   "Always returns null",
+   "Requires T to be a class"
+  ],
+  "answer": 0,
+  "explanation": "The generic parameter T captures the argument's type so the return type matches it exactly."
+ },
+ {
+  "id": "ts-018",
+  "skill": "typescript",
+  "topic": "Utility Types",
+  "difficulty": "hard",
+  "question": "Omit<T, K> is equivalent to...",
+  "options": [
+   "Pick<T, K>",
+   "Pick<T, Exclude<keyof T, K>>",
+   "Partial<T>",
+   "Required<T>"
+  ],
+  "answer": 1,
+  "explanation": "Omit drops keys K by picking every key of T except those in K."
+ },
+ {
+  "id": "sd-010",
+  "skill": "system-design",
+  "topic": "Consistent Hashing",
+  "difficulty": "medium",
+  "question": "Consistent hashing minimizes...",
+  "options": [
+   "Request latency",
+   "Data remapping when nodes join or leave",
+   "Memory usage",
+   "Query planning time"
+  ],
+  "answer": 1,
+  "explanation": "Only keys near the changed node move, unlike naive modulo hashing which reshuffles nearly everything."
+ },
+ {
+  "id": "sd-001",
+  "skill": "system-design",
+  "topic": "Load Balancing",
+  "difficulty": "easy",
+  "question": "What is the main job of a load balancer?",
+  "options": [
+   "Storing user sessions",
+   "Distributing incoming traffic across servers",
+   "Encrypting databases",
+   "Compressing images"
+  ],
+  "answer": 1,
+  "explanation": "It spreads requests over healthy servers so no single machine is overwhelmed."
+ },
+ {
+  "id": "sd-020",
+  "skill": "system-design",
+  "topic": "Caching",
+  "difficulty": "hard",
+  "question": "Write-through caching means...",
+  "options": [
+   "Writes go to the cache only",
+   "Writes go to the cache and the database synchronously",
+   "Writes bypass the cache entirely",
+   "Reads lazily populate the cache"
+  ],
+  "answer": 1,
+  "explanation": "Both layers update together, so the cache never serves stale data after a write."
+ },
+ {
+  "id": "sd-003",
+  "skill": "system-design",
+  "topic": "CDNs",
+  "difficulty": "easy",
+  "question": "A content delivery network (CDN) mainly...",
+  "options": [
+   "Runs your primary database",
+   "Serves static content from edge locations near users",
+   "Balances database writes",
+   "Queues background jobs"
+  ],
+  "answer": 1,
+  "explanation": "Edge caches shorten the physical distance content travels, cutting latency worldwide."
+ },
+ {
+  "id": "sd-014",
+  "skill": "system-design",
+  "topic": "Message Queues",
+  "difficulty": "medium",
+  "question": "A dead-letter queue holds...",
+  "options": [
+   "High-priority messages",
+   "Messages that repeatedly failed processing",
+   "Archived audit logs",
+   "Duplicate deliveries"
+  ],
+  "answer": 1,
+  "explanation": "Poison messages are parked aside for inspection instead of blocking the main queue forever."
+ },
+ {
+  "id": "sd-006",
+  "skill": "system-design",
+  "topic": "Rate Limiting",
+  "difficulty": "easy",
+  "question": "Rate limiting protects an API by...",
+  "options": [
+   "Caching responses",
+   "Capping the requests a client may make over time",
+   "Compressing payloads",
+   "Sharding the database"
+  ],
+  "answer": 1,
+  "explanation": "Limits like 100 requests/minute per key prevent abuse and keep the service stable."
+ },
+ {
+  "id": "sd-011",
+  "skill": "system-design",
+  "topic": "Caching",
+  "difficulty": "medium",
+  "question": "In the cache-aside (lazy loading) pattern...",
+  "options": [
+   "The app checks the cache first and loads from the DB on a miss",
+   "The DB pushes every write into the cache",
+   "The cache is the primary data store",
+   "Writes go only to the cache"
+  ],
+  "answer": 0,
+  "explanation": "The application owns cache population: misses fall through to the database, then fill the cache."
+ },
+ {
+  "id": "sd-005",
+  "skill": "system-design",
+  "topic": "Message Queues",
+  "difficulty": "easy",
+  "question": "Message queues help systems by...",
+  "options": [
+   "Speeding up SQL queries",
+   "Decoupling services through async processing",
+   "Replacing caches",
+   "Encrypting network traffic"
+  ],
+  "answer": 1,
+  "explanation": "Producers and consumers work independently, smoothing traffic spikes and isolating failures."
+ },
+ {
+  "id": "sd-013",
+  "skill": "system-design",
+  "topic": "SQL vs NoSQL",
+  "difficulty": "medium",
+  "question": "NoSQL document stores are a good fit for...",
+  "options": [
+   "Complex multi-table joins",
+   "Flexible, evolving semi-structured data",
+   "Strict financial ledgers",
+   "Full-text search only"
+  ],
+  "answer": 1,
+  "explanation": "Schema-less JSON-like documents adapt easily when fields change often."
+ },
+ {
+  "id": "sd-015",
+  "skill": "system-design",
+  "topic": "Microservices",
+  "difficulty": "medium",
+  "question": "A major cost of a microservices architecture is...",
+  "options": [
+   "Simpler deployments",
+   "Operational complexity of many independently deployed services",
+   "Fewer network calls",
+   "Always faster local development"
+  ],
+  "answer": 1,
+  "explanation": "You trade one deployable for distributed debugging, versioning, and network failure modes."
+ },
+ {
+  "id": "sd-007",
+  "skill": "system-design",
+  "topic": "Microservices",
+  "difficulty": "easy",
+  "question": "A monolithic architecture means...",
+  "options": [
+   "Each service owns its database",
+   "One deployable codebase for the whole application",
+   "No API gateway is used",
+   "Only serverless functions"
+  ],
+  "answer": 1,
+  "explanation": "All components ship and scale together as a single unit, unlike independently deployed microservices."
+ },
+ {
+  "id": "sd-016",
+  "skill": "system-design",
+  "topic": "CAP Theorem",
+  "difficulty": "hard",
+  "question": "During a network partition, a CP system...",
+  "options": [
+   "Stays available, sacrificing consistency",
+   "Sacrifices availability to preserve consistency",
+   "Keeps both consistency and availability",
+   "Drops the partitioned nodes permanently"
+  ],
+  "answer": 1,
+  "explanation": "CP systems refuse or block writes on the minority side rather than risk divergent data."
+ },
+ {
+  "id": "sd-017",
+  "skill": "system-design",
+  "topic": "Sharding",
+  "difficulty": "hard",
+  "question": "A 'hot shard' occurs when...",
+  "options": [
+   "A node runs out of disk",
+   "One shard key receives disproportionate traffic",
+   "Replication lag grows cluster-wide",
+   "The shard key is a UUID"
+  ],
+  "answer": 1,
+  "explanation": "Skewed access patterns overload one shard while others sit idle, defeating the purpose of sharding."
+ },
+ {
+  "id": "sd-008",
+  "skill": "system-design",
+  "topic": "CAP Theorem",
+  "difficulty": "medium",
+  "question": "The CAP theorem states a distributed system can guarantee at most two of...",
+  "options": [
+   "Consistency, Availability, Partition tolerance",
+   "Caching, APIs, Proxies",
+   "Concurrency, Atomicity, Persistence",
+   "Compression, Auth, Pagination"
+  ],
+  "answer": 0,
+  "explanation": "When networks partition, you must choose between staying consistent or staying available."
+ },
+ {
+  "id": "sd-018",
+  "skill": "system-design",
+  "topic": "Consistent Hashing",
+  "difficulty": "hard",
+  "question": "Virtual nodes in consistent hashing...",
+  "options": [
+   "Are standby backup servers",
+   "Give one physical node many ring positions for even distribution",
+   "Replace the hash function",
+   "Store only metadata"
+  ],
+  "answer": 1,
+  "explanation": "Multiple tokens per node smooth out uneven key ranges, especially with few physical nodes."
+ },
+ {
+  "id": "sd-002",
+  "skill": "system-design",
+  "topic": "Caching",
+  "difficulty": "easy",
+  "question": "Caching primarily improves...",
+  "options": [
+   "Write durability",
+   "Read latency by serving stored responses",
+   "Data consistency",
+   "Total storage capacity"
+  ],
+  "answer": 1,
+  "explanation": "Serving repeated requests from fast memory avoids slow recomputation or database hits."
+ },
+ {
+  "id": "sd-009",
+  "skill": "system-design",
+  "topic": "Sharding",
+  "difficulty": "medium",
+  "question": "Database sharding means...",
+  "options": [
+   "Replicating all data to every node",
+   "Splitting data across nodes by a shard key",
+   "Backing up data hourly",
+   "Encrypting sensitive columns"
+  ],
+  "answer": 1,
+  "explanation": "Each shard owns a slice of rows, letting writes and storage scale horizontally."
+ },
+ {
+  "id": "sd-019",
+  "skill": "system-design",
+  "topic": "Rate Limiting",
+  "difficulty": "hard",
+  "question": "A token-bucket rate limiter...",
+  "options": [
+   "Blocks all traffic bursts",
+   "Allows bursts up to the bucket capacity, refilling over time",
+   "Counts only failed requests",
+   "Always needs a central database"
+  ],
+  "answer": 1,
+  "explanation": "Tokens accrue at a fixed rate and each request spends one, permitting short bursts within the limit."
+ },
+ {
+  "id": "sd-012",
+  "skill": "system-design",
+  "topic": "Load Balancing",
+  "difficulty": "medium",
+  "question": "Round-robin load balancing...",
+  "options": [
+   "Routes by hashing the URL",
+   "Cycles requests evenly across servers in order",
+   "Sends all traffic to one server",
+   "Routes by client geography"
+  ],
+  "answer": 1,
+  "explanation": "Each new request goes to the next server in sequence, giving a simple even split."
+ },
+ {
+  "id": "sd-004",
+  "skill": "system-design",
+  "topic": "SQL vs NoSQL",
+  "difficulty": "easy",
+  "question": "SQL databases are best known for...",
+  "options": [
+   "Flexible schemas",
+   "ACID transactions and JOINs",
+   "Cheap blob storage",
+   "Schema-less documents"
+  ],
+  "answer": 1,
+  "explanation": "Relational databases guarantee atomic, consistent transactions across related tables."
+ },
+ {
+  "id": "st-011",
+  "skill": "statistics",
+  "topic": "Hypothesis Testing",
+  "difficulty": "medium",
+  "question": "The null hypothesis typically states...",
+  "options": [
+   "That an effect exists",
+   "That there is no effect or difference",
+   "That the p-value is small",
+   "That data is normally distributed"
+  ],
+  "answer": 1,
+  "explanation": "Tests look for evidence strong enough to reject the default claim of no effect."
+ },
+ {
+  "id": "st-001",
+  "skill": "statistics",
+  "topic": "Central Tendency",
+  "difficulty": "easy",
+  "question": "What is the median of [3, 1, 2]?",
+  "options": [
+   "1",
+   "2",
+   "3",
+   "6"
+  ],
+  "answer": 1,
+  "explanation": "Sorted values are [1, 2, 3]; the median is the middle value, 2."
+ },
+ {
+  "id": "st-015",
+  "skill": "statistics",
+  "topic": "Correlation",
+  "difficulty": "medium",
+  "question": "A confounding variable...",
+  "options": [
+   "Increases the sample size",
+   "Influences both variables, creating a spurious association",
+   "Reduces measurement variance",
+   "Guarantees a causal link"
+  ],
+  "answer": 1,
+  "explanation": "Because it drives both variables, it can fake a relationship where none exists."
+ },
+ {
+  "id": "st-009",
+  "skill": "statistics",
+  "topic": "P-values",
+  "difficulty": "medium",
+  "question": "A p-value of 0.03 means...",
+  "options": [
+   "There is a 3% chance the null hypothesis is true",
+   "If the null were true, results this extreme would occur 3% of the time",
+   "There is a 97% chance the effect is real",
+   "The effect size equals 0.03"
+  ],
+  "answer": 1,
+  "explanation": "The p-value is a probability about the data under the null, not about the hypothesis being true."
+ },
+ {
+  "id": "st-013",
+  "skill": "statistics",
+  "topic": "Distributions",
+  "difficulty": "medium",
+  "question": "For a binomial distribution with parameters n and p, the mean is...",
+  "options": [
+   "n * p",
+   "n / p",
+   "p^n",
+   "sqrt(n * p)"
+  ],
+  "answer": 0,
+  "explanation": "Expect p successes per trial over n trials, so the expected count is n times p."
+ },
+ {
+  "id": "st-012",
+  "skill": "statistics",
+  "topic": "Variance",
+  "difficulty": "medium",
+  "question": "Variance is computed as...",
+  "options": [
+   "The mean of absolute deviations",
+   "The mean of squared deviations from the mean",
+   "The square root of the range",
+   "The sum of raw deviations"
+  ],
+  "answer": 1,
+  "explanation": "Squaring deviations penalizes larger spreads and keeps the math tractable."
+ },
+ {
+  "id": "st-017",
+  "skill": "statistics",
+  "topic": "P-values",
+  "difficulty": "hard",
+  "question": "Why is p-hacking a problem?",
+  "options": [
+   "It slows down computation",
+   "Repeated testing inflates the false-positive rate",
+   "It reduces statistical power",
+   "It requires larger samples"
+  ],
+  "answer": 1,
+  "explanation": "Testing many hypotheses until one 'works' virtually guarantees spurious significant results."
+ },
+ {
+  "id": "st-016",
+  "skill": "statistics",
+  "topic": "Bayes Theorem",
+  "difficulty": "hard",
+  "question": "1% disease prevalence, 99% test sensitivity, 5% false-positive rate. P(disease | positive) is about...",
+  "options": [
+   "50%",
+   "99%",
+   "16.7%",
+   "5%"
+  ],
+  "answer": 2,
+  "explanation": "Posterior = (0.99 x 0.01) / (0.99 x 0.01 + 0.05 x 0.99) = 0.167. Base rates dominate."
+ },
+ {
+  "id": "st-006",
+  "skill": "statistics",
+  "topic": "Central Tendency",
+  "difficulty": "easy",
+  "question": "Which measure is most affected by extreme outliers?",
+  "options": [
+   "Median",
+   "Mean",
+   "Mode",
+   "Range of the middle 50%"
+  ],
+  "answer": 1,
+  "explanation": "The mean averages every value, so one extreme pulls it strongly; the median resists."
+ },
+ {
+  "id": "st-018",
+  "skill": "statistics",
+  "topic": "Hypothesis Testing",
+  "difficulty": "hard",
+  "question": "A Type II error is...",
+  "options": [
+   "Rejecting a true null hypothesis",
+   "Failing to reject a false null hypothesis",
+   "Using the wrong test statistic",
+   "Introducing sampling bias"
+  ],
+  "answer": 1,
+  "explanation": "It is a false negative: the effect is real, but the test lacked evidence to detect it."
+ },
+ {
+  "id": "st-005",
+  "skill": "statistics",
+  "topic": "Distributions",
+  "difficulty": "easy",
+  "question": "A normal distribution is...",
+  "options": [
+   "Skewed to the right",
+   "Symmetric and bell-shaped",
+   "Uniform across values",
+   "Always bimodal"
+  ],
+  "answer": 1,
+  "explanation": "It is symmetric about the mean, with most mass near the center tapering into thin tails."
+ },
+ {
+  "id": "st-007",
+  "skill": "statistics",
+  "topic": "Sampling",
+  "difficulty": "easy",
+  "question": "Random sampling helps ensure...",
+  "options": [
+   "A larger sample is always better",
+   "A sample representative of the population",
+   "Zero variance in estimates",
+   "Normally distributed data"
+  ],
+  "answer": 1,
+  "explanation": "Random selection gives every member a fair chance, reducing systematic selection bias."
+ },
+ {
+  "id": "st-019",
+  "skill": "statistics",
+  "topic": "Confidence Intervals",
+  "difficulty": "hard",
+  "question": "Holding the confidence level fixed, a larger sample size...",
+  "options": [
+   "Widens the interval",
+   "Narrows the interval",
+   "Leaves the width unchanged",
+   "Invalidates the interval"
+  ],
+  "answer": 1,
+  "explanation": "Standard error shrinks as 1/sqrt(n), so estimates get more precise."
+ },
+ {
+  "id": "st-004",
+  "skill": "statistics",
+  "topic": "Correlation",
+  "difficulty": "easy",
+  "question": "A strong correlation between two variables implies...",
+  "options": [
+   "Causation",
+   "Association, but not causation by itself",
+   "Statistical independence",
+   "A normal distribution"
+  ],
+  "answer": 1,
+  "explanation": "Correlation shows variables move together; only controlled experiments or causal analysis establish cause."
+ },
+ {
+  "id": "st-014",
+  "skill": "statistics",
+  "topic": "Probability Basics",
+  "difficulty": "medium",
+  "question": "For independent events A and B, P(A and B) =",
+  "options": [
+   "P(A) + P(B)",
+   "P(A) x P(B)",
+   "P(A) - P(B)",
+   "P(A | B)"
+  ],
+  "answer": 1,
+  "explanation": "Independence means the joint probability factorizes into the product of the marginals."
+ },
+ {
+  "id": "st-020",
+  "skill": "statistics",
+  "topic": "Sampling",
+  "difficulty": "hard",
+  "question": "Sampling bias occurs when...",
+  "options": [
+   "The sample is too large",
+   "The sample systematically misrepresents the population",
+   "The data is normally distributed",
+   "Outliers are removed"
+  ],
+  "answer": 1,
+  "explanation": "Non-random selection tilts estimates away from true population values no matter the sample size."
+ },
+ {
+  "id": "st-010",
+  "skill": "statistics",
+  "topic": "Confidence Intervals",
+  "difficulty": "medium",
+  "question": "A 95% confidence interval means...",
+  "options": [
+   "95% of the data lies inside it",
+   "About 95% of such intervals from repeated sampling would contain the true parameter",
+   "There is a 95% probability this interval contains the parameter",
+   "The margin of error is exactly 5%"
+  ],
+  "answer": 1,
+  "explanation": "The 95% refers to the long-run procedure's capture rate, not a probability about one fixed interval."
+ },
+ {
+  "id": "st-008",
+  "skill": "statistics",
+  "topic": "Bayes Theorem",
+  "difficulty": "medium",
+  "question": "Bayes' theorem is used to...",
+  "options": [
+   "Increase the sample size",
+   "Update prior beliefs with new evidence into a posterior",
+   "Set the p-value threshold",
+   "Turn correlation into causation"
+  ],
+  "answer": 1,
+  "explanation": "Posterior = likelihood x prior / evidence, blending what you knew with what you observed."
+ },
+ {
+  "id": "st-002",
+  "skill": "statistics",
+  "topic": "Variance",
+  "difficulty": "easy",
+  "question": "Standard deviation is...",
+  "options": [
+   "The square of the variance",
+   "The square root of the variance",
+   "Always equal to the mean",
+   "Always larger than the variance"
+  ],
+  "answer": 1,
+  "explanation": "Taking the square root returns spread to the original units of the data."
+ },
+ {
+  "id": "st-003",
+  "skill": "statistics",
+  "topic": "Probability Basics",
+  "difficulty": "easy",
+  "question": "For a fair coin, P(heads twice in a row) =",
+  "options": [
+   "1/2",
+   "1/4",
+   "1/3",
+   "2/3"
+  ],
+  "answer": 1,
+  "explanation": "Independent events multiply: 1/2 x 1/2 = 1/4."
+ }
+]

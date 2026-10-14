@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block theme %}resume{% endblock %}
+{% block title %}Quiz History | AI Career & Research Assistant{% endblock %}
+{% block nav_learn %}b-active{% endblock %}
+
+{% block content %}
+<section style="padding-top:2.6rem;">
+    <div class="b-sec-head b-reveal">
+        <span class="b-pill"><span class="b-pulse"></span>History</span>
+        <h1>Quiz <span class="b-grad">history</span></h1>
+        <p class="b-lede">Every attempt, with your best score per skill up top.</p>
+    </div>
+</section>
+
+{% if best %}
+<section class="b-section" style="padding-top:0;" aria-label="Best scores">
+    <div class="b-sec-head"><h2>Best <span class="b-grad">scores</span></h2></div>
+    <div class="b-bento">
+        {% for skill, b in best.items() %}
+        <div class="b-card b-card--stat b-reveal">
+            <div class="b-stat-num">{{ b.pct }}%</div>
+            <div class="b-stat-label">{{ skill|replace('-',' ')|title }} — {{ b.score }}/{{ b.total }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="b-section" style="padding-top:0;" aria-label="Attempts">
+    {% if attempts %}
+    <div class="b-bento">
+        {% for a in attempts %}
+        {% set s = a.summary_json or {} %}
+        <a class="b-card b-card--lite b-reveal" href="{{ url_for('view_quiz_result', attempt_id=a.id) }}">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;">
+                <h3 style="margin:0;">{{ a.skill|replace('-',' ')|title }}</h3>
+                <span class="b-tag">{{ s.get('pct', 0) }}%</span>
+            </div>
+            <div style="color:var(--b-muted);font-size:.85rem;margin-top:.4rem;">
+                {{ s.get('score', 0) }}/{{ s.get('total', a.num_questions) }} &middot; {{ a.num_questions }} questions
+                {% if a.timed %}&middot; timed{% endif %} &middot;
+                {{ a.submitted_at.strftime('%d %b %Y') if a.submitted_at else '' }}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="b-card b-card--cta b-reveal">
+        <h2>No quizzes <span class="b-grad">yet</span></h2>
+        <p class="b-lede" style="margin-left:auto;margin-right:auto;">Take your first quiz and your history will appear here.</p>
+        <a class="b-btn b-btn--primary b-magnet" href="{{ url_for('quizzes_home') }}">Start a quiz</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
