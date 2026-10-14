@@ -288,6 +288,10 @@ from flashcards import (generate_deck as fc_generate_deck,
                         mastery_stats as fc_mastery_stats)
 import momentum as momentum_mod
 import retrospective_data as retro_data
+from health_review import (DIMENSIONS as HR_DIMENSIONS,
+                           generate_review as hr_generate_review,
+                           valid_month_key as hr_valid_month_key,
+                           current_month_key as hr_current_month_key)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -1121,6 +1125,32 @@ class MomentumSettings(db.Model):
                            onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("momentum_settings", uselist=False,
+                                                      cascade="all, delete-orphan"))
+
+
+class HealthReview(db.Model):
+    """A monthly, explainable career-health review (Wave 6 #30).
+
+    One row per (user, month_key). dimensions_json holds the five transparent
+    dimensions (direction, proof, opportunity, preparation, wellbeing), each
+    {score 0-100 or None, trend vs last month or None, confidence 0-100,
+    evidence: [human strings]}. No opaque employability score — everything
+    the user sees is backed by evidence strings. Idempotent: regenerating a
+    month updates the row in place.
+    """
+    __tablename__ = "health_review"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    month_key = db.Column(db.String(7), nullable=False, index=True)  # "2026-10"
+    dimensions_json = db.Column(db.JSON)  # per-dimension payloads (see docstring)
+    narrative = db.Column(db.Text)         # 2-3 plain sentences, no jargon
+    next_action = db.Column(db.Text)      # single smallest high-leverage action
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "month_key",
+                                          name="uq_health_review_user_month"),)
+
+    user = db.relationship("User", backref=db.backref("health_reviews", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -6572,6 +6602,105 @@ def register_routes(app):
         except Exception:
             log.exception("Constructor failed")
             return jsonify({'error': 'Paper generation hit an unexpected error. Please try again.'}), 500
+
+    # ================= Wave 6 #30: career health review =================
+    def _hr_to_dict(review):
+        dims = review.dimensions_json or {}
+        return {
+            "month_key": review.month_key,
+            "dimensions": [
+                {"id": d["id"], "title": d["title"],
+                 "description": d["description"],
+                 **{k: v for k, v in (dims.get(d["id"]) or {}).items()
+                    if k != "signals"}}
+                for d in HR_DIMENSIONS
+            ],
+            "narrative": review.narrative,
+            "next_action": review.next_action,
+            "created_at": (review.created_at.isoformat()
+                           if review.created_at else None),
+        }
+
+    def _hr_generate_current(user_id):
+        """Generate (idempotently) the current month's review for the user.
+
+        Returns (review, created). XP is awarded only when the row is newly
+        INSERTED — regenerating an existing month never re-awards.
+        """
+        mk = hr_current_month_key()
+        review, created = hr_generate_review(user_id, mk)
+        xp_awarded = False
+        if created:
+            try:
+                res = momentum_mod.record_event(user_id, "health_review_completed")
+                xp_awarded = bool(res.get("ok") and not res.get("skipped")
+                                  and res.get("xp"))
+            except Exception:
+                log.exception("health_review: XP award failed")
+        return review, created, xp_awarded
+
+    @app.route('/review')
+    @login_required
+    def health_review_hub():
+        """Current month's review (auto-generated on first view): five
+        dimension cards with score bars, trend arrows, confidence and
+        evidence, plus the next-action callout and a history of past months.
+
+        Trust rule: no opaque employability score — every number carries its
+        evidence, and locked dimensions say exactly what would unlock them.
+        """
+        review, _created, _xp = _hr_generate_current(current_user.id)
+        history = (HealthReview.query
+                   .filter(HealthReview.user_id == current_user.id,
+                           HealthReview.month_key != review.month_key)
+                   .order_by(HealthReview.month_key.desc()).all())
+        return render_template('health_review_hub.html',
+                               review=_hr_to_dict(review),
+                               month_key=review.month_key,
+                               is_current=True,
+                               history=[{"month_key": r.month_key,
+                                         "next_action": r.next_action}
+                                        for r in history])
+
+    @app.route('/review/<month_key>')
+    @login_required
+    def health_review_month(month_key):
+        """View a past month's review. Bad format -> 400; no row for this
+        user (including other users' rows) -> 404."""
+        if not hr_valid_month_key(month_key):
+            abort(400)
+        review = (HealthReview.query
+                  .filter_by(user_id=current_user.id, month_key=month_key).first())
+        if review is None:
+            abort(404)
+        history = (HealthReview.query
+                   .filter(HealthReview.user_id == current_user.id,
+                           HealthReview.month_key != review.month_key)
+                   .order_by(HealthReview.month_key.desc()).all())
+        return render_template('health_review_hub.html',
+                               review=_hr_to_dict(review),
+                               month_key=review.month_key,
+                               is_current=(month_key == hr_current_month_key()),
+                               history=[{"month_key": r.month_key,
+                                         "next_action": r.next_action}
+                                        for r in history])
+
+    @app.route('/review/api/regenerate', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def health_review_regenerate():
+        """Regenerate the current month's review. CSRF via the X-CSRFToken
+        header (not exempt). XP is awarded only when the review row is first
+        created, never on updates."""
+        try:
+            review, created, xp_awarded = _hr_generate_current(current_user.id)
+            return jsonify({"ok": True, "month_key": review.month_key,
+                            "created": created, "xp_awarded": xp_awarded,
+                            "review": _hr_to_dict(review)})
+        except Exception:
+            log.exception("health_review regenerate failed")
+            return jsonify({"error": "Could not regenerate the review. "
+                                     "Please try again."}), 500
 
     csrf.exempt(api_constructor_generate)
 

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'career' %}
+{% block title %}Career Health Review — {{ month_key }} | STUDY-BUDDY{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        .hr-bar { height: 12px; border-radius: 999px; background: rgba(255,255,255,.07); overflow: hidden; margin-top: .7rem; }
+        .hr-bar > span { display: block; height: 100%; border-radius: 999px;
+            background: linear-gradient(90deg, var(--b-a1), var(--b-a2)); }
+        .hr-bar--locked > span { background: rgba(255,255,255,.12); }
+        .hr-score { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; }
+        .hr-meta { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; margin-top: .35rem; }
+        .hr-trend { font-size: .82rem; font-weight: 800; padding: .2rem .6rem; border-radius: 999px; }
+        .hr-trend--up { color: #34d399; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.35); }
+        .hr-trend--down { color: #f87171; background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); }
+        .hr-trend--flat { color: #94a3b8; background: rgba(148,163,184,.1); border: 1px solid rgba(148,163,184,.3); }
+        .hr-conf { font-size: .78rem; color: var(--b-muted); }
+        .hr-ev { margin: .8rem 0 0; padding-left: 1.1rem; font-size: .88rem; color: #e2e8f0; display: grid; gap: .3rem; }
+        .hr-ev li::marker { color: var(--b-a2); }
+        .hr-next { border-left: 3px solid var(--b-a1); padding: .9rem 1.1rem; border-radius: 0 14px 14px 0;
+            background: rgba(255,255,255,.04); margin-top: 1rem; }
+        .hr-next strong { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+            color: var(--b-a2); margin-bottom: .35rem; }
+        .hr-next p { margin: 0; font-size: 1.05rem; font-weight: 600; }
+        .hr-hist { width: 100%; border-collapse: collapse; font-size: .9rem; margin-top: .6rem; }
+        .hr-hist td { padding: .55rem .5rem; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: top; }
+        .hr-hist td:first-child { white-space: nowrap; }
+        .hr-err { display: none; color: #f87171; font-size: .85rem; margin-top: .6rem; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Career health review · {{ month_key }}</span>
+            <h1>Your month, <span class="b-grad">explained</span>.</h1>
+            <p class="b-lede">Five transparent dimensions — direction, proof, opportunity activity, preparation and wellbeing — built only from what you've actually done. No hidden score: every number shows its evidence, and a quiet area is a gap, never a grade.</p>
+            <p style="color:var(--b-muted);max-width:46rem;">{{ review.narrative }}</p>
+            {% if is_current %}
+            <div class="b-cta-row">
+                <button class="b-btn b-btn--primary" id="hr-regen" type="button">Regenerate this month</button>
+                <span class="b-pill">Trends compare against last month</span>
+            </div>
+            <p class="hr-err" id="hr-regen-err" role="alert"></p>
+            {% else %}
+            <div class="b-cta-row">
+                <a class="b-btn" href="{{ url_for('health_review_hub') }}">Back to current month</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% if review.next_action %}
+<section class="b-section" aria-label="Next action">
+    <div class="b-card b-reveal">
+        <div class="hr-next">
+            <strong>Your smallest next step</strong>
+            <p>{{ review.next_action }}</p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="b-section" aria-label="Dimensions">
+    <div class="b-sec-head"><h2>Five <span class="b-grad">dimensions</span></h2><p>Score out of 100 where there's enough data; trend vs last month; confidence reflects how much data backs the number.</p></div>
+    <div class="b-bento">
+        {% for d in review.dimensions %}
+        <div class="b-card {% if loop.index0 == 0 %}b-span-2{% endif %} b-reveal">
+            <h3 style="margin-top:0;">{{ d.title }}</h3>
+            <p style="color:var(--b-muted);font-size:.85rem;margin:.2rem 0 0;">{{ d.description }}</p>
+            {% if d.score is not none %}
+            <div class="hr-score" style="margin-top:.5rem;">{{ d.score }}<span style="font-size:1rem;color:var(--b-muted);font-weight:600;"> / 100</span></div>
+            <div class="hr-bar" role="img" aria-label="{{ d.title }} score {{ d.score }} of 100"><span style="width:{{ d.score }}%;"></span></div>
+            {% else %}
+            <div class="hr-score" style="margin-top:.5rem;color:var(--b-muted);">—</div>
+            <div class="hr-bar hr-bar--locked" role="img" aria-label="{{ d.title }}: not enough data"><span style="width:100%;"></span></div>
+            {% endif %}
+            <div class="hr-meta">
+                {% if d.trend is not none %}
+                    {% if d.trend > 0 %}
+                    <span class="hr-trend hr-trend--up" title="Up since last month">&#9650; {{ d.trend }}</span>
+                    {% elif d.trend < 0 %}
+                    <span class="hr-trend hr-trend--down" title="Down since last month">&#9660; {{ d.trend | abs }}</span>
+                    {% else %}
+                    <span class="hr-trend hr-trend--flat" title="Unchanged since last month">&mdash; 0</span>
+                    {% endif %}
+                {% else %}
+                <span class="hr-trend hr-trend--flat" title="No previous month to compare">&mdash;</span>
+                {% endif %}
+                <span class="hr-conf">Confidence {{ d.confidence }}%</span>
+            </div>
+            <ul class="hr-ev">
+                {% for e in d.evidence %}
+                <li>{{ e }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% if history %}
+<section class="b-section" aria-label="History">
+    <div class="b-card b-reveal">
+        <div class="b-sec-head" style="margin-top:0;"><h2>Past <span class="b-grad">months</span></h2><p>Your review archive — watch the trends move over time.</p></div>
+        <table class="hr-hist">
+            <tbody>
+            {% for h in history %}
+                <tr>
+                    <td><a href="{{ url_for('health_review_month', month_key=h.month_key) }}">{{ h.month_key }}</a></td>
+                    <td style="color:var(--b-muted);">{{ h.next_action or "" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+
+{% if is_current %}
+<script>
+(function () {
+    var btn = document.getElementById('hr-regen');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var err = document.getElementById('hr-regen-err');
+        err.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'Regenerating\u2026';
+        var headers = {'Content-Type': 'application/json', 'Accept': 'application/json'};
+        var m = document.querySelector('meta[name="csrf-token"]');
+        if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+        fetch('{{ url_for('health_review_regenerate') }}', {method: 'POST', headers: headers, body: '{}'})
+            .then(function (r) { return r.json().then(function (j) { return {status: r.status, body: j}; }); })
+            .then(function (res) {
+                if (res.status === 200 && res.body.ok) {
+                    window.location.reload();
+                } else {
+                    err.textContent = (res.body && res.body.error) || 'Could not regenerate the review. Please try again.';
+                    err.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = 'Regenerate this month';
+                }
+            })
+            .catch(function () {
+                err.textContent = 'Could not regenerate the review. Please try again.';
+                err.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Regenerate this month';
+            });
+    });
+})();
+</script>
+{% endif %}
+{% endblock %}
