@@ -356,6 +356,36 @@ class LinkedInReport(db.Model):
                                                       cascade="all, delete-orphan"))
 
 
+# Kanban stages for the application tracker (Wave 1 #6).
+TRACKER_STAGES = (
+    ("wishlist", "Wishlist"),
+    ("applied", "Applied"),
+    ("oa", "OA / Assignment"),
+    ("interview", "Interview"),
+    ("offer", "Offer"),
+    ("rejected", "Rejected"),
+)
+TRACKER_STAGE_IDS = {s[0] for s in TRACKER_STAGES}
+
+
+class JobApplication(db.Model):
+    """A tracked job application belonging to a user (Wave 1 #6)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    company = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(200), nullable=False)
+    stage = db.Column(db.String(20), nullable=False, default="wishlist", index=True)
+    jd_url = db.Column(db.String(500))
+    notes = db.Column(db.Text)
+    applied_date = db.Column(db.Date)
+    stage_updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                                 nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("job_applications", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
 class ResearchSession(db.Model):
     """A saved research-chat conversation belonging to a user."""
     id = db.Column(db.Integer, primary_key=True)
@@ -1786,6 +1816,169 @@ def register_routes(app):
         return render_template('linkedin_report.html', report=row.report_json,
                                report_id=row.id, created_at=row.created_at)
 
+    # ---------- APPLICATION TRACKER KANBAN (Wave 1 #6) ----------
+    def _tracker_app_to_dict(a):
+        return {
+            'id': a.id, 'company': a.company, 'role': a.role, 'stage': a.stage,
+            'jd_url': a.jd_url, 'notes': a.notes,
+            'applied_date': a.applied_date.isoformat() if a.applied_date else None,
+            'stage_updated_at': a.stage_updated_at.isoformat() if a.stage_updated_at else None,
+            'created_at': a.created_at.isoformat() if a.created_at else None,
+        }
+
+    def _validate_tracker_payload(payload, require_company_role=True):
+        """Validate tracker add/edit fields. Returns (data, error)."""
+        data = {}
+        company = (payload.get('company') or '').strip()
+        role = (payload.get('role') or '').strip()
+        if require_company_role:
+            if not company:
+                return None, 'Company name is required.'
+            if not role:
+                return None, 'Role / position is required.'
+        if company and len(company) > 200:
+            return None, 'Company name is too long (max 200 characters).'
+        if role and len(role) > 200:
+            return None, 'Role is too long (max 200 characters).'
+        data['company'] = company[:200]
+        data['role'] = role[:200]
+        jd_url = (payload.get('jd_url') or '').strip()
+        if jd_url:
+            if len(jd_url) > 500:
+                return None, 'Link is too long (max 500 characters).'
+            if not re.match(r'^https?://', jd_url, re.I):
+                return None, 'Link must start with http:// or https://.'
+        data['jd_url'] = jd_url[:500] or None
+        notes = (payload.get('notes') or '').strip()
+        if len(notes) > 5000:
+            return None, 'Notes are too long (max 5,000 characters).'
+        data['notes'] = notes or None
+        raw_date = (payload.get('applied_date') or '').strip()
+        if raw_date:
+            try:
+                data['applied_date'] = date.fromisoformat(raw_date)
+            except ValueError:
+                return None, 'Applied date must be YYYY-MM-DD.'
+        else:
+            data['applied_date'] = None
+        return data, None
+
+    def _tracker_stats(user_id):
+        """Stage counts, response rate, and avg current dwell per stage."""
+        apps = JobApplication.query.filter_by(user_id=user_id).all()
+        counts = {sid: 0 for sid, _ in TRACKER_STAGES}
+        for a in apps:
+            counts[a.stage] = counts.get(a.stage, 0) + 1
+        in_pipeline = counts['applied'] + counts['oa'] + counts['interview'] + counts['offer'] + counts['rejected']
+        responded = counts['oa'] + counts['interview'] + counts['offer']
+        response_rate = round(100.0 * responded / in_pipeline, 1) if in_pipeline else 0.0
+        now = datetime.now(timezone.utc)
+        dwell = {}
+        for sid, _ in TRACKER_STAGES:
+            days = []
+            for a in apps:
+                if a.stage != sid or not a.stage_updated_at:
+                    continue
+                ts = a.stage_updated_at
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+                days.append(max(0.0, (now - ts).total_seconds() / 86400.0))
+            dwell[sid] = round(sum(days) / len(days), 1) if days else 0.0
+        return {'counts': counts, 'total': len(apps),
+                'response_rate': response_rate, 'avg_days_in_stage': dwell}
+
+    @app.route('/tracker')
+    @login_required
+    def tracker_board():
+        """Kanban board of the user's job applications."""
+        apps = (JobApplication.query.filter_by(user_id=current_user.id)
+                .order_by(JobApplication.created_at.desc()).all())
+        by_stage = {sid: [] for sid, _ in TRACKER_STAGES}
+        for a in apps:
+            by_stage.setdefault(a.stage, []).append(a)
+        return render_template('tracker.html', stages=TRACKER_STAGES,
+                               by_stage=by_stage, stats=_tracker_stats(current_user.id))
+
+    @app.route('/tracker/add', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def tracker_add():
+        """Add a job application. CSRF via X-CSRFToken header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to track applications.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        payload = payload or {}
+        stage = (payload.get('stage') or 'wishlist').strip()
+        if stage not in TRACKER_STAGE_IDS:
+            return jsonify({'error': 'Invalid stage.'}), 400
+        data, error = _validate_tracker_payload(payload)
+        if error:
+            return jsonify({'error': error}), 400
+        app_row = JobApplication(user_id=current_user.id, stage=stage, **data)
+        db.session.add(app_row)
+        db.session.commit()
+        return jsonify({'success': True, 'application': _tracker_app_to_dict(app_row)}), 201
+
+    @app.route('/tracker/<int:app_id>/move', methods=['POST'])
+    def tracker_move(app_id):
+        """Move an application to another stage. CSRF via X-CSRFToken header."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        app_row = JobApplication.query.filter_by(id=app_id,
+                                                 user_id=current_user.id).first()
+        if not app_row:
+            return jsonify({'error': 'Application not found.'}), 404
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        stage = ((payload or {}).get('stage') or '').strip()
+        if stage not in TRACKER_STAGE_IDS:
+            return jsonify({'error': 'Invalid stage.'}), 400
+        if app_row.stage != stage:
+            app_row.stage = stage
+            app_row.stage_updated_at = datetime.now(timezone.utc)
+            db.session.commit()
+        return jsonify({'success': True, 'application': _tracker_app_to_dict(app_row)})
+
+    @app.route('/tracker/<int:app_id>/edit', methods=['POST'])
+    def tracker_edit(app_id):
+        """Edit an application's fields. CSRF via X-CSRFToken header."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        app_row = JobApplication.query.filter_by(id=app_id,
+                                                 user_id=current_user.id).first()
+        if not app_row:
+            return jsonify({'error': 'Application not found.'}), 404
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        data, error = _validate_tracker_payload(payload or {}, require_company_role=False)
+        if error:
+            return jsonify({'error': error}), 400
+        if data['company']:
+            app_row.company = data['company']
+        if data['role']:
+            app_row.role = data['role']
+        app_row.jd_url = data['jd_url']
+        app_row.notes = data['notes']
+        app_row.applied_date = data['applied_date']
+        db.session.commit()
+        return jsonify({'success': True, 'application': _tracker_app_to_dict(app_row)})
+
+    @app.route('/tracker/<int:app_id>/delete', methods=['POST'])
+    def tracker_delete(app_id):
+        """Delete an application. CSRF via X-CSRFToken header."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        app_row = JobApplication.query.filter_by(id=app_id,
+                                                 user_id=current_user.id).first()
+        if not app_row:
+            return jsonify({'error': 'Application not found.'}), 404
+        db.session.delete(app_row)
+        db.session.commit()
+        return jsonify({'success': True})
+
+    @app.route('/tracker/stats')
+    @login_required
+    def tracker_stats():
+        """JSON stats for the user's tracker."""
+        return jsonify({'success': True, 'stats': _tracker_stats(current_user.id)})
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -1824,11 +2017,13 @@ def register_routes(app):
         linkedin_reports = (LinkedInReport.query
                             .filter_by(user_id=current_user.id)
                             .order_by(LinkedInReport.created_at.desc()).all())
+        tracker_stats = _tracker_stats(current_user.id)
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
                                jd_matches=jd_matches, rewrites=rewrites,
-                               cover_docs=cover_docs, linkedin_reports=linkedin_reports)
+                               cover_docs=cover_docs, linkedin_reports=linkedin_reports,
+                               tracker_stats=tracker_stats)
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])

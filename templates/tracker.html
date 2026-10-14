@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Application Tracker | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <style>
+        .tk-wrap { max-width: 1400px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .tk-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+        .tk-head h1 { font-size: 1.9rem; }
+        .tk-head h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .tk-head p { color: var(--text-muted, #94a3b8); margin-top: 0.3rem; }
+        .tk-btn { background: var(--gradient-primary); color: #fff; border: none; border-radius: 12px; padding: 0.7rem 1.3rem; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+        .tk-btn:hover { filter: brightness(1.1); }
+        .tk-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text-main, #f8fafc); border-radius: 10px; padding: 0.45rem 0.8rem; cursor: pointer; font-size: 0.85rem; }
+        .tk-stats { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
+        .tk-stat { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.22); border-radius: 14px; padding: 0.7rem 1.1rem; min-width: 120px; }
+        .tk-stat strong { display: block; font-size: 1.4rem; color: var(--accent-primary); }
+        .tk-stat span { font-size: 0.8rem; color: var(--text-muted, #94a3b8); }
+        .tk-board { display: grid; grid-template-columns: repeat(6, minmax(230px, 1fr)); gap: 0.9rem; overflow-x: auto; padding-bottom: 1rem; align-items: start; }
+        .tk-col { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 0.8rem; min-height: 220px; }
+        .tk-col.tk-drop { border-color: var(--accent-primary); background: rgba(16,185,129,0.08); }
+        .tk-col-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; padding: 0 0.2rem; }
+        .tk-col-head h3 { font-size: 0.92rem; font-weight: 700; }
+        .tk-count { background: rgba(16,185,129,0.18); color: var(--accent-primary); border-radius: 999px; padding: 0.1rem 0.6rem; font-size: 0.78rem; font-weight: 700; }
+        .tk-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.8rem; margin-bottom: 0.7rem; cursor: grab; }
+        .tk-card:active { cursor: grabbing; }
+        .tk-card.tk-dragging { opacity: 0.45; }
+        .tk-card h4 { font-size: 0.95rem; margin-bottom: 0.15rem; word-break: break-word; }
+        .tk-card .tk-role { font-size: 0.83rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.4rem; word-break: break-word; }
+        .tk-card .tk-meta { font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.5rem; }
+        .tk-card .tk-notes { font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.5rem; white-space: pre-wrap; word-break: break-word; max-height: 5.5em; overflow: hidden; }
+        .tk-card .tk-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+        .tk-card select { background: rgba(255,255,255,0.06); color: var(--text-main, #f8fafc); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 0.3rem 0.4rem; font-size: 0.78rem; max-width: 100%; }
+        .tk-card select option { color: #0f172a; }
+        .tk-mini { background: transparent; border: 1px solid rgba(255,255,255,0.14); color: var(--text-muted, #94a3b8); border-radius: 8px; padding: 0.28rem 0.55rem; font-size: 0.76rem; cursor: pointer; }
+        .tk-mini:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+        .tk-mini.danger:hover { color: var(--accent-danger); border-color: var(--accent-danger); }
+        .tk-empty { text-align: center; color: var(--text-muted, #94a3b8); font-size: 0.82rem; padding: 1.2rem 0.4rem; border: 1px dashed rgba(255,255,255,0.12); border-radius: 10px; }
+        .tk-modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 60; padding: 1rem; }
+        .tk-modal { background: #0b1020; border: 1px solid rgba(16,185,129,0.3); border-radius: 18px; padding: 1.6rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+        .tk-modal h3 { margin-bottom: 1rem; }
+        .tk-modal label { display: block; font-size: 0.85rem; font-weight: 600; margin: 0.8rem 0 0.3rem; }
+        .tk-modal input, .tk-modal textarea, .tk-modal select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; color: var(--text-main, #f8fafc); padding: 0.6rem 0.7rem; font-size: 0.9rem; }
+        .tk-modal input:focus, .tk-modal textarea:focus, .tk-modal select:focus { outline: none; border-color: var(--accent-primary); }
+        .tk-modal select option { color: #0f172a; }
+        .tk-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+        .tk-error { color: var(--accent-danger); font-size: 0.85rem; margin-top: 0.7rem; }
+        .tk-modal-foot { display: flex; gap: 0.7rem; justify-content: flex-end; margin-top: 1.2rem; }
+        @media (max-width: 700px) {
+            .tk-modal-row { grid-template-columns: 1fr; }
+            .tk-wrap { padding-top: 5.5rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .tk-card { transition: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
+            <span>ResumeAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            {% include "_auth_links.html" %}
+        </ul>
+    </nav>
+
+    <div class="tk-wrap">
+        <div class="tk-head">
+            <div>
+                <h1>Application <span class="gradient-text">Tracker</span></h1>
+                <p>Drag cards between stages, or use the move dropdown on any card. Everything is private to you.</p>
+            </div>
+            <button class="tk-btn" id="tkAddBtn" type="button">+ Add application</button>
+        </div>
+
+        <div class="tk-stats" id="tkStats" aria-live="polite">
+            <div class="tk-stat"><strong>{{ stats.total }}</strong><span>Total tracked</span></div>
+            <div class="tk-stat"><strong>{{ stats.response_rate }}%</strong><span>Response rate</span></div>
+            {% for sid, label in stages %}
+            <div class="tk-stat"><strong>{{ stats.counts.get(sid, 0) }}</strong><span>{{ label }}</span></div>
+            {% endfor %}
+        </div>
+
+        <div class="tk-error" id="tkError" hidden></div>
+
+        <div class="tk-board" id="tkBoard">
+            {% for sid, label in stages %}
+            <div class="tk-col" data-stage="{{ sid }}">
+                <div class="tk-col-head"><h3>{{ label }}</h3><span class="tk-count">{{ by_stage.get(sid, [])|length }}</span></div>
+                <div class="tk-col-body">
+                    {% for a in by_stage.get(sid, []) %}
+                    <div class="tk-card" draggable="true" data-id="{{ a.id }}" data-stage="{{ a.stage }}">
+                        <h4>{{ a.company }}</h4>
+                        <div class="tk-role">{{ a.role }}</div>
+                        {% if a.applied_date %}<div class="tk-meta">Applied {{ a.applied_date.strftime('%d %b %Y') }}</div>{% endif %}
+                        {% if a.notes %}<div class="tk-notes">{{ a.notes }}</div>{% endif %}
+                        <div class="tk-actions">
+                            {% if a.jd_url %}<a class="tk-mini" href="{{ a.jd_url }}" target="_blank" rel="noopener" style="text-decoration:none;">JD link</a>{% endif %}
+                            <select class="tk-move" aria-label="Move to stage">
+                                {% for osid, olabel in stages %}
+                                <option value="{{ osid }}" {% if osid == a.stage %}selected{% endif %}>{{ olabel }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="tk-mini tk-edit" type="button">Edit</button>
+                            <button class="tk-mini danger tk-del" type="button">Delete</button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="tk-empty">No applications here yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="tk-modal-back" id="tkModalBack" hidden>
+        <div class="tk-modal" role="dialog" aria-modal="true" aria-labelledby="tkModalTitle">
+            <h3 id="tkModalTitle">Add application</h3>
+            <form id="tkForm" novalidate>
+                <input type="hidden" id="tkId">
+                <label for="tkCompany">Company *</label>
+                <input id="tkCompany" maxlength="200" required placeholder="e.g. Acme Corp">
+                <label for="tkRole">Role / position *</label>
+                <input id="tkRole" maxlength="200" required placeholder="e.g. Backend Engineer Intern">
+                <div class="tk-modal-row">
+                    <div>
+                        <label for="tkStage">Stage</label>
+                        <select id="tkStage">
+                            {% for sid, label in stages %}
+                            <option value="{{ sid }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tkDate">Applied date</label>
+                        <input id="tkDate" type="date">
+                    </div>
+                </div>
+                <label for="tkUrl">Job posting link</label>
+                <input id="tkUrl" maxlength="500" placeholder="https://…">
+                <label for="tkNotes">Notes</label>
+                <textarea id="tkNotes" rows="3" maxlength="5000" placeholder="Contacts, deadlines, interview prep…"></textarea>
+                <div class="tk-error" id="tkFormError" hidden></div>
+                <div class="tk-modal-foot">
+                    <button type="button" class="tk-btn-ghost" id="tkCancel">Cancel</button>
+                    <button type="submit" class="tk-btn" id="tkSave">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Built with AI for students | AI Resume Analyzer &amp; Job Recommendation System</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/tracker.js') }}"></script>
+</body>
+</html>
