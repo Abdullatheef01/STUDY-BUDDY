@@ -14,6 +14,7 @@ flask-limiter
 # --- Phase 1 (Foundation): persistence + auth ---
 flask-sqlalchemy
 flask-login
+psycopg2-binary  # PostgreSQL driver (needed when DATABASE_URL points to Postgres)
 # --- Phase 1: testing ---
 pytest
 # --- Social login + profile integrations ---
