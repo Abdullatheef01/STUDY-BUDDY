@@ -121,6 +121,29 @@
         </div>
     </section>
 
+    <!-- AI Bullet Rewriter (Wave 1, feature #2) -->
+    <section class="jd-section" id="bullet-rewriter">
+        <div class="jd-card">
+            <h2>Rewrite Any <span class="gradient-text">Resume Bullet</span></h2>
+            <p>Paste one bullet from your resume and get 2&ndash;3 stronger versions: punchier action verbs, quantified impact, and an ATS-friendly tightened line. Accept or edit any variant &mdash; every rewrite is saved to your dashboard.</p>
+            {% if current_user.is_authenticated %}
+            <form id="bulletForm" novalidate>
+                <label class="jd-label" for="bulletText">Resume bullet</label>
+                <textarea class="jd-textarea" id="bulletText" name="bullet_text" maxlength="1000" rows="3"
+                    placeholder="e.g. Worked on the payments API and helped reduce errors"></textarea>
+                <div class="jd-error" id="bulletError" hidden></div>
+                <button type="submit" class="jd-submit" id="bulletBtn"><span>Rewrite My Bullet</span></button>
+            </form>
+            <div id="bulletResult" aria-live="polite"></div>
+            {% else %}
+            <div class="jd-login-cta">
+                <p>Log in to rewrite your resume bullets. Your rewrites are saved to your dashboard.</p>
+                <a href="{{ url_for('login', next=url_for('resume_home')) }}">Log in to start rewriting</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
@@ -196,5 +219,6 @@
 
     <script src="{{ url_for('static', filename='js/resume_script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jd_match.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bullet_rewriter.js') }}"></script>
 </body>
 </html>

@@ -120,6 +120,25 @@
 </div>
 
 <div class="section">
+    <h2>&#9998;&#65039; Bullet Rewrites</h2>
+    {% if rewrites %}
+    <div class="card-grid">
+        {% for r in rewrites %}
+        <div class="hist-card">
+            <div class="fname">&#9998;&#65039; {{ r.original[:80] }}{% if r.original|length > 80 %}…{% endif %}</div>
+            <div class="meta">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}{% if r.ai_powered %} · AI-polished{% endif %}</div>
+            <span class="score-pill">{{ r.rewrites|length }} variants</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        No bullet rewrites yet. <a href="{{ url_for('resume_home') }}#bullet-rewriter">Rewrite a resume bullet</a> and it will appear here.
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
     <h2>&#127919; Career Goals</h2>    <form class="goal-form" method="POST" action="{{ url_for('goal_add') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" name="title" placeholder="e.g. Crack SDE-1 interviews by March" maxlength="255" required>

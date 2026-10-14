@@ -2200,6 +2200,23 @@ h1 svg { width: 1em; height: 1em; vertical-align: -0.12em; margin-right: 0.2em; 
     background: var(--gradient-primary); color: #03222d; font-weight: 700; text-decoration: none;
 }
 
+.jd-suggest-list { display: grid; gap: 1rem; margin: 1.2rem 0; }
+.jd-suggest-card {
+    background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px; padding: 1.1rem 1.2rem;
+}
+.jd-suggest-section { font-weight: 700; color: var(--accent-secondary); font-size: 0.85rem;
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+.jd-suggest-fix { font-size: 1rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 0.4rem; }
+.jd-suggest-tip { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.7rem; }
+.jd-copy-btn {
+    background: transparent; border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-primary);
+    border-radius: 8px; padding: 0.4rem 1rem; font-size: 0.85rem; cursor: pointer;
+}
+.jd-copy-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+.jd-score-hero { margin-bottom: 0.6rem; }
+.jd-score-label { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+
 @media (max-width: 640px) {
     .jd-card { padding: 1.3rem; }
     .jd-kw-grid { grid-template-columns: 1fr; }

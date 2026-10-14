@@ -223,6 +223,7 @@ from models.ats_scorer import calculate_ats_score
 from models.resume_feedback import generate_feedback, get_overall_summary
 from jd_matcher import (score_jd_match, generate_rule_based_suggestions,
                         JD_MIN_CHARS, JD_MAX_CHARS)
+from bullet_rewriter import (improve_bullet, BULLET_MIN_CHARS, BULLET_MAX_CHARS)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -293,6 +294,19 @@ class JDMatchReport(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("jd_match_reports", lazy="dynamic",
+                                                     cascade="all, delete-orphan"))
+
+
+class BulletRewrite(db.Model):
+    """A saved bullet-rewrite result belonging to a user (Wave 1 #2)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    original = db.Column(db.Text, nullable=False)
+    rewrites = db.Column(db.JSON)  # [{"label","text","tip"}...] + optional AI variant
+    ai_powered = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("bullet_rewrites", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
 
 
@@ -703,6 +717,52 @@ def _jd_match_suggestions(report, jd_text):
             log.warning("JD-match suggestions: model returned no usable items")
         except (ValueError, json.JSONDecodeError):
             log.warning("JD-match suggestions: non-JSON model output, retrying")
+    return fallback, False
+
+
+def _rewrite_bullet_ai(bullet):
+    """AI-polished bullet rewrites via Gemini, with rule-based fallback.
+
+    Returns (rewrites, ai_powered). The rule-based variants from
+    bullet_rewriter.improve_bullet always work; Gemini adds an AI-polished
+    alternative when available.
+    """
+    fallback = improve_bullet(bullet)
+    prompt = (
+        "You are a senior career coach rewriting resume bullets. Rewrite "
+        "this resume bullet into 2 stronger versions: one emphasizing "
+        "quantified impact, one emphasizing leadership/scope. Use strong "
+        "action verbs. Keep each under 25 words. If the bullet has no "
+        "numbers, insert a bracketed placeholder like [X%] for the metric.\n\n"
+        f"BULLET: {bullet[:800]}\n\n"
+        'Return ONLY a JSON object like {"rewrites": [{"label": "...", '
+        '"text": "...", "tip": "..."}]} with exactly 2 items.'
+    )
+    for _attempt in range(2):
+        try:
+            raw = call_gemini_ai(prompt)
+        except GeminiError as e:
+            log.warning("Bullet rewrite: Gemini unavailable: %s", e)
+            return fallback, False
+        try:
+            parsed = _parse_json_safely(raw)
+            items = parsed.get("rewrites") if isinstance(parsed, dict) else None
+            cleaned = []
+            for it in (items or [])[:2]:
+                if not isinstance(it, dict):
+                    continue
+                text = str(it.get("text") or "").strip()[:400]
+                if text and text != bullet.strip():
+                    cleaned.append({
+                        "label": str(it.get("label") or "AI-polished")[:60],
+                        "text": text,
+                        "tip": str(it.get("tip") or "AI-polished alternative.")[:200],
+                    })
+            if cleaned:
+                return fallback + cleaned, True
+            log.warning("Bullet rewrite: model returned no usable items")
+        except (ValueError, json.JSONDecodeError):
+            log.warning("Bullet rewrite: non-JSON model output, retrying")
     return fallback, False
 
 
@@ -1193,6 +1253,59 @@ def register_routes(app):
         return render_template('jd_match_report.html', report=row.report_json,
                                report_id=row.id, created_at=row.created_at)
 
+    # ---------- AI BULLET REWRITER (Wave 1 #2) ----------
+    @app.route('/rewrite-bullet', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def rewrite_bullet():
+        """Rewrite a resume bullet into stronger variants.
+
+        Login required (rewrites are persisted per user). Accepts JSON:
+        {bullet_text}. The page sends the CSRF token in the X-CSRFToken
+        header, so this route is NOT CSRF-exempt.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to rewrite bullets.'}), 401
+
+        payload = request.get_json(silent=True) or {}
+        bullet_text = (payload.get('bullet_text') or '').strip()
+
+        # --- Server-side validation ---
+        if not bullet_text:
+            return jsonify({'error': 'Please enter a bullet to rewrite.'}), 400
+        if len(bullet_text) < BULLET_MIN_CHARS:
+            return jsonify({'error': f'That bullet looks too short '
+                                     f'(minimum {BULLET_MIN_CHARS} characters).'}), 400
+        if len(bullet_text) > BULLET_MAX_CHARS:
+            return jsonify({'error': f'That bullet is too long '
+                                     f'(maximum {BULLET_MAX_CHARS} characters).'}), 400
+
+        try:
+            rewrites, ai_powered = _rewrite_bullet_ai(bullet_text)
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
+
+        try:
+            row = BulletRewrite(
+                user_id=current_user.id,
+                original=bullet_text,
+                rewrites=json_safe(rewrites),
+                ai_powered=ai_powered,
+            )
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Bullet rewrite persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your rewrite. Please try again.'}), 500
+
+        return jsonify({
+            'success': True,
+            'rewrite_id': row.id,
+            'original': bullet_text,
+            'rewrites': json_safe(rewrites),
+            'ai_powered': ai_powered,
+        })
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -1222,10 +1335,13 @@ def register_routes(app):
         jd_matches = (JDMatchReport.query
                       .filter_by(user_id=current_user.id)
                       .order_by(JDMatchReport.created_at.desc()).all())
+        rewrites = (BulletRewrite.query
+                    .filter_by(user_id=current_user.id)
+                    .order_by(BulletRewrite.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
-                               jd_matches=jd_matches)
+                               jd_matches=jd_matches, rewrites=rewrites)
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])
