@@ -49,7 +49,7 @@
     }
 
     function cardHtml(a) {
-        var html = '<div class="tk-card" draggable="true" data-id="' + a.id + '" data-stage="' + esc(a.stage) + '">';
+        var html = '<div class="tk-card b-kcard" draggable="true" data-id="' + a.id + '" data-stage="' + esc(a.stage) + '">';
         html += '<h4>' + esc(a.company) + '</h4>';
         html += '<div class="tk-role">' + esc(a.role) + '</div>';
         if (a.applied_date) html += '<div class="tk-meta">Applied ' + esc(a.applied_date) + '</div>';
