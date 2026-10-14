@@ -1,10 +1,10 @@
-{# Shared auth links snippet. Include inside any .nav-links / navbar list.
-   Fully inline-styled so it matches the midnight-neon theme in every template. #}
+{# Shared auth links snippet. Include inside a .b-nav-links list.
+   Keeps the bento nav theme in every template. #}
 {% if current_user.is_authenticated %}
     <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-    <li><span title="{{ current_user.email }}" style="color: #f8fafc; font-weight: 600; font-size: 0.9rem;">{{ current_user.name }}</span></li>
-    <li><form method="POST" action="{{ url_for('logout') }}" style="display:inline; margin:0;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" style="padding: 0.45rem 1.1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #f8fafc; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit;">Logout</button></form></li>
+    <li><span class="b-nav-user" title="{{ current_user.email }}">{{ current_user.name }}</span></li>
+    <li><form method="POST" action="{{ url_for('logout') }}" style="display:inline; margin:0;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="b-btn b-btn--ghost b-btn--sm" style="font-family:inherit;">Logout</button></form></li>
 {% else %}
     <li><a href="{{ url_for('login') }}">Login</a></li>
-    <li><a href="{{ url_for('register') }}" style="padding: 0.45rem 1.1rem; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #ec4899); color: #f8fafc; text-decoration: none; font-weight: 600; font-size: 0.85rem;">Sign Up</a></li>
+    <li><a href="{{ url_for('register') }}" class="b-btn b-btn--primary b-btn--sm">Sign Up</a></li>
 {% endif %}
