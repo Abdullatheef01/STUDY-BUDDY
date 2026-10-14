@@ -2216,6 +2216,36 @@ h1 svg { width: 1em; height: 1em; vertical-align: -0.12em; margin-right: 0.2em; 
 .jd-copy-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
 .jd-score-hero { margin-bottom: 0.6rem; }
 .jd-score-label { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.jd-default-badge {
+    display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #03222d; background: var(--gradient-primary);
+    border-radius: 20px; padding: 0.2rem 0.7rem; margin-left: 0.6rem;
+}
+.jd-btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.8rem; }
+.jd-mini-btn {
+    background: transparent; border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-primary);
+    border-radius: 8px; padding: 0.35rem 0.9rem; font-size: 0.82rem; cursor: pointer;
+}
+.jd-mini-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+.jd-mini-btn.jd-danger:hover { border-color: var(--accent-danger); color: var(--accent-danger); }
+.jd-diff-out { margin-top: 1rem; }
+.jd-diff-lines {
+    font-family: ui-monospace, monospace; font-size: 0.82rem; line-height: 1.55;
+    background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 0.9rem;
+    max-height: 320px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+}
+.jd-diff-add { color: #6ee7b7; background: rgba(16, 185, 129, 0.08); }
+.jd-diff-del { color: #fca5a5; background: rgba(248, 113, 113, 0.08); }
+.jd-diff-ctx { color: var(--text-muted); }
+.jd-diff-hunk { color: var(--accent-info); font-weight: 700; }
+.jd-line-chip {
+    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-secondary); border-radius: 20px; padding: 0.35rem 0.9rem;
+    font-size: 0.8rem; cursor: pointer; text-align: left;
+}
+.jd-line-chip:hover { border-color: var(--accent-primary); color: var(--text-primary); }
+#bulletLinePicker { margin-bottom: 0.8rem; }
+#jdVersionWrap { margin-bottom: 0.8rem; }
 
 @media (max-width: 640px) {
     .jd-card { padding: 1.3rem; }

@@ -310,6 +310,21 @@ class BulletRewrite(db.Model):
                                                      cascade="all, delete-orphan"))
 
 
+class ResumeVersion(db.Model):
+    """A named, saved resume version belonging to a user (Wave 1 #3)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    name = db.Column(db.String(120), nullable=False)  # e.g. "Backend v1"
+    resume_text = db.Column(db.Text, nullable=False)
+    is_default = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("resume_versions", lazy="dynamic",
+                                                     cascade="all, delete-orphan"))
+
+
 class ResearchSession(db.Model):
     """A saved research-chat conversation belonging to a user."""
     id = db.Column(db.Integer, primary_key=True)
@@ -1180,6 +1195,21 @@ def register_routes(app):
                                              'Please upload your resume instead.'}), 400
                 resume_text = row.resume_text
                 filename = row.filename
+            elif resume_source == 'version':
+                if request.is_json:
+                    version_id = (payload.get('version_id') or 0)
+                else:
+                    version_id = request.form.get('version_id', type=int) or 0
+                try:
+                    version_id = int(version_id)
+                except (TypeError, ValueError):
+                    version_id = 0
+                version = ResumeVersion.query.filter_by(id=version_id,
+                                                        user_id=current_user.id).first()
+                if not version:
+                    return jsonify({'error': 'Please choose one of your saved resume versions.'}), 400
+                resume_text = version.resume_text
+                filename = version.name
             else:
                 if 'resume' not in request.files:
                     return jsonify({'error': 'No file uploaded.'}), 400
@@ -1304,6 +1334,191 @@ def register_routes(app):
             'original': bullet_text,
             'rewrites': json_safe(rewrites),
             'ai_powered': ai_powered,
+        })
+
+    # ---------- RESUME VERSIONS (Wave 1 #3) ----------
+    @app.route('/resume-versions', methods=['GET'])
+    def list_resume_versions():
+        """List the user's saved resume versions (newest first)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to manage resume versions.'}), 401
+        versions = (ResumeVersion.query
+                    .filter_by(user_id=current_user.id)
+                    .order_by(ResumeVersion.created_at.desc()).all())
+        return jsonify({
+            'success': True,
+            'versions': [{
+                'id': v.id,
+                'name': v.name,
+                'is_default': v.is_default,
+                'created_at': v.created_at.isoformat(),
+                'preview': (v.resume_text or '')[:200],
+            } for v in versions],
+        })
+
+    @app.route('/resume-versions', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def create_resume_version():
+        """Save a named resume version. JSON: {name, resume_text} or
+        {name, source: "latest"} to snapshot the latest saved analysis.
+        CSRF token via X-CSRFToken header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to save resume versions.'}), 401
+        payload = request.get_json(silent=True) or {}
+        name = (payload.get('name') or '').strip()
+        source = (payload.get('source') or 'text').strip()
+        resume_text = (payload.get('resume_text') or '').strip()
+
+        if not name:
+            return jsonify({'error': 'Please give this version a name.'}), 400
+        if len(name) > 120:
+            return jsonify({'error': 'Version name is too long (max 120 characters).'}), 400
+        if source == 'latest':
+            row = (ResumeAnalysis.query
+                   .filter_by(user_id=current_user.id)
+                   .filter(ResumeAnalysis.resume_text.isnot(None))
+                   .order_by(ResumeAnalysis.created_at.desc()).first())
+            if not row or not (row.resume_text or '').strip():
+                return jsonify({'error': 'No saved resume with extractable text found.'}), 400
+            resume_text = row.resume_text.strip()
+        if len(resume_text) < 50:
+            return jsonify({'error': 'Resume text looks too short to save as a version.'}), 400
+        if len(resume_text) > 50000:
+            return jsonify({'error': 'Resume text is too long (max 50,000 characters).'}), 400
+
+        existing = ResumeVersion.query.filter_by(user_id=current_user.id).count()
+        try:
+            version = ResumeVersion(
+                user_id=current_user.id,
+                name=name,
+                resume_text=resume_text,
+                is_default=(existing == 0),  # first version becomes the default
+            )
+            db.session.add(version)
+            db.session.commit()
+        except Exception:
+            log.exception("Resume version save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save this version. Please try again.'}), 500
+        return jsonify({'success': True, 'version': {
+            'id': version.id, 'name': version.name,
+            'is_default': version.is_default,
+            'created_at': version.created_at.isoformat(),
+        }})
+
+    @app.route('/resume-versions/<int:version_id>', methods=['GET'])
+    def get_resume_version(version_id):
+        """Fetch one version with its full text (owner only)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        version = ResumeVersion.query.filter_by(id=version_id,
+                                                user_id=current_user.id).first()
+        if not version:
+            return jsonify({'error': 'Version not found.'}), 404
+        return jsonify({'success': True, 'version': {
+            'id': version.id,
+            'name': version.name,
+            'is_default': version.is_default,
+            'resume_text': version.resume_text,
+            'created_at': version.created_at.isoformat(),
+        }})
+
+    @app.route('/resume-versions/<int:version_id>/set-default', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def set_default_resume_version(version_id):
+        """Mark one version as the default (used by JD-match "version" source)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        version = ResumeVersion.query.filter_by(id=version_id,
+                                                user_id=current_user.id).first()
+        if not version:
+            return jsonify({'error': 'Version not found.'}), 404
+        try:
+            (ResumeVersion.query.filter_by(user_id=current_user.id)
+             .update({'is_default': False}))
+            version.is_default = True
+            db.session.commit()
+        except Exception:
+            log.exception("Set-default version failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not update the default version.'}), 500
+        return jsonify({'success': True, 'version_id': version.id})
+
+    @app.route('/resume-versions/<int:version_id>/delete', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def delete_resume_version(version_id):
+        """Delete a saved version (POST-only, CSRF-protected)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        version = ResumeVersion.query.filter_by(id=version_id,
+                                                user_id=current_user.id).first()
+        if not version:
+            return jsonify({'error': 'Version not found.'}), 404
+        try:
+            was_default = version.is_default
+            db.session.delete(version)
+            db.session.commit()
+            if was_default:
+                # Promote the newest remaining version to default.
+                nxt = (ResumeVersion.query.filter_by(user_id=current_user.id)
+                       .order_by(ResumeVersion.created_at.desc()).first())
+                if nxt:
+                    nxt.is_default = True
+                    db.session.commit()
+        except Exception:
+            log.exception("Delete version failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not delete this version.'}), 500
+        return jsonify({'success': True})
+
+    @app.route('/resume-versions/<int:version_id>/diff', methods=['GET'])
+    def diff_resume_version(version_id):
+        """Line diff of a version against another (?against=<id>, default:
+        the next-older version). Returns structured lines for safe rendering."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        version = ResumeVersion.query.filter_by(id=version_id,
+                                                user_id=current_user.id).first()
+        if not version:
+            return jsonify({'error': 'Version not found.'}), 404
+        against_id = request.args.get('against', type=int)
+        if against_id:
+            other = ResumeVersion.query.filter_by(id=against_id,
+                                                  user_id=current_user.id).first()
+            if not other:
+                return jsonify({'error': 'Comparison version not found.'}), 404
+        else:
+            other = (ResumeVersion.query
+                     .filter(ResumeVersion.user_id == current_user.id,
+                             ResumeVersion.id != version.id,
+                             ResumeVersion.created_at <= version.created_at)
+                     .order_by(ResumeVersion.created_at.desc()).first())
+            if not other:
+                return jsonify({'error': 'No earlier version to compare against.'}), 400
+        import difflib
+        old_lines = (other.resume_text or '').splitlines()
+        new_lines = (version.resume_text or '').splitlines()
+        out_lines = []
+        added = removed = 0
+        for line in difflib.unified_diff(old_lines, new_lines, lineterm='', n=2):
+            if line.startswith('+++') or line.startswith('---'):
+                continue
+            if line.startswith('@@'):
+                out_lines.append({'type': 'hunk', 'text': line})
+            elif line.startswith('+'):
+                out_lines.append({'type': 'add', 'text': line[1:]})
+                added += 1
+            elif line.startswith('-'):
+                out_lines.append({'type': 'del', 'text': line[1:]})
+                removed += 1
+            else:
+                out_lines.append({'type': 'ctx', 'text': line[1:] if line.startswith(' ') else line})
+        return jsonify({
+            'success': True,
+            'version': {'id': version.id, 'name': version.name},
+            'against': {'id': other.id, 'name': other.name},
+            'summary': {'added': added, 'removed': removed},
+            'lines': out_lines[:500],
         })
 
     @app.route('/results/<analysis_id>')

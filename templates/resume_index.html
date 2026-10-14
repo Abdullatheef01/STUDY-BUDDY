@@ -102,6 +102,10 @@
                     {% if has_saved_resume %}
                     <label class="jd-radio"><input type="radio" name="resume_source" value="latest"> Use my latest saved analysis</label>
                     {% endif %}
+                    <label class="jd-radio"><input type="radio" name="resume_source" value="version"> Use a saved version</label>
+                </div>
+                <div id="jdVersionWrap" hidden>
+                    <select class="jd-textarea" style="min-height:0;" id="jdVersionSelect" name="version_id" aria-label="Saved resume version"></select>
                 </div>
                 <div id="jdFileWrap">
                     <input class="jd-file" type="file" id="jdMatchFile" name="resume" accept=".pdf,.docx,.doc">
@@ -128,6 +132,13 @@
             <p>Paste one bullet from your resume and get 2&ndash;3 stronger versions: punchier action verbs, quantified impact, and an ATS-friendly tightened line. Accept or edit any variant &mdash; every rewrite is saved to your dashboard.</p>
             {% if current_user.is_authenticated %}
             <form id="bulletForm" novalidate>
+                <div class="jd-source-row" style="margin-bottom:0.8rem;">
+                    <label class="jd-label" for="bulletVersionSelect" style="margin:0;">Or pick a bullet from a saved version:</label>
+                    <select class="jd-textarea" style="min-height:0;" id="bulletVersionSelect" aria-label="Saved resume version">
+                        <option value="">Choose a version…</option>
+                    </select>
+                </div>
+                <div id="bulletLinePicker" hidden></div>
                 <label class="jd-label" for="bulletText">Resume bullet</label>
                 <textarea class="jd-textarea" id="bulletText" name="bullet_text" maxlength="1000" rows="3"
                     placeholder="e.g. Worked on the payments API and helped reduce errors"></textarea>
@@ -139,6 +150,34 @@
             <div class="jd-login-cta">
                 <p>Log in to rewrite your resume bullets. Your rewrites are saved to your dashboard.</p>
                 <a href="{{ url_for('login', next=url_for('resume_home')) }}">Log in to start rewriting</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Saved Resume Versions (Wave 1, feature #3) -->
+    <section class="jd-section" id="resume-versions">
+        <div class="jd-card">
+            <h2>Saved <span class="gradient-text">Resume Versions</span></h2>
+            <p>Keep named versions of your resume &mdash; one per target role. Set a default, compare any two versions line-by-line, and use a version directly in JD matching.</p>
+            {% if current_user.is_authenticated %}
+            <form id="versionForm" novalidate>
+                <div class="jd-source-row" style="margin-bottom:0.8rem;">
+                    <input class="jd-textarea" style="min-height:0;" id="versionName" name="name" maxlength="120"
+                        placeholder="Version name, e.g. Backend v1" aria-label="Version name">
+                </div>
+                <label class="jd-label" for="versionText">Resume text</label>
+                <textarea class="jd-textarea" id="versionText" name="resume_text" maxlength="50000" rows="5"
+                    placeholder="Paste the full text of this resume version…"></textarea>
+                <div class="jd-error" id="versionError" hidden></div>
+                <button type="submit" class="jd-submit" id="versionBtn"><span>Save Version</span></button>
+            </form>
+            <div id="versionList" aria-live="polite"></div>
+            <div id="versionDiff" aria-live="polite"></div>
+            {% else %}
+            <div class="jd-login-cta">
+                <p>Log in to save and compare resume versions.</p>
+                <a href="{{ url_for('login', next=url_for('resume_home')) }}">Log in to manage versions</a>
             </div>
             {% endif %}
         </div>
@@ -220,5 +259,6 @@
     <script src="{{ url_for('static', filename='js/resume_script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jd_match.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bullet_rewriter.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/resume_versions.js') }}"></script>
 </body>
 </html>
