@@ -25,10 +25,17 @@ def _bm(client, opp_id="gate-2027", remove=False):
 
 def test_dataset_loads():
     data = load_dataset()
-    assert len(data["opportunities"]) == 20
-    assert set(o["type"] for o in data["opportunities"]) == {
+    curated = [o for o in data["opportunities"] if o.get("curated", True)]
+    assert len(curated) == 20
+    assert set(o["type"] for o in curated) == {
         "internship", "scholarship", "exam"}
-    assert data["meta"]["last_updated"] == "2026-10-01"
+    # auto-refresh may have added hackathon/competition/internship entries;
+    # every type in the file must still be a known type.
+    from opportunities import TYPES
+    assert set(o["type"] for o in data["opportunities"]) <= set(TYPES)
+    import re
+    # last_updated changes whenever the auto-refresh runs; just check format.
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", data["meta"]["last_updated"])
 
 
 def test_closing_soon_logic_fixed_today():
@@ -43,15 +50,27 @@ def test_closing_soon_logic_fixed_today():
 
 
 def test_sorted_by_deadline_nulls_not_present():
-    opps = list_opportunities(today=date(2026, 10, 14))
+    # Curated slice keeps the original deterministic fixture for sort checks.
+    data = load_dataset()
+    curated_ids = {o["id"] for o in data["opportunities"] if o.get("curated", True)}
+    opps = [o for o in list_opportunities(today=date(2026, 10, 14))
+            if o["id"] in curated_ids]
     deadlines = [o["deadline"] for o in opps]
     assert deadlines == sorted(deadlines)
 
 
 def test_type_filter_and_invalid():
-    assert len(list_opportunities(opp_type="exam")) == 7
-    assert len(list_opportunities(opp_type="scholarship")) == 6
-    assert len(list_opportunities(opp_type="internship")) == 7
+    data = load_dataset()
+    curated = [o for o in data["opportunities"] if o.get("curated", True)]
+    counts = {}
+    for o in curated:
+        counts[o["type"]] = counts.get(o["type"], 0) + 1
+    assert counts.get("exam") == 7
+    assert counts.get("scholarship") == 6
+    assert counts.get("internship") == 7
+    # filtered listing returns only that type (auto entries included)
+    for o in list_opportunities(opp_type="hackathon"):
+        assert o["type"] == "hackathon"
     assert list_opportunities(opp_type="lottery") == []
 
 

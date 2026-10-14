@@ -1,8 +1,24 @@
-"""Internship / scholarship / exam opportunity radar (Wave 1 feature #9).
+"""Internship / scholarship / exam / hackathon / competition opportunity radar.
 
-Serves a curated, built-in dataset (data/opportunities.json) of opportunities
-with deadlines. The dataset is a curated starter set — deadlines are indicative
-and the UI must tell users to verify on official sites.
+Serves opportunities from data/opportunities.json. The dataset mixes:
+- curated entries (curated=true): hand-maintained, NEVER touched by refresh
+- auto entries (curated=false): refreshed automatically every STALE_AFTER_DAYS
+  from free public sources (see opportunity_sources.py)
+
+AUTO-REFRESH DESIGN (works on Render free tier — no external cron needed):
+- load_dataset() checks meta.last_updated on every (cached) load. If the data
+  is older than STALE_AFTER_DAYS and no refresh is already running (guarded by
+  a lock file with 30-min TTL, so multi-worker gunicorn can't stampede), it
+  spawns a daemon thread running refresh_opportunities() and returns the
+  current (slightly stale) data immediately — requests are never blocked.
+- refresh_opportunities() fetches all sources, merges, and ATOMICALLY rewrites
+  data/opportunities.json (temp file + os.replace), then clears the lru_cache
+  so the next request serves fresh data.
+- Merge rules: dedupe by normalized link URL; curated entries are never
+  deleted or modified; auto entries with deadline < today are pruned; auto
+  entries are capped at MAX_AUTO_ENTRIES (soonest deadlines first); every
+  merged entry is schema-validated (invalid ones are dropped with a warning,
+  never crash the refresh).
 
 OPPORTUNITY JSON SCHEMA (for extending data/opportunities.json):
 {
@@ -16,25 +32,41 @@ OPPORTUNITY JSON SCHEMA (for extending data/opportunities.json):
             "id": "kebab-case-unique",   # required, unique across the file
             "title": "string",           # required, <= 120 chars
             "organization": "string",    # required, <= 120 chars
-            "type": "internship|scholarship|exam",  # required
+            "type": "internship|scholarship|exam|hackathon|competition",
             "deadline": "YYYY-MM-DD",    # required ISO date, or null = rolling
             "eligibility": "string",     # required, <= 300 chars
-            "link": "https://..."        # required, http(s) URL
+            "link": "https://...",       # required, http(s) URL
+            "curated": true|false,       # optional; missing = curated (legacy)
+            "source": "string"           # optional; e.g. "devpost"
         }
     ]
 }
 """
 
 import json
+import logging
 import os
-from datetime import date
+import threading
+import time
+from datetime import date, datetime
 from functools import lru_cache
+from urllib.parse import urlsplit, urlunsplit
+
+log = logging.getLogger(__name__)
 
 DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                          "data", "opportunities.json")
+_LOCK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "data", ".refresh_lock")
 
-TYPES = ("internship", "scholarship", "exam")
+TYPES = ("internship", "scholarship", "exam", "hackathon", "competition")
 CLOSING_SOON_DAYS = 14
+
+STALE_AFTER_DAYS = 2          # auto-refresh cadence
+LOCK_TTL_SECONDS = 30 * 60    # refresh lock expiry (stuck-thread safety)
+MAX_AUTO_ENTRIES = 60         # cap on auto (non-curated) entries
+
+_refresh_lock = threading.Lock()  # guards merge+write within this process
 
 
 class OpportunityDataError(Exception):
@@ -52,9 +84,46 @@ def _parse_deadline(value, opp_id):
             f"Opportunity {opp_id!r} has an invalid deadline.") from exc
 
 
+def _validate_entry(o, seen_ids):
+    """Validate one raw entry dict. Returns normalized entry or raises."""
+    for key in ("id", "title", "organization", "type", "deadline",
+                "eligibility", "link"):
+        if key not in o:
+            raise OpportunityDataError(
+                f"Opportunity {o.get('id', '?')!r} missing key: {key}")
+    if o["id"] in seen_ids:
+        raise OpportunityDataError(f"Duplicate opportunity id: {o['id']!r}")
+    seen_ids.add(o["id"])
+    if o["type"] not in TYPES:
+        raise OpportunityDataError(
+            f"Opportunity {o['id']!r} has invalid type: {o['type']!r}")
+    if len(o["title"]) > 120 or len(o["organization"]) > 120:
+        raise OpportunityDataError(
+            f"Opportunity {o['id']!r} title/organization too long.")
+    if len(o["eligibility"]) > 300:
+        raise OpportunityDataError(
+            f"Opportunity {o['id']!r} eligibility too long.")
+    if not (str(o["link"]).startswith("https://")
+            or str(o["link"]).startswith("http://")):
+        raise OpportunityDataError(
+            f"Opportunity {o['id']!r} link must be http(s).")
+    _parse_deadline(o["deadline"], o["id"])
+    return o
+
+
 @lru_cache(maxsize=1)
 def load_dataset():
-    """Load and validate the opportunity dataset (cached for process lifetime)."""
+    """Load and validate the opportunity dataset (cached for process lifetime).
+
+    If the data is stale (> STALE_AFTER_DAYS), kicks off a background refresh
+    (once per LOCK_TTL_SECONDS across workers) and returns current data.
+    """
+    data = _load_from_disk()
+    _maybe_trigger_refresh(data)
+    return data
+
+
+def _load_from_disk():
     if not os.path.exists(DATA_PATH):
         raise OpportunityDataError("Opportunity dataset not found.")
     try:
@@ -71,32 +140,237 @@ def load_dataset():
         raise OpportunityDataError("Opportunity dataset has no opportunities.")
     seen = set()
     for o in opps:
-        for key in ("id", "title", "organization", "type", "deadline",
-                    "eligibility", "link"):
-            if key not in o:
-                raise OpportunityDataError(
-                    f"Opportunity {o.get('id', '?')!r} missing key: {key}")
-        if o["id"] in seen:
-            raise OpportunityDataError(f"Duplicate opportunity id: {o['id']!r}")
-        seen.add(o["id"])
-        if o["type"] not in TYPES:
-            raise OpportunityDataError(
-                f"Opportunity {o['id']!r} has invalid type: {o['type']!r}")
-        if len(o["title"]) > 120 or len(o["organization"]) > 120:
-            raise OpportunityDataError(
-                f"Opportunity {o['id']!r} title/organization too long.")
-        if len(o["eligibility"]) > 300:
-            raise OpportunityDataError(
-                f"Opportunity {o['id']!r} eligibility too long.")
-        if not (o["link"].startswith("https://") or o["link"].startswith("http://")):
-            raise OpportunityDataError(
-                f"Opportunity {o['id']!r} link must be http(s).")
-        _parse_deadline(o["deadline"], o["id"])
+        _validate_entry(o, seen)
     return data
+
+
+def _is_stale(meta, today=None):
+    """True if meta.last_updated is older than STALE_AFTER_DAYS."""
+    today = today or date.today()
+    try:
+        y, m, d = (int(p) for p in str(meta.get("last_updated", "")).split("-"))
+        updated = date(y, m, d)
+    except (ValueError, TypeError, AttributeError):
+        return True  # unparseable -> treat as stale, refresh will fix it
+    return (today - updated).days >= STALE_AFTER_DAYS
+
+
+def _refresh_already_running():
+    """Cross-process guard: True if a fresh lock file exists."""
+    try:
+        with open(_LOCK_PATH, "r", encoding="utf-8") as f:
+            ts = float(f.read().strip())
+        return (time.time() - ts) < LOCK_TTL_SECONDS
+    except (OSError, ValueError):
+        return False
+
+
+def _take_refresh_lock():
+    try:
+        with open(_LOCK_PATH, "w", encoding="utf-8") as f:
+            f.write(str(time.time()))
+    except OSError as exc:
+        log.warning("Could not write refresh lock: %s", exc)
+
+
+def _maybe_trigger_refresh(data):
+    """Spawn a background refresh if data is stale. Never raises."""
+    try:
+        # Tests and operators can disable auto-refresh entirely.
+        if os.environ.get("OPP_NO_AUTO_REFRESH") == "1":
+            return
+        if not _is_stale(data.get("meta") or {}):
+            return
+        if _refresh_already_running():
+            return
+        _take_refresh_lock()
+        t = threading.Thread(target=refresh_opportunities,
+                             name="opp-refresh", daemon=True)
+        t.start()
+        log.info("Opportunity refresh triggered in background.")
+    except Exception as exc:  # never break request handling
+        log.warning("Failed to trigger opportunity refresh: %s", exc)
+
+
+def _normalize_link(url):
+    """Normalize a URL for dedupe: lowercase, strip trailing slash."""
+    try:
+        parts = urlsplit(str(url).strip())
+        netloc = parts.netloc.lower()
+        path = (parts.path.rstrip("/") or "/").lower()
+        return urlunsplit((parts.scheme.lower(), netloc, path, "", ""))
+    except Exception:
+        return str(url).strip().lower()
+
+
+def _is_curated(o):
+    # Missing flag = curated (protects legacy entries).
+    return o.get("curated", True) is True
+
+
+def merge_opportunities(existing, fetched, today=None):
+    """Merge fetched auto entries into the existing list.
+
+    Pure function (no IO) — easy to test. Returns the new list.
+    Rules:
+      * curated entries: kept verbatim, never modified or deleted
+      * existing auto entries: re-validated; expired (deadline < today) or
+        corrupt ones are pruned
+      * dedupe by normalized link (existing entries win over fetched)
+      * fetched entries are schema-validated; invalid ones dropped w/ warning
+      * TOTAL auto entries capped at MAX_AUTO_ENTRIES (soonest deadlines
+        first, null deadlines last) — the file never grows unboundedly
+    """
+    today = today or date.today()
+    curated = []
+    old_auto = []
+    seen_ids = set()
+    seen_links = set()
+
+    for o in existing:
+        seen_ids.add(o["id"])
+        seen_links.add(_normalize_link(o["link"]))
+        if _is_curated(o):
+            curated.append(dict(o))
+        else:
+            try:
+                _validate_entry(dict(o), set())
+                dl = _parse_deadline(o["deadline"], o["id"])
+                if dl is not None and dl < today:
+                    continue  # expired auto entry
+                old_auto.append(dict(o))
+            except (OpportunityDataError, TypeError, KeyError):
+                continue  # corrupt auto entry
+
+    auto_new = []
+    for raw in fetched:
+        try:
+            entry = {
+                "id": str(raw["id"]),
+                "title": str(raw["title"])[:120],
+                "organization": str(raw["organization"])[:120],
+                "type": str(raw["type"]),
+                "deadline": raw["deadline"],
+                "eligibility": str(raw["eligibility"])[:300],
+                "link": str(raw["link"]),
+                "curated": False,
+                "source": str(raw.get("source", "auto")),
+            }
+            # Preserve extra informative keys (e.g. posted_days_ago) —
+            # harmless for validation, useful for the UI.
+            if "posted_days_ago" in raw:
+                entry["posted_days_ago"] = raw["posted_days_ago"]
+            # Validate fields only (fresh set): id collisions are resolved
+            # by the uniquify pass below.
+            _validate_entry(entry, set())
+        except (KeyError, OpportunityDataError, TypeError) as exc:
+            log.warning("Dropping invalid fetched opportunity: %s", exc)
+            continue
+        if _normalize_link(entry["link"]) in seen_links:
+            continue  # already have it
+        seen_links.add(_normalize_link(entry["link"]))
+        auto_new.append(entry)
+
+    # Ensure unique ids (existing ids are never renamed).
+    for e in auto_new:
+        base = e["id"]
+        i = 2
+        while e["id"] in seen_ids:
+            e["id"] = f"{base}-{i}"
+            i += 1
+        seen_ids.add(e["id"])
+
+    # Prune expired fetched entries, then cap the TOTAL auto pool.
+    fresh_auto = []
+    for e in auto_new:
+        dl = _parse_deadline(e["deadline"], e["id"])
+        if dl is not None and dl < today:
+            continue
+        fresh_auto.append(e)
+
+    all_auto = old_auto + fresh_auto
+    all_auto.sort(key=lambda e: (e["deadline"] is None, e["deadline"] or "9999"))
+    all_auto = all_auto[:MAX_AUTO_ENTRIES]
+
+    return curated + all_auto
+
+
+def _atomic_write(data):
+    """Write JSON atomically: temp file + os.replace. Never leaves partial."""
+    tmp_path = DATA_PATH + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp_path, DATA_PATH)
+
+
+def refresh_opportunities():
+    """Fetch sources, merge, atomically rewrite the dataset. Never raises."""
+    try:
+        from opportunity_sources import fetch_all  # local import: no cycle
+        fetched = fetch_all()
+    except Exception as exc:
+        log.warning("Opportunity refresh: source fetch failed: %s", exc)
+        return False
+    try:
+        with _refresh_lock:
+            try:
+                current = _load_from_disk()
+            except OpportunityDataError as exc:
+                log.warning("Opportunity refresh: current data unreadable: %s",
+                            exc)
+                return False
+            today = date.today()
+            merged = merge_opportunities(current["opportunities"], fetched,
+                                         today=today)
+            new_data = {
+                "meta": {
+                    **current.get("meta", {}),
+                    "last_updated": today.isoformat(),
+                },
+                "opportunities": merged,
+            }
+            # Validate the final dataset before writing.
+            seen = set()
+            for o in merged:
+                _validate_entry(o, seen)
+            _atomic_write(new_data)
+        load_dataset.cache_clear()
+        log.info("Opportunity refresh complete: %d total (%d auto).",
+                 len(merged),
+                 sum(1 for o in merged if not _is_curated(o)))
+        return True
+    except Exception as exc:
+        log.warning("Opportunity refresh failed: %s", exc)
+        return False
 
 
 def get_meta():
     return dict(load_dataset()["meta"])
+
+
+def freshness_label(meta=None, now=None):
+    """Human label like 'Updated 5 hours ago · auto-refreshes every 2 days'."""
+    meta = meta or get_meta()
+    now = now or datetime.now()
+    try:
+        updated = datetime.strptime(str(meta.get("last_updated", "")),
+                                    "%Y-%m-%d")
+    except (ValueError, TypeError):
+        return "Update time unknown · auto-refreshes every 2 days"
+    delta = now - updated
+    total_seconds = max(0, int(delta.total_seconds()))
+    if total_seconds < 3600:
+        ago = "just now" if total_seconds < 60 else \
+            f"{total_seconds // 60} minutes ago"
+    elif total_seconds < 86400:
+        hrs = total_seconds // 3600
+        ago = f"{hrs} hour{'s' if hrs != 1 else ''} ago"
+    else:
+        days = total_seconds // 86400
+        ago = f"{days} day{'s' if days != 1 else ''} ago"
+    return f"Updated {ago} · auto-refreshes every {STALE_AFTER_DAYS} days"
 
 
 def _enrich(o, today):
@@ -114,6 +388,7 @@ def _enrich(o, today):
         "is_past": days_left is not None and days_left < 0,
         "eligibility": o["eligibility"],
         "link": o["link"],
+        "posted_days_ago": o.get("posted_days_ago"),
     }
 
 

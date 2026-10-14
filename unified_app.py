@@ -3644,10 +3644,12 @@ def register_routes(app):
                 opps = [o for o in opps if o["id"] in bookmarked]
         for o in opps:
             o["deadline_label"], o["countdown_label"] = _opp_labels(o)
+        from opportunities import freshness_label as _freshness_label
         return render_template('opportunities.html', opps=opps, meta=meta,
                                types=OPP_TYPES, active_type=opp_type,
                                saved_only=saved_only, bookmarked=bookmarked,
-                               is_authed=current_user.is_authenticated)
+                               is_authed=current_user.is_authenticated,
+                               freshness=_freshness_label(meta))
 
     @app.route('/opportunities/bookmark', methods=['POST'])
     @limiter.limit("60 per hour")

@@ -1,0 +1,150 @@
+{
+ "hackathons": [
+  {
+   "id": 30992,
+   "title": "Build, Ship, Shape: Amazon Developer Hackathon",
+   "displayed_location": {
+    "icon": "globe",
+    "location": "Online"
+   },
+   "open_state": "open",
+   "thumbnail_url": "//d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/005/173/047/datas/medium_square.png",
+   "analytics_identifier": "Build, Ship, Shape: Amazon Developer Hackathon (30992)",
+   "url": "https://amazonappdev2026.devpost.com/",
+   "time_left_to_submission": "10 days left",
+   "submission_period_dates": "Aug 31 - Oct 23, 2026",
+   "themes": [
+    {
+     "id": 6,
+     "name": "Machine Learning/AI"
+    },
+    {
+     "id": 22,
+     "name": "Open Ended"
+    },
+    {
+     "id": 11,
+     "name": "Productivity"
+    }
+   ],
+   "prize_amount": "$<span data-currency-value>138,000</span>",
+   "prizes_counts": {
+    "cash": 1,
+    "other": 0
+   },
+   "registrations_count": 54951,
+   "featured": true,
+   "organization_name": "Amazon",
+   "winners_announced": false,
+   "submission_gallery_url": "https://amazonappdev2026.devpost.com/project-gallery",
+   "start_a_submission_url": "https://amazonappdev2026.devpost.com/challenges/start_a_submission",
+   "invite_only": false,
+   "eligibility_requirement_invite_only_description": null,
+   "managed_by_devpost_badge": true
+  },
+  {
+   "id": 30790,
+   "title": "Nebius x NVIDIA Global AI Hackathon",
+   "displayed_location": {
+    "icon": "globe",
+    "location": "Online"
+   },
+   "open_state": "open",
+   "thumbnail_url": "//d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/005/173/025/datas/medium_square.png",
+   "analytics_identifier": "Nebius x NVIDIA Global AI Hackathon (30790)",
+   "url": "https://nebiusglobalaihackathon.devpost.com/",
+   "time_left_to_submission": "16 days left",
+   "submission_period_dates": "Aug 26 - Oct 30, 2026",
+   "themes": [
+    {
+     "id": 6,
+     "name": "Machine Learning/AI"
+    },
+    {
+     "id": 23,
+     "name": "Beginner Friendly"
+    },
+    {
+     "id": 27,
+     "name": "Robotic Process Automation"
+    }
+   ],
+   "prize_amount": "$<span data-currency-value>50,000</span>",
+   "prizes_counts": {
+    "cash": 1,
+    "other": 0
+   },
+   "registrations_count": 22937,
+   "featured": true,
+   "organization_name": "nebius",
+   "winners_announced": false,
+   "submission_gallery_url": "https://nebiusglobalaihackathon.devpost.com/project-gallery",
+   "start_a_submission_url": "https://nebiusglobalaihackathon.devpost.com/challenges/start_a_submission",
+   "invite_only": false,
+   "eligibility_requirement_invite_only_description": null,
+   "managed_by_devpost_badge": true
+  },
+  {
+   "id": 31302,
+   "title": "PayPal AI Hackathon",
+   "displayed_location": {
+    "icon": "globe",
+    "location": "Online"
+   },
+   "open_state": "open",
+   "thumbnail_url": "//d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/005/288/985/datas/medium_square.png",
+   "analytics_identifier": "PayPal AI Hackathon (31302)",
+   "url": "https://paypalaihackathon.devpost.com/",
+   "time_left_to_submission": "30 days left",
+   "submission_period_dates": "Oct 01 - Nov 12, 2026",
+   "themes": [
+    {
+     "id": 17,
+     "name": "Low/No Code"
+    },
+    {
+     "id": 6,
+     "name": "Machine Learning/AI"
+    },
+    {
+     "id": 25,
+     "name": "Web"
+    }
+   ],
+   "prize_amount": "$<span data-currency-value>67,500</span>",
+   "prizes_counts": {
+    "cash": 14,
+    "other": 3
+   },
+   "registrations_count": 13926,
+   "featured": false,
+   "organization_name": "PayPal",
+   "winners_announced": false,
+   "submission_gallery_url": "https://paypalaihackathon.devpost.com/project-gallery",
+   "start_a_submission_url": "https://paypalaihackathon.devpost.com/challenges/start_a_submission",
+   "invite_only": false,
+   "eligibility_requirement_invite_only_description": null,
+   "managed_by_devpost_badge": true
+  },
+  {
+   "id": 999001,
+   "title": "Closed Hackathon 2025",
+   "url": "https://closed.devpost.com/",
+   "open_state": "completed",
+   "submission_period_dates": "Jan 05 - Feb 20, 2025",
+   "organization_name": "OldOrg",
+   "prize_amount": "$1,000",
+   "displayed_location": "Online"
+  },
+  {
+   "id": 999002,
+   "title": "New Year Build-a-thon",
+   "url": "https://newyear.devpost.com/",
+   "open_state": "open",
+   "submission_period_dates": "Dec 15, 2026 - Jan 15, 2027",
+   "organization_name": "NYOrg",
+   "prize_amount": "$5,000",
+   "displayed_location": "Online"
+  }
+ ]
+}
