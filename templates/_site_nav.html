@@ -6,17 +6,7 @@
 <header class="b-nav" id="navbar">
     <div class="b-wrap b-nav-in">
         <a href="{{ url_for('index') }}" class="b-brand" aria-label="Study-Buddy home">
-            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                <defs>
-                    <linearGradient id="b-nav-lg" x1="0" y1="0" x2="40" y2="40">
-                        <stop offset="0" stop-color="#6366f1"/>
-                        <stop offset="1" stop-color="#22d3ee"/>
-                    </linearGradient>
-                </defs>
-                <circle cx="20" cy="20" r="17" stroke="url(#b-nav-lg)" stroke-width="3"/>
-                <circle cx="20" cy="20" r="7" fill="url(#b-nav-lg)"/>
-                <circle cx="31" cy="10" r="3.4" fill="#22d3ee"/>
-            </svg>
+            <img src="{{ url_for('static', filename='img/study-buddy-icon.png') }}" alt="Study-Buddy logo" width="36" height="36" style="border-radius:10px;display:block;">
             Study-<span class="b-grad">Buddy</span>
         </a>
         <button class="b-nav-toggle" type="button" aria-expanded="false" aria-controls="b-nav-menu" aria-label="Toggle navigation">

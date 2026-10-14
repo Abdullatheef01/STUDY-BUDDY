@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <script>document.documentElement.classList.replace('no-js', 'js');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Research Paper AI Assistant | Premium AI Tools</title>
+    <title>Study-Buddy | Research Intelligence</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
     <meta name="description" content="An AI-powered research assistant for academic paper generation and analysis. Built with modern web standards and high-end animations.">
     <!-- Google Fonts: Outfit and Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,8 +42,8 @@
     <header class="b-nav" id="research-nav">
         <div class="b-wrap b-nav-in">
             <a href="{{ url_for('index') }}" class="b-brand" aria-label="Study-Buddy home">
-                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#8b5cf6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#8b5cf6"/><circle cx="31" cy="10" r="3.4" fill="#22d3ee"/></svg>
-                Paper<span class="b-grad">AI</span>
+                <img src="{{ url_for('static', filename='img/study-buddy-icon.png') }}" alt="Study-Buddy logo" width="36" height="36" style="border-radius:10px;display:block;">
+                Study-<span class="b-grad">Buddy</span>
             </a>
             <nav aria-label="Primary">
                 <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
