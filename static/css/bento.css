@@ -581,3 +581,56 @@ div.jd-loading p { position: relative; z-index: 1; margin: 0; font-size: .9rem; 
   color: var(--b-text); font-weight: 600; font-size: .9rem;
   max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* ============ UI repair pass (2026-10-14) ============ */
+
+/* 1. Whole-card links: reset raw link styling (teal + underline) so
+   card titles/descriptions use card typography. Inner text links
+   inside cards keep the accent link style. */
+a.b-card { text-decoration: none; color: inherit; }
+a.b-card:hover, a.b-card:focus-visible { color: inherit; }
+
+/* 2. Dark-theme autofill override: stop browsers painting saved
+   credentials as an opaque black box on .b-input fields. */
+.b-input:-webkit-autofill,
+.b-input:-webkit-autofill:hover,
+.b-input:-webkit-autofill:focus,
+.b-input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--b-text);
+  -webkit-box-shadow: 0 0 0 60px var(--b-card-solid) inset;
+  caret-color: var(--b-text);
+  border-radius: 12px;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* 3. Company logo fallback: letter avatar shown by logoFallback()
+   when a logo image 404s (e.g. IBM/Microsoft missing from icon set). */
+.logo-fallback {
+  width: 100%; height: 100%; min-width: 40px; min-height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.7rem;
+  color: var(--b-a3); background: var(--b-accent-soft);
+  border: 1px solid var(--b-accent-border); border-radius: 10px;
+}
+
+/* 4. Hero visual: score ring + floating tool chips fill the hero's
+   right column (decorative; hidden on narrow screens). */
+.b-hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 2.5rem; align-items: center; }
+.b-hero-visual { position: relative; min-height: 300px; display: flex; align-items: center; justify-content: center; }
+.b-ring { width: 210px; height: 210px; filter: drop-shadow(0 12px 32px rgba(99,102,241,.35)); }
+.b-ring-num { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.4rem; fill: var(--b-text); }
+.b-ring-sub { font-family: 'Inter', system-ui, sans-serif; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; fill: var(--b-muted); }
+.b-chip-float {
+  position: absolute; display: inline-flex; align-items: center; gap: .5rem;
+  padding: .55rem .95rem; border-radius: 999px; white-space: nowrap;
+  background: var(--b-card); border: 1px solid var(--b-border);
+  font-size: .8rem; font-weight: 600; color: var(--b-text);
+  box-shadow: 0 10px 28px rgba(0,0,0,.4);
+  animation: b-float 5s ease-in-out infinite;
+}
+.b-chip-float .b-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--b-ok); flex: 0 0 auto; box-shadow: 0 0 8px var(--b-ok); }
+@keyframes b-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@media (max-width: 900px) {
+  .b-hero-grid { grid-template-columns: 1fr; }
+  .b-hero-visual { display: none; }
+}

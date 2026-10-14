@@ -86,7 +86,7 @@
                         <div class="company-logo">
                             {% set slug = logo_map.get(company.strip()) %}
                             {% if slug %}
-                                <img src="https://unpkg.com/simple-icons@v13/icons/{{ slug }}.svg" alt="{{ company }}">
+                                <img src="https://unpkg.com/simple-icons@v13/icons/{{ slug }}.svg" alt="{{ company }}" loading="lazy" onerror="logoFallback(this, '{{ company }}')">
                             {% else %}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="width:2rem;height:2rem;opacity:.7"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M10 21v-3h4v3"/></svg>
                             {% endif %}
@@ -132,7 +132,7 @@
                         <div class="company-logo">
                             {% set slug = logo_map.get(company.strip()) %}
                             {% if slug %}
-                                <img src="https://unpkg.com/simple-icons@v13/icons/{{ slug }}.svg" alt="{{ company }}">
+                                <img src="https://unpkg.com/simple-icons@v13/icons/{{ slug }}.svg" alt="{{ company }}" loading="lazy" onerror="logoFallback(this, '{{ company }}')">
                             {% else %}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="width:2rem;height:2rem;opacity:.7"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M10 21v-3h4v3"/></svg>
                             {% endif %}

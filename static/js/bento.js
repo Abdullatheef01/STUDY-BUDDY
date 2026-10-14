@@ -148,3 +148,13 @@
     update();
   }
 })();
+
+/* Company logo fallback: swap a broken logo <img> for a letter avatar.
+   Called via onerror from templates (global by design). */
+window.logoFallback = function (img, name) {
+  var d = document.createElement('div');
+  d.className = 'logo-fallback';
+  d.setAttribute('aria-hidden', 'true');
+  d.textContent = (name || '?').trim().charAt(0).toUpperCase();
+  img.replaceWith(d);
+};
