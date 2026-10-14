@@ -543,6 +543,28 @@ a { color: var(--b-a3); }
 }
 @keyframes b-shimmer { to { transform: translateX(100%); } }
 
+/* §7: upgrade legacy async loaders (.jd-loading) to skeleton shimmer.
+   Higher specificity (div.jd-loading) beats the legacy stylesheet's
+   .jd-loading rules regardless of load order; status text is kept,
+   the dead spinner is replaced by the shimmer sweep. */
+div.jd-loading {
+  position: relative; overflow: hidden;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid var(--b-border);
+  border-radius: var(--b-radius-sm);
+  min-height: 120px;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 1.5rem 1rem;
+}
+div.jd-loading::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .09), transparent);
+  animation: b-shimmer 1.6s infinite;
+}
+div.jd-loading .jd-spinner { display: none; }
+div.jd-loading p { position: relative; z-index: 1; margin: 0; font-size: .9rem; }
+
 /* Scroll-progress hairline (bento.js sets scaleX) */
 .b-scroll-progress {
   position: fixed; top: 0; left: 0; z-index: 80;
