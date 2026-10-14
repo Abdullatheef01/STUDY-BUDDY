@@ -2244,6 +2244,11 @@ h1 svg { width: 1em; height: 1em; vertical-align: -0.12em; margin-right: 0.2em; 
     font-size: 0.8rem; cursor: pointer; text-align: left;
 }
 .jd-line-chip:hover { border-color: var(--accent-primary); color: var(--text-primary); }
+.jd-doc-body {
+    white-space: pre-wrap; word-break: break-word; font-size: 0.95rem;
+    line-height: 1.7; color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.25); border-radius: 10px; padding: 1rem 1.1rem;
+}
 #bulletLinePicker { margin-bottom: 0.8rem; }
 #jdVersionWrap { margin-bottom: 0.8rem; }
 

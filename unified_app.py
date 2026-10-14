@@ -224,6 +224,8 @@ from models.resume_feedback import generate_feedback, get_overall_summary
 from jd_matcher import (score_jd_match, generate_rule_based_suggestions,
                         JD_MIN_CHARS, JD_MAX_CHARS)
 from bullet_rewriter import (improve_bullet, BULLET_MIN_CHARS, BULLET_MAX_CHARS)
+from cover_generator import (rule_based_cover_letter, rule_based_outreach,
+                             validate_cover_inputs, TONES)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -322,6 +324,21 @@ class ResumeVersion(db.Model):
                            onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("resume_versions", lazy="dynamic",
+                                                     cascade="all, delete-orphan"))
+
+
+class CoverDoc(db.Model):
+    """A generated cover letter / outreach message belonging to a user (Wave 1 #4)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    doc_type = db.Column(db.String(20), nullable=False)  # cover_letter | outreach
+    title = db.Column(db.String(255))
+    tone = db.Column(db.String(20), default="professional", nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    ai_powered = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("cover_docs", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
 
 
@@ -778,6 +795,44 @@ def _rewrite_bullet_ai(bullet):
             log.warning("Bullet rewrite: model returned no usable items")
         except (ValueError, json.JSONDecodeError):
             log.warning("Bullet rewrite: non-JSON model output, retrying")
+    return fallback, False
+
+
+def _generate_cover_ai(resume_text, jd_text, tone):
+    """Tailored cover letter + outreach via Gemini, with rule-based fallback.
+
+    Returns ((cover_letter, outreach), ai_powered). Follows the constructor
+    pattern: fenced-JSON-tolerant parsing, retry once.
+    """
+    fallback = (rule_based_cover_letter(resume_text, jd_text, tone),
+                rule_based_outreach(resume_text, jd_text, tone))
+    prompt = (
+        "You are a senior career coach. Write a tailored cover letter and a "
+        "short cold-outreach message (LinkedIn/email style, under 80 words) "
+        f"for the candidate below. Tone: {tone}. The cover letter must "
+        "reference specific requirements from the job description — no "
+        "generic filler. Keep the letter under 220 words.\n\n"
+        f"CANDIDATE RESUME (truncated):\n{(resume_text or '')[:4000]}\n\n"
+        f"JOB DESCRIPTION (truncated):\n{(jd_text or '')[:4000]}\n\n"
+        'Return ONLY a JSON object like {"cover_letter": "...", "outreach": "..."}.'
+    )
+    for _attempt in range(2):
+        try:
+            raw = call_gemini_ai(prompt)
+        except GeminiError as e:
+            log.warning("Cover generator: Gemini unavailable: %s", e)
+            return fallback, False
+        try:
+            parsed = _parse_json_safely(raw)
+            if not isinstance(parsed, dict):
+                raise ValueError("non-dict output")
+            letter = str(parsed.get("cover_letter") or "").strip()
+            outreach = str(parsed.get("outreach") or "").strip()
+            if letter and outreach and len(letter) > 100:
+                return (letter[:6000], outreach[:1500]), True
+            log.warning("Cover generator: model returned unusable items")
+        except (ValueError, json.JSONDecodeError):
+            log.warning("Cover generator: non-JSON model output, retrying")
     return fallback, False
 
 
@@ -1521,6 +1576,93 @@ def register_routes(app):
             'lines': out_lines[:500],
         })
 
+    # ---------- COVER LETTER + OUTREACH GENERATOR (Wave 1 #4) ----------
+    @app.route('/generate-cover', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def generate_cover():
+        """Generate a tailored cover letter + cold-outreach message.
+
+        Login required. JSON: {jd_text, tone, resume_text?, version_id?}.
+        Resume resolves from version_id (owner-checked) -> resume_text ->
+        latest saved analysis. CSRF via X-CSRFToken header (not exempt).
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to generate cover letters.'}), 401
+        payload = request.get_json(silent=True) or {}
+        data, error = validate_cover_inputs(payload)
+        if error:
+            return jsonify({'error': error}), 400
+
+        # --- Resolve resume text ---
+        resume_text = data["resume_text"]
+        if data["version_id"]:
+            try:
+                vid = int(data["version_id"])
+            except (TypeError, ValueError):
+                vid = 0
+            version = ResumeVersion.query.filter_by(id=vid,
+                                                    user_id=current_user.id).first()
+            if not version:
+                return jsonify({'error': 'Please choose one of your saved resume versions.'}), 400
+            resume_text = version.resume_text
+        if not resume_text:
+            row = (ResumeAnalysis.query
+                   .filter_by(user_id=current_user.id)
+                   .filter(ResumeAnalysis.resume_text.isnot(None))
+                   .order_by(ResumeAnalysis.created_at.desc()).first())
+            if not row or not (row.resume_text or '').strip():
+                return jsonify({'error': 'No resume found. Upload or save a resume version first.'}), 400
+            resume_text = row.resume_text.strip()
+
+        (cover_letter, outreach), ai_powered = _generate_cover_ai(
+            resume_text, data["jd_text"], data["tone"])
+        title = (data["jd_text"].strip().splitlines() or ["Role"])[0][:120]
+
+        try:
+            docs = []
+            for doc_type, content in (("cover_letter", cover_letter),
+                                      ("outreach", outreach)):
+                doc = CoverDoc(
+                    user_id=current_user.id,
+                    doc_type=doc_type,
+                    title=title,
+                    tone=data["tone"],
+                    content=content,
+                    ai_powered=ai_powered,
+                )
+                db.session.add(doc)
+                docs.append(doc)
+            db.session.commit()
+        except Exception:
+            log.exception("Cover doc persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your documents. Please try again.'}), 500
+
+        return jsonify({
+            'success': True,
+            'cover_letter': cover_letter,
+            'outreach': outreach,
+            'ai_powered': ai_powered,
+            'tone': data["tone"],
+            'doc_ids': [d.id for d in docs],
+        })
+
+    @app.route('/cover-docs', methods=['GET'])
+    def list_cover_docs():
+        """List the user's generated cover letters / outreach messages."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        docs = (CoverDoc.query
+                .filter_by(user_id=current_user.id)
+                .order_by(CoverDoc.created_at.desc())
+                .limit(50).all())
+        return jsonify({'success': True, 'docs': [{
+            'id': d.id, 'doc_type': d.doc_type, 'title': d.title,
+            'tone': d.tone, 'ai_powered': d.ai_powered,
+            'created_at': d.created_at.isoformat(),
+            'preview': (d.content or '')[:200],
+        } for d in docs]})
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -1553,10 +1695,14 @@ def register_routes(app):
         rewrites = (BulletRewrite.query
                     .filter_by(user_id=current_user.id)
                     .order_by(BulletRewrite.created_at.desc()).all())
+        cover_docs = (CoverDoc.query
+                      .filter_by(user_id=current_user.id)
+                      .order_by(CoverDoc.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
-                               jd_matches=jd_matches, rewrites=rewrites)
+                               jd_matches=jd_matches, rewrites=rewrites,
+                               cover_docs=cover_docs)
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])

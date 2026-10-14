@@ -183,6 +183,41 @@
         </div>
     </section>
 
+    <!-- Cover Letter + Cold Outreach Generator (Wave 1, feature #4) -->
+    <section class="jd-section" id="cover-generator">
+        <div class="jd-card">
+            <h2>Cover Letter <span class="gradient-text">& Cold Outreach</span></h2>
+            <p>Pick a resume version, paste the job description (or describe the company and role), choose a tone — get a tailored cover letter plus a short LinkedIn/email outreach message. Both are saved to your dashboard.</p>
+            {% if current_user.is_authenticated %}
+            <form id="coverForm" novalidate>
+                <div class="jd-source-row" style="margin-bottom:0.8rem;">
+                    <label class="jd-label" for="coverVersionSelect" style="margin:0;">Resume version:</label>
+                    <select class="jd-textarea" style="min-height:0;" id="coverVersionSelect" aria-label="Saved resume version">
+                        <option value="">Use my latest saved analysis</option>
+                    </select>
+                </div>
+                <label class="jd-label" for="coverJdText">Job description / company & role</label>
+                <textarea class="jd-textarea" id="coverJdText" maxlength="20000" rows="5"
+                    placeholder="Paste the job posting, or describe the company and role…"></textarea>
+                <span class="jd-label">Tone</span>
+                <div class="jd-source-row">
+                    <label class="jd-radio"><input type="radio" name="tone" value="professional" checked> Professional</label>
+                    <label class="jd-radio"><input type="radio" name="tone" value="enthusiastic"> Enthusiastic</label>
+                    <label class="jd-radio"><input type="radio" name="tone" value="concise"> Concise</label>
+                </div>
+                <div class="jd-error" id="coverError" hidden></div>
+                <button type="submit" class="jd-submit" id="coverBtn"><span>Generate Documents</span></button>
+            </form>
+            <div id="coverResult" aria-live="polite"></div>
+            {% else %}
+            <div class="jd-login-cta">
+                <p>Log in to generate tailored cover letters and outreach messages.</p>
+                <a href="{{ url_for('login', next=url_for('resume_home')) }}">Log in to generate</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
@@ -260,5 +295,6 @@
     <script src="{{ url_for('static', filename='js/jd_match.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bullet_rewriter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/resume_versions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cover_generator.js') }}"></script>
 </body>
 </html>
