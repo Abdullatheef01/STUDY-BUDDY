@@ -1,0 +1,435 @@
+{"skills": [
+  {
+    "id": "machine-learning",
+    "name": "Machine Learning",
+    "domain": "AI/ML",
+    "summary": "Machine learning teaches computers to learn patterns from data. It powers recommendations, fraud detection and AI products, and is one of the most in-demand skills in India and globally.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "ML Foundations with Python",
+        "weeks": 5,
+        "topics": ["Regression and classification basics", "Train/test splits and cross-validation", "Feature engineering and preprocessing", "Overfitting, underfitting and regularization", "scikit-learn estimator API", "Evaluation metrics: accuracy, precision, recall, F1", "Decision trees and random forests", "Building an end-to-end pipeline"],
+        "resources": [
+          {"title": "Kaggle Learn: Intro to Machine Learning", "type": "course", "url": "https://www.kaggle.com/learn/intro-to-machine-learning", "provider": "Kaggle", "free": true, "note": "Hands-on micro-course; build your first models in the browser."},
+          {"title": "Google Machine Learning Crash Course", "type": "video", "url": "https://developers.google.com/machine-learning/crash-course", "provider": "Google", "free": true, "note": "Short video lessons with exercises from Google engineers."},
+          {"title": "scikit-learn Tutorials", "type": "docs", "url": "https://scikit-learn.org/stable/tutorial/", "provider": "scikit-learn", "free": true, "note": "Official tutorials covering every core estimator."},
+          {"title": "Andrew Ng YouTube Lectures", "type": "video", "url": "https://www.youtube.com/@AndrewYNg", "provider": "YouTube", "free": true, "note": "Free Stanford-style ML lectures and talks."},
+          {"title": "NPTEL: Introduction to Machine Learning", "type": "course", "url": "https://nptel.ac.in/courses/106106139", "provider": "NPTEL/SWAYAM", "free": true, "note": "IIT-level course with assignments; certificate optional."},
+          {"title": "freeCodeCamp Machine Learning with Python", "type": "practice", "url": "https://www.freecodecamp.org/learn", "provider": "freeCodeCamp", "free": true, "note": "Project-based Python ML practice with certification."}
+        ],
+        "practice_tasks": ["Predict house prices on the Ames dataset with linear regression", "Classify Titanic survivors and compare 3 models", "Cluster Iris flowers and visualize clusters in 2D", "Tune a random forest with grid search and report the best score"],
+        "checkpoint": "You can load a dataset, clean it, train and evaluate at least three scikit-learn models, and explain precision, recall and overfitting with plots."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Applied ML and Model Tuning",
+        "weeks": 6,
+        "topics": ["Ensembles: bagging, boosting, stacking", "Gradient boosting with XGBoost/LightGBM", "Hyperparameter tuning: grid, random, Bayesian", "Imbalanced data and sampling techniques", "Pipelines and ColumnTransformer", "Model calibration and probability scores", "SHAP for model interpretability", "Saving and serving models with joblib/Flask"],
+        "resources": [
+          {"title": "Kaggle Learn: Intermediate Machine Learning", "type": "course", "url": "https://www.kaggle.com/learn/intermediate-machine-learning", "provider": "Kaggle", "free": true, "note": "XGBoost, pipelines and cross-validation exercises."},
+          {"title": "Kaggle Learn: Feature Engineering", "type": "course", "url": "https://www.kaggle.com/learn/feature-engineering", "provider": "Kaggle", "free": true, "note": "Hands-on feature creation on real datasets."},
+          {"title": "Practical Machine Learning (fast.ai)", "type": "course", "url": "https://course.fast.ai/", "provider": "fast.ai", "free": true, "note": "Top-down applied ML with tabular data and ensembles."},
+          {"title": "scikit-learn User Guide", "type": "docs", "url": "https://scikit-learn.org/stable/user_guide.html", "provider": "scikit-learn", "free": true, "note": "Deep-dive reference for tuning, pipelines and metrics."},
+          {"title": "Google ML Crash Course: fairness and deployment", "type": "article", "url": "https://developers.google.com/machine-learning/crash-course", "provider": "Google", "free": true, "note": "Data fairness, testing and production concerns."}
+        ],
+        "practice_tasks": ["Win a tabular Kaggle playground competition with XGBoost", "Build a pipeline that handles missing values, encoding and scaling", "Explain a boosted model's predictions with SHAP plots", "Deploy a trained model behind a simple Flask API"],
+        "checkpoint": "You can design a reproducible pipeline, tune gradient-boosted models, handle imbalance and leakage, and explain model decisions to a non-technical stakeholder."
+      },
+      {
+        "stage": "advanced",
+        "title": "ML Systems and Production",
+        "weeks": 6,
+        "topics": ["Training/serving skew and data validation", "Feature stores and data pipelines", "Model monitoring and drift detection", "Time series forecasting with ML", "Anomaly detection methods", "Distributed training concepts", "A/B testing for ML models", "MLOps tooling overview: MLflow, Kubeflow"],
+        "resources": [
+          {"title": "Andrew Ng MLOps Lectures", "type": "video", "url": "https://www.youtube.com/@AndrewYNg", "provider": "YouTube", "free": true, "note": "Free lectures on deploying and maintaining ML systems."},
+          {"title": "Google Rules of ML", "type": "docs", "url": "https://developers.google.com/machine-learning/guides/rules-of-ml", "provider": "Google", "free": true, "note": "The canonical production-ML engineering playbook."},
+          {"title": "MLflow Documentation", "type": "docs", "url": "https://mlflow.org/docs/latest/index.html", "provider": "MLflow", "free": true, "note": "Track experiments and package models for deployment."},
+          {"title": "Kaggle Learn: Intro to Deep Learning", "type": "course", "url": "https://www.kaggle.com/learn/intro-to-deep-learning", "provider": "Kaggle", "free": true, "note": "Neural nets primer that extends your ML toolkit."},
+          {"title": "NPTEL Machine Learning Courses", "type": "course", "url": "https://nptel.ac.in/", "provider": "NPTEL/SWAYAM", "free": true, "note": "Advanced IIT courses with rigorous assignments."}
+        ],
+        "practice_tasks": ["Set up MLflow tracking for an experiment series", "Build a drift-detection check on a deployed model's inputs", "Forecast sales with a time-series ML pipeline", "Run an A/B test analysis for two model versions"],
+        "checkpoint": "You can take a model from notebook to a monitored, versioned production pipeline and diagnose data drift, skew and performance decay."
+      }
+    ]
+  },
+  {
+    "id": "deep-learning",
+    "name": "Deep Learning",
+    "domain": "AI/ML",
+    "summary": "Deep learning uses neural networks to solve vision, language and speech problems. It drives modern AI from chatbots to image recognition and commands premium salaries.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Neural Networks and PyTorch",
+        "weeks": 5,
+        "topics": ["Perceptrons, activations and backpropagation", "Tensors and autograd in PyTorch", "Training loops and loss functions", "Overfitting in neural nets: dropout, augmentation", "Convolutional neural networks (CNNs)", "Transfer learning with pretrained models", "GPU basics and Colab usage", "Visualizing training with TensorBoard"],
+        "resources": [
+          {"title": "PyTorch Tutorials", "type": "docs", "url": "https://pytorch.org/tutorials/", "provider": "PyTorch", "free": true, "note": "Official beginner-to-advanced tutorials with runnable code."},
+          {"title": "fast.ai Practical Deep Learning", "type": "course", "url": "https://course.fast.ai/", "provider": "fast.ai", "free": true, "note": "Free top-down deep learning course used worldwide."},
+          {"title": "TensorFlow Tutorials", "type": "docs", "url": "https://www.tensorflow.org/tutorials", "provider": "Google", "free": true, "note": "Official Keras/TF guides from basics to CNNs."},
+          {"title": "Andrew Ng Deep Learning Lectures", "type": "video", "url": "https://www.youtube.com/@AndrewYNg", "provider": "YouTube", "free": true, "note": "Free lectures covering neural net fundamentals."},
+          {"title": "NPTEL Deep Learning Courses", "type": "course", "url": "https://nptel.ac.in/", "provider": "NPTEL/SWAYAM", "free": true, "note": "IIT deep learning courses; certificate track available."}
+        ],
+        "practice_tasks": ["Train a CNN on CIFAR-10 in PyTorch", "Fine-tune a pretrained ResNet on your own image dataset", "Build an MLP from scratch with NumPy backprop", "Track experiments with TensorBoard in Google Colab"],
+        "checkpoint": "You can implement, train and debug a PyTorch CNN end-to-end, explain backpropagation, and use transfer learning to reach strong accuracy on a small dataset."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Sequences, Transformers and NLP",
+        "weeks": 6,
+        "topics": ["RNNs, LSTMs and GRUs", "Word embeddings and attention", "Transformer architecture in depth", "Fine-tuning BERT and GPT-style models", "Hugging Face transformers library", "Object detection: YOLO and Faster R-CNN", "Generative models: GANs and VAEs", "Mixed precision and training optimization"],
+        "resources": [
+          {"title": "Hugging Face NLP Course", "type": "course", "url": "https://huggingface.co/learn/nlp-course", "provider": "Hugging Face", "free": true, "note": "Free NLP course on transformers with the HF ecosystem."},
+          {"title": "fast.ai Part 2: Deep Learning from the Foundations", "type": "course", "url": "https://www.fast.ai/", "provider": "fast.ai", "free": true, "note": "Advanced deep learning: GANs, deployment, cutting-edge papers."},
+          {"title": "PyTorch Intermediate Tutorials", "type": "docs", "url": "https://pytorch.org/tutorials/", "provider": "PyTorch", "free": true, "note": "Sequence models, DCGAN and transformer tutorials."},
+          {"title": "Andrew Ng NLP Lectures", "type": "video", "url": "https://www.youtube.com/@AndrewYNg", "provider": "YouTube", "free": true, "note": "Free NLP specialization lectures and interviews."},
+          {"title": "NPTEL Deep Learning for NLP", "type": "course", "url": "https://nptel.ac.in/", "provider": "NPTEL/SWAYAM", "free": true, "note": "IIT course on neural NLP methods and transformers."}
+        ],
+        "practice_tasks": ["Fine-tune a BERT model for sentiment analysis", "Build a text generator with a small transformer", "Train a YOLO-style detector on a custom object dataset", "Generate images with a pretrained GAN or diffusion model"],
+        "checkpoint": "You can fine-tune transformer models for NLP tasks, explain attention, and ship a working object-detection or generation demo with the Hugging Face ecosystem."
+      },
+      {
+        "stage": "advanced",
+        "title": "Training at Scale and Generative AI",
+        "weeks": 6,
+        "topics": ["Distributed training: DDP and FSDP", "Large language model pretraining concepts", "LoRA, QLoRA and parameter-efficient tuning", "Diffusion models and stable diffusion", "Model quantization and ONNX export", "Inference optimization: vLLM, TensorRT", "Evaluation of LLMs and RAG systems", "Responsible AI and alignment basics"],
+        "resources": [
+          {"title": "PyTorch Distributed Tutorials", "type": "docs", "url": "https://pytorch.org/tutorials/", "provider": "PyTorch", "free": true, "note": "Official guides on multi-GPU and distributed training."},
+          {"title": "Hugging Face Learn", "type": "docs", "url": "https://huggingface.co/learn", "provider": "Hugging Face", "free": true, "note": "Open recipes for fine-tuning and aligning LLMs."},
+          {"title": "fast.ai Stable Diffusion Notes", "type": "course", "url": "https://www.fast.ai/", "provider": "fast.ai", "free": true, "note": "Build and understand diffusion models hands-on."},
+          {"title": "Andrew Ng Generative AI Lectures", "type": "video", "url": "https://www.youtube.com/@AndrewYNg", "provider": "YouTube", "free": true, "note": "Free talks on LLMs, agents and AI engineering."},
+          {"title": "TensorFlow Advanced Tutorials", "type": "docs", "url": "https://www.tensorflow.org/tutorials", "provider": "Google", "free": true, "note": "Distributed training and TFX production pipelines."}
+        ],
+        "practice_tasks": ["Fine-tune an LLM with QLoRA on a single GPU", "Build a RAG chatbot over your own documents", "Quantize a model to INT8 and benchmark latency", "Set up multi-GPU DDP training for a small transformer"],
+        "checkpoint": "You can efficiently fine-tune and deploy large models under hardware constraints, build RAG systems, and reason about inference cost, latency and quality trade-offs."
+      }
+    ]
+  },
+  {
+    "id": "powerbi",
+    "name": "Power BI & Tableau",
+    "domain": "Data",
+    "summary": "Power BI and Tableau turn raw data into interactive dashboards. BI skills are hired across every industry in India, from startups to banks and consulting firms.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Dashboards with Power BI Desktop",
+        "weeks": 4,
+        "topics": ["Power BI Desktop interface and views", "Importing Excel, CSV and databases", "Data cleaning with Power Query", "Relationships and star schema basics", "DAX: calculated columns and measures", "Building charts, slicers and cards", "Publishing to Power BI Service", "Sharing and scheduled refresh"],
+        "resources": [
+          {"title": "Power BI Guided Learning", "type": "course", "url": "https://learn.microsoft.com/en-us/power-bi/", "provider": "Microsoft", "free": true, "note": "Official Microsoft learning path, free with exercises."},
+          {"title": "Guy in a Cube", "type": "video", "url": "https://www.youtube.com/@GuyinaCube", "provider": "YouTube", "free": true, "note": "Weekly Power BI tutorials from Microsoft MVPs."},
+          {"title": "Tableau Training Videos", "type": "video", "url": "https://www.tableau.com/learn/training", "provider": "Tableau", "free": true, "note": "Free official Tableau fundamentals video series."},
+          {"title": "freeCodeCamp Power BI Course", "type": "video", "url": "https://www.freecodecamp.org/", "provider": "freeCodeCamp", "free": true, "note": "Full-length beginner course with a capstone dashboard."},
+          {"title": "Power BI Documentation", "type": "docs", "url": "https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-getting-started", "provider": "Microsoft", "free": true, "note": "Official docs for every Power BI feature."}
+        ],
+        "practice_tasks": ["Build a sales dashboard from a messy Excel file", "Create DAX measures for YTD growth and moving averages", "Model a star schema with fact and dimension tables", "Publish a dashboard and set up scheduled refresh"],
+        "checkpoint": "You can connect, clean and model data, write core DAX measures, and publish an interactive dashboard that answers real business questions."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Data Modeling, DAX and Tableau",
+        "weeks": 5,
+        "topics": ["Advanced DAX: CALCULATE, filter context", "Time intelligence functions", "Row-level security (RLS)", "Power Query M language basics", "Tableau: LOD expressions and parameters", "Dashboard design and UX principles", "DirectQuery vs Import modes", "Performance tuning with DAX Studio"],
+        "resources": [
+          {"title": "SQLBI DAX Guide", "type": "docs", "url": "https://www.sqlbi.com/guides/dax/", "provider": "SQLBI", "free": true, "note": "The definitive free DAX reference by industry experts."},
+          {"title": "Guy in a Cube: Advanced DAX Series", "type": "video", "url": "https://www.youtube.com/@GuyinaCube", "provider": "YouTube", "free": true, "note": "Deep dives into filter context and optimization."},
+          {"title": "Tableau Free Training", "type": "course", "url": "https://www.tableau.com/learn/training", "provider": "Tableau", "free": true, "note": "Intermediate Tableau: calculations, LODs, mapping."},
+          {"title": "Microsoft Power BI Community", "type": "article", "url": "https://community.powerbi.com/", "provider": "Microsoft", "free": true, "note": "Real-world problems solved by the BI community."},
+          {"title": "NPTEL Data Analytics with Python", "type": "course", "url": "https://nptel.ac.in/", "provider": "NPTEL/SWAYAM", "free": true, "note": "IIT analytics foundations that strengthen BI work."}
+        ],
+        "practice_tasks": ["Rewrite a slow dashboard using variables and optimized DAX", "Implement row-level security for a multi-region report", "Rebuild a Power BI dashboard natively in Tableau", "Design an executive KPI dashboard with drill-through"],
+        "checkpoint": "You write complex DAX confidently, secure reports with RLS, and can deliver the same insight story in both Power BI and Tableau."
+      },
+      {
+        "stage": "advanced",
+        "title": "Enterprise BI and Analytics Engineering",
+        "weeks": 5,
+        "topics": ["Composite models and aggregations", "Deployment pipelines and ALM", "Paginated reports with Report Builder", "Power BI REST API automation", "Dataflows and datamarts", "Governance: workspaces, sensitivity labels", "Integrating Python/R visuals", "Certification: PL-300 exam prep"],
+        "resources": [
+          {"title": "Power BI Enterprise Docs", "type": "docs", "url": "https://learn.microsoft.com/en-us/power-bi/", "provider": "Microsoft", "free": true, "note": "Deployment pipelines, governance and admin guides."},
+          {"title": "SQLBI Optimization Articles", "type": "article", "url": "https://www.sqlbi.com/articles/", "provider": "SQLBI", "free": true, "note": "Advanced VertiPaq and DAX performance tuning."},
+          {"title": "Guy in a Cube: Admin and Governance", "type": "video", "url": "https://www.youtube.com/@GuyinaCube", "provider": "YouTube", "free": true, "note": "Enterprise deployment and tenant management."},
+          {"title": "Tableau Public Gallery", "type": "practice", "url": "https://public.tableau.com/", "provider": "Tableau", "free": true, "note": "Study top dashboards; publish your own portfolio."},
+          {"title": "freeCodeCamp PL-300 Prep", "type": "course", "url": "https://www.freecodecamp.org/", "provider": "freeCodeCamp", "free": true, "note": "Free exam-prep content for the Power BI certification."}
+        ],
+        "practice_tasks": ["Set up deployment pipelines across dev/test/prod workspaces", "Automate dataset refresh via the Power BI REST API", "Build a paginated invoice report in Report Builder", "Publish 3 portfolio dashboards on Tableau Public"],
+        "checkpoint": "You can run BI as a governed enterprise practice — pipelines, security, automation — and have a public portfolio proving it."
+      }
+    ]
+  },
+  {
+    "id": "cloud-aws",
+    "name": "Cloud Fundamentals (AWS)",
+    "domain": "Cloud",
+    "summary": "AWS is the dominant cloud platform and the backbone of most backend jobs. Cloud fundamentals unlock DevOps, backend and data roles across the Indian IT market.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Core AWS Services",
+        "weeks": 4,
+        "topics": ["AWS console, regions and the shared responsibility model", "EC2: instances, AMIs and key pairs", "S3: buckets, storage classes, static hosting", "IAM: users, roles and policies", "Billing, budgets and Free Tier limits", "RDS basics and managed databases", "VPC fundamentals: subnets and security groups", "Deploying a static site on S3 + CloudFront"],
+        "resources": [
+          {"title": "AWS Skill Builder", "type": "course", "url": "https://skillbuilder.aws/", "provider": "AWS", "free": true, "note": "Official free courses and Cloud Quest labs."},
+          {"title": "AWS Training and Certification", "type": "course", "url": "https://aws.amazon.com/training/", "provider": "AWS", "free": true, "note": "Official learning plans including Cloud Practitioner."},
+          {"title": "freeCodeCamp AWS Course", "type": "video", "url": "https://www.freecodecamp.org/", "provider": "freeCodeCamp", "free": true, "note": "Full hands-on AWS walkthrough for beginners."},
+          {"title": "AWS Whitepapers", "type": "docs", "url": "https://aws.amazon.com/whitepapers/", "provider": "AWS", "free": true, "note": "Well-Architected Framework and best practices."},
+          {"title": "roadmap.sh AWS", "type": "article", "url": "https://roadmap.sh/aws", "provider": "roadmap.sh", "free": true, "note": "Step-by-step AWS learning roadmap with resources."}
+        ],
+        "practice_tasks": ["Launch an EC2 instance and host a web app on it", "Store and serve assets from an S3 bucket", "Create IAM roles with least-privilege policies", "Set up billing alerts and stay inside the Free Tier"],
+        "checkpoint": "You can provision EC2, S3, RDS and IAM resources from the console, explain the shared responsibility model, and keep a project inside the Free Tier."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Networking, Serverless and IaC",
+        "weeks": 6,
+        "topics": ["VPC design: subnets, NAT, route tables", "Application Load Balancer and Auto Scaling", "Lambda functions and API Gateway", "DynamoDB data modeling", "CloudFormation and Terraform basics", "CloudWatch logs, metrics and alarms", "SQS, SNS and event-driven patterns", "RDS backups, Multi-AZ and read replicas"],
+        "resources": [
+          {"title": "AWS Skill Builder: Solutions Architect Path", "type": "course", "url": "https://skillbuilder.aws/", "provider": "AWS", "free": true, "note": "Official free path toward the SAA certification."},
+          {"title": "AWS Documentation", "type": "docs", "url": "https://docs.aws.amazon.com/", "provider": "AWS", "free": true, "note": "Authoritative reference for every AWS service."},
+          {"title": "roadmap.sh AWS", "type": "article", "url": "https://roadmap.sh/aws", "provider": "roadmap.sh", "free": true, "note": "Ordered checklist of intermediate AWS topics."},
+          {"title": "freeCodeCamp Serverless Course", "type": "video", "url": "https://www.freecodecamp.org/", "provider": "freeCodeCamp", "free": true, "note": "Lambda and API Gateway project walkthroughs."},
+          {"title": "AWS Workshops", "type": "practice", "url": "https://workshops.aws/", "provider": "AWS", "free": true, "note": "Free hands-on workshops with real AWS accounts."}
+        ],
+        "practice_tasks": ["Build a serverless REST API with Lambda and API Gateway", "Model and query data in DynamoDB with GSI design", "Write a CloudFormation template for a 2-tier app", "Set up autoscaling behind an ALB with CloudWatch alarms"],
+        "checkpoint": "You can design VPC networks, build serverless APIs, model NoSQL data, and define infrastructure as code for a production-style workload."
+      },
+      {
+        "stage": "advanced",
+        "title": "Architecture, Security and Cost",
+        "weeks": 6,
+        "topics": ["Multi-account strategy with Organizations", "Advanced IAM: SCPs, SSO, cross-account roles", "Well-Architected Framework reviews", "Cost optimization: Savings Plans, Graviton", "High availability and disaster recovery", "Containers on ECS/EKS", "Security: KMS, WAF, GuardDuty", "SAA-C03 certification preparation"],
+        "resources": [
+          {"title": "AWS Well-Architected Labs", "type": "practice", "url": "https://www.wellarchitectedlabs.com/", "provider": "AWS", "free": true, "note": "Hands-on labs for the five Well-Architected pillars."},
+          {"title": "AWS Skill Builder: Exam Prep", "type": "course", "url": "https://skillbuilder.aws/", "provider": "AWS", "free": true, "note": "Free official practice questions for SAA-C03."},
+          {"title": "AWS re:Invent Talks", "type": "video", "url": "https://www.youtube.com/@amazonwebservices", "provider": "YouTube", "free": true, "note": "Deep-dive architecture talks from AWS engineers."},
+          {"title": "AWS Whitepapers", "type": "docs", "url": "https://aws.amazon.com/whitepapers/", "provider": "AWS", "free": true, "note": "Security, cost and reliability whitepapers."},
+          {"title": "roadmap.sh DevOps", "type": "article", "url": "https://roadmap.sh/devops", "provider": "roadmap.sh", "free": true, "note": "DevOps practices that complement AWS architecture."}
+        ],
+        "practice_tasks": ["Run a Well-Architected review on your own project", "Cut a sample AWS bill by 40% with right-sizing", "Design a multi-region DR plan with RTO/RPO targets", "Deploy a containerized app to ECS with CI/CD"],
+        "checkpoint": "You can architect secure, cost-efficient, highly available systems on AWS and are ready to attempt the Solutions Architect Associate exam."
+      }
+    ]
+  },
+  {
+    "id": "docker",
+    "name": "Docker & Containers",
+    "domain": "DevOps",
+    "summary": "Docker packages apps into portable containers that run anywhere. It is the standard unit of modern deployment and a prerequisite for DevOps and backend roles.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Containers and Dockerfiles",
+        "weeks": 3,
+        "topics": ["Containers vs virtual machines", "Images, containers and registries", "Docker CLI: run, ps, exec, logs", "Writing Dockerfiles: layers and caching", "Port mapping and environment variables", "Docker Hub: pulling and pushing", "Bind mounts vs volumes", "Containerizing a Python/Node app"],
+        "resources": [
+          {"title": "Docker Get Started", "type": "docs", "url": "https://docs.docker.com/get-started/", "provider": "Docker", "free": true, "note": "Official hands-on getting-started guide."},
+          {"title": "TechWorld with Nana: Docker Course", "type": "video", "url": "https://www.youtube.com/@TechWorldwithNana", "provider": "YouTube", "free": true, "note": "Clear full-length Docker course for beginners."},
+          {"title": "Play with Docker", "type": "practice", "url": "https://labs.play-with-docker.com/", "provider": "Docker", "free": true, "note": "Free Docker playground in the browser, no install."},
+          {"title": "roadmap.sh Docker", "type": "article", "url": "https://roadmap.sh/docker", "provider": "roadmap.sh", "free": true, "note": "Ordered Docker learning path with resources."},
+          {"title": "Docker Samples", "type": "practice", "url": "https://github.com/dockersamples", "provider": "Docker", "free": true, "note": "Official sample apps to containerize and run."}
+        ],
+        "practice_tasks": ["Containerize a Flask app with a multi-line Dockerfile", "Debug a failing container using logs and exec", "Push your image to Docker Hub", "Run a Postgres container with a persistent volume"],
+        "checkpoint": "You can write efficient Dockerfiles, manage the container lifecycle from the CLI, and run multi-container setups with persistent data."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Compose, Networks and Volumes",
+        "weeks": 4,
+        "topics": ["Docker Compose for multi-service apps", "Custom bridge networks and DNS", "Named volumes and backup strategies", "Environment-specific compose overrides", "Healthchecks and restart policies", "Private registries: Harbor, ECR", "Image scanning and security basics", "Debugging networking between containers"],
+        "resources": [
+          {"title": "Docker Compose Docs", "type": "docs", "url": "https://docs.docker.com/compose/", "provider": "Docker", "free": true, "note": "Official reference for compose files and CLI."},
+          {"title": "TechWorld with Nana: Docker Advanced", "type": "video", "url": "https://www.youtube.com/@TechWorldwithNana", "provider": "YouTube", "free": true, "note": "Compose, volumes and production patterns."},
+          {"title": "Play with Docker Classroom", "type": "practice", "url": "https://labs.play-with-docker.com/", "provider": "Docker", "free": true, "note": "Guided labs for compose and swarm."},
+          {"title": "roadmap.sh Docker", "type": "article", "url": "https://roadmap.sh/docker", "provider": "roadmap.sh", "free": true, "note": "Intermediate milestones and project ideas."},
+          {"title": "Awesome Compose", "type": "practice", "url": "https://github.com/docker/awesome-compose", "provider": "Docker", "free": true, "note": "Real-world compose examples to study and run."}
+        ],
+        "practice_tasks": ["Define a 3-service app (web, API, DB) in compose", "Add healthchecks and zero-downtime restarts", "Back up and restore a named volume", "Run a private registry and push images to it"],
+        "checkpoint": "You can model a full application stack in Compose, manage networks and volumes, and keep stateful services reliable across restarts."
+      },
+      {
+        "stage": "advanced",
+        "title": "Production Containers and Orchestration",
+        "weeks": 5,
+        "topics": ["Multi-stage builds for tiny images", "Distroless and minimal base images", "Docker Swarm vs Kubernetes overview", "Kubernetes pods, deployments, services", "Helm charts basics", "CI pipelines that build and push images", "Runtime security: seccomp, non-root users", "Logging and monitoring containers"],
+        "resources": [
+          {"title": "Docker Best Practices", "type": "docs", "url": "https://docs.docker.com/develop/develop-images/dockerfile_best-practices/", "provider": "Docker", "free": true, "note": "Official guide to fast, secure, tiny images."},
+          {"title": "Kubernetes Basics", "type": "docs", "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/", "provider": "Kubernetes", "free": true, "note": "Free official intro to orchestration concepts."},
+          {"title": "TechWorld with Nana: Kubernetes Course", "type": "video", "url": "https://www.youtube.com/@TechWorldwithNana", "provider": "YouTube", "free": true, "note": "Free full Kubernetes course building on Docker."},
+          {"title": "roadmap.sh DevOps", "type": "article", "url": "https://roadmap.sh/devops", "provider": "roadmap.sh", "free": true, "note": "Where containers fit in the DevOps landscape."},
+          {"title": "Play with Kubernetes", "type": "practice", "url": "https://labs.play-with-k8s.com/", "provider": "Docker", "free": true, "note": "Free Kubernetes playground in the browser."}
+        ],
+        "practice_tasks": ["Shrink an image below 50MB with multi-stage builds", "Deploy your compose app to a Kubernetes cluster", "Build a CI pipeline that scans and pushes images", "Harden a container to run as non-root with read-only FS"],
+        "checkpoint": "You ship minimal, scanned, secure images through CI into orchestrated environments, and can debug Kubernetes deployments of containerized apps."
+      }
+    ]
+  },
+  {
+    "id": "system-design",
+    "name": "System Design",
+    "domain": "Computer Science",
+    "summary": "System design is how engineers architect software that scales to millions of users. It is the deciding interview round for SDE roles at product companies in India.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Scaling Fundamentals",
+        "weeks": 4,
+        "topics": ["Horizontal vs vertical scaling", "Load balancers and reverse proxies", "Caching: CDN, Redis, cache patterns", "Relational vs NoSQL databases", "Database indexing and replication", "API design: REST principles", "Monolith vs microservices", "Consistency models overview"],
+        "resources": [
+          {"title": "System Design Primer", "type": "docs", "url": "https://github.com/donnemartin/system-design-primer", "provider": "GitHub", "free": true, "note": "The classic open-source interview prep repo."},
+          {"title": "ByteByteGo", "type": "video", "url": "https://www.youtube.com/@ByteByteGo", "provider": "YouTube", "free": true, "note": "Animated explainers of core system design topics."},
+          {"title": "GeeksforGeeks System Design Tutorial", "type": "article", "url": "https://www.geeksforgeeks.org/system-design-tutorial/", "provider": "GeeksforGeeks", "free": true, "note": "Beginner-friendly tutorials with Indian interview focus."},
+          {"title": "roadmap.sh System Design", "type": "article", "url": "https://roadmap.sh/system-design", "provider": "roadmap.sh", "free": true, "note": "Structured topic checklist for interview prep."},
+          {"title": "ByteByteGo Newsletter", "type": "article", "url": "https://blog.bytebytego.com/", "provider": "ByteByteGo", "free": true, "note": "Free weekly deep-dives on architecture topics."}
+        ],
+        "practice_tasks": ["Draw a scaled architecture for a blog with 1M users", "Benchmark Redis caching vs direct DB queries", "Design a REST API for a URL shortener", "Write a 1-page design doc for a file-upload service"],
+        "checkpoint": "You can explain scaling, caching and load balancing trade-offs, and produce a clean high-level design for a small system with a written doc."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Distributed Systems Core",
+        "weeks": 6,
+        "topics": ["CAP theorem and PACELC", "Sharding and partitioning strategies", "Message queues: Kafka, RabbitMQ", "Eventual consistency and idempotency", "Distributed transactions and sagas", "Rate limiting and backpressure", "Search: Elasticsearch basics", "Observability: metrics, traces, logs"],
+        "resources": [
+          {"title": "System Design Primer: Advanced Sections", "type": "docs", "url": "https://github.com/donnemartin/system-design-primer", "provider": "GitHub", "free": true, "note": "Distributed systems theory and company architectures."},
+          {"title": "ByteByteGo System Design Interviews", "type": "video", "url": "https://www.youtube.com/@ByteByteGo", "provider": "YouTube", "free": true, "note": "Mock interviews and classic problem walkthroughs."},
+          {"title": "DDIA Community Notes", "type": "article", "url": "https://github.com/donnemartin/system-design-primer", "provider": "GitHub", "free": true, "note": "Community summaries of the essential distributed-systems book."},
+          {"title": "GeeksforGeeks Advanced Topics", "type": "article", "url": "https://www.geeksforgeeks.org/system-design-tutorial/", "provider": "GeeksforGeeks", "free": true, "note": "Sharding, consensus and queue patterns explained."},
+          {"title": "roadmap.sh System Design", "type": "article", "url": "https://roadmap.sh/system-design", "provider": "roadmap.sh", "free": true, "note": "Track progress across intermediate topics."}
+        ],
+        "practice_tasks": ["Design a rate limiter handling 10k rps", "Compare Kafka vs RabbitMQ for an order pipeline", "Design sharding for a multi-tenant SaaS DB", "Add idempotency to a payment webhook handler"],
+        "checkpoint": "You can reason about consistency, partitioning and failure modes, and defend distributed-system trade-offs in a 45-minute interview round."
+      },
+      {
+        "stage": "advanced",
+        "title": "Designing Real Systems",
+        "weeks": 6,
+        "topics": ["Design WhatsApp: messaging at scale", "Design YouTube: video ingestion and CDN", "Design Twitter/X: fan-out and timelines", "Design Uber: geospatial and matching", "Capacity estimation and back-of-envelope math", "Evolving monoliths to microservices", "Multi-region active-active design", "System design interview frameworks"],
+        "resources": [
+          {"title": "System Design Primer: Company Architectures", "type": "docs", "url": "https://github.com/donnemartin/system-design-primer", "provider": "GitHub", "free": true, "note": "Real architectures from large tech companies."},
+          {"title": "ByteByteGo Case Studies", "type": "video", "url": "https://www.youtube.com/@ByteByteGo", "provider": "YouTube", "free": true, "note": "End-to-end designs of famous systems."},
+          {"title": "Hello Interview: System Design", "type": "article", "url": "https://www.hellointerview.com/learn/system-design", "provider": "Hello Interview", "free": true, "note": "Free structured lessons with practice problems."},
+          {"title": "GeeksforGeeks Interview Experiences", "type": "article", "url": "https://www.geeksforgeeks.org/", "provider": "GeeksforGeeks", "free": true, "note": "Real Indian company interview design rounds."},
+          {"title": "Awesome System Design", "type": "practice", "url": "https://github.com/madd86/awesome-system-design", "provider": "GitHub", "free": true, "note": "Curated problems and resources for practice."}
+        ],
+        "practice_tasks": ["Whiteboard-design YouTube end-to-end in 40 minutes", "Do capacity estimation for a 100M DAU chat app", "Write a migration plan from monolith to microservices", "Record yourself solving a design problem and self-review"],
+        "checkpoint": "You can lead a full system design interview round — requirements, estimation, deep dives, trade-offs — for any classic large-scale system."
+      }
+    ]
+  },
+  {
+    "id": "cybersecurity-basics",
+    "name": "Cybersecurity Fundamentals",
+    "domain": "Security",
+    "summary": "Cybersecurity protects systems and data from attackers. With rising breaches and compliance needs, security analysts are in short supply across Indian enterprises.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Security and Networking Foundations",
+        "weeks": 4,
+        "topics": ["CIA triad and threat modeling", "TCP/IP, DNS, HTTP in depth", "Linux command line for security", "Common attacks: phishing, malware, MITM", "Passwords, MFA and hashing basics", "Firewalls and VPN concepts", "Intro to TryHackMe labs", "Security career paths overview"],
+        "resources": [
+          {"title": "TryHackMe", "type": "course", "url": "https://tryhackme.com/", "provider": "TryHackMe", "free": true, "note": "Gamified labs; generous free rooms for beginners."},
+          {"title": "NetworkChuck", "type": "video", "url": "https://www.youtube.com/@NetworkChuck", "provider": "YouTube", "free": true, "note": "Energetic networking and security tutorials."},
+          {"title": "Professor Messer Security+", "type": "video", "url": "https://www.professormesser.com/", "provider": "Professor Messer", "free": true, "note": "Free full Security+ course, highly respected."},
+          {"title": "roadmap.sh Cyber Security", "type": "article", "url": "https://roadmap.sh/cyber-security", "provider": "roadmap.sh", "free": true, "note": "Structured beginner-to-pro security roadmap."},
+          {"title": "freeCodeCamp Ethical Hacking Course", "type": "video", "url": "https://www.freecodecamp.org/", "provider": "freeCodeCamp", "free": true, "note": "Full ethical hacking course with lab demos."}
+        ],
+        "practice_tasks": ["Complete TryHackMe's 'Introduction to Cyber Security' room", "Capture and analyze traffic with Wireshark", "Crack weak hashes with John the Ripper in a lab", "Write a threat model for a college web app"],
+        "checkpoint": "You understand core networking and attack concepts, can navigate Linux confidently, and have completed beginner TryHackMe rooms with written notes."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Web Security and Defense",
+        "weeks": 6,
+        "topics": ["OWASP Top 10 vulnerabilities", "Burp Suite for web testing", "SQL injection and XSS labs", "Cryptography: TLS, PKI, certificates", "Linux hardening and log analysis", "SIEM basics and alert triage", "Nmap scanning and enumeration", "Incident response lifecycle"],
+        "resources": [
+          {"title": "TryHackMe Jr Penetration Tester Path", "type": "course", "url": "https://tryhackme.com/", "provider": "TryHackMe", "free": true, "note": "Free rooms on pentesting methodology and tools."},
+          {"title": "PortSwigger Web Security Academy", "type": "course", "url": "https://portswigger.net/web-security", "provider": "PortSwigger", "free": true, "note": "Free world-class labs for every OWASP topic."},
+          {"title": "Professor Messer Advanced Topics", "type": "video", "url": "https://www.professormesser.com/", "provider": "Professor Messer", "free": true, "note": "Deeper Security+ modules on defense and crypto."},
+          {"title": "NetworkChuck Security Playlists", "type": "video", "url": "https://www.youtube.com/@NetworkChuck", "provider": "YouTube", "free": true, "note": "Wireshark, Nmap and homelab security builds."},
+          {"title": "OWASP Top 10", "type": "docs", "url": "https://owasp.org/www-project-top-ten/", "provider": "OWASP", "free": true, "note": "The authoritative web-risk reference."}
+        ],
+        "practice_tasks": ["Exploit and fix SQLi and XSS in a DVWA lab", "Write a Burp-tested report for a vulnerable demo app", "Harden an Ubuntu server and document each control", "Triage 10 simulated SIEM alerts and write findings"],
+        "checkpoint": "You can find and explain OWASP Top 10 flaws, use Burp and Nmap in labs, and write a professional vulnerability report with remediation steps."
+      },
+      {
+        "stage": "advanced",
+        "title": "Pentesting and SOC Operations",
+        "weeks": 6,
+        "topics": ["Active Directory attack paths", "Privilege escalation on Linux/Windows", "Metasploit framework workflows", "SOC analyst: detection engineering", "Digital forensics basics", "Cloud security: AWS misconfigurations", "Red team vs blue team exercises", "Security+ / CEH exam preparation"],
+        "resources": [
+          {"title": "TryHackMe SOC Level 1", "type": "course", "url": "https://tryhackme.com/", "provider": "TryHackMe", "free": true, "note": "Free SOC analyst path with detection labs."},
+          {"title": "HackTheBox Academy", "type": "practice", "url": "https://www.hackthebox.com/", "provider": "Hack The Box", "free": true, "note": "Free starting-point machines and modules."},
+          {"title": "Professor Messer Exam Prep", "type": "video", "url": "https://www.professormesser.com/", "provider": "Professor Messer", "free": true, "note": "Free Security+ study notes and practice exams."},
+          {"title": "roadmap.sh Cyber Security", "type": "article", "url": "https://roadmap.sh/cyber-security", "provider": "roadmap.sh", "free": true, "note": "Advanced tracks: pentest, DFIR, cloud security."},
+          {"title": "OWASP Testing Guide", "type": "docs", "url": "https://owasp.org/www-project-web-security-testing-guide/", "provider": "OWASP", "free": true, "note": "Professional methodology for security testing."}
+        ],
+        "practice_tasks": ["Root 5 HackTheBox starting-point machines", "Write Sigma detection rules for a lab attack", "Perform a full AD lab attack chain in TryHackMe", "Draft a pentest report with CVSS-scored findings"],
+        "checkpoint": "You can execute a structured pentest in labs, write detection rules, and produce client-ready reports — ready for SOC analyst or junior pentester interviews."
+      }
+    ]
+  },
+  {
+    "id": "devops-cicd",
+    "name": "CI/CD & DevOps Practices",
+    "domain": "DevOps",
+    "summary": "DevOps and CI/CD automate how software is built, tested and shipped. Every product team needs it, and DevOps engineers are among the best-paid infrastructure roles.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "CI/CD Concepts and GitHub Actions",
+        "weeks": 4,
+        "topics": ["What CI/CD solves: build, test, deploy", "Git workflows: branching and PRs", "GitHub Actions: workflows, jobs, steps", "YAML syntax and secrets management", "Running tests and linters in CI", "Artifacts and caching strategies", "Deploying static sites via CI", "Pipeline failure debugging"],
+        "resources": [
+          {"title": "GitHub Actions Docs", "type": "docs", "url": "https://docs.github.com/en/actions", "provider": "GitHub", "free": true, "note": "Official tutorials from first workflow to deployment."},
+          {"title": "TechWorld with Nana: CI/CD Explainer", "type": "video", "url": "https://www.youtube.com/@TechWorldwithNana", "provider": "YouTube", "free": true, "note": "Clear visual intro to CI/CD pipelines."},
+          {"title": "roadmap.sh DevOps", "type": "article", "url": "https://roadmap.sh/devops", "provider": "roadmap.sh", "free": true, "note": "Full DevOps roadmap; follow the CI/CD track."},
+          {"title": "GitHub Skills", "type": "practice", "url": "https://skills.github.com/", "provider": "GitHub", "free": true, "note": "Interactive courses that run inside your own repo."},
+          {"title": "freeCodeCamp DevOps", "type": "video", "url": "https://www.freecodecamp.org/", "provider": "freeCodeCamp", "free": true, "note": "Hands-on DevOps and CI/CD project course."}
+        ],
+        "practice_tasks": ["Add a CI workflow that tests every PR", "Cache dependencies to speed up a pipeline", "Deploy a docs site automatically on merge", "Fix a broken workflow using Actions logs"],
+        "checkpoint": "You can write GitHub Actions workflows that lint, test and deploy on every push, and debug failures from logs independently."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Jenkins and Pipeline Engineering",
+        "weeks": 5,
+        "topics": ["Jenkins: controllers, agents, pipelines", "Declarative Pipeline syntax", "Shared libraries for reusable steps", "Docker-based build agents", "SonarQube quality gates", "Artifact repos: Nexus, Artifactory", "Deployment strategies: blue-green, canary", "Rollback and release management"],
+        "resources": [
+          {"title": "Jenkins Tutorials", "type": "docs", "url": "https://www.jenkins.io/doc/tutorials/", "provider": "Jenkins", "free": true, "note": "Official hands-on pipeline tutorials."},
+          {"title": "TechWorld with Nana: Jenkins Course", "type": "video", "url": "https://www.youtube.com/@TechWorldwithNana", "provider": "YouTube", "free": true, "note": "Full Jenkins pipeline course with Docker agents."},
+          {"title": "roadmap.sh DevOps", "type": "article", "url": "https://roadmap.sh/devops", "provider": "roadmap.sh", "free": true, "note": "Intermediate DevOps milestones and tools."},
+          {"title": "Jenkins Pipeline Examples", "type": "practice", "url": "https://github.com/jenkinsci/pipeline-examples", "provider": "Jenkins", "free": true, "note": "Real pipeline scripts to study and adapt."},
+          {"title": "freeCodeCamp Jenkins", "type": "video", "url": "https://www.freecodecamp.org/", "provider": "freeCodeCamp", "free": true, "note": "Practical Jenkins setup and pipeline builds."}
+        ],
+        "practice_tasks": ["Build a multibranch Jenkins pipeline with quality gates", "Create a shared library used by 3 pipelines", "Implement blue-green deployment for a web app", "Set up artifact versioning with retention policies"],
+        "checkpoint": "You can run Jenkins with Docker agents, write shared-library pipelines with quality gates, and execute safe blue-green or canary releases."
+      },
+      {
+        "stage": "advanced",
+        "title": "GitOps, IaC and Reliability",
+        "weeks": 6,
+        "topics": ["Infrastructure as Code with Terraform", "GitOps with ArgoCD/Flux", "Kubernetes deployments and Helm", "Observability: Prometheus and Grafana", "SLOs, error budgets and incident response", "Secrets management: Vault, SOPS", "Policy as code with OPA", "Platform engineering basics"],
+        "resources": [
+          {"title": "Terraform Tutorials", "type": "docs", "url": "https://developer.hashicorp.com/terraform/tutorials", "provider": "HashiCorp", "free": true, "note": "Official IaC labs from zero to modules."},
+          {"title": "ArgoCD Docs", "type": "docs", "url": "https://argo-cd.readthedocs.io/", "provider": "Argo CD", "free": true, "note": "GitOps continuous delivery on Kubernetes."},
+          {"title": "TechWorld with Nana: DevOps Bootcamp", "type": "video", "url": "https://www.youtube.com/@TechWorldwithNana", "provider": "YouTube", "free": true, "note": "Advanced DevOps: K8s, Terraform, monitoring."},
+          {"title": "roadmap.sh DevOps", "type": "article", "url": "https://roadmap.sh/devops", "provider": "roadmap.sh", "free": true, "note": "Advanced track: GitOps, SRE, platform topics."},
+          {"title": "Prometheus Docs", "type": "docs", "url": "https://prometheus.io/docs/", "provider": "Prometheus", "free": true, "note": "Metrics, alerting and PromQL reference."}
+        ],
+        "practice_tasks": ["Provision cloud infra with Terraform modules", "Deploy via GitOps with ArgoCD auto-sync", "Build Grafana dashboards with SLO burn alerts", "Run a blameless postmortem for a simulated outage"],
+        "checkpoint": "You can manage infrastructure as code, run GitOps delivery on Kubernetes, and operate services against SLOs with real observability."
+      }
+    ]
+  }
+]}

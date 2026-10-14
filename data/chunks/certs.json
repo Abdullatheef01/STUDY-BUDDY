@@ -1,0 +1,883 @@
+[
+  {
+    "id": "aws-clf",
+    "name": "AWS Certified Cloud Practitioner",
+    "provider": "Amazon Web Services",
+    "domain": "Cloud",
+    "cost_inr": 8300,
+    "cost_note": "Approximate; exam priced at USD 100",
+    "validity_years": 3,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. Basic IT concepts and 6 months of general cloud exposure recommended.",
+    "exam_format": "65 multiple-choice/multiple-response questions, 90 minutes, online or test center.",
+    "official_url": "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+    "prep_resources": [
+      {"title": "AWS Skill Builder Cloud Practitioner learning plan (free tier)", "kind": "free", "url": "https://skillbuilder.aws/"},
+      {"title": "AWS Certified Cloud Practitioner course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "AWS Certified Cloud Practitioner - full course", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"}
+    ],
+    "career_value": "Unlocks cloud support associate, cloud operations trainee and junior cloud engineer roles; signals cloud literacy that fresher IT-services interviews in India (₹4-8 LPA range) increasingly expect.",
+    "roles": ["backend-dev", "devops-engineer", "data-engineer"]
+  },
+  {
+    "id": "aws-saa",
+    "name": "AWS Certified Solutions Architect - Associate",
+    "provider": "Amazon Web Services",
+    "domain": "Cloud",
+    "cost_inr": 12500,
+    "cost_note": "Approximate; exam priced at USD 150",
+    "validity_years": 3,
+    "difficulty": "Intermediate",
+    "prerequisites": "6+ months hands-on AWS experience recommended; basic networking knowledge helps.",
+    "exam_format": "65 multiple-choice/multiple-response questions, 130 minutes, online or test center.",
+    "official_url": "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
+    "prep_resources": [
+      {"title": "AWS Skill Builder Solutions Architect learning plan (free tier)", "kind": "free", "url": "https://skillbuilder.aws/"},
+      {"title": "AWS Solutions Architect full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "AWS documentation", "kind": "free", "url": "https://docs.aws.amazon.com/"},
+      {"title": "Ultimate AWS Certified Solutions Architect Associate course (Stephane Maarek)", "kind": "paid", "url": "https://www.udemy.com/"}
+    ],
+    "career_value": "Unlocks solutions architect, cloud engineer and backend/devops roles; one of the most salary-bumping Associate certs in India (₹8-20 LPA for architect-track roles).",
+    "roles": ["backend-dev", "devops-engineer", "data-engineer"]
+  },
+  {
+    "id": "aws-dva",
+    "name": "AWS Certified Developer - Associate",
+    "provider": "Amazon Web Services",
+    "domain": "Cloud",
+    "cost_inr": 12500,
+    "cost_note": "Approximate; exam priced at USD 150",
+    "validity_years": 3,
+    "difficulty": "Intermediate",
+    "prerequisites": "1+ year of experience developing and maintaining AWS-based applications; proficiency in a high-level programming language.",
+    "exam_format": "65 multiple-choice/multiple-response questions, 130 minutes, online or test center.",
+    "official_url": "https://aws.amazon.com/certification/certified-developer-associate/",
+    "prep_resources": [
+      {"title": "AWS Skill Builder Developer learning plan (free tier)", "kind": "free", "url": "https://skillbuilder.aws/"},
+      {"title": "AWS Certified Developer Associate course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "AWS documentation", "kind": "free", "url": "https://docs.aws.amazon.com/"}
+    ],
+    "career_value": "Unlocks backend and cloud-native developer roles (Lambda, API Gateway, DynamoDB stacks); helps fresher-to-mid developers stand out for India product and services roles (₹6-16 LPA).",
+    "roles": ["backend-dev", "fullstack-dev", "devops-engineer"]
+  },
+  {
+    "id": "az-900",
+    "name": "Microsoft Certified: Azure Fundamentals (AZ-900)",
+    "provider": "Microsoft",
+    "domain": "Cloud",
+    "cost_inr": 3699,
+    "cost_note": "Approximate; INR 3,699 in India (USD 99 in the US)",
+    "validity_years": 1,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. General technology concepts familiarity helps.",
+    "exam_format": "40-60 multiple-choice questions, 45 minutes, online or test center.",
+    "official_url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-fundamentals/",
+    "prep_resources": [
+      {"title": "Microsoft Learn AZ-900 learning path", "kind": "free", "url": "https://learn.microsoft.com/en-us/credentials/"},
+      {"title": "AZ-900 full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "AZ-900 exam prep videos", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"}
+    ],
+    "career_value": "Entry ticket to Azure-ecosystem roles (many Indian enterprises and GCCs run on Azure); pairs well with AZ-104 for administrator roles (₹5-12 LPA).",
+    "roles": ["backend-dev", "devops-engineer", "data-engineer"]
+  },
+  {
+    "id": "az-104",
+    "name": "Microsoft Certified: Azure Administrator Associate (AZ-104)",
+    "provider": "Microsoft",
+    "domain": "Cloud",
+    "cost_inr": 3699,
+    "cost_note": "Approximate; INR 3,699 in India (USD 165 in the US)",
+    "validity_years": 1,
+    "difficulty": "Intermediate",
+    "prerequisites": "AZ-900 recommended; 6+ months hands-on experience administering Azure resources.",
+    "exam_format": "40-60 multiple-choice/case-study questions, 45 minutes, online or test center.",
+    "official_url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/",
+    "prep_resources": [
+      {"title": "Microsoft Learn AZ-104 learning path", "kind": "free", "url": "https://learn.microsoft.com/en-us/credentials/"},
+      {"title": "AZ-104 full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Microsoft Learn sandbox labs", "kind": "free", "url": "https://learn.microsoft.com/en-us/training/"}
+    ],
+    "career_value": "Unlocks Azure administrator and cloud support engineer roles across Indian IT services and enterprises (₹6-14 LPA); renewable free via Microsoft's annual renewal assessment.",
+    "roles": ["devops-engineer", "backend-dev"]
+  },
+  {
+    "id": "gcp-ace",
+    "name": "Google Associate Cloud Engineer",
+    "provider": "Google Cloud",
+    "domain": "Cloud",
+    "cost_inr": 10400,
+    "cost_note": "Approximate; exam priced at USD 125",
+    "validity_years": 2,
+    "difficulty": "Intermediate",
+    "prerequisites": "6+ months hands-on experience with Google Cloud recommended; basic Linux and networking knowledge.",
+    "exam_format": "50-60 multiple-choice/multiple-select questions, 2 hours, online proctored or test center.",
+    "official_url": "https://cloud.google.com/learn/certification/cloud-engineer",
+    "prep_resources": [
+      {"title": "Google Cloud certification learning paths", "kind": "free", "url": "https://cloud.google.com/learn/certification"},
+      {"title": "Google Cloud documentation", "kind": "free", "url": "https://cloud.google.com/docs"},
+      {"title": "Associate Cloud Engineer course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"}
+    ],
+    "career_value": "Unlocks GCP cloud engineer and platform engineer roles, including at Google partner firms and startups in India (₹8-18 LPA); a strong differentiator since GCP skills are rarer than AWS/Azure.",
+    "roles": ["devops-engineer", "backend-dev", "data-engineer"]
+  },
+  {
+    "id": "gcp-pde",
+    "name": "Google Professional Data Engineer",
+    "provider": "Google Cloud",
+    "domain": "Cloud",
+    "cost_inr": 16600,
+    "cost_note": "Approximate; exam priced at USD 200",
+    "validity_years": 2,
+    "difficulty": "Advanced",
+    "prerequisites": "3+ years of industry experience including 1+ year designing and managing data solutions on Google Cloud recommended.",
+    "exam_format": "50-60 multiple-choice/multiple-select questions, 2 hours, online proctored or test center.",
+    "official_url": "https://cloud.google.com/learn/certification/data-engineer",
+    "prep_resources": [
+      {"title": "Google Cloud certification learning paths", "kind": "free", "url": "https://cloud.google.com/learn/certification"},
+      {"title": "Google Cloud documentation", "kind": "free", "url": "https://cloud.google.com/docs"},
+      {"title": "Professional Data Engineer exam guide and practice", "kind": "free", "url": "https://cloud.google.com/learn/certification/data-engineer"}
+    ],
+    "career_value": "Unlocks senior data engineer and data platform roles; consistently ranks among the highest-paying cloud certs in India (₹15-35 LPA for experienced engineers).",
+    "roles": ["data-engineer", "ml-engineer"]
+  },
+  {
+    "id": "oci-foundations",
+    "name": "Oracle Cloud Infrastructure Foundations Associate",
+    "provider": "Oracle",
+    "domain": "Cloud",
+    "cost_inr": 7900,
+    "cost_note": "Approximate; exam priced at USD 95",
+    "validity_years": 2,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. Basic cloud concepts familiarity helps.",
+    "exam_format": "40 multiple-choice questions, 90 minutes, online proctored.",
+    "official_url": "https://education.oracle.com/oracle-cloud-infrastructure-foundations",
+    "prep_resources": [
+      {"title": "Oracle University OCI Foundations learning path", "kind": "free", "url": "https://education.oracle.com/"},
+      {"title": "OCI Foundations full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL cloud computing courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Useful for Oracle-shop roles and ERP/database-adjacent cloud jobs in India (₹5-12 LPA); cheap, quick first cloud credential before attempting AWS/Azure associate exams.",
+    "roles": ["devops-engineer", "backend-dev"]
+  },
+  {
+    "id": "google-data-analytics",
+    "name": "Google Data Analytics Professional Certificate",
+    "provider": "Google (via Coursera)",
+    "domain": "Data",
+    "cost_inr": 24400,
+    "cost_note": "Approximate; Coursera subscription ~USD 49/month for ~6 months (financial aid available)",
+    "validity_years": null,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. No prior experience required.",
+    "exam_format": "7 courses plus a capstone case study, self-paced (~6 months at 10 hrs/week); graded quizzes and peer-reviewed projects.",
+    "official_url": "https://www.coursera.org/professional-certificates/google-data-analytics",
+    "prep_resources": [
+      {"title": "Google Data Analytics Professional Certificate", "kind": "paid", "url": "https://www.coursera.org/professional-certificates/google-data-analytics"},
+      {"title": "SQL and spreadsheets tutorials", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL data analytics courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "One of the most recognized entry-level data analytics credentials; unlocks data analyst and business analyst roles in India (₹5-10 LPA for freshers).",
+    "roles": ["data-analyst"]
+  },
+  {
+    "id": "ibm-data-science",
+    "name": "IBM Data Science Professional Certificate",
+    "provider": "IBM (via Coursera)",
+    "domain": "Data",
+    "cost_inr": 24400,
+    "cost_note": "Approximate; Coursera subscription ~USD 49/month for ~5 months (financial aid available)",
+    "validity_years": null,
+    "difficulty": "Intermediate",
+    "prerequisites": "Basic computer literacy; no prior programming required (Python taught from scratch).",
+    "exam_format": "10 courses plus a capstone project, self-paced (~5 months); hands-on labs with Python, SQL and machine learning.",
+    "official_url": "https://www.coursera.org/professional-certificates/ibm-data-science",
+    "prep_resources": [
+      {"title": "IBM Data Science Professional Certificate", "kind": "paid", "url": "https://www.coursera.org/professional-certificates/ibm-data-science"},
+      {"title": "Python for data science tutorials", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "IBM developer resources", "kind": "free", "url": "https://developer.ibm.com/"}
+    ],
+    "career_value": "Unlocks junior data scientist and data analyst roles; the Python + SQL + ML capstone portfolio directly supports India analytics hiring (₹6-12 LPA).",
+    "roles": ["data-scientist", "data-analyst"]
+  },
+  {
+    "id": "ms-dp-900",
+    "name": "Microsoft Certified: Azure Data Fundamentals (DP-900)",
+    "provider": "Microsoft",
+    "domain": "Data",
+    "cost_inr": 3699,
+    "cost_note": "Approximate; INR 3,699 in India (USD 99 in the US)",
+    "validity_years": 1,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. Basic familiarity with data concepts helps.",
+    "exam_format": "40-60 multiple-choice questions, 45 minutes, online or test center.",
+    "official_url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-data-fundamentals/",
+    "prep_resources": [
+      {"title": "Microsoft Learn DP-900 learning path", "kind": "free", "url": "https://learn.microsoft.com/en-us/credentials/"},
+      {"title": "DP-900 full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL database courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Cheap first credential for Azure data roles; a stepping stone to DP-203 data engineer jobs in Indian IT services (₹5-11 LPA).",
+    "roles": ["data-analyst", "data-engineer"]
+  },
+  {
+    "id": "ms-pl-300",
+    "name": "Microsoft Certified: Power BI Data Analyst Associate (PL-300)",
+    "provider": "Microsoft",
+    "domain": "Data",
+    "cost_inr": 3699,
+    "cost_note": "Approximate; INR 3,699 in India (USD 165 in the US)",
+    "validity_years": 1,
+    "difficulty": "Intermediate",
+    "prerequisites": "DP-900 recommended; experience with Power BI, DAX and data modelling.",
+    "exam_format": "40-60 multiple-choice/case-study questions, 100 minutes, online or test center.",
+    "official_url": "https://learn.microsoft.com/en-us/credentials/certifications/power-bi-data-analyst-associate/",
+    "prep_resources": [
+      {"title": "Microsoft Learn PL-300 learning path", "kind": "free", "url": "https://learn.microsoft.com/en-us/credentials/"},
+      {"title": "Power BI full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Power BI exam prep videos", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"}
+    ],
+    "career_value": "Unlocks Power BI developer and BI analyst roles, heavily hired by Indian GCCs, consulting firms and banks (₹7-15 LPA); the single most in-demand BI tool certification in India.",
+    "roles": ["data-analyst"]
+  },
+  {
+    "id": "tableau-desktop-associate",
+    "name": "Tableau Desktop Certified Associate",
+    "provider": "Salesforce (Tableau)",
+    "domain": "Data",
+    "cost_inr": 20800,
+    "cost_note": "Approximate; exam priced at USD 250",
+    "validity_years": 2,
+    "difficulty": "Intermediate",
+    "prerequisites": "5+ months hands-on Tableau Desktop experience recommended.",
+    "exam_format": "30 knowledge-based and hands-on lab questions, 120 minutes, online proctored.",
+    "official_url": "https://www.tableau.com/learn/training/certification",
+    "prep_resources": [
+      {"title": "Tableau certification and training resources", "kind": "free", "url": "https://www.tableau.com/learn/training/certification"},
+      {"title": "Tableau full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Tableau Desktop Certified Associate practice labs", "kind": "paid", "url": "https://www.udemy.com/"}
+    ],
+    "career_value": "Unlocks Tableau developer and BI analyst roles at analytics-first companies in India (₹7-16 LPA); pairs well with PL-300 for BI specialists.",
+    "roles": ["data-analyst"]
+  },
+  {
+    "id": "aws-dea",
+    "name": "AWS Certified Data Engineer - Associate",
+    "provider": "Amazon Web Services",
+    "domain": "Data",
+    "cost_inr": 12500,
+    "cost_note": "Approximate; exam priced at USD 150",
+    "validity_years": 3,
+    "difficulty": "Intermediate",
+    "prerequisites": "2-3 years of experience with AWS services and data engineering workloads recommended.",
+    "exam_format": "65 multiple-choice/multiple-response questions, 130 minutes, online or test center.",
+    "official_url": "https://aws.amazon.com/certification/certified-data-engineer-associate/",
+    "prep_resources": [
+      {"title": "AWS Skill Builder Data Engineer learning plan (free tier)", "kind": "free", "url": "https://skillbuilder.aws/"},
+      {"title": "AWS Certified Data Engineer course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "AWS documentation", "kind": "free", "url": "https://docs.aws.amazon.com/"}
+    ],
+    "career_value": "Unlocks data engineer roles building pipelines on AWS (Glue, Redshift, EMR); data engineers in India command ₹10-25 LPA at mid level.",
+    "roles": ["data-engineer"]
+  },
+  {
+    "id": "snowpro-core",
+    "name": "SnowPro Core Certification",
+    "provider": "Snowflake",
+    "domain": "Data",
+    "cost_inr": 14500,
+    "cost_note": "Approximate; exam priced at USD 175",
+    "validity_years": 2,
+    "difficulty": "Intermediate",
+    "prerequisites": "6+ months hands-on Snowflake experience recommended.",
+    "exam_format": "100 multiple-choice/multiple-select questions, 115 minutes, online proctored.",
+    "official_url": "https://learn.snowflake.com/en/certifications/snowpro-core-certification",
+    "prep_resources": [
+      {"title": "Snowflake University (free on-demand courses)", "kind": "free", "url": "https://learn.snowflake.com/"},
+      {"title": "SnowPro Core exam prep videos", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"},
+      {"title": "Snowflake documentation", "kind": "free", "url": "https://docs.snowflake.com/"}
+    ],
+    "career_value": "Unlocks Snowflake developer and cloud data warehouse roles; Snowflake skills carry a premium in India consulting and product companies (₹10-22 LPA).",
+    "roles": ["data-engineer", "data-analyst"]
+  },
+  {
+    "id": "oca-java-se",
+    "name": "Oracle Certified Associate: Java SE",
+    "provider": "Oracle",
+    "domain": "Programming",
+    "cost_inr": 20400,
+    "cost_note": "Approximate; exam priced at USD 245",
+    "validity_years": null,
+    "difficulty": "Intermediate",
+    "prerequisites": "Working knowledge of Java syntax and OOP concepts; no formal prerequisites.",
+    "exam_format": "56 multiple-choice questions, 130 minutes, online proctored or test center; 65% to pass.",
+    "official_url": "https://education.oracle.com/oracle-certified-associate-java-se-8-programmer/trackp_333",
+    "prep_resources": [
+      {"title": "Oracle University Java learning paths", "kind": "free", "url": "https://education.oracle.com/"},
+      {"title": "Java full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL Programming in Java course", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Signals solid Java fundamentals for backend SDE roles at banks, enterprises and IT services in India (₹5-14 LPA); pairs with Spring Boot projects for interviews.",
+    "roles": ["sde", "backend-dev"]
+  },
+  {
+    "id": "pcep-python",
+    "name": "PCEP - Certified Entry-Level Python Programmer",
+    "provider": "OpenEDG Python Institute",
+    "domain": "Programming",
+    "cost_inr": 4900,
+    "cost_note": "Approximate; exam priced at USD 59",
+    "validity_years": null,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. Basic computer literacy suffices.",
+    "exam_format": "30 single/multiple-choice questions, 45 minutes, online proctored.",
+    "official_url": "https://pythoninstitute.org/pcep",
+    "prep_resources": [
+      {"title": "Python Institute free study resources", "kind": "free", "url": "https://pythoninstitute.org/"},
+      {"title": "Learn Python full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL Joy of Computing using Python", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "A cheap, lifetime first programming credential proving Python basics; useful for students targeting Python backend, data or scripting roles (₹4-9 LPA entry).",
+    "roles": ["sde", "backend-dev", "data-analyst"]
+  },
+  {
+    "id": "pcap-python",
+    "name": "PCAP - Certified Associate in Python Programming",
+    "provider": "OpenEDG Python Institute",
+    "domain": "Programming",
+    "cost_inr": 24500,
+    "cost_note": "Approximate; exam priced at USD 295",
+    "validity_years": null,
+    "difficulty": "Intermediate",
+    "prerequisites": "PCEP recommended; solid Python fundamentals including OOP, modules and exception handling.",
+    "exam_format": "40 single/multiple-choice questions, 65 minutes, online proctored.",
+    "official_url": "https://pythoninstitute.org/pcap",
+    "prep_resources": [
+      {"title": "Python Institute free study resources", "kind": "free", "url": "https://pythoninstitute.org/"},
+      {"title": "Python OOP and advanced tutorials", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL Python for Data Science", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Validates professional-grade Python for backend SDE, automation and data roles; a lifetime credential that strengthens resumes for Python-heavy India hiring (₹6-14 LPA).",
+    "roles": ["sde", "backend-dev", "data-scientist"]
+  },
+  {
+    "id": "meta-frontend-dev",
+    "name": "Meta Front-End Developer Professional Certificate",
+    "provider": "Meta (via Coursera)",
+    "domain": "Programming",
+    "cost_inr": 28500,
+    "cost_note": "Approximate; Coursera subscription ~USD 49/month for ~7 months (financial aid available)",
+    "validity_years": null,
+    "difficulty": "Intermediate",
+    "prerequisites": "No prerequisites. Basic computer literacy; HTML/CSS taught from scratch.",
+    "exam_format": "9 courses plus a capstone project, self-paced (~7 months); builds React portfolio projects with peer review.",
+    "official_url": "https://www.coursera.org/professional-certificates/meta-front-end-developer",
+    "prep_resources": [
+      {"title": "Meta Front-End Developer Professional Certificate", "kind": "paid", "url": "https://www.coursera.org/professional-certificates/meta-front-end-developer"},
+      {"title": "React and JavaScript tutorials", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "MDN Web Docs", "kind": "free", "url": "https://developer.mozilla.org/"}
+    ],
+    "career_value": "Unlocks front-end and React developer roles; the portfolio of React projects directly supports India frontend hiring (₹5-15 LPA), and the Meta brand carries weight with recruiters.",
+    "roles": ["frontend-dev", "fullstack-dev"]
+  },
+  {
+    "id": "meta-backend-dev",
+    "name": "Meta Back-End Developer Professional Certificate",
+    "provider": "Meta (via Coursera)",
+    "domain": "Programming",
+    "cost_inr": 28500,
+    "cost_note": "Approximate; Coursera subscription ~USD 49/month for ~7 months (financial aid available)",
+    "validity_years": null,
+    "difficulty": "Intermediate",
+    "prerequisites": "Basic programming knowledge helpful; Python and Linux taught within the program.",
+    "exam_format": "10 courses plus a capstone project, self-paced (~7 months); Django/REST API projects with peer review.",
+    "official_url": "https://www.coursera.org/professional-certificates/meta-back-end-developer",
+    "prep_resources": [
+      {"title": "Meta Back-End Developer Professional Certificate", "kind": "paid", "url": "https://www.coursera.org/professional-certificates/meta-back-end-developer"},
+      {"title": "Django and API tutorials", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL database and web courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Unlocks Python/Django backend roles; the capstone API projects help freshers clear backend interviews in India (₹5-14 LPA).",
+    "roles": ["backend-dev", "fullstack-dev"]
+  },
+  {
+    "id": "istqb-ctfl",
+    "name": "ISTQB Certified Tester Foundation Level (CTFL)",
+    "provider": "ISTQB (via Indian Testing Board)",
+    "domain": "Programming",
+    "cost_inr": 8850,
+    "cost_note": "Approximate; Indian Testing Board exam fee ~INR 8,850 including taxes",
+    "validity_years": null,
+    "difficulty": "Beginner",
+    "prerequisites": "No formal prerequisites. Basic software concepts and 6 months of testing exposure recommended.",
+    "exam_format": "40 multiple-choice questions, 60 minutes, online or test center; 65% to pass.",
+    "official_url": "https://www.istqb.org/certifications/certified-tester-foundation-level",
+    "prep_resources": [
+      {"title": "ISTQB official syllabus and sample papers", "kind": "free", "url": "https://www.istqb.org/"},
+      {"title": "ISTQB CTFL full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL software testing course", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "The standard QA entry credential in India; unlocks manual/automation tester roles at IT services companies (₹4-9 LPA) and is often listed as required in QA job postings.",
+    "roles": ["qa-automation"]
+  },
+  {
+    "id": "comptia-security-plus",
+    "name": "CompTIA Security+",
+    "provider": "CompTIA",
+    "domain": "Cybersecurity",
+    "cost_inr": 33500,
+    "cost_note": "Approximate; exam priced at USD 404",
+    "validity_years": 3,
+    "difficulty": "Intermediate",
+    "prerequisites": "CompTIA Network+ and 2 years of IT admin experience recommended (not mandatory).",
+    "exam_format": "Maximum 90 multiple-choice/performance-based questions, 90 minutes, online or test center.",
+    "official_url": "https://www.comptia.org/certifications/security",
+    "prep_resources": [
+      {"title": "CompTIA Security+ exam objectives and resources", "kind": "free", "url": "https://www.comptia.org/certifications/security"},
+      {"title": "Security+ full course (SY0-701)", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Security+ exam prep videos", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"}
+    ],
+    "career_value": "The global baseline infosec credential; unlocks SOC analyst, security engineer and IT auditor roles in India (₹6-15 LPA) and is a DoD-approved baseline.",
+    "roles": ["cybersecurity-analyst", "qa-automation"]
+  },
+  {
+    "id": "google-cybersecurity",
+    "name": "Google Cybersecurity Professional Certificate",
+    "provider": "Google (via Coursera)",
+    "domain": "Cybersecurity",
+    "cost_inr": 24400,
+    "cost_note": "Approximate; Coursera subscription ~USD 49/month for ~6 months (financial aid available)",
+    "validity_years": null,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. No prior cybersecurity experience required.",
+    "exam_format": "8 courses, self-paced (~6 months); hands-on labs with Linux, SQL and SIEM tools plus assessments.",
+    "official_url": "https://www.coursera.org/professional-certificates/google-cybersecurity",
+    "prep_resources": [
+      {"title": "Google Cybersecurity Professional Certificate", "kind": "paid", "url": "https://www.coursera.org/professional-certificates/google-cybersecurity"},
+      {"title": "Cybersecurity fundamentals tutorials", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL information security courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Entry path into SOC analyst and security operations roles; pairs well with Security+ for India security hiring (₹5-12 LPA).",
+    "roles": ["cybersecurity-analyst"]
+  },
+  {
+    "id": "ceh",
+    "name": "Certified Ethical Hacker (CEH)",
+    "provider": "EC-Council",
+    "domain": "Cybersecurity",
+    "cost_inr": 78900,
+    "cost_note": "Approximate; exam priced at USD 950",
+    "validity_years": 3,
+    "difficulty": "Advanced",
+    "prerequisites": "Official training or 2 years of infosec experience required for exam eligibility.",
+    "exam_format": "125 multiple-choice questions, 4 hours, online proctored or test center.",
+    "official_url": "https://www.eccouncil.org/train-certify/certified-ethical-hacker-ceh/",
+    "prep_resources": [
+      {"title": "EC-Council official CEH page and resources", "kind": "paid", "url": "https://www.eccouncil.org/train-certify/certified-ethical-hacker-ceh/"},
+      {"title": "CEH full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "TryHackMe labs (hands-on practice)", "kind": "free", "url": "https://tryhackme.com/"}
+    ],
+    "career_value": "Unlocks penetration tester, ethical hacker and VAPT consultant roles in India (₹8-20 LPA); one of the most recognized offensive-security brands on resumes.",
+    "roles": ["cybersecurity-analyst"]
+  },
+  {
+    "id": "cissp",
+    "name": "CISSP - Certified Information Systems Security Professional",
+    "provider": "ISC2",
+    "domain": "Cybersecurity",
+    "cost_inr": 62200,
+    "cost_note": "Approximate; exam priced at USD 749",
+    "validity_years": 3,
+    "difficulty": "Advanced",
+    "prerequisites": "5 years of cumulative paid infosec work experience in 2+ domains (1-year waiver with degree or approved cert).",
+    "exam_format": "100-150 adaptive multiple-choice questions, 3 hours (English), computer-based testing.",
+    "official_url": "https://www.isc2.org/certifications/cissp",
+    "prep_resources": [
+      {"title": "ISC2 official CISSP resources", "kind": "free", "url": "https://www.isc2.org/certifications/cissp"},
+      {"title": "CISSP full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "CISSP study groups and practice questions", "kind": "free", "url": "https://www.isc2.org/"}
+    ],
+    "career_value": "The gold-standard senior security credential; unlocks security architect, CISO-track and consultant roles in India (₹20-50+ LPA); often mandatory in enterprise job postings.",
+    "roles": ["cybersecurity-analyst"]
+  },
+  {
+    "id": "comptia-cysa-plus",
+    "name": "CompTIA CySA+",
+    "provider": "CompTIA",
+    "domain": "Cybersecurity",
+    "cost_inr": 33500,
+    "cost_note": "Approximate; exam priced at USD 404",
+    "validity_years": 3,
+    "difficulty": "Intermediate",
+    "prerequisites": "CompTIA Security+ (or equivalent) and 3-4 years of hands-on infosec experience recommended.",
+    "exam_format": "Maximum 85 multiple-choice/performance-based questions, 165 minutes, online or test center.",
+    "official_url": "https://www.comptia.org/certifications/cybersecurity-analyst",
+    "prep_resources": [
+      {"title": "CompTIA CySA+ exam objectives and resources", "kind": "free", "url": "https://www.comptia.org/certifications/cybersecurity-analyst"},
+      {"title": "CySA+ full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "TryHackMe labs (hands-on practice)", "kind": "free", "url": "https://tryhackme.com/"}
+    ],
+    "career_value": "Unlocks security analyst and threat-hunting roles focused on defense and incident response in India (₹8-18 LPA); the natural step after Security+.",
+    "roles": ["cybersecurity-analyst"]
+  },
+  {
+    "id": "ms-sc-900",
+    "name": "Microsoft Certified: Security, Compliance, and Identity Fundamentals (SC-900)",
+    "provider": "Microsoft",
+    "domain": "Cybersecurity",
+    "cost_inr": 3699,
+    "cost_note": "Approximate; INR 3,699 in India (USD 99 in the US)",
+    "validity_years": 1,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. General familiarity with Microsoft 365/Azure helps.",
+    "exam_format": "40-60 multiple-choice questions, 45 minutes, online or test center.",
+    "official_url": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+    "prep_resources": [
+      {"title": "Microsoft Learn SC-900 learning path", "kind": "free", "url": "https://learn.microsoft.com/en-us/credentials/"},
+      {"title": "SC-900 full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Microsoft security documentation", "kind": "free", "url": "https://learn.microsoft.com/en-us/security/"}
+    ],
+    "career_value": "Cheap first security credential for Microsoft-ecosystem shops; stepping stone to SC-200/SC-300 security engineer roles in Indian enterprises (₹6-13 LPA).",
+    "roles": ["cybersecurity-analyst", "devops-engineer"]
+  },
+  {
+    "id": "aws-scs",
+    "name": "AWS Certified Security - Specialty",
+    "provider": "Amazon Web Services",
+    "domain": "Cybersecurity",
+    "cost_inr": 24900,
+    "cost_note": "Approximate; exam priced at USD 300",
+    "validity_years": 3,
+    "difficulty": "Advanced",
+    "prerequisites": "2+ years securing AWS workloads; 5+ years IT security experience recommended.",
+    "exam_format": "65 multiple-choice/multiple-response questions, 170 minutes, online or test center.",
+    "official_url": "https://aws.amazon.com/certification/certified-security-specialty/",
+    "prep_resources": [
+      {"title": "AWS Skill Builder Security learning plan (free tier)", "kind": "free", "url": "https://skillbuilder.aws/"},
+      {"title": "AWS Certified Security Specialty course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "AWS security documentation", "kind": "free", "url": "https://docs.aws.amazon.com/security/"}
+    ],
+    "career_value": "Unlocks cloud security engineer and DevSecOps roles; cloud security is one of India's highest-paid security tracks (₹15-30 LPA).",
+    "roles": ["cybersecurity-analyst", "devops-engineer"]
+  },
+  {
+    "id": "google-project-management",
+    "name": "Google Project Management Professional Certificate",
+    "provider": "Google (via Coursera)",
+    "domain": "Project Management",
+    "cost_inr": 24400,
+    "cost_note": "Approximate; Coursera subscription ~USD 49/month for ~6 months (financial aid available)",
+    "validity_years": null,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. No prior project management experience required.",
+    "exam_format": "6 courses plus a capstone, self-paced (~6 months); real-world project artifacts and peer-reviewed assignments.",
+    "official_url": "https://www.coursera.org/professional-certificates/google-project-management",
+    "prep_resources": [
+      {"title": "Google Project Management Professional Certificate", "kind": "paid", "url": "https://www.coursera.org/professional-certificates/google-project-management"},
+      {"title": "Project management fundamentals", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL project management courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Unlocks associate project manager, program coordinator and scrum-adjacent roles; helps tech leads in India move into delivery management (₹8-16 LPA).",
+    "roles": ["fullstack-dev", "sde", "backend-dev"]
+  },
+  {
+    "id": "capm",
+    "name": "Certified Associate in Project Management (CAPM)",
+    "provider": "PMI",
+    "domain": "Project Management",
+    "cost_inr": 24900,
+    "cost_note": "Approximate; exam priced at USD 300 for PMI members, USD 400 for non-members",
+    "validity_years": 3,
+    "difficulty": "Beginner",
+    "prerequisites": "Secondary degree plus 23 hours of project management education (or CAPM bundle course).",
+    "exam_format": "150 multiple-choice questions, 3 hours, online proctored or test center.",
+    "official_url": "https://www.pmi.org/certifications/certified-associate-capm",
+    "prep_resources": [
+      {"title": "PMI official CAPM page and resources", "kind": "free", "url": "https://www.pmi.org/certifications/certified-associate-capm"},
+      {"title": "CAPM exam prep videos", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"},
+      {"title": "CAPM practice exams", "kind": "paid", "url": "https://www.udemy.com/"}
+    ],
+    "career_value": "The recognized entry-level PMI credential; unlocks project coordinator and junior PM roles in India IT services (₹6-12 LPA) and is a stepping stone to PMP.",
+    "roles": ["fullstack-dev", "sde", "backend-dev"]
+  },
+  {
+    "id": "pmp",
+    "name": "Project Management Professional (PMP)",
+    "provider": "PMI",
+    "domain": "Project Management",
+    "cost_inr": 33600,
+    "cost_note": "Approximate; exam priced at USD 405 for PMI members, USD 575 for non-members",
+    "validity_years": 3,
+    "difficulty": "Advanced",
+    "prerequisites": "4-year degree + 36 months leading projects + 35 hours PM education (or CAPM); alternate path with secondary degree.",
+    "exam_format": "180 multiple-choice/matching questions, 230 minutes, online proctored or test center.",
+    "official_url": "https://www.pmi.org/certifications/project-management-pmp",
+    "prep_resources": [
+      {"title": "PMI official PMP page and resources", "kind": "free", "url": "https://www.pmi.org/certifications/project-management-pmp"},
+      {"title": "PMP exam prep videos", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"},
+      {"title": "PMP practice exams", "kind": "paid", "url": "https://www.udemy.com/"}
+    ],
+    "career_value": "The global standard PM credential; unlocks senior project/program manager roles in India (₹15-30 LPA) and is frequently listed as required in enterprise delivery hiring.",
+    "roles": ["fullstack-dev", "sde", "backend-dev"]
+  },
+  {
+    "id": "prince2-foundation",
+    "name": "PRINCE2 Foundation",
+    "provider": "PeopleCert (AXELOS)",
+    "domain": "Project Management",
+    "cost_inr": 38700,
+    "cost_note": "Approximate; online exam ~GBP 358 via PeopleCert",
+    "validity_years": 3,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. Familiarity with project environments helps.",
+    "exam_format": "60 multiple-choice questions, 60 minutes, online proctored; 55% to pass.",
+    "official_url": "https://www.prince2.com/",
+    "prep_resources": [
+      {"title": "PRINCE2 official site and syllabus", "kind": "paid", "url": "https://www.prince2.com/"},
+      {"title": "PRINCE2 Foundation exam prep", "kind": "free", "url": "https://www.youtube.com/@SimplilearnOfficial"},
+      {"title": "PRINCE2 practice papers", "kind": "paid", "url": "https://www.udemy.com/"}
+    ],
+    "career_value": "Preferred PM methodology credential in UK/Europe-facing India outsourcing and government projects; unlocks PM roles in consulting firms (₹8-18 LPA).",
+    "roles": ["fullstack-dev", "sde", "backend-dev"]
+  },
+  {
+    "id": "csm",
+    "name": "Certified ScrumMaster (CSM)",
+    "provider": "Scrum Alliance",
+    "domain": "Project Management",
+    "cost_inr": 28000,
+    "cost_note": "Approximate; mandatory 2-day course in India ~INR 25,000-30,000 includes exam",
+    "validity_years": 2,
+    "difficulty": "Beginner",
+    "prerequisites": "Attendance at an official 2-day CSM course (exam included in the course).",
+    "exam_format": "50 multiple-choice questions, 60 minutes, online; 74% to pass.",
+    "official_url": "https://www.scrumalliance.org/get-certified/scrum-master-track/certified-scrummaster",
+    "prep_resources": [
+      {"title": "Scrum Alliance CSM track", "kind": "paid", "url": "https://www.scrumalliance.org/get-certified/scrum-master-track/certified-scrummaster"},
+      {"title": "Scrum and Agile tutorials", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Scrum Guide (official, free)", "kind": "free", "url": "https://scrumguides.org/"}
+    ],
+    "career_value": "Unlocks scrum master and agile delivery roles across India product and services companies (₹8-18 LPA); the most recognized agile certification for tech leads.",
+    "roles": ["fullstack-dev", "sde", "backend-dev"]
+  },
+  {
+    "id": "ccna",
+    "name": "Cisco Certified Network Associate (CCNA)",
+    "provider": "Cisco",
+    "domain": "Networking",
+    "cost_inr": 24900,
+    "cost_note": "Approximate; exam priced at USD 300",
+    "validity_years": 3,
+    "difficulty": "Intermediate",
+    "prerequisites": "No formal prerequisites; 1 year of networking experience and basic IP addressing knowledge recommended.",
+    "exam_format": "Around 100 multiple-choice/simulation questions, 120 minutes, test center or online.",
+    "official_url": "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html",
+    "prep_resources": [
+      {"title": "Cisco Learning Network (free study resources)", "kind": "free", "url": "https://learningnetwork.cisco.com/"},
+      {"title": "Cisco Networking Academy courses", "kind": "free", "url": "https://www.netacad.com/"},
+      {"title": "CCNA full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"}
+    ],
+    "career_value": "The foundational networking credential; unlocks network engineer, NOC engineer and network admin roles in India (₹5-12 LPA); often required for telecom and ISP jobs.",
+    "roles": ["devops-engineer", "cybersecurity-analyst", "backend-dev"]
+  },
+  {
+    "id": "comptia-network-plus",
+    "name": "CompTIA Network+",
+    "provider": "CompTIA",
+    "domain": "Networking",
+    "cost_inr": 33500,
+    "cost_note": "Approximate; exam priced at USD 404",
+    "validity_years": 3,
+    "difficulty": "Beginner",
+    "prerequisites": "CompTIA A+ and 9-12 months of networking experience recommended (not mandatory).",
+    "exam_format": "Maximum 90 multiple-choice/performance-based questions, 90 minutes, online or test center.",
+    "official_url": "https://www.comptia.org/certifications/network",
+    "prep_resources": [
+      {"title": "CompTIA Network+ exam objectives and resources", "kind": "free", "url": "https://www.comptia.org/certifications/network"},
+      {"title": "Network+ full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL computer networks course", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Vendor-neutral networking baseline; unlocks network support, NOC and infrastructure roles in India (₹4-10 LPA); good pairing with Security+.",
+    "roles": ["devops-engineer", "cybersecurity-analyst"]
+  },
+  {
+    "id": "jncia-junos",
+    "name": "Juniper JNCIA-Junos",
+    "provider": "Juniper Networks",
+    "domain": "Networking",
+    "cost_inr": 16600,
+    "cost_note": "Approximate; exam priced at USD 200",
+    "validity_years": 3,
+    "difficulty": "Beginner",
+    "prerequisites": "No prerequisites. Basic networking concepts familiarity helps.",
+    "exam_format": "65 multiple-choice questions, 90 minutes, online proctored or test center.",
+    "official_url": "https://www.juniper.net/us/en/training/certification/certification-tracks/jncia-junos.html",
+    "prep_resources": [
+      {"title": "Juniper Open Learning (free courses)", "kind": "free", "url": "https://learningportal.juniper.net/"},
+      {"title": "JNCIA-Junos exam prep", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Juniper documentation", "kind": "free", "url": "https://www.juniper.net/documentation/"}
+    ],
+    "career_value": "Entry into Juniper-based enterprise and service-provider networks; valued by telecom and large-network employers in India (₹5-12 LPA).",
+    "roles": ["devops-engineer"]
+  },
+  {
+    "id": "aws-ans",
+    "name": "AWS Certified Advanced Networking - Specialty",
+    "provider": "Amazon Web Services",
+    "domain": "Networking",
+    "cost_inr": 24900,
+    "cost_note": "Approximate; exam priced at USD 300",
+    "validity_years": 3,
+    "difficulty": "Advanced",
+    "prerequisites": "5+ years of networking experience with 2+ years on AWS; an Associate-level AWS cert recommended.",
+    "exam_format": "65 multiple-choice/multiple-response questions, 170 minutes, online or test center.",
+    "official_url": "https://aws.amazon.com/certification/certified-advanced-networking-specialty/",
+    "prep_resources": [
+      {"title": "AWS Skill Builder networking learning plan (free tier)", "kind": "free", "url": "https://skillbuilder.aws/"},
+      {"title": "AWS Advanced Networking course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "AWS networking documentation", "kind": "free", "url": "https://docs.aws.amazon.com/vpc/"}
+    ],
+    "career_value": "Unlocks cloud network architect and senior DevOps roles designing hybrid/VPN/Direct Connect topologies in India (₹15-30 LPA).",
+    "roles": ["devops-engineer", "backend-dev"]
+  },
+  {
+    "id": "cka",
+    "name": "Certified Kubernetes Administrator (CKA)",
+    "provider": "CNCF / Linux Foundation",
+    "domain": "DevOps",
+    "cost_inr": 36900,
+    "cost_note": "Approximate; exam priced at USD 445",
+    "validity_years": 2,
+    "difficulty": "Advanced",
+    "prerequisites": "Strong Kubernetes hands-on experience; no formal prerequisites.",
+    "exam_format": "2-hour hands-on performance-based exam: solve real tasks in live clusters, online proctored.",
+    "official_url": "https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/",
+    "prep_resources": [
+      {"title": "CNCF CKA certification page and exam guide", "kind": "paid", "url": "https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/"},
+      {"title": "Kubernetes documentation", "kind": "free", "url": "https://kubernetes.io/docs/home/"},
+      {"title": "CKA full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"}
+    ],
+    "career_value": "The most respected hands-on DevOps credential; unlocks Kubernetes/platform engineer and SRE roles in India (₹12-28 LPA).",
+    "roles": ["devops-engineer"]
+  },
+  {
+    "id": "terraform-associate",
+    "name": "HashiCorp Certified: Terraform Associate",
+    "provider": "HashiCorp",
+    "domain": "DevOps",
+    "cost_inr": 5900,
+    "cost_note": "Approximate; exam priced at USD 70.50",
+    "validity_years": 2,
+    "difficulty": "Beginner",
+    "prerequisites": "Basic terminal skills and understanding of cloud/infrastructure concepts; no formal prerequisites.",
+    "exam_format": "57 multiple-choice questions, 60 minutes, online proctored.",
+    "official_url": "https://www.hashicorp.com/certification/terraform-associate",
+    "prep_resources": [
+      {"title": "HashiCorp official Terraform Associate study guide", "kind": "free", "url": "https://developer.hashicorp.com/terraform/tutorials/certification-003/associate-study-003"},
+      {"title": "Terraform documentation", "kind": "free", "url": "https://developer.hashicorp.com/terraform/docs"},
+      {"title": "Terraform full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"}
+    ],
+    "career_value": "Unlocks infrastructure-as-code and platform roles; Terraform is near-mandatory for DevOps hiring in India (₹8-18 LPA); cheapest high-signal DevOps cert.",
+    "roles": ["devops-engineer", "backend-dev"]
+  },
+  {
+    "id": "docker-dca",
+    "name": "Docker Certified Associate (DCA)",
+    "provider": "Mirantis (Docker)",
+    "domain": "DevOps",
+    "cost_inr": 16200,
+    "cost_note": "Approximate; exam priced at USD 195",
+    "validity_years": 2,
+    "difficulty": "Intermediate",
+    "prerequisites": "6-12 months of Docker experience recommended; no formal prerequisites.",
+    "exam_format": "55 multiple-choice/DOMC questions, 80 minutes, online proctored.",
+    "official_url": "https://www.mirantis.com/training/dca-certification/",
+    "prep_resources": [
+      {"title": "Mirantis DCA certification training", "kind": "paid", "url": "https://www.mirantis.com/training/dca-certification/"},
+      {"title": "Docker documentation", "kind": "free", "url": "https://docs.docker.com/"},
+      {"title": "Docker full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"}
+    ],
+    "career_value": "Validates container fundamentals and orchestration basics; supports DevOps and backend roles in containerized shops in India (₹7-16 LPA).",
+    "roles": ["devops-engineer", "backend-dev"]
+  },
+  {
+    "id": "az-400",
+    "name": "Microsoft Certified: DevOps Engineer Expert (AZ-400)",
+    "provider": "Microsoft",
+    "domain": "DevOps",
+    "cost_inr": 3699,
+    "cost_note": "Approximate; INR 3,699 in India (USD 165 in the US)",
+    "validity_years": 1,
+    "difficulty": "Advanced",
+    "prerequisites": "AZ-104 or AZ-204 Associate-level certification required before earning Expert.",
+    "exam_format": "40-60 multiple-choice/case-study questions, 45 minutes, online or test center.",
+    "official_url": "https://learn.microsoft.com/en-us/credentials/certifications/devops-engineer-expert/",
+    "prep_resources": [
+      {"title": "Microsoft Learn AZ-400 learning path", "kind": "free", "url": "https://learn.microsoft.com/en-us/credentials/"},
+      {"title": "AZ-400 full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "Azure DevOps documentation", "kind": "free", "url": "https://learn.microsoft.com/en-us/azure/devops/"}
+    ],
+    "career_value": "Unlocks DevOps engineer and release manager roles in Azure-heavy enterprises and GCCs in India (₹10-22 LPA); Expert-level badge stands out strongly.",
+    "roles": ["devops-engineer", "fullstack-dev"]
+  },
+  {
+    "id": "aws-mls",
+    "name": "AWS Certified Machine Learning - Specialty",
+    "provider": "Amazon Web Services",
+    "domain": "AI/ML",
+    "cost_inr": 24900,
+    "cost_note": "Approximate; exam priced at USD 300",
+    "validity_years": 3,
+    "difficulty": "Advanced",
+    "prerequisites": "2+ years of ML/deep learning experience on AWS; Associate-level AWS knowledge recommended.",
+    "exam_format": "65 multiple-choice/multiple-response questions, 170 minutes, online or test center.",
+    "official_url": "https://aws.amazon.com/certification/certified-machine-learning-specialty/",
+    "prep_resources": [
+      {"title": "AWS Skill Builder ML learning plan (free tier)", "kind": "free", "url": "https://skillbuilder.aws/"},
+      {"title": "AWS Machine Learning Specialty course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL machine learning courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Unlocks ML engineer and MLOps roles building on SageMaker; cloud-ML hybrid skills command ₹15-35 LPA in India product companies.",
+    "roles": ["ml-engineer", "data-scientist"]
+  },
+  {
+    "id": "gcp-pmle",
+    "name": "Google Professional Machine Learning Engineer",
+    "provider": "Google Cloud",
+    "domain": "AI/ML",
+    "cost_inr": 16600,
+    "cost_note": "Approximate; exam priced at USD 200",
+    "validity_years": 2,
+    "difficulty": "Advanced",
+    "prerequisites": "3+ years of industry experience including 1+ year designing ML solutions on Google Cloud recommended.",
+    "exam_format": "50-60 multiple-choice/multiple-select questions, 2 hours, online proctored or test center.",
+    "official_url": "https://cloud.google.com/learn/certification/machine-learning-engineer",
+    "prep_resources": [
+      {"title": "Google Cloud certification learning paths", "kind": "free", "url": "https://cloud.google.com/learn/certification"},
+      {"title": "Google Cloud ML documentation", "kind": "free", "url": "https://cloud.google.com/docs"},
+      {"title": "NPTEL deep learning courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Unlocks senior ML engineer roles; Vertex AI and production-ML focus appeals to AI startups and labs in India (₹18-40 LPA).",
+    "roles": ["ml-engineer", "data-scientist"]
+  },
+  {
+    "id": "tensorflow-developer",
+    "name": "TensorFlow Developer Certificate",
+    "provider": "Google (TensorFlow)",
+    "domain": "AI/ML",
+    "cost_inr": 8300,
+    "cost_note": "Approximate; exam priced at USD 100",
+    "validity_years": 3,
+    "difficulty": "Intermediate",
+    "prerequisites": "Working knowledge of Python and basic ML concepts; no formal prerequisites.",
+    "exam_format": "5-hour practical coding exam in PyCharm via TrueAbility: build and train models on real datasets.",
+    "official_url": "https://www.tensorflow.org/certificate",
+    "prep_resources": [
+      {"title": "TensorFlow certificate program resources", "kind": "free", "url": "https://www.tensorflow.org/certificate"},
+      {"title": "TensorFlow full course", "kind": "free", "url": "https://www.youtube.com/@freecodecamp"},
+      {"title": "NPTEL deep learning courses", "kind": "free", "url": "https://nptel.ac.in/"}
+    ],
+    "career_value": "Hands-on proof of deep-learning building skills; helps freshers break into ML engineer and AI developer roles in India (₹8-18 LPA).",
+    "roles": ["ml-engineer", "data-scientist"]
+  }
+]

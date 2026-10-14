@@ -1,0 +1,1202 @@
+[
+  {
+    "id": "py-020",
+    "skill": "python",
+    "topic": "Generators",
+    "difficulty": "hard",
+    "question": "For processing a very large sequence, why is a generator expression preferred over a list comprehension?",
+    "options": [
+      "List comprehensions are slower at every size",
+      "It yields items lazily, using constant memory instead of building the whole list",
+      "It caches results automatically",
+      "It runs in parallel"
+    ],
+    "answer": 1,
+    "explanation": "Generators produce one item at a time, so memory stays flat even for huge sequences."
+  },
+  {
+    "id": "py-006",
+    "skill": "python",
+    "topic": "OOP",
+    "difficulty": "medium",
+    "question": "Which special method runs automatically when a class instance is created?",
+    "options": [
+      "__start__",
+      "__init__",
+      "__create__",
+      "__build__"
+    ],
+    "answer": 1,
+    "explanation": "__init__ is the initializer called right after an object is created to set up its state."
+  },
+  {
+    "id": "py-015",
+    "skill": "python",
+    "topic": "Data Types",
+    "difficulty": "easy",
+    "question": "Which of the following types is immutable?",
+    "options": [
+      "list",
+      "dict",
+      "tuple",
+      "set"
+    ],
+    "answer": 2,
+    "explanation": "Tuples cannot be changed after creation; lists, dicts, and sets are mutable."
+  },
+  {
+    "id": "py-005",
+    "skill": "python",
+    "topic": "Dictionaries",
+    "difficulty": "medium",
+    "question": "Given `d = {'a': 1, 'b': 2}`, what does `d.get('c', 'missing')` return?",
+    "options": [
+      "It raises KeyError",
+      "None",
+      "'missing'",
+      "0"
+    ],
+    "answer": 2,
+    "explanation": "dict.get() returns the default value instead of raising when the key is absent."
+  },
+  {
+    "id": "py-010",
+    "skill": "python",
+    "topic": "Strings",
+    "difficulty": "easy",
+    "question": "What does `'hello'.upper()` return?",
+    "options": [
+      "'hello'",
+      "'HELLO'",
+      "'Hello'",
+      "A TypeError"
+    ],
+    "answer": 1,
+    "explanation": "upper() returns a new string with all characters converted to uppercase."
+  },
+  {
+    "id": "py-014",
+    "skill": "python",
+    "topic": "stdlib",
+    "difficulty": "hard",
+    "question": "Which standard-library module provides regular expression support in Python?",
+    "options": [
+      "regex",
+      "re",
+      "pattern",
+      "matchlib"
+    ],
+    "answer": 1,
+    "explanation": "The re module implements regular expressions (re.search, re.findall, re.sub, ...)."
+  },
+  {
+    "id": "py-016",
+    "skill": "python",
+    "topic": "Modules",
+    "difficulty": "medium",
+    "question": "How do you import only the `sqrt` function from the `math` module?",
+    "options": [
+      "import math.sqrt",
+      "from math import sqrt",
+      "require('math').sqrt",
+      "using math: sqrt"
+    ],
+    "answer": 1,
+    "explanation": "from X import Y brings just the named attribute into the current namespace."
+  },
+  {
+    "id": "py-019",
+    "skill": "python",
+    "topic": "OOP",
+    "difficulty": "medium",
+    "question": "What is the main purpose of inheritance in OOP?",
+    "options": [
+      "Copy-pasting code between files",
+      "Letting a class reuse and extend another class's behavior",
+      "Making code run faster",
+      "Hiding all methods from subclasses"
+    ],
+    "answer": 1,
+    "explanation": "Inheritance lets a subclass reuse the parent's attributes/methods and override or extend them."
+  },
+  {
+    "id": "py-007",
+    "skill": "python",
+    "topic": "Decorators",
+    "difficulty": "hard",
+    "question": "What does a decorator fundamentally do?",
+    "options": [
+      "Takes a function or class and returns a (usually modified) version of it",
+      "Only wraps built-in functions",
+      "Rewrites the module's namespace",
+      "Declares variables in global scope"
+    ],
+    "answer": 0,
+    "explanation": "A decorator is a callable that receives a function/class and returns a replacement for it."
+  },
+  {
+    "id": "py-013",
+    "skill": "python",
+    "topic": "File I/O",
+    "difficulty": "medium",
+    "question": "What does opening a file with mode 'w' do?",
+    "options": [
+      "Opens it for reading",
+      "Opens it for writing, truncating any existing content",
+      "Appends to the end of the file",
+      "Opens it in binary mode only"
+    ],
+    "answer": 1,
+    "explanation": "'w' opens for writing and empties the file first; use 'a' to append instead."
+  },
+  {
+    "id": "py-018",
+    "skill": "python",
+    "topic": "Control Flow",
+    "difficulty": "easy",
+    "question": "What sequence does `range(5)` produce?",
+    "options": [
+      "1 to 5",
+      "0 to 4",
+      "0 to 5",
+      "5 down to 0"
+    ],
+    "answer": 1,
+    "explanation": "range(5) starts at 0 and stops before 5, giving 0, 1, 2, 3, 4."
+  },
+  {
+    "id": "py-011",
+    "skill": "python",
+    "topic": "Lists",
+    "difficulty": "easy",
+    "question": "Which list method adds a single item to the end of the list?",
+    "options": [
+      "add()",
+      "append()",
+      "push()",
+      "insert(-1, x)"
+    ],
+    "answer": 1,
+    "explanation": "append() adds one element at the end; push() does not exist in Python."
+  },
+  {
+    "id": "py-002",
+    "skill": "python",
+    "topic": "Control Flow",
+    "difficulty": "easy",
+    "question": "Which keyword skips the rest of the current loop iteration and jumps to the next one?",
+    "options": [
+      "skip",
+      "continue",
+      "pass",
+      "next"
+    ],
+    "answer": 1,
+    "explanation": "continue ends the current iteration immediately and moves the loop to the next item."
+  },
+  {
+    "id": "py-012",
+    "skill": "python",
+    "topic": "Functions",
+    "difficulty": "hard",
+    "question": "Given `def f(a, b=[]): b.append(a); return b` — after calling f(1), what does a call to f(2) return?",
+    "options": [
+      "[2]",
+      "[1]",
+      "[1, 2]",
+      "TypeError"
+    ],
+    "answer": 2,
+    "explanation": "Default arguments are evaluated once at def time, so the same list accumulates across calls."
+  },
+  {
+    "id": "py-003",
+    "skill": "python",
+    "topic": "Functions",
+    "difficulty": "easy",
+    "question": "What does a Python function return if it has no `return` statement?",
+    "options": [
+      "0",
+      "None",
+      "An empty string",
+      "undefined"
+    ],
+    "answer": 1,
+    "explanation": "Functions without an explicit return implicitly return None."
+  },
+  {
+    "id": "py-017",
+    "skill": "python",
+    "topic": "Scope",
+    "difficulty": "hard",
+    "question": "What does the `nonlocal` keyword do?",
+    "options": [
+      "Makes the variable global",
+      "Lets a nested function rebind a variable in the enclosing (non-global) scope",
+      "Deletes the variable",
+      "Imports it from another module"
+    ],
+    "answer": 1,
+    "explanation": "nonlocal targets the nearest enclosing function scope, unlike global which targets module scope."
+  },
+  {
+    "id": "py-008",
+    "skill": "python",
+    "topic": "Generators",
+    "difficulty": "medium",
+    "question": "What does the `yield` keyword do inside a function?",
+    "options": [
+      "Immediately returns and exits the function",
+      "Pauses the function and lazily produces one value per request",
+      "Raises StopIteration at once",
+      "Stops the whole program"
+    ],
+    "answer": 1,
+    "explanation": "yield turns the function into a generator that pauses, emits a value, and resumes on next()."
+  },
+  {
+    "id": "py-009",
+    "skill": "python",
+    "topic": "Exceptions",
+    "difficulty": "medium",
+    "question": "In a try/except statement, which block always runs whether or not an exception occurred?",
+    "options": [
+      "except",
+      "else",
+      "finally",
+      "try"
+    ],
+    "answer": 2,
+    "explanation": "finally executes no matter what, making it ideal for cleanup like closing files."
+  },
+  {
+    "id": "py-001",
+    "skill": "python",
+    "topic": "Data Types",
+    "difficulty": "easy",
+    "question": "What does the `len()` function return for an empty list?",
+    "options": [
+      "0",
+      "None",
+      "An error",
+      "-1"
+    ],
+    "answer": 0,
+    "explanation": "len() returns the number of items in a sequence; an empty list has 0 items."
+  },
+  {
+    "id": "py-004",
+    "skill": "python",
+    "topic": "List Comprehensions",
+    "difficulty": "medium",
+    "question": "What does `[x * 2 for x in range(3)]` evaluate to?",
+    "options": [
+      "[2, 4, 6]",
+      "[1, 2, 3]",
+      "[0, 2, 4]",
+      "A generator object"
+    ],
+    "answer": 2,
+    "explanation": "range(3) gives 0, 1, 2; doubling each produces [0, 2, 4]."
+  },
+  {
+    "id": "js-015",
+    "skill": "javascript",
+    "topic": "Operators",
+    "difficulty": "medium",
+    "question": "Compare `0 == '0'` and `0 === '0'`. Which statement is true?",
+    "options": [
+      "Both are true",
+      "== is true but === is false, because strict equality also checks type",
+      "== is false but === is true",
+      "Both are false"
+    ],
+    "answer": 1,
+    "explanation": "Loose == coerces types before comparing; strict === requires the same type and value."
+  },
+  {
+    "id": "js-009",
+    "skill": "javascript",
+    "topic": "ES6",
+    "difficulty": "easy",
+    "question": "Which of these is valid arrow-function syntax?",
+    "options": [
+      "function(x) { return x; }",
+      "x => x",
+      "(x) -> x",
+      "lambda x: x"
+    ],
+    "answer": 1,
+    "explanation": "Arrow functions use => ; `(x) -> x` is not JavaScript syntax."
+  },
+  {
+    "id": "js-004",
+    "skill": "javascript",
+    "topic": "Array Methods",
+    "difficulty": "easy",
+    "question": "What does `[1, 2, 3].map(x => x * 2)` return?",
+    "options": [
+      "[1, 2, 3]",
+      "[2, 4, 6]",
+      "[2, 4]",
+      "undefined"
+    ],
+    "answer": 1,
+    "explanation": "map applies the callback to every element and returns a new array of the results."
+  },
+  {
+    "id": "js-012",
+    "skill": "javascript",
+    "topic": "Array Methods",
+    "difficulty": "easy",
+    "question": "Which array method removes and returns the LAST element?",
+    "options": [
+      "shift()",
+      "pop()",
+      "slice()",
+      "splice()"
+    ],
+    "answer": 1,
+    "explanation": "pop() removes the final element; shift() removes the first one."
+  },
+  {
+    "id": "js-011",
+    "skill": "javascript",
+    "topic": "Variables",
+    "difficulty": "medium",
+    "question": "What happens when you try to reassign a `const` variable?",
+    "options": [
+      "Nothing changes",
+      "A TypeError is thrown",
+      "The value silently stays the same",
+      "Only a warning is logged"
+    ],
+    "answer": 1,
+    "explanation": "const bindings cannot be reassigned; attempting it throws a TypeError at runtime."
+  },
+  {
+    "id": "js-017",
+    "skill": "javascript",
+    "topic": "ES6",
+    "difficulty": "easy",
+    "question": "What does `` `Hello ${1 + 1}` `` (backticks) evaluate to?",
+    "options": [
+      "'Hello ${1 + 1}'",
+      "'Hello 2'",
+      "'Hello 1 + 1'",
+      "A SyntaxError"
+    ],
+    "answer": 1,
+    "explanation": "Template literals interpolate ${} expressions; 1 + 1 becomes 2."
+  },
+  {
+    "id": "js-002",
+    "skill": "javascript",
+    "topic": "Hoisting",
+    "difficulty": "easy",
+    "question": "What is hoisting in JavaScript?",
+    "options": [
+      "var declarations and function declarations are moved to the top of their scope before execution",
+      "Variables are deleted at runtime",
+      "Code is compressed before running",
+      "Functions execute in reverse order"
+    ],
+    "answer": 0,
+    "explanation": "During compilation, declarations are registered first, so they appear usable before their line."
+  },
+  {
+    "id": "js-013",
+    "skill": "javascript",
+    "topic": "DOM",
+    "difficulty": "medium",
+    "question": "How do you select the element with id=\"main\" in vanilla JavaScript?",
+    "options": [
+      "document.querySelector('#main')",
+      "document.querySelector('main')",
+      "document.getClass('main')",
+      "document.findById('main')"
+    ],
+    "answer": 0,
+    "explanation": "querySelector takes a CSS selector, and IDs are prefixed with #."
+  },
+  {
+    "id": "js-006",
+    "skill": "javascript",
+    "topic": "async/await",
+    "difficulty": "medium",
+    "question": "What does the `await` keyword do?",
+    "options": [
+      "Pauses the entire program",
+      "Pauses the async function until the promise settles, then resumes with its value",
+      "Makes asynchronous code fully synchronous",
+      "Cancels the promise"
+    ],
+    "answer": 1,
+    "explanation": "await suspends only that async function, yielding control back to the event loop meanwhile."
+  },
+  {
+    "id": "js-019",
+    "skill": "javascript",
+    "topic": "Promises",
+    "difficulty": "hard",
+    "question": "When does `Promise.all([...])` reject?",
+    "options": [
+      "As soon as the first input promise rejects",
+      "Only after every promise has rejected",
+      "It never rejects",
+      "Only when a timeout occurs"
+    ],
+    "answer": 0,
+    "explanation": "Promise.all short-circuits: the first rejection rejects the combined promise immediately."
+  },
+  {
+    "id": "js-003",
+    "skill": "javascript",
+    "topic": "Closures",
+    "difficulty": "medium",
+    "question": "What is a closure?",
+    "options": [
+      "A function bundled together with references to its surrounding lexical state",
+      "A syntax error in strict mode",
+      "A special kind of loop",
+      "An object literal with methods"
+    ],
+    "answer": 0,
+    "explanation": "An inner function keeps access to its outer scope's variables even after the outer function returns."
+  },
+  {
+    "id": "js-001",
+    "skill": "javascript",
+    "topic": "Variables",
+    "difficulty": "easy",
+    "question": "Which declaration creates a block-scoped variable that CAN be reassigned?",
+    "options": [
+      "var",
+      "let",
+      "const",
+      "static"
+    ],
+    "answer": 1,
+    "explanation": "let is block-scoped and reassignable; const forbids reassignment, var is function-scoped."
+  },
+  {
+    "id": "js-005",
+    "skill": "javascript",
+    "topic": "Promises",
+    "difficulty": "medium",
+    "question": "What is the initial state of a newly created Promise?",
+    "options": [
+      "resolved",
+      "pending",
+      "rejected",
+      "settled"
+    ],
+    "answer": 1,
+    "explanation": "A promise starts as pending and later becomes either fulfilled or rejected."
+  },
+  {
+    "id": "js-010",
+    "skill": "javascript",
+    "topic": "Prototypes",
+    "difficulty": "hard",
+    "question": "How does one object inherit behavior from another in JavaScript?",
+    "options": [
+      "Through the prototype chain, set up via Object.create or class extends",
+      "By deep-copying all properties at creation",
+      "JavaScript has no inheritance mechanism",
+      "Only built-in objects can inherit"
+    ],
+    "answer": 0,
+    "explanation": "Property lookup walks the prototype chain, so shared behavior lives on the prototype."
+  },
+  {
+    "id": "js-016",
+    "skill": "javascript",
+    "topic": "Closures",
+    "difficulty": "hard",
+    "question": "What does this log? `for (var i = 0; i < 3; i++) { setTimeout(() => console.log(i), 0); }`",
+    "options": [
+      "0, 1, 2",
+      "3, 3, 3",
+      "undefined three times",
+      "A ReferenceError"
+    ],
+    "answer": 1,
+    "explanation": "var is function-scoped, so all three callbacks share one binding whose final value is 3."
+  },
+  {
+    "id": "js-008",
+    "skill": "javascript",
+    "topic": "this",
+    "difficulty": "medium",
+    "question": "In a regular function invoked as `obj.method()`, what does `this` refer to?",
+    "options": [
+      "The global object",
+      "obj",
+      "Always undefined",
+      "The function itself"
+    ],
+    "answer": 1,
+    "explanation": "When called as a method, this is bound to the object before the dot at call time."
+  },
+  {
+    "id": "js-014",
+    "skill": "javascript",
+    "topic": "Operators",
+    "difficulty": "easy",
+    "question": "What does `typeof []` evaluate to?",
+    "options": [
+      "'array'",
+      "'object'",
+      "'list'",
+      "'undefined'"
+    ],
+    "answer": 1,
+    "explanation": "Arrays are objects in JavaScript, so typeof reports 'object'; use Array.isArray to check."
+  },
+  {
+    "id": "js-020",
+    "skill": "javascript",
+    "topic": "this",
+    "difficulty": "hard",
+    "question": "What is special about `this` inside an arrow function?",
+    "options": [
+      "It always refers to the global object",
+      "It has no own binding and inherits `this` from the enclosing lexical scope",
+      "It is always undefined",
+      "It refers to the DOM element that triggered the event"
+    ],
+    "answer": 1,
+    "explanation": "Arrow functions capture this lexically, which is why they are popular for callbacks."
+  },
+  {
+    "id": "js-007",
+    "skill": "javascript",
+    "topic": "Event Loop",
+    "difficulty": "hard",
+    "question": "Given `console.log(1); setTimeout(() => console.log(2), 0); Promise.resolve().then(() => console.log(3));` — what prints?",
+    "options": [
+      "1, 2, 3",
+      "1, 3, 2",
+      "3, 1, 2",
+      "2, 1, 3"
+    ],
+    "answer": 1,
+    "explanation": "Microtasks (promise callbacks) run before macrotasks (setTimeout), so 3 prints before 2."
+  },
+  {
+    "id": "js-018",
+    "skill": "javascript",
+    "topic": "ES6",
+    "difficulty": "medium",
+    "question": "What does `[...a, ...b]` do when a and b are arrays?",
+    "options": [
+      "Concatenates a and b into one new array",
+      "Creates a nested array [a, b]",
+      "Mutates a in place",
+      "Compares a and b"
+    ],
+    "answer": 0,
+    "explanation": "The spread operator expands each array's elements into the new array literal."
+  },
+  {
+    "id": "hc-010",
+    "skill": "html-css",
+    "topic": "Box Model",
+    "difficulty": "hard",
+    "question": "With `box-sizing: border-box`, an element with width:200px and padding:20px has what total width?",
+    "options": [
+      "240px",
+      "200px — padding and border are included inside the declared width",
+      "160px",
+      "Padding is ignored"
+    ],
+    "answer": 1,
+    "explanation": "border-box makes width cover content + padding + border, simplifying layout math."
+  },
+  {
+    "id": "hc-001",
+    "skill": "html-css",
+    "topic": "Semantic HTML",
+    "difficulty": "easy",
+    "question": "Which tag is meant to wrap the primary content of a page?",
+    "options": [
+      "<div>",
+      "<main>",
+      "<span>",
+      "<section>"
+    ],
+    "answer": 1,
+    "explanation": "The <main> element identifies the dominant content, helping assistive tech and SEO."
+  },
+  {
+    "id": "hc-020",
+    "skill": "html-css",
+    "topic": "Accessibility",
+    "difficulty": "hard",
+    "question": "What does the `aria-label` attribute do?",
+    "options": [
+      "Changes the element's visual style",
+      "Provides an accessible name for assistive technology when no visible text exists",
+      "Hides the element from everyone",
+      "Validates the HTML document"
+    ],
+    "answer": 1,
+    "explanation": "aria-label gives screen readers a name for icon buttons and other text-less controls."
+  },
+  {
+    "id": "hc-003",
+    "skill": "html-css",
+    "topic": "Flexbox",
+    "difficulty": "medium",
+    "question": "Which flexbox property centers items along the MAIN axis?",
+    "options": [
+      "align-items",
+      "justify-content",
+      "align-content",
+      "place-content"
+    ],
+    "answer": 1,
+    "explanation": "justify-content distributes space along the main axis; align-items handles the cross axis."
+  },
+  {
+    "id": "hc-014",
+    "skill": "html-css",
+    "topic": "Flexbox",
+    "difficulty": "medium",
+    "question": "What does `flex-direction: column` do to a flex container?",
+    "options": [
+      "Stacks flex items vertically, top to bottom",
+      "Stacks flex items horizontally",
+      "Reverses the whole page",
+      "Centers all items automatically"
+    ],
+    "answer": 0,
+    "explanation": "It makes the main axis vertical, so items flow down the column."
+  },
+  {
+    "id": "hc-006",
+    "skill": "html-css",
+    "topic": "Specificity",
+    "difficulty": "medium",
+    "question": "Which selector has the HIGHEST specificity?",
+    "options": [
+      "p",
+      ".note",
+      "#note",
+      "p.note"
+    ],
+    "answer": 2,
+    "explanation": "ID selectors outrank classes, which outrank element selectors: #note wins."
+  },
+  {
+    "id": "hc-011",
+    "skill": "html-css",
+    "topic": "Accessibility",
+    "difficulty": "easy",
+    "question": "Why should images have meaningful alt text?",
+    "options": [
+      "It makes images load faster",
+      "Screen readers announce it, and it displays if the image fails to load",
+      "It increases image resolution",
+      "It is only useful for SEO"
+    ],
+    "answer": 1,
+    "explanation": "Alt text is the accessible fallback that conveys the image's meaning non-visually."
+  },
+  {
+    "id": "hc-005",
+    "skill": "html-css",
+    "topic": "Selectors",
+    "difficulty": "easy",
+    "question": "Which CSS selector targets elements with class=\"btn\"?",
+    "options": [
+      "#btn",
+      ".btn",
+      "btn",
+      "*btn"
+    ],
+    "answer": 1,
+    "explanation": "A leading dot selects by class; # selects by id."
+  },
+  {
+    "id": "hc-013",
+    "skill": "html-css",
+    "topic": "Semantic HTML",
+    "difficulty": "easy",
+    "question": "Which element is designed to wrap a set of navigation links?",
+    "options": [
+      "<nav>",
+      "<menu>",
+      "<links>",
+      "<header>"
+    ],
+    "answer": 0,
+    "explanation": "<nav> marks major navigation blocks so assistive tech can jump to them."
+  },
+  {
+    "id": "hc-015",
+    "skill": "html-css",
+    "topic": "Grid",
+    "difficulty": "hard",
+    "question": "What does the `grid-area` shorthand set on a grid item?",
+    "options": [
+      "Only the column",
+      "row-start / column-start / row-end / column-end",
+      "The gap between tracks",
+      "The size of the grid container"
+    ],
+    "answer": 1,
+    "explanation": "grid-area places an item by naming its four bounding grid lines in one declaration."
+  },
+  {
+    "id": "hc-007",
+    "skill": "html-css",
+    "topic": "Positioning",
+    "difficulty": "hard",
+    "question": "How does `position: sticky` behave?",
+    "options": [
+      "It fixes the element to the viewport permanently",
+      "It acts like relative until the element crosses a threshold, then sticks in place",
+      "It removes the element from document flow",
+      "It centers the element in its parent"
+    ],
+    "answer": 1,
+    "explanation": "Sticky is a hybrid: normal flow first, then fixed-like within its scroll container."
+  },
+  {
+    "id": "hc-016",
+    "skill": "html-css",
+    "topic": "CSS Basics",
+    "difficulty": "easy",
+    "question": "What is the correct way to link an external stylesheet?",
+    "options": [
+      "<link rel=\"stylesheet\" href=\"style.css\">",
+      "<style src=\"style.css\">",
+      "<css href=\"style.css\">",
+      "<a href=\"style.css\">"
+    ],
+    "answer": 0,
+    "explanation": "The link element with rel=\"stylesheet\" in <head> loads external CSS."
+  },
+  {
+    "id": "hc-017",
+    "skill": "html-css",
+    "topic": "Selectors",
+    "difficulty": "medium",
+    "question": "What does the selector `ul > li` match?",
+    "options": [
+      "Every li anywhere inside a ul",
+      "Only li elements that are direct children of a ul",
+      "The first li inside each ul",
+      "li elements inside any list type"
+    ],
+    "answer": 1,
+    "explanation": "The child combinator (>) matches only one level down, not deeper descendants."
+  },
+  {
+    "id": "hc-008",
+    "skill": "html-css",
+    "topic": "Forms",
+    "difficulty": "easy",
+    "question": "Which input type gives built-in email-format validation?",
+    "options": [
+      "type=\"text\"",
+      "type=\"email\"",
+      "type=\"mail\"",
+      "type=\"address\""
+    ],
+    "answer": 1,
+    "explanation": "type=\"email\" validates the value against an email pattern on form submission."
+  },
+  {
+    "id": "hc-018",
+    "skill": "html-css",
+    "topic": "Positioning",
+    "difficulty": "hard",
+    "question": "Which position value takes an element out of normal flow and positions it relative to its nearest positioned ancestor?",
+    "options": [
+      "relative",
+      "absolute",
+      "static",
+      "sticky"
+    ],
+    "answer": 1,
+    "explanation": "absolute removes the element from flow and anchors it to the closest non-static ancestor."
+  },
+  {
+    "id": "hc-002",
+    "skill": "html-css",
+    "topic": "Box Model",
+    "difficulty": "easy",
+    "question": "What is the correct order of the CSS box model from inside out?",
+    "options": [
+      "content, padding, border, margin",
+      "margin, border, padding, content",
+      "content, margin, border, padding",
+      "padding, content, margin, border"
+    ],
+    "answer": 0,
+    "explanation": "An element is content, wrapped by padding, then border, then margin."
+  },
+  {
+    "id": "hc-009",
+    "skill": "html-css",
+    "topic": "Responsive",
+    "difficulty": "medium",
+    "question": "What does `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">` do?",
+    "options": [
+      "Disables pinch zoom",
+      "Makes the layout viewport match the device width for proper mobile scaling",
+      "Speeds up page loading",
+      "Hides the browser address bar"
+    ],
+    "answer": 1,
+    "explanation": "Without it, mobile browsers render pages at a desktop width and shrink them."
+  },
+  {
+    "id": "hc-019",
+    "skill": "html-css",
+    "topic": "Responsive",
+    "difficulty": "medium",
+    "question": "Which CSS unit is relative to the viewport width?",
+    "options": [
+      "px",
+      "em",
+      "vw",
+      "pt"
+    ],
+    "answer": 2,
+    "explanation": "1vw equals 1% of the viewport width, so layouts scale with the browser window."
+  },
+  {
+    "id": "hc-012",
+    "skill": "html-css",
+    "topic": "Forms",
+    "difficulty": "medium",
+    "question": "Which attribute makes a form input mandatory before submission?",
+    "options": [
+      "validate",
+      "required",
+      "mandatory",
+      "check"
+    ],
+    "answer": 1,
+    "explanation": "The required boolean attribute blocks submission until the field has a value."
+  },
+  {
+    "id": "hc-004",
+    "skill": "html-css",
+    "topic": "Grid",
+    "difficulty": "medium",
+    "question": "What does `grid-template-columns: 1fr 2fr;` create?",
+    "options": [
+      "Two equal columns",
+      "Two columns where the second is twice as wide as the first",
+      "Columns fixed at 12px and 22px",
+      "One row split into fractions"
+    ],
+    "answer": 1,
+    "explanation": "fr units divide free space proportionally, so the columns share space 1:2."
+  },
+  {
+    "id": "dsa-011",
+    "skill": "dsa",
+    "topic": "Hashing",
+    "difficulty": "medium",
+    "question": "What is the average-case lookup time in a well-designed hash table?",
+    "options": [
+      "O(n)",
+      "O(log n)",
+      "O(1)",
+      "O(n^2)"
+    ],
+    "answer": 2,
+    "explanation": "Hashing maps keys directly to buckets, so average lookup is constant time."
+  },
+  {
+    "id": "dsa-001",
+    "skill": "dsa",
+    "topic": "Big-O",
+    "difficulty": "easy",
+    "question": "What is the time complexity of accessing an array element by its index?",
+    "options": [
+      "O(n)",
+      "O(1)",
+      "O(log n)",
+      "O(n^2)"
+    ],
+    "answer": 1,
+    "explanation": "Array elements sit at computable memory offsets, so index access is constant time."
+  },
+  {
+    "id": "dsa-015",
+    "skill": "dsa",
+    "topic": "Graphs",
+    "difficulty": "hard",
+    "question": "What problem does Dijkstra's algorithm solve?",
+    "options": [
+      "Finding a minimum spanning tree",
+      "Shortest paths from a source node with non-negative edge weights",
+      "Listing all topological orderings",
+      "Computing maximum flow"
+    ],
+    "answer": 1,
+    "explanation": "Dijkstra greedily finalizes the closest unsettled node, which is correct only for non-negative weights."
+  },
+  {
+    "id": "dsa-009",
+    "skill": "dsa",
+    "topic": "Sorting",
+    "difficulty": "medium",
+    "question": "When does quicksort hit its O(n^2) worst case?",
+    "options": [
+      "With a naive pivot choice on an already-sorted array",
+      "When the array is empty",
+      "When all elements are equal and pivot is random",
+      "Only on arrays larger than memory"
+    ],
+    "answer": 0,
+    "explanation": "A bad pivot repeatedly creates maximally unbalanced partitions, degrading to quadratic time."
+  },
+  {
+    "id": "dsa-013",
+    "skill": "dsa",
+    "topic": "Graphs",
+    "difficulty": "medium",
+    "question": "Breadth-first search (BFS) is typically implemented with which data structure?",
+    "options": [
+      "Stack",
+      "Queue",
+      "Heap",
+      "Priority queue"
+    ],
+    "answer": 1,
+    "explanation": "BFS explores level by level, and a queue naturally processes nodes in discovery order."
+  },
+  {
+    "id": "dsa-012",
+    "skill": "dsa",
+    "topic": "Big-O",
+    "difficulty": "easy",
+    "question": "Which function grows the SLOWEST as n gets large?",
+    "options": [
+      "n^2",
+      "n log n",
+      "2^n",
+      "n"
+    ],
+    "answer": 3,
+    "explanation": "Linear growth is outpaced by n log n, quadratic, and exponential functions."
+  },
+  {
+    "id": "dsa-017",
+    "skill": "dsa",
+    "topic": "DP",
+    "difficulty": "medium",
+    "question": "What is the key idea behind dynamic programming?",
+    "options": [
+      "Divide into independent subproblems",
+      "Solve each overlapping subproblem once and reuse the results",
+      "Always take the locally greedy choice",
+      "Use recursion without any memoization"
+    ],
+    "answer": 1,
+    "explanation": "Memoization or tabulation avoids recomputing shared subproblems, turning exponential into polynomial time."
+  },
+  {
+    "id": "dsa-016",
+    "skill": "dsa",
+    "topic": "Searching",
+    "difficulty": "easy",
+    "question": "What precondition does binary search require on the array?",
+    "options": [
+      "It must be large",
+      "It must be sorted",
+      "All elements must be unique",
+      "It must be a linked list"
+    ],
+    "answer": 1,
+    "explanation": "Binary search halves the search range by comparing against the middle, which needs sorted order."
+  },
+  {
+    "id": "dsa-006",
+    "skill": "dsa",
+    "topic": "Trees",
+    "difficulty": "medium",
+    "question": "In a binary tree with the root at level 0, what is the maximum number of nodes at level k?",
+    "options": [
+      "k",
+      "2^k",
+      "n - k",
+      "k^2"
+    ],
+    "answer": 1,
+    "explanation": "Each level can hold twice the nodes of the previous one, so level k holds at most 2^k nodes."
+  },
+  {
+    "id": "dsa-018",
+    "skill": "dsa",
+    "topic": "Trees",
+    "difficulty": "hard",
+    "question": "What is the height of a complete binary tree with n nodes?",
+    "options": [
+      "O(n)",
+      "O(log n)",
+      "O(1)",
+      "O(sqrt(n))"
+    ],
+    "answer": 1,
+    "explanation": "A complete tree is as balanced as possible, so its height grows logarithmically with n."
+  },
+  {
+    "id": "dsa-005",
+    "skill": "dsa",
+    "topic": "Queues",
+    "difficulty": "easy",
+    "question": "Which ordering principle does a queue follow?",
+    "options": [
+      "LIFO",
+      "FIFO",
+      "Sorted order",
+      "Heap order"
+    ],
+    "answer": 1,
+    "explanation": "A queue is first-in-first-out: elements leave in the order they arrived."
+  },
+  {
+    "id": "dsa-007",
+    "skill": "dsa",
+    "topic": "BST",
+    "difficulty": "hard",
+    "question": "What is the search time complexity in a BALANCED binary search tree with n nodes?",
+    "options": [
+      "O(n)",
+      "O(log n)",
+      "O(1)",
+      "O(n log n)"
+    ],
+    "answer": 1,
+    "explanation": "Each comparison discards half the remaining tree, giving logarithmic search."
+  },
+  {
+    "id": "dsa-019",
+    "skill": "dsa",
+    "topic": "Stacks",
+    "difficulty": "easy",
+    "question": "Which everyday operation is most naturally modeled with a stack?",
+    "options": [
+      "A print job queue",
+      "Undo in a text editor",
+      "Round-robin CPU scheduling",
+      "Level-order tree traversal"
+    ],
+    "answer": 1,
+    "explanation": "Undo reverses the most recent action first, which is exactly LIFO stack behavior."
+  },
+  {
+    "id": "dsa-004",
+    "skill": "dsa",
+    "topic": "Stacks",
+    "difficulty": "medium",
+    "question": "Which ordering principle does a stack follow?",
+    "options": [
+      "FIFO",
+      "LIFO",
+      "Priority order",
+      "Random access"
+    ],
+    "answer": 1,
+    "explanation": "A stack is last-in-first-out: push adds to the top, pop removes from the top."
+  },
+  {
+    "id": "dsa-014",
+    "skill": "dsa",
+    "topic": "Graphs",
+    "difficulty": "medium",
+    "question": "Depth-first search (DFS) is typically implemented with which data structure?",
+    "options": [
+      "Queue",
+      "Stack (or recursion)",
+      "Heap",
+      "Linked list"
+    ],
+    "answer": 1,
+    "explanation": "DFS goes deep before backtracking, which a stack (or the call stack via recursion) provides."
+  },
+  {
+    "id": "dsa-020",
+    "skill": "dsa",
+    "topic": "Hashing",
+    "difficulty": "hard",
+    "question": "What is a hash collision?",
+    "options": [
+      "Two distinct keys mapping to the same bucket",
+      "A corrupted hash function",
+      "Two identical keys in the table",
+      "Deleting from a full table"
+    ],
+    "answer": 0,
+    "explanation": "Collisions are resolved with chaining or open addressing when different keys hash alike."
+  },
+  {
+    "id": "dsa-010",
+    "skill": "dsa",
+    "topic": "Heaps",
+    "difficulty": "hard",
+    "question": "What is the time complexity of extracting the maximum from a binary max-heap of n elements?",
+    "options": [
+      "O(1)",
+      "O(log n)",
+      "O(n)",
+      "O(n log n)"
+    ],
+    "answer": 1,
+    "explanation": "Removing the root requires sifting the replacement down the heap's height, which is log n."
+  },
+  {
+    "id": "dsa-008",
+    "skill": "dsa",
+    "topic": "Sorting",
+    "difficulty": "easy",
+    "question": "Which of these sorting algorithms runs in O(n log n) average time?",
+    "options": [
+      "Bubble sort",
+      "Merge sort",
+      "Selection sort",
+      "Insertion sort"
+    ],
+    "answer": 1,
+    "explanation": "Merge sort divides the array in half recursively and merges in linear time per level."
+  },
+  {
+    "id": "dsa-002",
+    "skill": "dsa",
+    "topic": "Arrays",
+    "difficulty": "easy",
+    "question": "In a dynamic array (like Python's list), appending at the end is usually:",
+    "options": [
+      "O(n)",
+      "O(1) amortized",
+      "O(log n)",
+      "O(n^2)"
+    ],
+    "answer": 1,
+    "explanation": "Appends are constant time except occasional resizing, which averages out to O(1)."
+  },
+  {
+    "id": "dsa-003",
+    "skill": "dsa",
+    "topic": "Linked Lists",
+    "difficulty": "medium",
+    "question": "What is the main advantage of a linked list over an array?",
+    "options": [
+      "Faster random access",
+      "O(1) insertion/deletion at a known node",
+      "Less memory per element",
+      "Better cache locality"
+    ],
+    "answer": 1,
+    "explanation": "Relinking pointers is constant time, while arrays must shift elements to insert or delete."
+  }
+]

@@ -1,0 +1,1202 @@
+[
+  {
+    "id": "nj-020",
+    "skill": "nodejs",
+    "topic": "Environment Variables",
+    "difficulty": "hard",
+    "question": "Why should secrets come from environment variables instead of being hardcoded?",
+    "options": [
+      "Hardcoded secrets leak into version control, logs, and builds",
+      "Environment variables are faster to read",
+      "Environment variables cannot be read by attackers",
+      "Node.js forbids hardcoded strings"
+    ],
+    "answer": 0,
+    "explanation": "Code gets committed, shared, and logged; env vars keep secrets out of the codebase entirely."
+  },
+  {
+    "id": "nj-006",
+    "skill": "nodejs",
+    "topic": "Environment Variables",
+    "difficulty": "easy",
+    "question": "How do you read an environment variable named PORT in Node.js?",
+    "options": [
+      "process.env.PORT",
+      "env.PORT",
+      "process.getEnv('PORT')",
+      "require('PORT')"
+    ],
+    "answer": 0,
+    "explanation": "Node exposes environment variables on the process.env object."
+  },
+  {
+    "id": "nj-015",
+    "skill": "nodejs",
+    "topic": "Async Patterns",
+    "difficulty": "medium",
+    "question": "What does Promise.all() do when one of its promises rejects?",
+    "options": [
+      "Rejects immediately with that rejection reason",
+      "Waits for all, then resolves",
+      "Returns an array of the errors",
+      "Retries the failed promise once"
+    ],
+    "answer": 0,
+    "explanation": "Promise.all short-circuits: the first rejection rejects the whole combined promise."
+  },
+  {
+    "id": "nj-005",
+    "skill": "nodejs",
+    "topic": "REST",
+    "difficulty": "easy",
+    "question": "Which HTTP method is typically used to create a new resource in a REST API?",
+    "options": [
+      "GET",
+      "DELETE",
+      "POST",
+      "HEAD"
+    ],
+    "answer": 2,
+    "explanation": "POST to a collection resource is the conventional way to create a new resource in REST."
+  },
+  {
+    "id": "nj-010",
+    "skill": "nodejs",
+    "topic": "Middleware",
+    "difficulty": "medium",
+    "question": "In Express, what must middleware call to pass control to the next middleware?",
+    "options": [
+      "next()",
+      "continue()",
+      "proceed()",
+      "return true"
+    ],
+    "answer": 0,
+    "explanation": "Calling next() hands the request to the next matching middleware or route handler in the stack."
+  },
+  {
+    "id": "nj-014",
+    "skill": "nodejs",
+    "topic": "Streams",
+    "difficulty": "medium",
+    "question": "Why use streams instead of fs.readFile for a 5GB file?",
+    "options": [
+      "Streams process data in chunks with near-constant memory",
+      "Streams are always faster",
+      "readFile cannot open large files at all",
+      "Streams compress the file automatically"
+    ],
+    "answer": 0,
+    "explanation": "Streams emit data piece by piece, so memory stays flat instead of buffering the whole file."
+  },
+  {
+    "id": "nj-016",
+    "skill": "nodejs",
+    "topic": "Event Loop",
+    "difficulty": "hard",
+    "question": "In which event-loop phase do setImmediate() callbacks run relative to I/O callbacks?",
+    "options": [
+      "Check phase, right after the poll phase",
+      "Before the poll phase",
+      "Inside the timers phase",
+      "After the process exits"
+    ],
+    "answer": 0,
+    "explanation": "setImmediate callbacks run in the check phase, which follows the poll phase where I/O callbacks execute."
+  },
+  {
+    "id": "nj-019",
+    "skill": "nodejs",
+    "topic": "Modules",
+    "difficulty": "hard",
+    "question": "What is the key difference between require() and ES `import` in Node.js?",
+    "options": [
+      "require is synchronous and dynamic; import is static and hoisted",
+      "import is synchronous",
+      "require works only in browsers",
+      "They behave identically"
+    ],
+    "answer": 0,
+    "explanation": "require() can be called conditionally at runtime, while import statements are static and evaluated before execution."
+  },
+  {
+    "id": "nj-007",
+    "skill": "nodejs",
+    "topic": "Modules",
+    "difficulty": "easy",
+    "question": "What is the purpose of module.exports in CommonJS?",
+    "options": [
+      "Defines what a module exposes to other files",
+      "Installs the module",
+      "Runs the module only once",
+      "Clears the module cache"
+    ],
+    "answer": 0,
+    "explanation": "Assigning to module.exports sets the value other files receive when they require() the module."
+  },
+  {
+    "id": "nj-013",
+    "skill": "nodejs",
+    "topic": "npm",
+    "difficulty": "medium",
+    "question": "What is the difference between dependencies and devDependencies?",
+    "options": [
+      "devDependencies are needed only for development/build, not production runtime",
+      "dependencies are only used for tests",
+      "There is no difference",
+      "devDependencies install globally"
+    ],
+    "answer": 0,
+    "explanation": "Build tools, linters, and test frameworks go in devDependencies so production installs stay lean."
+  },
+  {
+    "id": "nj-018",
+    "skill": "nodejs",
+    "topic": "Error Handling",
+    "difficulty": "hard",
+    "question": "Why can an unhandled 'error' event on an EventEmitter crash a Node process?",
+    "options": [
+      "Node throws the error if no 'error' listener is attached",
+      "Emitters call process.exit on errors",
+      "It corrupts the event loop queue",
+      "It only logs a warning, never crashes"
+    ],
+    "answer": 0,
+    "explanation": "Emitting 'error' with no listener makes Node throw, which crashes the process if uncaught."
+  },
+  {
+    "id": "nj-011",
+    "skill": "nodejs",
+    "topic": "Express Routing",
+    "difficulty": "medium",
+    "question": "What does `app.use('/api', router)` do?",
+    "options": [
+      "Mounts the router for all HTTP methods under /api",
+      "Only handles GET /api",
+      "Registers a 404 handler",
+      "Starts the server on /api"
+    ],
+    "answer": 0,
+    "explanation": "app.use mounts middleware/router for every method on paths starting with the given prefix."
+  },
+  {
+    "id": "nj-002",
+    "skill": "nodejs",
+    "topic": "Modules",
+    "difficulty": "easy",
+    "question": "How do you import a local module named utils.js using CommonJS?",
+    "options": [
+      "import utils from 'utils'",
+      "require('./utils')",
+      "load('utils.js')",
+      "include 'utils'"
+    ],
+    "answer": 1,
+    "explanation": "require() with a relative path loads a CommonJS module; './' means look in the current directory."
+  },
+  {
+    "id": "nj-012",
+    "skill": "nodejs",
+    "topic": "Error Handling",
+    "difficulty": "medium",
+    "question": "How should an async Express route handler forward an error?",
+    "options": [
+      "Catch it and call next(err)",
+      "console.log it and continue",
+      "Call process.exit(1)",
+      "Return the error object from the handler"
+    ],
+    "answer": 0,
+    "explanation": "Passing the error to next(err) routes it to Express error-handling middleware."
+  },
+  {
+    "id": "nj-003",
+    "skill": "nodejs",
+    "topic": "npm",
+    "difficulty": "easy",
+    "question": "What does running `npm install` with no arguments do?",
+    "options": [
+      "Uninstalls all packages",
+      "Installs the dependencies listed in package.json",
+      "Updates npm itself",
+      "Creates a new package.json"
+    ],
+    "answer": 1,
+    "explanation": "With no arguments, npm reads package.json and installs everything under dependencies and devDependencies."
+  },
+  {
+    "id": "nj-017",
+    "skill": "nodejs",
+    "topic": "Streams",
+    "difficulty": "hard",
+    "question": "What is backpressure in Node.js streams?",
+    "options": [
+      "The consumer cannot keep up, so the producer must pause writing",
+      "Extra memory reserved for buffers",
+      "A special stream error type",
+      "Compression applied to stream data"
+    ],
+    "answer": 0,
+    "explanation": "Backpressure signals a fast producer to slow down via write() returning false and the 'drain' event."
+  },
+  {
+    "id": "nj-008",
+    "skill": "nodejs",
+    "topic": "Async Patterns",
+    "difficulty": "medium",
+    "question": "What does `await` do inside an async function?",
+    "options": [
+      "Pauses the function until the promise settles, then resumes with its value",
+      "Spawns a new OS thread",
+      "Blocks the entire event loop permanently",
+      "Converts a promise into a callback"
+    ],
+    "answer": 0,
+    "explanation": "await suspends only that async function's execution; the event loop keeps handling other work meanwhile."
+  },
+  {
+    "id": "nj-009",
+    "skill": "nodejs",
+    "topic": "Event Loop",
+    "difficulty": "medium",
+    "question": "Which callback runs first: process.nextTick() or setTimeout(..., 0)?",
+    "options": [
+      "setTimeout(..., 0)",
+      "process.nextTick()",
+      "They run in parallel threads",
+      "Neither runs on modern Node"
+    ],
+    "answer": 1,
+    "explanation": "nextTick callbacks run before the event loop advances to its next phase; setTimeout waits for the timers phase."
+  },
+  {
+    "id": "nj-001",
+    "skill": "nodejs",
+    "topic": "Event Loop",
+    "difficulty": "easy",
+    "question": "What is the event loop in Node.js?",
+    "options": [
+      "A mechanism that handles async operations without blocking",
+      "A loop that blocks until I/O completes",
+      "A built-in database engine",
+      "A package manager"
+    ],
+    "answer": 0,
+    "explanation": "The event loop lets Node.js perform non-blocking I/O by offloading operations and processing callbacks when they complete."
+  },
+  {
+    "id": "nj-004",
+    "skill": "nodejs",
+    "topic": "Express Routing",
+    "difficulty": "easy",
+    "question": "Which Express statement handles GET requests to /users?",
+    "options": [
+      "app.get('/users', handler)",
+      "app.fetch('/users', handler)",
+      "app.route.get('/users')",
+      "app.post('/users', handler)"
+    ],
+    "answer": 0,
+    "explanation": "app.get(path, handler) registers a route that responds to HTTP GET requests at that path."
+  },
+  {
+    "id": "gg-015",
+    "skill": "git-github",
+    "topic": "Stashing",
+    "difficulty": "medium",
+    "question": "Which command restores the most recently stashed changes?",
+    "options": [
+      "git stash pop",
+      "git stash undo",
+      "git unstash",
+      "git stash back"
+    ],
+    "answer": 0,
+    "explanation": "pop applies the latest stash entry and drops it from the stash list."
+  },
+  {
+    "id": "gg-009",
+    "skill": "git-github",
+    "topic": "Stashing",
+    "difficulty": "medium",
+    "question": "What does `git stash` do?",
+    "options": [
+      "Temporarily shelves uncommitted changes so you can switch branches",
+      "Deletes uncommitted changes permanently",
+      "Commits changes without a message",
+      "Pushes changes to a stash remote"
+    ],
+    "answer": 0,
+    "explanation": "Stash saves your dirty working tree aside so the branch becomes clean, restorable later."
+  },
+  {
+    "id": "gg-004",
+    "skill": "git-github",
+    "topic": "Pull & Push",
+    "difficulty": "easy",
+    "question": "What does `git push origin main` do?",
+    "options": [
+      "Uploads local main commits to the origin remote",
+      "Downloads main from origin",
+      "Deletes the remote main branch",
+      "Merges origin into local main"
+    ],
+    "answer": 0,
+    "explanation": "push sends your local commits to the named remote's branch."
+  },
+  {
+    "id": "gg-012",
+    "skill": "git-github",
+    "topic": "Branches",
+    "difficulty": "medium",
+    "question": "How do you delete a local branch named old-feature?",
+    "options": [
+      "git branch -d old-feature",
+      "git remove old-feature",
+      "git delete-branch old-feature",
+      "git branch --kill old-feature"
+    ],
+    "answer": 0,
+    "explanation": "-d deletes the branch safely, refusing if its commits are not fully merged."
+  },
+  {
+    "id": "gg-011",
+    "skill": "git-github",
+    "topic": "Pull & Push",
+    "difficulty": "medium",
+    "question": "What does `git pull` do?",
+    "options": [
+      "Fetches remote changes and merges them into the current branch",
+      "Only downloads without merging",
+      "Deletes local commits",
+      "Opens a pull request"
+    ],
+    "answer": 0,
+    "explanation": "pull is fetch plus merge: it brings remote commits in and integrates them locally."
+  },
+  {
+    "id": "gg-017",
+    "skill": "git-github",
+    "topic": "GitHub Actions",
+    "difficulty": "hard",
+    "question": "Where do workflow files live in a GitHub repository?",
+    "options": [
+      ".github/workflows/",
+      ".workflows/",
+      "ci/actions/",
+      "github/actions/"
+    ],
+    "answer": 0,
+    "explanation": "GitHub discovers YAML workflow definitions only under .github/workflows/ at the repo root."
+  },
+  {
+    "id": "gg-002",
+    "skill": "git-github",
+    "topic": "Add & Commit",
+    "difficulty": "easy",
+    "question": "Which command stages all modified and new files for commit?",
+    "options": [
+      "git stage *",
+      "git add .",
+      "git commit --stage-all",
+      "git push ."
+    ],
+    "answer": 1,
+    "explanation": "git add . stages everything in the current directory and below for the next commit."
+  },
+  {
+    "id": "gg-013",
+    "skill": "git-github",
+    "topic": "GitHub Actions",
+    "difficulty": "medium",
+    "question": "What triggers a GitHub Actions workflow?",
+    "options": [
+      "Events like push or pull_request listed in the workflow file",
+      "Manual server restarts only",
+      "Any file save on your computer",
+      "A fixed daily timer only"
+    ],
+    "answer": 0,
+    "explanation": "The `on:` block declares events; a matching event on GitHub starts a workflow run."
+  },
+  {
+    "id": "gg-006",
+    "skill": "git-github",
+    "topic": "Pull Requests",
+    "difficulty": "easy",
+    "question": "What is a pull request on GitHub?",
+    "options": [
+      "A proposal to merge changes from one branch into another",
+      "A request to download the code",
+      "A billing invoice",
+      "A code search query"
+    ],
+    "answer": 0,
+    "explanation": "A pull request opens review and discussion around merging one branch's changes into another."
+  },
+  {
+    "id": "gg-019",
+    "skill": "git-github",
+    "topic": "Add & Commit",
+    "difficulty": "hard",
+    "question": "What does `git commit --amend` do?",
+    "options": [
+      "Folds new staged changes or a new message into the most recent commit",
+      "Creates an empty commit",
+      "Rewrites the entire history",
+      "Splits one commit into two"
+    ],
+    "answer": 0,
+    "explanation": "--amend replaces the tip commit; use it only before that commit is shared."
+  },
+  {
+    "id": "gg-003",
+    "skill": "git-github",
+    "topic": "Branches",
+    "difficulty": "easy",
+    "question": "How do you create a branch called feature and switch to it in one command?",
+    "options": [
+      "git branch feature",
+      "git checkout -b feature",
+      "git new feature",
+      "git switch --create-only feature"
+    ],
+    "answer": 1,
+    "explanation": "checkout -b creates the branch and moves HEAD to it in a single step."
+  },
+  {
+    "id": "gg-001",
+    "skill": "git-github",
+    "topic": "Init & Clone",
+    "difficulty": "easy",
+    "question": "What does `git init` do?",
+    "options": [
+      "Creates a new empty Git repository in the current directory",
+      "Clones a remote repository",
+      "Deletes the .git folder",
+      "Commits all files"
+    ],
+    "answer": 0,
+    "explanation": "git init creates the .git directory that turns the current folder into a repository."
+  },
+  {
+    "id": "gg-005",
+    "skill": "git-github",
+    "topic": ".gitignore",
+    "difficulty": "easy",
+    "question": "What is the purpose of a .gitignore file?",
+    "options": [
+      "Lists files and patterns Git should not track",
+      "Lists files to delete from disk",
+      "Configures the remote URL",
+      "Stores default commit messages"
+    ],
+    "answer": 0,
+    "explanation": "Patterns in .gitignore keep build output, secrets, and dependencies out of version control."
+  },
+  {
+    "id": "gg-010",
+    "skill": "git-github",
+    "topic": "Resolving Conflicts",
+    "difficulty": "medium",
+    "question": "When does a merge conflict occur?",
+    "options": [
+      "Two branches changed the same lines in different ways",
+      "The remote server is offline",
+      "A branch name is too long",
+      "The .gitignore file is missing"
+    ],
+    "answer": 0,
+    "explanation": "Git cannot auto-merge overlapping edits, so it marks the conflict for you to resolve manually."
+  },
+  {
+    "id": "gg-016",
+    "skill": "git-github",
+    "topic": "Merge vs Rebase",
+    "difficulty": "hard",
+    "question": "Why is rebasing a shared or public branch discouraged?",
+    "options": [
+      "It rewrites commit hashes, breaking collaborators' history",
+      "It runs slower than merge",
+      "It deletes the remote branch",
+      "GitHub blocks rebased pushes"
+    ],
+    "answer": 0,
+    "explanation": "Rewritten hashes diverge from what others pulled, forcing everyone into painful reconciliations."
+  },
+  {
+    "id": "gg-008",
+    "skill": "git-github",
+    "topic": "Merge vs Rebase",
+    "difficulty": "medium",
+    "question": "What is the main difference between merge and rebase?",
+    "options": [
+      "Merge preserves history with a merge commit; rebase rewrites commits onto the target",
+      "Rebase deletes the source branch",
+      "Merge only works on local branches",
+      "They produce identical history"
+    ],
+    "answer": 0,
+    "explanation": "Merge keeps both histories joined by a merge commit; rebase replays commits linearly on top of the target."
+  },
+  {
+    "id": "gg-014",
+    "skill": "git-github",
+    "topic": "Resolving Conflicts",
+    "difficulty": "medium",
+    "question": "After editing a conflicted file, how do you mark the conflict resolved?",
+    "options": [
+      "git add the file, then commit",
+      "Run git resolve on the file",
+      "Delete the file",
+      "Run git push --resolve"
+    ],
+    "answer": 0,
+    "explanation": "Staging the fixed file tells Git the conflict is resolved; the merge commit finalizes it."
+  },
+  {
+    "id": "gg-020",
+    "skill": "git-github",
+    "topic": "Branches",
+    "difficulty": "hard",
+    "question": "What is a detached HEAD state?",
+    "options": [
+      "HEAD points directly at a commit instead of a branch",
+      "The repository has no commits",
+      "HEAD was deleted",
+      "The repository is corrupted"
+    ],
+    "answer": 0,
+    "explanation": "Checking out a commit or tag detaches HEAD; new commits there are orphaned unless you create a branch."
+  },
+  {
+    "id": "gg-007",
+    "skill": "git-github",
+    "topic": "Add & Commit",
+    "difficulty": "easy",
+    "question": "What does `git commit -m \"add login\"` do?",
+    "options": [
+      "Saves staged changes to history with that message",
+      "Stages all files",
+      "Pushes to the remote",
+      "Shows the commit log"
+    ],
+    "answer": 0,
+    "explanation": "commit records the staged snapshot into history; -m supplies the message inline."
+  },
+  {
+    "id": "gg-018",
+    "skill": "git-github",
+    "topic": "Pull & Push",
+    "difficulty": "hard",
+    "question": "How does `git push --force-with-lease` differ from `--force`?",
+    "options": [
+      "It overwrites the remote only if it still matches your last fetch",
+      "It pushes twice as fast",
+      "It creates a merge commit",
+      "It deletes remote tags first"
+    ],
+    "answer": 0,
+    "explanation": "--force-with-lease refuses when someone else pushed since you fetched, preventing lost work."
+  },
+  {
+    "id": "lx-010",
+    "skill": "linux",
+    "topic": "grep/sed/awk",
+    "difficulty": "medium",
+    "question": "What does `grep -r \"TODO\" .` do?",
+    "options": [
+      "Recursively searches for TODO in files under the current directory",
+      "Replaces TODO with a dot",
+      "Deletes lines containing TODO",
+      "Counts files named TODO"
+    ],
+    "answer": 0,
+    "explanation": "-r makes grep descend into subdirectories, searching every file's contents."
+  },
+  {
+    "id": "lx-001",
+    "skill": "linux",
+    "topic": "Navigation",
+    "difficulty": "easy",
+    "question": "Which command lists files in the current directory?",
+    "options": [
+      "ls",
+      "list",
+      "dir",
+      "show"
+    ],
+    "answer": 0,
+    "explanation": "ls lists directory contents; common flags are -l (long) and -a (include hidden)."
+  },
+  {
+    "id": "lx-020",
+    "skill": "linux",
+    "topic": "Processes",
+    "difficulty": "hard",
+    "question": "What is a zombie process?",
+    "options": [
+      "A terminated process whose parent has not read its exit status",
+      "A process using 100% CPU",
+      "A process that cannot be killed",
+      "A background daemon"
+    ],
+    "answer": 0,
+    "explanation": "Zombies linger in the process table until the parent calls wait() to reap the exit code."
+  },
+  {
+    "id": "lx-003",
+    "skill": "linux",
+    "topic": "Navigation",
+    "difficulty": "easy",
+    "question": "Which command copies a.txt to b.txt?",
+    "options": [
+      "cp a.txt b.txt",
+      "copy a.txt b.txt",
+      "mv a.txt b.txt",
+      "clone a.txt b.txt"
+    ],
+    "answer": 0,
+    "explanation": "cp copies; mv would move (rename) instead of duplicating the file."
+  },
+  {
+    "id": "lx-014",
+    "skill": "linux",
+    "topic": "grep/sed/awk",
+    "difficulty": "medium",
+    "question": "What does `sed 's/foo/bar/g' file.txt` do?",
+    "options": [
+      "Replaces every foo with bar in the output",
+      "Deletes lines containing foo",
+      "Sorts the file alphabetically",
+      "Counts foo occurrences"
+    ],
+    "answer": 0,
+    "explanation": "s/// is the substitute command and the g flag applies it globally on each line."
+  },
+  {
+    "id": "lx-006",
+    "skill": "linux",
+    "topic": "Package Managers",
+    "difficulty": "easy",
+    "question": "Which command installs a package on Ubuntu or Debian?",
+    "options": [
+      "sudo apt install <pkg>",
+      "sudo yum install <pkg>",
+      "pkg-add <pkg>",
+      "install-pkg <pkg>"
+    ],
+    "answer": 0,
+    "explanation": "Debian-based systems use APT; yum/dnf belongs to Red Hat-based systems."
+  },
+  {
+    "id": "lx-011",
+    "skill": "linux",
+    "topic": "Processes",
+    "difficulty": "medium",
+    "question": "What is the difference between `kill PID` and `kill -9 PID`?",
+    "options": [
+      "kill sends SIGTERM (graceful); -9 sends SIGKILL (forceful)",
+      "-9 restarts the process",
+      "There is no difference",
+      "kill -9 pauses the process"
+    ],
+    "answer": 0,
+    "explanation": "SIGTERM asks the process to clean up and exit; SIGKILL terminates it immediately without cleanup."
+  },
+  {
+    "id": "lx-005",
+    "skill": "linux",
+    "topic": "Processes",
+    "difficulty": "easy",
+    "question": "Which command shows currently running processes?",
+    "options": [
+      "ps",
+      "proc",
+      "lsproc",
+      "showproc"
+    ],
+    "answer": 0,
+    "explanation": "ps reports a snapshot of processes; `ps aux` shows all with details."
+  },
+  {
+    "id": "lx-013",
+    "skill": "linux",
+    "topic": "Environment Variables",
+    "difficulty": "medium",
+    "question": "How do you make an environment variable persist for future shells?",
+    "options": [
+      "Add `export VAR=value` to ~/.bashrc or ~/.profile",
+      "Run VAR=value once in the terminal",
+      "Store it in /tmp",
+      "Use env --temporary"
+    ],
+    "answer": 0,
+    "explanation": "Shell startup files are sourced on login, so exports placed there apply to every new session."
+  },
+  {
+    "id": "lx-015",
+    "skill": "linux",
+    "topic": "Shell Scripting",
+    "difficulty": "medium",
+    "question": "What does the shebang line `#!/bin/bash` do?",
+    "options": [
+      "Tells the OS to run the script with /bin/bash",
+      "Comments out the whole script",
+      "Installs bash automatically",
+      "Prints /bin/bash to the terminal"
+    ],
+    "answer": 0,
+    "explanation": "The kernel reads #! and execs the script with the named interpreter."
+  },
+  {
+    "id": "lx-007",
+    "skill": "linux",
+    "topic": "Pipes & Redirection",
+    "difficulty": "easy",
+    "question": "What does the pipe do in `ls | grep txt`?",
+    "options": [
+      "Sends ls output as input to grep",
+      "Runs both commands on two files",
+      "Deletes the ls output",
+      "Merges two files"
+    ],
+    "answer": 0,
+    "explanation": "A pipe connects one command's stdout to the next command's stdin."
+  },
+  {
+    "id": "lx-016",
+    "skill": "linux",
+    "topic": "Permissions",
+    "difficulty": "hard",
+    "question": "What does the setuid bit do on an executable file?",
+    "options": [
+      "Runs the program with the file owner's privileges",
+      "Makes the file impossible to delete",
+      "Hides the file from ls",
+      "Always runs it as root"
+    ],
+    "answer": 0,
+    "explanation": "setuid elevates the process to the owner's identity, which is why it demands careful auditing."
+  },
+  {
+    "id": "lx-017",
+    "skill": "linux",
+    "topic": "Pipes & Redirection",
+    "difficulty": "hard",
+    "question": "In `cmd1 | cmd2 | cmd3`, how do the commands execute?",
+    "options": [
+      "All three run concurrently, connected by pipes",
+      "Strictly one after another",
+      "Only cmd1 and cmd3 run",
+      "Only cmd3 runs"
+    ],
+    "answer": 0,
+    "explanation": "The shell launches the whole pipeline at once; data streams through as each stage produces it."
+  },
+  {
+    "id": "lx-008",
+    "skill": "linux",
+    "topic": "Permissions",
+    "difficulty": "medium",
+    "question": "What is the octal form of the permission string rwxr-xr--?",
+    "options": [
+      "754",
+      "777",
+      "644",
+      "755"
+    ],
+    "answer": 0,
+    "explanation": "rwx=7, r-x=5, r--=4, so the bits map to 754 for user, group, and others."
+  },
+  {
+    "id": "lx-018",
+    "skill": "linux",
+    "topic": "grep/sed/awk",
+    "difficulty": "hard",
+    "question": "What does `awk -F: '{print $1}' /etc/passwd` print?",
+    "options": [
+      "The first colon-separated field (usernames)",
+      "The entire file unchanged",
+      "The file with field 1 deleted",
+      "A count of the lines"
+    ],
+    "answer": 0,
+    "explanation": "-F: sets the field separator to a colon, and $1 is the first field of each record."
+  },
+  {
+    "id": "lx-002",
+    "skill": "linux",
+    "topic": "Navigation",
+    "difficulty": "easy",
+    "question": "What does `cd ..` do?",
+    "options": [
+      "Moves up to the parent directory",
+      "Deletes the current directory",
+      "Creates a directory named ..",
+      "Prints the working directory"
+    ],
+    "answer": 0,
+    "explanation": "`..` always refers to the parent directory, so cd .. goes one level up."
+  },
+  {
+    "id": "lx-009",
+    "skill": "linux",
+    "topic": "Pipes & Redirection",
+    "difficulty": "medium",
+    "question": "What does `command > out.txt 2>&1` do?",
+    "options": [
+      "Redirects both stdout and stderr to out.txt",
+      "Appends stdout only to out.txt",
+      "Redirects stdin from out.txt",
+      "Prints output to the terminal twice"
+    ],
+    "answer": 0,
+    "explanation": "2>&1 merges stderr into stdout, so both streams land in the file."
+  },
+  {
+    "id": "lx-019",
+    "skill": "linux",
+    "topic": "Shell Scripting",
+    "difficulty": "hard",
+    "question": "What does `set -e` do in a bash script?",
+    "options": [
+      "Exits the script immediately if any command fails",
+      "Echoes each command before running it",
+      "Sets a variable named e",
+      "Ignores all errors silently"
+    ],
+    "answer": 0,
+    "explanation": "With errexit, a non-zero status aborts the script, failing fast instead of continuing broken."
+  },
+  {
+    "id": "lx-012",
+    "skill": "linux",
+    "topic": "SSH",
+    "difficulty": "medium",
+    "question": "What does `ssh user@host` do?",
+    "options": [
+      "Opens an encrypted shell session on the remote host",
+      "Copies files to the host",
+      "Starts an SSH server locally",
+      "Encrypts the local disk"
+    ],
+    "answer": 0,
+    "explanation": "SSH gives you a secure remote terminal, tunneling all traffic with encryption."
+  },
+  {
+    "id": "lx-004",
+    "skill": "linux",
+    "topic": "Permissions",
+    "difficulty": "easy",
+    "question": "What does `chmod +x script.sh` do?",
+    "options": [
+      "Makes script.sh executable",
+      "Deletes script.sh",
+      "Opens script.sh in an editor",
+      "Compresses script.sh"
+    ],
+    "answer": 0,
+    "explanation": "+x adds the execute bit so the file can be run as a program."
+  },
+  {
+    "id": "da-011",
+    "skill": "data-analysis",
+    "topic": "Filtering",
+    "difficulty": "medium",
+    "question": "How do you select just the 'name' and 'age' columns?",
+    "options": [
+      "df[['name', 'age']]",
+      "df['name', 'age']",
+      "df.select('name', 'age')",
+      "df.cols('name', 'age')"
+    ],
+    "answer": 0,
+    "explanation": "Passing a list of labels to [] returns a DataFrame with those columns."
+  },
+  {
+    "id": "da-001",
+    "skill": "data-analysis",
+    "topic": "DataFrames",
+    "difficulty": "easy",
+    "question": "How do you create a DataFrame from a dictionary in pandas?",
+    "options": [
+      "pd.DataFrame(data)",
+      "pd.create(data)",
+      "pd.frame(data)",
+      "DataFrame.new(data)"
+    ],
+    "answer": 0,
+    "explanation": "The DataFrame constructor accepts a dict of column names to lists or arrays."
+  },
+  {
+    "id": "da-015",
+    "skill": "data-analysis",
+    "topic": "CSV I/O",
+    "difficulty": "medium",
+    "question": "How do you write a DataFrame to CSV without the index column?",
+    "options": [
+      "df.to_csv('f.csv', index=False)",
+      "df.to_csv('f.csv', no_index=True)",
+      "df.write_csv('f.csv')",
+      "df.save('f.csv')"
+    ],
+    "answer": 0,
+    "explanation": "index=False omits the row labels so the file contains only data columns."
+  },
+  {
+    "id": "da-009",
+    "skill": "data-analysis",
+    "topic": "Merging",
+    "difficulty": "medium",
+    "question": "What does `pd.merge(df1, df2, on='id', how='left')` keep?",
+    "options": [
+      "All rows from df1, with matching df2 columns attached",
+      "Only rows matching in both",
+      "All rows from both frames",
+      "Only df2 rows"
+    ],
+    "answer": 0,
+    "explanation": "A left join preserves every left row, filling NaN where no right-side match exists."
+  },
+  {
+    "id": "da-013",
+    "skill": "data-analysis",
+    "topic": "NumPy",
+    "difficulty": "medium",
+    "question": "What is broadcasting in NumPy?",
+    "options": [
+      "Element-wise ops between arrays of different but compatible shapes",
+      "Sending arrays over the network",
+      "Copying arrays to the GPU",
+      "Converting lists to arrays"
+    ],
+    "answer": 0,
+    "explanation": "Broadcasting stretches the smaller array's dimensions so shapes align without copying data."
+  },
+  {
+    "id": "da-012",
+    "skill": "data-analysis",
+    "topic": "Data Cleaning",
+    "difficulty": "medium",
+    "question": "What does `df.drop_duplicates()` do?",
+    "options": [
+      "Removes duplicate rows",
+      "Removes duplicate columns",
+      "Drops rows with NaN",
+      "Resets the index"
+    ],
+    "answer": 0,
+    "explanation": "It keeps the first occurrence of each duplicated row and drops the rest."
+  },
+  {
+    "id": "da-017",
+    "skill": "data-analysis",
+    "topic": "Merging",
+    "difficulty": "hard",
+    "question": "When should you use pd.concat instead of pd.merge?",
+    "options": [
+      "Stacking frames with the same columns, or aligning along an axis",
+      "Joining on differently named keys",
+      "Filtering rows by condition",
+      "Always; they are interchangeable"
+    ],
+    "answer": 0,
+    "explanation": "concat glues frames along rows or columns; merge joins on key values like SQL."
+  },
+  {
+    "id": "da-016",
+    "skill": "data-analysis",
+    "topic": "GroupBy",
+    "difficulty": "hard",
+    "question": "How does `df.groupby('g').transform('mean')` differ from `.agg('mean')`?",
+    "options": [
+      "transform returns same-shaped output aligned to original rows; agg returns one row per group",
+      "They return identical results",
+      "transform is always faster",
+      "agg cannot compute a mean"
+    ],
+    "answer": 0,
+    "explanation": "transform broadcasts each group's result back to every member row; agg collapses each group to one row."
+  },
+  {
+    "id": "da-006",
+    "skill": "data-analysis",
+    "topic": "Matplotlib",
+    "difficulty": "easy",
+    "question": "Which call creates a simple line plot in matplotlib?",
+    "options": [
+      "plt.plot(x, y)",
+      "plt.line(x, y)",
+      "plt.draw(x, y)",
+      "plt.graph(x, y)"
+    ],
+    "answer": 0,
+    "explanation": "plt.plot draws lines through the points; call plt.show() to display the figure."
+  },
+  {
+    "id": "da-018",
+    "skill": "data-analysis",
+    "topic": "Data Cleaning",
+    "difficulty": "hard",
+    "question": "Why convert low-cardinality string columns with `astype('category')`?",
+    "options": [
+      "It reduces memory and speeds up groupby and merge operations",
+      "It changes the string values",
+      "It is required for plotting",
+      "It increases numeric precision"
+    ],
+    "answer": 0,
+    "explanation": "Categorical dtype stores each unique string once as an integer code instead of repeating it."
+  },
+  {
+    "id": "da-005",
+    "skill": "data-analysis",
+    "topic": "NumPy",
+    "difficulty": "easy",
+    "question": "How do you create a NumPy array from a Python list?",
+    "options": [
+      "np.array([1, 2, 3])",
+      "np.list([1, 2, 3])",
+      "np.create([1, 2, 3])",
+      "array.np([1, 2, 3])"
+    ],
+    "answer": 0,
+    "explanation": "np.array() converts a list (or nested lists) into an n-dimensional array."
+  },
+  {
+    "id": "da-007",
+    "skill": "data-analysis",
+    "topic": "Missing Data",
+    "difficulty": "easy",
+    "question": "How do you detect missing values in a DataFrame?",
+    "options": [
+      "df.isna()",
+      "df.find_null()",
+      "df.missing()",
+      "df.hasna()"
+    ],
+    "answer": 0,
+    "explanation": "isna() returns a boolean DataFrame marking every NaN or None entry as True."
+  },
+  {
+    "id": "da-019",
+    "skill": "data-analysis",
+    "topic": "NumPy",
+    "difficulty": "hard",
+    "question": "What does `arr.reshape(-1, 3)` do?",
+    "options": [
+      "Reshapes arr to 3 columns, inferring the row count",
+      "Deletes the array",
+      "Flattens the array to 1D",
+      "Adds 3 to every element"
+    ],
+    "answer": 0,
+    "explanation": "-1 tells reshape to compute that dimension from the total element count."
+  },
+  {
+    "id": "da-004",
+    "skill": "data-analysis",
+    "topic": "Descriptive Stats",
+    "difficulty": "easy",
+    "question": "What does `df.describe()` return?",
+    "options": [
+      "Summary statistics for numeric columns",
+      "The first five rows",
+      "Column data types",
+      "A plotted chart"
+    ],
+    "answer": 0,
+    "explanation": "describe() reports count, mean, std, min, quartiles, and max per numeric column."
+  },
+  {
+    "id": "da-014",
+    "skill": "data-analysis",
+    "topic": "Descriptive Stats",
+    "difficulty": "medium",
+    "question": "What does the median represent?",
+    "options": [
+      "The middle value of sorted data",
+      "The most frequent value",
+      "The arithmetic average",
+      "The range of the data"
+    ],
+    "answer": 0,
+    "explanation": "The median splits ordered data in half, making it robust to outliers."
+  },
+  {
+    "id": "da-020",
+    "skill": "data-analysis",
+    "topic": "Matplotlib",
+    "difficulty": "hard",
+    "question": "What is the difference between plt.subplots() and plt.figure()?",
+    "options": [
+      "subplots creates a figure plus Axes objects; figure creates only the canvas",
+      "figure is deprecated",
+      "subplots only makes bar charts",
+      "There is no difference"
+    ],
+    "answer": 0,
+    "explanation": "Axes are what you actually plot on; subplots hands you a ready grid of them."
+  },
+  {
+    "id": "da-010",
+    "skill": "data-analysis",
+    "topic": "Missing Data",
+    "difficulty": "medium",
+    "question": "What does `df.fillna(0)` do?",
+    "options": [
+      "Replaces all missing values with 0",
+      "Drops rows containing missing values",
+      "Counts missing values",
+      "Fills with each column's mean"
+    ],
+    "answer": 0,
+    "explanation": "fillna substitutes a value for every NaN; here the literal 0."
+  },
+  {
+    "id": "da-008",
+    "skill": "data-analysis",
+    "topic": "GroupBy",
+    "difficulty": "medium",
+    "question": "What does `df.groupby('dept')['salary'].mean()` compute?",
+    "options": [
+      "Mean salary per department",
+      "Overall mean salary",
+      "Mean of the dept column",
+      "Salaries sorted by department"
+    ],
+    "answer": 0,
+    "explanation": "groupby splits rows by dept, then the mean aggregation runs within each group."
+  },
+  {
+    "id": "da-002",
+    "skill": "data-analysis",
+    "topic": "Filtering",
+    "difficulty": "easy",
+    "question": "How do you select rows where the 'age' column is greater than 30?",
+    "options": [
+      "df[df['age'] > 30]",
+      "df.filter('age' > 30)",
+      "df.select(age > 30)",
+      "df.where(age > 30)"
+    ],
+    "answer": 0,
+    "explanation": "Boolean indexing keeps only rows where the condition Series is True."
+  },
+  {
+    "id": "da-003",
+    "skill": "data-analysis",
+    "topic": "CSV I/O",
+    "difficulty": "easy",
+    "question": "Which pandas function reads a CSV file?",
+    "options": [
+      "pd.read_csv('file.csv')",
+      "pd.open_csv('file.csv')",
+      "pd.load('file.csv')",
+      "pd.csv_read('file.csv')"
+    ],
+    "answer": 0,
+    "explanation": "read_csv parses the file into a DataFrame, inferring headers and dtypes."
+  }
+]

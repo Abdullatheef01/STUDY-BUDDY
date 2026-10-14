@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block theme %}resume{% endblock %}
+{% block title %}{{ skill.name }} Roadmap | AI Career & Research Assistant{% endblock %}
+{% block nav_learn %}b-active{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+
+{% block content %}
+<section style="padding-top:2.6rem;">
+    <div class="b-reveal">
+        <a href="{{ url_for('roadmaps_home') }}" style="font-size:.9rem;">&larr; All roadmaps</a>
+        <div class="b-sec-head">
+            <span class="b-pill">{{ skill.domain }} &middot; {{ skill.demand }} demand</span>
+            <h1>{{ skill.name }} <span class="b-grad">roadmap</span></h1>
+            <p class="b-lede">{{ skill.summary }}</p>
+        </div>
+    </div>
+</section>
+
+{% for st in skill.stages %}
+<section class="b-section" style="padding-top:0;" aria-label="{{ st.stage }} stage">
+    <div class="b-card b-reveal">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
+            <div>
+                <span class="b-tag">{{ st.stage }}</span>
+                <h2 style="margin:.5rem 0 .2rem;">{{ st.title }}</h2>
+                <p style="color:var(--b-muted);margin:0;">About {{ st.weeks }} weeks</p>
+            </div>
+            {% if is_authed %}
+            <div class="b-cta-row" role="group" aria-label="Mark {{ st.stage }} progress">
+                {% for val, label in [('not_started','Not started'),('in_progress','In progress'),('completed','Done')] %}
+                <button class="b-btn b-btn--sm stage-btn {% if progress.get(st.stage) == val %}b-btn--primary{% else %}b-btn--ghost{% endif %}"
+                        data-skill="{{ skill.id }}" data-stage="{{ st.stage }}" data-status="{{ val }}">{{ label }}</button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <h3 style="margin-top:1.4rem;">Topics</h3>
+        <ul style="columns:2;column-gap:2rem;margin:.4rem 0;">
+            {% for t in st.topics %}<li style="margin-bottom:.35rem;break-inside:avoid;">{{ t }}</li>{% endfor %}
+        </ul>
+
+        <h3>Free resources</h3>
+        <div class="b-bento" style="grid-template-columns:repeat(2,1fr);">
+            {% for r in st.resources %}
+            <a class="b-card b-card--lite" href="{{ r.url }}" target="_blank" rel="noopener noreferrer" style="padding:1rem 1.2rem;">
+                <div style="display:flex;justify-content:space-between;gap:.6rem;align-items:baseline;">
+                    <strong style="font-size:.92rem;">{{ r.title }}</strong>
+                    <span class="b-tag" style="flex-shrink:0;">{{ r.type }}</span>
+                </div>
+                <div style="color:var(--b-muted);font-size:.82rem;margin-top:.3rem;">{{ r.provider }}{% if r.note %} &middot; {{ r.note }}{% endif %}</div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <h3>Hands-on practice</h3>
+        <ol style="margin:.4rem 0;">
+            {% for task in st.practice_tasks %}<li style="margin-bottom:.35rem;">{{ task }}</li>{% endfor %}
+        </ol>
+
+        <div class="b-flash b-flash--info" style="margin:1.2rem 0 0;">
+            <strong>Milestone checkpoint:</strong> {{ st.checkpoint }}
+        </div>
+    </div>
+</section>
+{% endfor %}
+
+{% if not is_authed %}
+<section class="b-section" style="padding-top:0;">
+    <div class="b-card b-card--cta b-reveal">
+        <h2>Track your <span class="b-grad">progress</span></h2>
+        <p class="b-lede" style="margin-left:auto;margin-right:auto;">Sign in to mark stages complete and watch your roadmap fill up on your dashboard.</p>
+        <a class="b-btn b-btn--primary b-magnet" href="{{ url_for('login') }}">Sign in</a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/learn_roadmaps.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,744 @@
+{"skills": [
+  {
+    "id": "python",
+    "name": "Python",
+    "domain": "Programming",
+    "summary": "Python is the most beginner-friendly language for jobs in software, data, and AI. It powers backend services, automation, data analysis, and machine learning pipelines.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Python Foundations",
+        "weeks": 4,
+        "topics": [
+          "Variables, data types, operators, and type conversion",
+          "Strings, lists, tuples, dictionaries, and sets",
+          "Conditionals, for/while loops, break and continue",
+          "Functions, arguments, return values, and scope",
+          "Reading and writing files with pathlib",
+          "Error handling with try, except, and finally",
+          "Virtual environments, pip, and running scripts"
+        ],
+        "resources": [
+          {"title": "The Official Python Tutorial", "type": "docs", "url": "https://docs.python.org/3/tutorial/", "provider": "Python Software Foundation", "free": true, "note": "Start here; authoritative and complete."},
+          {"title": "Scientific Computing with Python", "type": "course", "url": "https://www.freecodecamp.org/learn/scientific-computing-with-python/", "provider": "freeCodeCamp", "free": true, "note": "Hands-on certification with projects."},
+          {"title": "CS50's Introduction to Programming with Python", "type": "course", "url": "https://cs50.harvard.edu/python/", "provider": "Harvard CS50", "free": true, "note": "Excellent lectures and problem sets."},
+          {"title": "Programming, Data Structures and Algorithms using Python", "type": "course", "url": "https://nptel.ac.in/courses/106106182", "provider": "NPTEL", "free": true, "note": "IIT Madras course, exam optional."},
+          {"title": "Learn Python", "type": "practice", "url": "https://www.kaggle.com/learn/python", "provider": "Kaggle Learn", "free": true, "note": "Short interactive micro-course with exercises."}
+        ],
+        "practice_tasks": [
+          "Write a CLI to-do app with argparse and file persistence",
+          "Build a number-guessing game with input validation and replay",
+          "Automate renaming and organizing 50 files using pathlib",
+          "Solve 15 easy HackerRank Python problems"
+        ],
+        "checkpoint": "You can write and debug a 200-line Python program on your own: the CLI to-do app runs, handles bad input gracefully, saves data to a file, and you can explain functions, scope, and try/except in your code."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Python for Real Projects",
+        "weeks": 6,
+        "topics": [
+          "OOP: classes, inheritance, dunder methods, properties",
+          "Decorators, generators, and context managers",
+          "Fetching and parsing JSON APIs with requests",
+          "Unit testing with pytest and fixtures",
+          "Logging, debugging with pdb, and profiling basics",
+          "Packaging projects with pyproject.toml and venv",
+          "Threading vs asyncio: when to use which",
+          "Working with dates, regex, and CSV/JSON data"
+        ],
+        "resources": [
+          {"title": "Corey Schafer Python Tutorials", "type": "video", "url": "https://www.youtube.com/@coreyms", "provider": "Corey Schafer", "free": true, "note": "OOP, decorators, and web framework playlists."},
+          {"title": "Automate the Boring Stuff with Python", "type": "book", "url": "https://automatetheboringstuff.com/", "provider": "Al Sweigart", "free": true, "note": "Free online book of practical projects."},
+          {"title": "Real Python Tutorials", "type": "article", "url": "https://realpython.com/", "provider": "Real Python", "free": true, "note": "Deep dives on intermediate topics."},
+          {"title": "pytest Documentation", "type": "docs", "url": "https://docs.pytest.org/", "provider": "pytest", "free": true, "note": "Learn fixtures and test organization."},
+          {"title": "asyncio Documentation", "type": "docs", "url": "https://docs.python.org/3/library/asyncio.html", "provider": "Python Software Foundation", "free": true, "note": "Official guide to async Python."}
+        ],
+        "practice_tasks": [
+          "Build a REST client that fetches, caches, and summarizes a public API",
+          "Write a 20+ test pytest suite for your to-do app",
+          "Create a retry/timeout decorator with logging",
+          "Build a polite rate-limited web scraper with threads"
+        ],
+        "checkpoint": "You can ship a tested Python project: the REST client has clean OOP design, 20+ passing pytest tests, logging, a pyproject.toml, and you can explain decorators and the asyncio event loop."
+      },
+      {
+        "stage": "advanced",
+        "title": "Professional Python Engineering",
+        "weeks": 8,
+        "topics": [
+          "Design patterns in Python: factory, strategy, observer",
+          "Type hints, mypy, and static analysis",
+          "Profiling with cProfile and performance optimization",
+          "The GIL, multiprocessing, and memory management",
+          "Building async web APIs with FastAPI",
+          "Publishing packages to PyPI with CI",
+          "C extensions and Cython overview",
+          "Reading and contributing to open-source codebases"
+        ],
+        "resources": [
+          {"title": "Python HOWTOs", "type": "docs", "url": "https://docs.python.org/3/howto/", "provider": "Python Software Foundation", "free": true, "note": "Authoritative guides on advanced topics."},
+          {"title": "FastAPI Tutorial", "type": "course", "url": "https://fastapi.tiangolo.com/tutorial/", "provider": "FastAPI", "free": true, "note": "Build production async APIs step by step."},
+          {"title": "mypy Documentation", "type": "docs", "url": "https://mypy.readthedocs.io/", "provider": "mypy", "free": true, "note": "Gradual typing for large codebases."},
+          {"title": "Python Packaging Guide", "type": "docs", "url": "https://packaging.python.org/tutorials/packaging-projects/", "provider": "Python Packaging Authority", "free": true, "note": "Publish your own package to PyPI."},
+          {"title": "Real Python Advanced Articles", "type": "article", "url": "https://realpython.com/", "provider": "Real Python", "free": true, "note": "Concurrency, GIL, and performance deep dives."}
+        ],
+        "practice_tasks": [
+          "Build and deploy a FastAPI service with async endpoints and tests",
+          "Type-annotate a 1000-line project and make mypy pass cleanly",
+          "Profile and 2x the speed of a slow data-processing script",
+          "Publish a small utility package to PyPI with GitHub Actions CI"
+        ],
+        "checkpoint": "You build production Python: the FastAPI service is typed, tested, profiled, and deployed; your PyPI package installs cleanly; you can explain the GIL and when to use multiprocessing."
+      }
+    ]
+  },
+  {
+    "id": "javascript",
+    "name": "JavaScript",
+    "domain": "Programming",
+    "summary": "JavaScript runs the web: every interactive site and most front-end jobs need it. It also powers back-end services with Node.js, mobile apps, and desktop apps.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "JavaScript Foundations",
+        "weeks": 4,
+        "topics": [
+          "let/const, primitive types, operators, and type coercion",
+          "Functions, arrow functions, parameters, and scope",
+          "Arrays and objects: map, filter, reduce, destructuring",
+          "DOM selection, events, and dynamic page updates",
+          "Template literals, spread/rest, and ES6 essentials",
+          "JSON, fetch basics, and handling responses",
+          "Debugging with browser DevTools and console"
+        ],
+        "resources": [
+          {"title": "MDN JavaScript Guide", "type": "docs", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript", "provider": "MDN", "free": true, "note": "The definitive JavaScript reference."},
+          {"title": "The Modern JavaScript Tutorial", "type": "docs", "url": "https://javascript.info/", "provider": "javascript.info", "free": true, "note": "Clear explanations with inline exercises."},
+          {"title": "JavaScript Algorithms and Data Structures", "type": "course", "url": "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/", "provider": "freeCodeCamp", "free": true, "note": "Certification with 5 final projects."},
+          {"title": "Traversy Media JavaScript Videos", "type": "video", "url": "https://www.youtube.com/@TraversyMedia", "provider": "Traversy Media", "free": true, "note": "Practical crash courses and projects."}
+        ],
+        "practice_tasks": [
+          "Build an interactive to-do list with localStorage persistence",
+          "Create a form validator with live inline error messages",
+          "Build a quiz app that loads questions from a JSON file",
+          "Recreate accordion, tabs, and modal components in vanilla JS"
+        ],
+        "checkpoint": "You can build interactive pages from scratch: the to-do app persists data, the form validates live, and you can explain scope, array methods, and how DOM events propagate."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Async JavaScript and Tooling",
+        "weeks": 6,
+        "topics": [
+          "Closures, the this keyword, and execution context",
+          "Prototypes, classes, and inheritance in JS",
+          "Callbacks, promises, and async/await patterns",
+          "Fetch, REST APIs, and robust error handling",
+          "ES modules, npm, and Vite project setup",
+          "Unit testing with Vitest",
+          "Regular expressions for validation and parsing",
+          "The event loop: call stack, queue, and microtasks"
+        ],
+        "resources": [
+          {"title": "You Don't Know JS (book series)", "type": "book", "url": "https://github.com/getify/You-Dont-Know-JS", "provider": "Kyle Simpson", "free": true, "note": "Free on GitHub; the deep-dive classic."},
+          {"title": "MDN Asynchronous JavaScript", "type": "docs", "url": "https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous", "provider": "MDN", "free": true, "note": "Promises and async/await explained well."},
+          {"title": "MDN Event Loop Guide", "type": "docs", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop", "provider": "MDN", "free": true, "note": "Understand how JS concurrency really works."},
+          {"title": "Vite Guide", "type": "docs", "url": "https://vite.dev/guide/", "provider": "Vite", "free": true, "note": "Modern build tooling for JS projects."},
+          {"title": "Vitest Documentation", "type": "docs", "url": "https://vitest.dev/", "provider": "Vitest", "free": true, "note": "Fast unit testing for modern JS."}
+        ],
+        "practice_tasks": [
+          "Build a GitHub-user dashboard using fetch with loading and error states",
+          "Rewrite callback code into clean async/await with retries",
+          "Set up a Vite project with Vitest and 15+ passing tests",
+          "Build a debounced live-search against a public API"
+        ],
+        "checkpoint": "You can build async front-ends confidently: the dashboard handles loading, errors, and retries; the Vite project is tested; you can whiteboard the event loop and explain closures."
+      },
+      {
+        "stage": "advanced",
+        "title": "Professional JavaScript Engineering",
+        "weeks": 8,
+        "topics": [
+          "TypeScript: types, interfaces, and generics",
+          "Design patterns: module, observer, factory in JS",
+          "Performance: profiling, memoization, bundle analysis",
+          "Web Workers and Service Workers for PWAs",
+          "Security: XSS, CSP, and safe DOM practices",
+          "Node.js core APIs and publishing an npm package",
+          "Reading framework source code (React/Vue internals)"
+        ],
+        "resources": [
+          {"title": "TypeScript Handbook", "type": "docs", "url": "https://www.typescriptlang.org/docs/handbook/intro.html", "provider": "Microsoft", "free": true, "note": "Official guide from basics to advanced types."},
+          {"title": "Node.js Learn Guides", "type": "docs", "url": "https://nodejs.org/en/learn", "provider": "Node.js", "free": true, "note": "Official Node.js learning material."},
+          {"title": "web.dev Performance Course", "type": "course", "url": "https://web.dev/learn/performance", "provider": "web.dev", "free": true, "note": "Make sites fast: metrics and techniques."},
+          {"title": "MDN Web Workers API", "type": "docs", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API", "provider": "MDN", "free": true, "note": "Background threads for heavy work."},
+          {"title": "patterns.dev", "type": "article", "url": "https://www.patterns.dev/", "provider": "patterns.dev", "free": true, "note": "Free book on JS design patterns."}
+        ],
+        "practice_tasks": [
+          "Convert a JS project to TypeScript with strict mode passing",
+          "Build an offline-capable PWA with a service worker",
+          "Profile and fix a slow page: measure before and after",
+          "Publish a small npm utility with docs and tests"
+        ],
+        "checkpoint": "You write production-grade JS: a strict TypeScript codebase, an offline PWA, documented performance wins, and a published npm package you can explain end to end."
+      }
+    ]
+  },
+  {
+    "id": "html-css",
+    "name": "HTML & CSS",
+    "domain": "Web",
+    "summary": "HTML and CSS are the foundation of every website and the entry point to front-end jobs. Strong layout and responsive skills are tested in almost every UI interview.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "HTML and CSS Foundations",
+        "weeks": 4,
+        "topics": [
+          "Semantic HTML5: header, nav, main, article, section, footer",
+          "Forms, inputs, labels, and basic validation",
+          "Links, images, media, and accessible alt text",
+          "CSS selectors, specificity, and the cascade",
+          "Box model, display types, and positioning",
+          "Flexbox for one-dimensional layouts",
+          "Responsive basics: viewport, media queries, fluid units",
+          "CSS variables and accessible color contrast"
+        ],
+        "resources": [
+          {"title": "MDN HTML Reference", "type": "docs", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML", "provider": "MDN", "free": true, "note": "Complete HTML element reference."},
+          {"title": "MDN CSS Reference", "type": "docs", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS", "provider": "MDN", "free": true, "note": "Every CSS property explained."},
+          {"title": "Responsive Web Design Certification", "type": "course", "url": "https://www.freecodecamp.org/learn/responsive-web-design/", "provider": "freeCodeCamp", "free": true, "note": "Project-based certification path."},
+          {"title": "Learn CSS", "type": "course", "url": "https://web.dev/learn/css", "provider": "web.dev", "free": true, "note": "Modern CSS from the Chrome team."}
+        ],
+        "practice_tasks": [
+          "Build a semantic personal portfolio page",
+          "Recreate a pricing-table section with flexbox",
+          "Build a responsive landing page with a mobile nav menu",
+          "Style an accessible form with focus and error states"
+        ],
+        "checkpoint": "You can hand-code responsive pages: the landing page works on mobile and desktop, uses semantic tags throughout, and you can explain specificity and the box model."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Modern CSS and Layout Mastery",
+        "weeks": 5,
+        "topics": [
+          "CSS Grid: tracks, areas, and complex layouts",
+          "Transitions, transforms, and keyframe animations",
+          "Custom properties for theming (dark mode)",
+          "BEM naming and maintainable CSS architecture",
+          "Fluid typography with clamp() and container queries",
+          "Tailwind CSS utility-first workflow",
+          "Responsive images: srcset, sizes, and formats"
+        ],
+        "resources": [
+          {"title": "CSS-Tricks Guides", "type": "article", "url": "https://css-tricks.com/", "provider": "CSS-Tricks", "free": true, "note": "Grid and flexbox visual guides."},
+          {"title": "Tailwind CSS Docs", "type": "docs", "url": "https://tailwindcss.com/docs", "provider": "Tailwind Labs", "free": true, "note": "Utility-first framework reference."},
+          {"title": "Learn Responsive Design", "type": "course", "url": "https://web.dev/learn/design", "provider": "web.dev", "free": true, "note": "Modern responsive patterns course."},
+          {"title": "Interneting Is Hard", "type": "course", "url": "https://www.internetingishard.com/", "provider": "Interneting Is Hard", "free": true, "note": "Friendly HTML/CSS from zero to advanced."}
+        ],
+        "practice_tasks": [
+          "Build a 12-section marketing page using CSS Grid",
+          "Implement dark/light theme toggle with CSS variables",
+          "Rebuild the same page with Tailwind and compare",
+          "Create an animated hero section with keyframes"
+        ],
+        "checkpoint": "You can build polished, modern UIs: the marketing page uses Grid, has a working theme toggle, animates smoothly, and you can defend your CSS architecture choices."
+      },
+      {
+        "stage": "advanced",
+        "title": "Production Front-End Craft",
+        "weeks": 6,
+        "topics": [
+          "Rendering pipeline: layout, paint, composite",
+          "Scroll-driven animations and FLIP technique",
+          "Design systems: tokens, components, documentation",
+          "WCAG 2.2 accessibility in practice",
+          "Sass/PostCSS in a build pipeline",
+          "Cross-browser testing and graceful fallbacks",
+          "CSS performance: containment and will-change"
+        ],
+        "resources": [
+          {"title": "MDN Accessibility Docs", "type": "docs", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility", "provider": "MDN", "free": true, "note": "ARIA and accessible patterns."},
+          {"title": "Learn Accessibility", "type": "course", "url": "https://web.dev/learn/accessibility", "provider": "web.dev", "free": true, "note": "Full accessibility course."},
+          {"title": "Sass Documentation", "type": "docs", "url": "https://sass-lang.com/documentation/", "provider": "Sass", "free": true, "note": "Preprocessor for large stylesheets."},
+          {"title": "Smashing Magazine CSS Articles", "type": "article", "url": "https://www.smashingmagazine.com/", "provider": "Smashing Magazine", "free": true, "note": "In-depth front-end engineering articles."}
+        ],
+        "practice_tasks": [
+          "Audit a site for accessibility and fix all critical issues",
+          "Build a mini design system: 10 components with docs",
+          "Optimize a janky animation using the rendering pipeline",
+          "Ship a Sass-based stylesheet architecture for a project"
+        ],
+        "checkpoint": "You ship accessible, performant UIs: the audit report shows fixed issues, the design system is documented and reusable, and you can explain the rendering pipeline."
+      }
+    ]
+  },
+  {
+    "id": "dsa",
+    "name": "Data Structures & Algorithms",
+    "domain": "Computer Science",
+    "summary": "Data structures and algorithms are the core of technical interviews at product companies. Strong DSA signals problem-solving ability for SDE roles and top placements.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "DSA Foundations",
+        "weeks": 5,
+        "topics": [
+          "Big-O notation and complexity analysis",
+          "Arrays and strings: two pointers, basic patterns",
+          "Sorting: bubble, insertion, merge, quick",
+          "Searching: linear and binary search",
+          "Recursion: base cases and call stacks",
+          "Hash maps and sets for O(1) lookups",
+          "Math for coding: GCD, primes, modular arithmetic"
+        ],
+        "resources": [
+          {"title": "GeeksforGeeks Data Structures", "type": "practice", "url": "https://www.geeksforgeeks.org/data-structures/", "provider": "GeeksforGeeks", "free": true, "note": "Topic-wise explanations and problems."},
+          {"title": "NeetCode Roadmap", "type": "course", "url": "https://neetcode.io/roadmap", "provider": "NeetCode", "free": true, "note": "Structured path with video solutions."},
+          {"title": "NeetCode YouTube Channel", "type": "video", "url": "https://www.youtube.com/@NeetCode", "provider": "NeetCode", "free": true, "note": "Clear animated problem walkthroughs."},
+          {"title": "HackerRank Algorithms Domain", "type": "practice", "url": "https://www.hackerrank.com/domains/algorithms", "provider": "HackerRank", "free": true, "note": "Graded problems with editorials."},
+          {"title": "Striver's A2Z DSA Sheet", "type": "practice", "url": "https://takeuforward.org/strivers-a2z-dsa-course/strivers-a2z-dsa-course-sheet-2", "provider": "takeUforward", "free": true, "note": "Popular curated problem list."}
+        ],
+        "practice_tasks": [
+          "Solve 40 easy array and string problems with complexity notes",
+          "Implement merge sort, quicksort, and binary search from scratch",
+          "Trace recursion call trees for 5 recursive problems",
+          "Finish the NeetCode Arrays and Hashing section"
+        ],
+        "checkpoint": "You can analyze and solve easy problems: 40 solved with correct Big-O stated, sorts implemented from memory, and you can explain recursion's call stack."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Core Patterns and Data Structures",
+        "weeks": 8,
+        "topics": [
+          "Linked lists: reversal, cycles, merging",
+          "Stacks, queues, and monotonic stack patterns",
+          "Trees: traversals, BST operations, LCA",
+          "Heaps and priority queues for top-K problems",
+          "Graphs: BFS, DFS, connected components",
+          "Sliding window and two pointers mastery",
+          "Binary search on answers",
+          "Backtracking: subsets, permutations, N-queens"
+        ],
+        "resources": [
+          {"title": "LeetCode Problem Set", "type": "practice", "url": "https://leetcode.com/problemset/", "provider": "LeetCode", "free": true, "note": "The standard interview problem bank."},
+          {"title": "CP-algorithms", "type": "docs", "url": "https://cp-algorithms.com/", "provider": "cp-algorithms", "free": true, "note": "Rigorous algorithm explanations."},
+          {"title": "NeetCode 150 Practice List", "type": "practice", "url": "https://neetcode.io/practice", "provider": "NeetCode", "free": true, "note": "150 curated interview problems."},
+          {"title": "Abdul Bari Algorithms", "type": "video", "url": "https://www.youtube.com/@abdul_bari", "provider": "Abdul Bari", "free": true, "note": "University-style algorithm lectures."},
+          {"title": "GeeksforGeeks Graph Algorithms", "type": "article", "url": "https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/", "provider": "GeeksforGeeks", "free": true, "note": "Graph theory with code examples."}
+        ],
+        "practice_tasks": [
+          "Solve 80 medium problems across the 8 topic areas",
+          "Implement a graph library: BFS, DFS, cycle detection",
+          "Solve 10 backtracking problems with pruning",
+          "Do 5 timed 90-minute mock problem sessions"
+        ],
+        "checkpoint": "You handle medium problems reliably: 80 solved, graph traversals coded from scratch, and you can pick the right pattern (window, heap, BFS) for a new problem."
+      },
+      {
+        "stage": "advanced",
+        "title": "Advanced Algorithms and Interview Mastery",
+        "weeks": 10,
+        "topics": [
+          "Dynamic programming: knapsack, LIS, interval patterns",
+          "Tries, segment trees, and Fenwick trees",
+          "Union-Find, Kruskal's, and MST",
+          "Dijkstra, topological sort, and SCC",
+          "Greedy algorithms and correctness proofs",
+          "Bit manipulation tricks",
+          "Timed contests and interview strategy"
+        ],
+        "resources": [
+          {"title": "LeetCode Study Plans", "type": "practice", "url": "https://leetcode.com/studyplan/", "provider": "LeetCode", "free": true, "note": "Structured plans including DP study plan."},
+          {"title": "CP-algorithms Dynamic Programming", "type": "docs", "url": "https://cp-algorithms.com/", "provider": "cp-algorithms", "free": true, "note": "Deep DP pattern catalog with proofs."},
+          {"title": "Codeforces Problemset", "type": "practice", "url": "https://codeforces.com/problemset", "provider": "Codeforces", "free": true, "note": "Hard problems and live contests."},
+          {"title": "MIT 6.006 Introduction to Algorithms", "type": "course", "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/", "provider": "MIT OpenCourseWare", "free": true, "note": "Full university algorithms course."},
+          {"title": "interviewing.io", "type": "practice", "url": "https://interviewing.io/", "provider": "interviewing.io", "free": true, "note": "Anonymous peer mock interviews."}
+        ],
+        "practice_tasks": [
+          "Solve 50 hard problems with written solution explanations",
+          "Implement segment tree, trie, and union-find from scratch",
+          "Compete in 6 Codeforces rounds and upsolve failures",
+          "Complete 5 full mock interviews with feedback notes"
+        ],
+        "checkpoint": "You are interview-ready: 50 hard problems solved, advanced structures implemented from memory, contest rating improving, and mock interviewers rate your communication strong."
+      }
+    ]
+  },
+  {
+    "id": "sql",
+    "name": "SQL & Databases",
+    "domain": "Data",
+    "summary": "SQL is required for backend, data analyst, and data science roles. Nearly every company stores data in relational databases, and SQL interviews are standard.",
+    "demand": "Very High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "SQL Foundations",
+        "weeks": 3,
+        "topics": [
+          "SELECT, WHERE, ORDER BY, LIMIT",
+          "Filtering with AND, OR, NOT, LIKE, IN, BETWEEN",
+          "Aggregate functions: COUNT, SUM, AVG, MIN, MAX",
+          "GROUP BY and HAVING",
+          "Handling NULLs and data types",
+          "INSERT, UPDATE, DELETE safely",
+          "Sorting, pagination, and DISTINCT"
+        ],
+        "resources": [
+          {"title": "SQLBolt", "type": "course", "url": "https://sqlbolt.com/", "provider": "SQLBolt", "free": true, "note": "Interactive lessons with exercises."},
+          {"title": "Intro to SQL", "type": "course", "url": "https://www.kaggle.com/learn/intro-to-sql", "provider": "Kaggle Learn", "free": true, "note": "Query real datasets in the browser."},
+          {"title": "Mode SQL Tutorial", "type": "course", "url": "https://mode.com/sql-tutorial", "provider": "Mode", "free": true, "note": "Business-focused SQL tutorial."},
+          {"title": "Learn SQL in 10 Minutes", "type": "article", "url": "https://www.freecodecamp.org/news/learn-sql-in-10-minutes/", "provider": "freeCodeCamp", "free": true, "note": "Quick syntax refresher."}
+        ],
+        "practice_tasks": [
+          "Write 50 queries against a sample e-commerce dataset",
+          "Build a movie-ratings database and answer 10 analytics questions",
+          "Normalize a messy spreadsheet into 3 related tables",
+          "Complete SQLBolt lessons 1-10 with all exercises"
+        ],
+        "checkpoint": "You can query confidently: 50 queries written, the movie database answers all 10 questions correctly, and you can explain GROUP BY vs WHERE filtering."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Joins, Subqueries and Real Databases",
+        "weeks": 5,
+        "topics": [
+          "INNER, LEFT, RIGHT, and FULL joins",
+          "Subqueries and common table expressions (CTEs)",
+          "Window functions: ROW_NUMBER, RANK, LAG, LEAD",
+          "Views and basic indexing",
+          "Transactions and ACID properties",
+          "PostgreSQL types, constraints, and keys",
+          "Loading CSVs with psql and pgAdmin"
+        ],
+        "resources": [
+          {"title": "PostgreSQL Documentation", "type": "docs", "url": "https://www.postgresql.org/docs/", "provider": "PostgreSQL", "free": true, "note": "Official reference for everything Postgres."},
+          {"title": "Database Management Systems", "type": "course", "url": "https://nptel.ac.in/courses/106104135", "provider": "NPTEL", "free": true, "note": "IIT Kharagpur DBMS course."},
+          {"title": "PostgreSQL Tutorial", "type": "docs", "url": "https://www.postgresql.org/docs/current/tutorial.html", "provider": "PostgreSQL", "free": true, "note": "Official hands-on tutorial."},
+          {"title": "SQLZoo", "type": "practice", "url": "https://sqlzoo.net/", "provider": "SQLZoo", "free": true, "note": "Interactive tutorials and quizzes."},
+          {"title": "LeetCode Database Problems", "type": "practice", "url": "https://leetcode.com/problemset/database/", "provider": "LeetCode", "free": true, "note": "Interview-style SQL problems."}
+        ],
+        "practice_tasks": [
+          "Solve 30 LeetCode database problems",
+          "Rewrite 10 subqueries as CTEs and window functions",
+          "Design a small app schema with keys and constraints",
+          "Load a 1M-row CSV into Postgres and query it"
+        ],
+        "checkpoint": "You write real-world SQL: 30 problems solved, CTEs and window functions used fluently, and your schema has proper keys, constraints, and indexes."
+      },
+      {
+        "stage": "advanced",
+        "title": "Database Engineering",
+        "weeks": 7,
+        "topics": [
+          "Query optimization and indexing strategies",
+          "Reading EXPLAIN ANALYZE output",
+          "Normalization to 3NF and denormalization trade-offs",
+          "Stored procedures, functions, and triggers",
+          "Backups, replication, and point-in-time recovery",
+          "NoSQL overview: MongoDB documents and Redis caching",
+          "Star schema modeling for analytics"
+        ],
+        "resources": [
+          {"title": "Use the Index, Luke", "type": "book", "url": "https://use-the-index-luke.com/", "provider": "Use the Index, Luke", "free": true, "note": "Free book on SQL performance."},
+          {"title": "PostgreSQL Performance Tips", "type": "docs", "url": "https://www.postgresql.org/docs/current/performance-tips.html", "provider": "PostgreSQL", "free": true, "note": "Official optimization guidance."},
+          {"title": "MongoDB University", "type": "course", "url": "https://learn.mongodb.com/", "provider": "MongoDB", "free": true, "note": "Free NoSQL courses and labs."},
+          {"title": "GeeksforGeeks DBMS Articles", "type": "article", "url": "https://www.geeksforgeeks.org/dbms/", "provider": "GeeksforGeeks", "free": true, "note": "DBMS theory for interviews."},
+          {"title": "freeCodeCamp Database Courses", "type": "video", "url": "https://www.youtube.com/@freecodecamp", "provider": "freeCodeCamp", "free": true, "note": "Full database design video courses."}
+        ],
+        "practice_tasks": [
+          "Optimize 5 slow queries: show before/after EXPLAIN plans",
+          "Design a star schema for an analytics dashboard",
+          "Build a Redis cache layer in front of a slow query",
+          "Set up automated Postgres backups and test a restore"
+        ],
+        "checkpoint": "You engineer databases: slow queries fixed with evidence, a working star schema, Redis caching demonstrated, and a tested backup/restore you can explain."
+      }
+    ]
+  },
+  {
+    "id": "git-github",
+    "name": "Git & GitHub",
+    "domain": "Tools",
+    "summary": "Git and GitHub are non-negotiable for every software job. Teams collaborate through pull requests, and your GitHub profile is your public portfolio.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Git Essentials",
+        "weeks": 3,
+        "topics": [
+          "init, add, commit, status, and log",
+          "Branching, switching, and basic merging",
+          "Writing good commit messages",
+          ".gitignore patterns",
+          "Undoing mistakes: restore and reset",
+          "diff, blame, and reading history",
+          "SSH keys, cloning, pushing, and pulling"
+        ],
+        "resources": [
+          {"title": "Pro Git Book", "type": "book", "url": "https://git-scm.com/book/en/v2", "provider": "git-scm", "free": true, "note": "The free definitive Git book."},
+          {"title": "Git Documentation", "type": "docs", "url": "https://git-scm.com/doc", "provider": "Git", "free": true, "note": "Official reference docs."},
+          {"title": "Learn Git Branching", "type": "practice", "url": "https://learngitbranching.js.org/", "provider": "LearnGitBranching", "free": true, "note": "Visual interactive branching game."},
+          {"title": "Oh My Git!", "type": "practice", "url": "https://ohmygit.org/", "provider": "Oh My Git", "free": true, "note": "Playful Git learning game."}
+        ],
+        "practice_tasks": [
+          "Create a repo with 20 commits across 3 branches, then merge",
+          "Break things on purpose, then recover with reflog",
+          "Push a project to GitHub with README and .gitignore",
+          "Finish Learn Git Branching main levels"
+        ],
+        "checkpoint": "You use Git daily without fear: branches and merges are routine, you can recover from mistakes with reflog, and your GitHub repo has clean history."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Collaborative GitHub Workflows",
+        "weeks": 5,
+        "topics": [
+          "Pull requests and code review etiquette",
+          "Merge vs rebase vs squash strategies",
+          "Resolving merge conflicts confidently",
+          "Issues, Projects, and linking work",
+          "Forking and contributing to open source",
+          "GitHub Actions CI basics",
+          "Tags, releases, stash, and cherry-pick"
+        ],
+        "resources": [
+          {"title": "GitHub Docs", "type": "docs", "url": "https://docs.github.com/", "provider": "GitHub", "free": true, "note": "Official GitHub documentation."},
+          {"title": "freeCodeCamp Git and GitHub Course", "type": "video", "url": "https://www.youtube.com/@freecodecamp", "provider": "freeCodeCamp", "free": true, "note": "Full Git and GitHub video course."},
+          {"title": "GitHub Skills", "type": "practice", "url": "https://skills.github.com/", "provider": "GitHub Skills", "free": true, "note": "Interactive courses inside GitHub."},
+          {"title": "Atlassian Git Tutorials", "type": "article", "url": "https://www.atlassian.com/git", "provider": "Atlassian", "free": true, "note": "Clear workflow comparisons."}
+        ],
+        "practice_tasks": [
+          "Open a PR on an open-source repo and address review feedback",
+          "Rebase a feature branch and resolve 3 conflicts",
+          "Add a GitHub Actions workflow that runs tests on PRs",
+          "Cut a tagged release with auto-generated notes"
+        ],
+        "checkpoint": "You collaborate like a pro: a merged OSS PR, clean rebased branches, a working CI workflow, and you can explain merge vs rebase trade-offs."
+      },
+      {
+        "stage": "advanced",
+        "title": "Git Mastery and DevOps Habits",
+        "weeks": 6,
+        "topics": [
+          "Interactive rebase and safe history rewriting",
+          "Git hooks and pre-commit frameworks",
+          "Submodules vs subtrees",
+          "Git internals: objects, refs, and the index",
+          "Advanced Actions: matrix builds, caching, deployments",
+          "Conventional commits and changelog generation",
+          "Signed commits and secret scanning"
+        ],
+        "resources": [
+          {"title": "GitHub Actions Docs", "type": "docs", "url": "https://docs.github.com/en/actions", "provider": "GitHub", "free": true, "note": "Official CI/CD documentation."},
+          {"title": "Pro Git: Internals", "type": "book", "url": "https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain", "provider": "git-scm", "free": true, "note": "How Git actually works under the hood."},
+          {"title": "Conventional Commits", "type": "docs", "url": "https://www.conventionalcommits.org/", "provider": "Conventional Commits", "free": true, "note": "Commit message specification."},
+          {"title": "pre-commit Framework", "type": "docs", "url": "https://pre-commit.com/", "provider": "pre-commit", "free": true, "note": "Automated checks before every commit."}
+        ],
+        "practice_tasks": [
+          "Rewrite a messy branch history into clean atomic commits",
+          "Build a matrix CI pipeline with caching and deployments",
+          "Set up pre-commit hooks with linting and secret scanning",
+          "Sign commits with GPG/SSH and verify them on GitHub"
+        ],
+        "checkpoint": "You master Git end to end: histories are clean and signed, CI deploys automatically, hooks catch mistakes, and you can explain Git internals."
+      }
+    ]
+  },
+  {
+    "id": "linux",
+    "name": "Linux & Command Line",
+    "domain": "Tools",
+    "summary": "Linux runs the servers behind nearly every web service, and the command line is a daily tool for developers. Cloud and DevOps roles assume solid Linux skills.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Command Line Foundations",
+        "weeks": 3,
+        "topics": [
+          "Navigation: pwd, ls, cd, absolute vs relative paths",
+          "File operations: cp, mv, rm, mkdir, touch",
+          "Reading files: cat, less, head, tail, wc",
+          "Permissions: chmod, chown, and sudo",
+          "Pipes, redirection, and chaining commands",
+          "Finding things: find and basic grep",
+          "man pages and --help"
+        ],
+        "resources": [
+          {"title": "Linux Journey", "type": "course", "url": "https://linuxjourney.com/", "provider": "Linux Journey", "free": true, "note": "Bite-size interactive lessons."},
+          {"title": "Ubuntu Tutorials", "type": "course", "url": "https://ubuntu.com/tutorials", "provider": "Ubuntu", "free": true, "note": "Official hands-on tutorials."},
+          {"title": "Linux Command Line Bash Tutorial", "type": "article", "url": "https://www.freecodecamp.org/news/linux-command-line-bash-tutorial/", "provider": "freeCodeCamp", "free": true, "note": "Comprehensive command reference."},
+          {"title": "NetworkChuck Linux Videos", "type": "video", "url": "https://www.youtube.com/@NetworkChuck", "provider": "NetworkChuck", "free": true, "note": "Fun, energetic Linux tutorials."}
+        ],
+        "practice_tasks": [
+          "Organize a 100-file practice directory using only the terminal",
+          "Fix a broken permissions scenario on a sample project",
+          "Write a personal cheatsheet of 40 commands with examples",
+          "Install and configure 3 CLI tools without any GUI"
+        ],
+        "checkpoint": "You live in the terminal comfortably: files managed, permissions fixed, and you can complete everyday tasks without reaching for a GUI."
+      },
+      {
+        "stage": "intermediate",
+        "title": "Shell Power and System Basics",
+        "weeks": 5,
+        "topics": [
+          "Bash scripting: variables, loops, functions, exit codes",
+          "Text processing with grep, sed, and awk",
+          "SSH, key-based auth, and scp",
+          "Processes: ps, kill, jobs, and tmux",
+          "Package management with apt",
+          "Scheduling with cron",
+          "Environment variables and PATH",
+          "Networking basics: curl, ping, and ports"
+        ],
+        "resources": [
+          {"title": "The Linux Documentation Project", "type": "docs", "url": "https://tldp.org/", "provider": "TLDP", "free": true, "note": "Classic Linux guides and HOWTOs."},
+          {"title": "Advanced Bash-Scripting Guide", "type": "docs", "url": "https://tldp.org/LDP/abs/html/", "provider": "TLDP", "free": true, "note": "The complete bash scripting reference."},
+          {"title": "OverTheWire: Bandit", "type": "practice", "url": "https://overthewire.org/wargames/bandit/", "provider": "OverTheWire", "free": true, "note": "Learn Linux by hacking wargame levels."},
+          {"title": "explainshell", "type": "practice", "url": "https://explainshell.com/", "provider": "explainshell", "free": true, "note": "Paste any command to understand it."},
+          {"title": "Ubuntu Server Guide", "type": "docs", "url": "https://ubuntu.com/server/docs", "provider": "Ubuntu", "free": true, "note": "Official server administration docs."}
+        ],
+        "practice_tasks": [
+          "Write a backup script with logging and error handling",
+          "Parse a log file with awk to produce a summary report",
+          "Set up passwordless SSH and transfer files with scp",
+          "Complete Bandit levels 0-15"
+        ],
+        "checkpoint": "You automate with the shell: the backup script runs on a cron schedule, log analysis is one awk pipeline, and Bandit levels prove real navigation skill."
+      },
+      {
+        "stage": "advanced",
+        "title": "Linux Administration and DevOps Tools",
+        "weeks": 7,
+        "topics": [
+          "systemd services and journalctl",
+          "Users, groups, and sudoers management",
+          "Disks, partitions, and LVM basics",
+          "Firewalls with ufw and basic networking",
+          "Docker: images, containers, and volumes",
+          "Log analysis and troubleshooting method",
+          "Basic security hardening checklist"
+        ],
+        "resources": [
+          {"title": "Docker Get Started", "type": "docs", "url": "https://docs.docker.com/get-started/", "provider": "Docker", "free": true, "note": "Official Docker hands-on tutorial."},
+          {"title": "Linux Upskill Challenge", "type": "practice", "url": "https://linuxupskillchallenge.org/", "provider": "Linux Upskill Challenge", "free": true, "note": "20-day sysadmin challenge."},
+          {"title": "DigitalOcean Tutorials", "type": "article", "url": "https://www.digitalocean.com/community/tutorials", "provider": "DigitalOcean", "free": true, "note": "Excellent sysadmin tutorials."},
+          {"title": "tmux Wiki", "type": "docs", "url": "https://github.com/tmux/tmux/wiki", "provider": "tmux", "free": true, "note": "Terminal multiplexer documentation."},
+          {"title": "The Linux Command Line (book)", "type": "book", "url": "https://linuxcommand.org/tlcl.php", "provider": "William Shotts", "free": true, "note": "Free book, beginner to scripting."}
+        ],
+        "practice_tasks": [
+          "Deploy an app in Docker behind a systemd-managed reverse proxy",
+          "Harden a fresh VM: firewall, users, SSH keys, updates",
+          "Diagnose and fix a failing service using journalctl",
+          "Complete the Linux Upskill Challenge"
+        ],
+        "checkpoint": "You administer Linux systems: the Dockerized app survives reboots, the VM passes a hardening checklist, and you can troubleshoot a dead service methodically."
+      }
+    ]
+  },
+  {
+    "id": "java",
+    "name": "Java",
+    "domain": "Programming",
+    "summary": "Java powers enterprise backends, Android apps, and banking systems across India. It dominates campus placements and large-company interviews.",
+    "demand": "High",
+    "stages": [
+      {
+        "stage": "beginner",
+        "title": "Java Foundations",
+        "weeks": 4,
+        "topics": [
+          "JDK setup, javac, java, and IDE basics",
+          "Variables, primitives, operators, and casting",
+          "Conditionals, loops, and switch",
+          "Arrays and ArrayList",
+          "Methods, overloading, and parameter passing",
+          "String handling and StringBuilder",
+          "OOP: classes, objects, and constructors",
+          "Encapsulation with getters and setters"
+        ],
+        "resources": [
+          {"title": "Oracle Java Tutorials", "type": "docs", "url": "https://docs.oracle.com/javase/tutorial/", "provider": "Oracle", "free": true, "note": "Official Java learning trails."},
+          {"title": "JavaTPoint Java Tutorial", "type": "course", "url": "https://www.javatpoint.com/java-tutorial", "provider": "JavaTPoint", "free": true, "note": "Beginner-friendly with examples."},
+          {"title": "Programming in Java", "type": "course", "url": "https://nptel.ac.in/courses/106105191", "provider": "NPTEL", "free": true, "note": "IIT Kharagpur Java course."},
+          {"title": "Programming with Mosh Java Videos", "type": "video", "url": "https://www.youtube.com/@ProgrammingwithMosh", "provider": "Mosh Hamedani", "free": true, "note": "Clear Java crash course videos."}
+        ],
+        "practice_tasks": [
+          "Build a student grade manager with classes and ArrayLists",
+          "Implement a CLI banking system with encapsulation",
+          "Solve 20 easy Java problems on HackerRank",
+          "Build a file-based contact book"
+        ],
+        "checkpoint": "You write clean Java independently: the banking system uses proper classes and encapsulation, 20 problems solved, and you can explain OOP basics with examples."
+      },
+      {
+        "stage": "intermediate",
+        "title": "OOP Depth and Core Libraries",
+        "weeks": 6,
+        "topics": [
+          "Inheritance, polymorphism, abstraction, interfaces",
+          "Exception handling and custom exceptions",
+          "Collections: List, Set, Map, and comparators",
+          "Generics and type safety",
+          "File I/O and NIO basics",
+          "Multithreading: Thread, Runnable, synchronization",
+          "Streams, lambdas, and Optional",
+          "Unit testing with JUnit 5"
+        ],
+        "resources": [
+          {"title": "GeeksforGeeks Java", "type": "article", "url": "https://www.geeksforgeeks.org/java/", "provider": "GeeksforGeeks", "free": true, "note": "Topic-wise Java with code."},
+          {"title": "Oracle Collections Trail", "type": "docs", "url": "https://docs.oracle.com/javase/tutorial/collections/", "provider": "Oracle", "free": true, "note": "Official collections framework guide."},
+          {"title": "Derek Banas Java Videos", "type": "video", "url": "https://www.youtube.com/@derekbanas", "provider": "Derek Banas", "free": true, "note": "Fast-paced complete Java series."},
+          {"title": "JUnit 5 User Guide", "type": "docs", "url": "https://junit.org/junit5/docs/current/user-guide/", "provider": "JUnit", "free": true, "note": "Official testing documentation."},
+          {"title": "JavaTPoint Multithreading", "type": "article", "url": "https://www.javatpoint.com/multithreading-in-java", "provider": "JavaTPoint", "free": true, "note": "Threading concepts with examples."}
+        ],
+        "practice_tasks": [
+          "Refactor the banking system with interfaces and polymorphism",
+          "Build a multithreaded file downloader with a thread pool",
+          "Solve 30 collection/stream problems on HackerRank",
+          "Write a JUnit 5 test suite with 25+ tests"
+        ],
+        "checkpoint": "You use Java's core libraries well: polymorphic design, working multithreaded code, streams used idiomatically, and a green JUnit suite."
+      },
+      {
+        "stage": "advanced",
+        "title": "Professional Java and Ecosystem",
+        "weeks": 8,
+        "topics": [
+          "JVM internals: heap, stack, and GC basics",
+          "Design patterns in Java",
+          "Maven builds and dependency management",
+          "Spring Boot REST APIs",
+          "JDBC and JPA/Hibernate basics",
+          "Concurrency: executors and concurrent collections",
+          "Profiling and debugging production issues"
+        ],
+        "resources": [
+          {"title": "Spring Guides", "type": "course", "url": "https://spring.io/guides", "provider": "Spring", "free": true, "note": "Official getting-started guides."},
+          {"title": "Maven Getting Started Guide", "type": "docs", "url": "https://maven.apache.org/guides/getting-started/", "provider": "Apache Maven", "free": true, "note": "Build your first Maven project."},
+          {"title": "Baeldung Java Tutorials", "type": "article", "url": "https://www.baeldung.com/", "provider": "Baeldung", "free": true, "note": "Deep Java and Spring tutorials."},
+          {"title": "Oracle Concurrency Tutorial", "type": "docs", "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/", "provider": "Oracle", "free": true, "note": "Official concurrency guide."},
+          {"title": "GeeksforGeeks Spring", "type": "article", "url": "https://www.geeksforgeeks.org/spring/", "provider": "GeeksforGeeks", "free": true, "note": "Spring framework articles."}
+        ],
+        "practice_tasks": [
+          "Build a Spring Boot REST API with JPA and tests",
+          "Convert a project to Maven with a multi-module build",
+          "Tune a slow endpoint using profiling and executor config",
+          "Contribute a small fix to a Java open-source project"
+        ],
+        "checkpoint": "You build enterprise Java: the Spring Boot API persists data via JPA, the Maven build is reproducible, and you can explain JVM memory and GC basics."
+      }
+    ]
+  }
+]}

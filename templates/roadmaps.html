@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block theme %}resume{% endblock %}
+{% block title %}Learning Roadmaps | AI Career & Research Assistant{% endblock %}
+{% block nav_learn %}b-active{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+
+{% block content %}
+<section style="padding-top:2.6rem;">
+    <div class="b-sec-head b-reveal">
+        <span class="b-pill"><span class="b-pulse"></span>Feature 18 &mdash; Roadmaps</span>
+        <h1>Skill-gap <span class="b-grad">learning roadmaps</span></h1>
+        <p class="b-lede">Pick a target role, tell us what you already know, and get a ranked gap report with a week-by-week plan — built entirely from free resources.</p>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Skill gap analyzer" style="padding-top:0;">
+    <div class="b-card b-reveal">
+        <h2 style="margin-top:0;">Find your gaps</h2>
+        <div class="b-field" style="max-width:420px;">
+            <label class="b-label" for="gap-role">Target role</label>
+            <select class="b-select" id="gap-role">
+                <option value="">Choose a role&hellip;</option>
+                {% for r in roles %}
+                <option value="{{ r.id }}">{{ r.name }}{% if r.short %} ({{ r.short }}){% endif %}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="b-field">
+            <span class="b-label">What do you already know? <span style="color:var(--b-muted);font-weight:400;">(tick + set your level)</span></span>
+            {% for domain, _ in domains %}
+            <details style="margin-bottom:.6rem;" {% if loop.first %}open{% endif %}>
+                <summary style="cursor:pointer;font-weight:600;margin-bottom:.5rem;">{{ domain }}</summary>
+                <div class="b-bento" style="grid-template-columns:repeat(3,1fr);">
+                    {% for s in skills if s.domain == domain %}
+                    <label class="b-card b-card--lite" style="display:flex;gap:.6rem;align-items:center;cursor:pointer;padding:.8rem 1rem;">
+                        <input type="checkbox" class="b-check gap-skill" value="{{ s.id }}" data-name="{{ s.name }}">
+                        <span style="flex:1;font-size:.9rem;">{{ s.name }}</span>
+                        <select class="b-select gap-stage" style="width:auto;padding:.35rem .5rem;font-size:.8rem;" aria-label="Your level in {{ s.name }}">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </label>
+                    {% endfor %}
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+        <button class="b-btn b-btn--primary b-magnet" id="gap-run">Analyze my gaps</button>
+        <span id="gap-status" role="status" style="margin-left:1rem;color:var(--b-muted);"></span>
+        <div id="gap-result" style="margin-top:1.6rem;"></div>
+    </div>
+</section>
+
+<section class="b-section" aria-label="All skills">
+    <div class="b-sec-head">
+        <h2>Browse <span class="b-grad">{{ skills|length }} skill roadmaps</span></h2>
+        <p>Every skill has beginner, intermediate, and advanced stages — topics, free resources, hands-on tasks, and a milestone checkpoint per stage.</p>
+    </div>
+    <div class="b-field" style="max-width:420px;">
+        <label class="b-label" for="skill-filter">Filter by domain</label>
+        <select class="b-select" id="skill-filter">
+            <option value="">All domains</option>
+            {% for domain, count in domains %}
+            <option value="{{ domain }}">{{ domain }} ({{ count }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="b-bento" id="skill-grid">
+        {% for s in skills %}
+        <a class="b-card b-card--feature b-reveal skill-card" data-domain="{{ s.domain }}" href="{{ url_for('roadmap_detail', skill_id=s.id) }}" aria-label="{{ s.name }} roadmap">
+            <span class="b-tag">{{ s.domain }}</span>
+            <h3 style="margin:0;">{{ s.name }}</h3>
+            <p style="color:var(--b-muted);margin:0;font-size:.9rem;">{{ s.summary }}</p>
+            <div class="b-kv" style="margin-top:auto;">
+                <div class="b-kv-row"><span class="b-kv-label">Total effort</span><span class="b-kv-val">{{ s.total_weeks }} weeks</span></div>
+                <div class="b-kv-row"><span class="b-kv-label">Free resources</span><span class="b-kv-val">{{ s.num_resources }}</span></div>
+                <div class="b-kv-row"><span class="b-kv-label">Demand</span><span class="b-kv-val">{{ s.demand }}</span></div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/learn_roadmaps.js') }}"></script>
+{% endblock %}

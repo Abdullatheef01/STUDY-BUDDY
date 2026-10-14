@@ -253,6 +253,13 @@ from star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
                           SECTION_GUIDE, all_examples, examples_for,
                           get_example, validate_draft, score_draft,
                           generate_rule_based_rewrite_tip)
+from learning_roadmaps import (list_skills as roadmap_skills,
+                               list_domains as roadmap_domains,
+                               get_skill as get_roadmap_skill,
+                               list_roles as roadmap_roles,
+                               analyze_gap, build_personal_roadmap,
+                               validate_progress_payload, validate_gap_payload,
+                               progress_summary as roadmap_progress_summary)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -507,6 +514,24 @@ class STARDraft(db.Model):
                            onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("star_drafts", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class RoadmapProgress(db.Model):
+    """Per-user learning-roadmap progress (Wave 3 #18). One row per user+skill+stage."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    skill_id = db.Column(db.String(50), nullable=False, index=True)
+    stage = db.Column(db.String(20), nullable=False)  # beginner|intermediate|advanced
+    status = db.Column(db.String(20), default="not_started", nullable=False)  # not_started|in_progress|completed
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "skill_id", "stage",
+                                          name="uq_roadmap_user_skill_stage"),)
+
+    user = db.relationship("User", backref=db.backref("roadmap_progress", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -2902,6 +2927,126 @@ def register_routes(app):
             db.session.rollback()
             return jsonify({'error': 'Could not delete the draft.'}), 500
         return jsonify({'success': True})
+
+    def _learn_ai_tip(prompt, fallback):
+        """Optional Gemini polish for learning tips. Returns (tip, ai_powered).
+
+        Deterministic fallback always works; the tip never affects scores.
+        """
+        if not _ai_ready():
+            return fallback, False
+        try:
+            raw = call_gemini_ai(
+                "You are a concise study coach. In 2-3 sentences, give one "
+                "actionable study tip. No preamble, no bullet list.\n" + prompt[:1500])
+            tip = (raw or "").strip()
+            if len(tip) >= 20:
+                return tip[:600], True
+        except GeminiError as e:
+            log.warning("Learn AI tip unavailable: %s", e)
+        except Exception:
+            log.exception("Learn AI tip failed")
+        return fallback, False
+
+    # ----- Feature #18: skill-gap learning roadmaps -----
+    @app.route('/learn/roadmaps')
+    def roadmaps_home():
+        """Browse skills + run the skill-gap analyzer."""
+        return render_template('roadmaps.html',
+                               skills=roadmap_skills(),
+                               domains=roadmap_domains(),
+                               roles=roadmap_roles(),
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/learn/roadmaps/<skill_id>')
+    def roadmap_detail(skill_id):
+        """Full 3-stage roadmap for one skill, with progress toggles."""
+        skill = get_roadmap_skill(skill_id)
+        if not skill:
+            abort(404)
+        progress = {}
+        if current_user.is_authenticated:
+            rows = RoadmapProgress.query.filter_by(
+                user_id=current_user.id, skill_id=skill_id).all()
+            progress = {r.stage: r.status for r in rows}
+        return render_template('roadmap_detail.html', skill=skill,
+                               progress=progress,
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/learn/roadmaps/gap', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def roadmaps_gap():
+        """Skill-gap analysis: current skills + target role -> ranked gaps.
+
+        JSON body: {"target_role": "...", "current_skills": [{"skill_id","stage"}]}.
+        CSRF token via X-CSRFToken header (not exempt). Anonymous allowed.
+        """
+        payload = request.get_json(silent=True) or {}
+        cleaned, error = validate_gap_payload(payload)
+        if error:
+            return jsonify({'error': error}), 400
+        gaps, role = analyze_gap(cleaned["current_skills"], cleaned["target_role"])
+        if role is None:
+            return jsonify({'error': 'Unknown target role.'}), 400
+        plan = build_personal_roadmap(gaps)
+        gap_desc = "; ".join(
+            f"{g['skill_name']} to {g['min_stage']} (priority {g['priority']})"
+            for g in gaps[:6])
+        fallback_tip = (
+            f"Start with your highest-priority gap and finish one stage "
+            f"before moving on. Consistency beats intensity — 1 focused hour "
+            f"daily compounds fast.")
+        tip, ai_powered = _learn_ai_tip(
+            f"A student targeting '{role['name']}' has these skill gaps: "
+            f"{gap_desc}. Give one actionable study tip.",
+            fallback_tip)
+        return jsonify({'success': True,
+                        'role': {'id': role['id'], 'name': role['name']},
+                        'gaps': json_safe(gaps),
+                        'total_weeks': plan['total_weeks'],
+                        'num_skills': plan['num_skills'],
+                        'study_tip': tip, 'ai_powered': ai_powered})
+
+    @app.route('/learn/roadmaps/progress', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def roadmaps_progress():
+        """Save per-stage progress. Login required.
+
+        JSON body: {"skill_id": "...", "stage": "beginner", "status": "completed"}.
+        CSRF token via X-CSRFToken header (not exempt).
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to track progress.'}), 401
+        payload = request.get_json(silent=True) or {}
+        cleaned, error = validate_progress_payload(payload)
+        if error:
+            return jsonify({'error': error}), 400
+        try:
+            row = RoadmapProgress.query.filter_by(
+                user_id=current_user.id, skill_id=cleaned["skill_id"],
+                stage=cleaned["stage"]).first()
+            if row:
+                row.status = cleaned["status"]
+            else:
+                row = RoadmapProgress(
+                    user_id=current_user.id, skill_id=cleaned["skill_id"],
+                    stage=cleaned["stage"], status=cleaned["status"])
+                db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Roadmap progress save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save progress. Please try again.'}), 500
+        return jsonify({'success': True, 'status': cleaned["status"]})
+
+    @app.route('/learn/roadmaps/dashboard')
+    @login_required
+    def roadmaps_dashboard():
+        """The user's roadmap progress across skills."""
+        rows = RoadmapProgress.query.filter_by(user_id=current_user.id).all()
+        return render_template('roadmaps_dashboard.html',
+                               summary=roadmap_progress_summary(rows),
+                               skills={s["id"]: s for s in roadmap_skills()})
 
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
