@@ -232,6 +232,25 @@
 </div>
 
 <div class="section">
+    <h2>&#127908; Communication Coach</h2>
+    {% if coach_reports %}
+    <div class="card-grid">
+        {% for r in coach_reports %}
+        <a class="hist-card" href="{{ url_for('view_coach_report', analysis_id=r.id) }}">
+            <div class="fname">&#127908; Clarity {{ '%.0f' % r.clarity_score if r.clarity_score is not none else '—' }}/100</div>
+            <div class="meta">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+            <span class="score-pill">{{ (r.analysis_json.metrics.word_count if r.analysis_json and r.analysis_json.metrics else '—') }} words</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        No coach analyses yet. <a href="{{ url_for('coach_home') }}">Analyze an answer</a> for filler words, pacing, and clarity.
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
     <h2>&#127919; Career Goals</h2>    <form class="goal-form" method="POST" action="{{ url_for('goal_add') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" name="title" placeholder="e.g. Crack SDE-1 interviews by March" maxlength="255" required>

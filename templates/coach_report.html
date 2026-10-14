@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Report | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <style>
+        .cr-wrap { max-width: 860px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .cr-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 2rem; backdrop-filter: blur(12px); margin-bottom: 1.2rem; }
+        .cr-meta { color: var(--text-muted, #94a3b8); font-size: 0.85rem; margin-bottom: 1rem; }
+        .cr-score-ring { width: 130px; height: 130px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; margin: 0 auto 1rem; }
+        .cr-bar-row { display: grid; grid-template-columns: 150px 1fr 48px; gap: 0.7rem; align-items: center; margin-bottom: 0.55rem; font-size: 0.85rem; }
+        .cr-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+        .cr-bar > div { height: 100%; background: var(--gradient-primary); border-radius: 999px; }
+        .cr-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.8rem; margin: 1.2rem 0; }
+        .cr-metric { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.8rem; text-align: center; }
+        .cr-metric .v { font-size: 1.4rem; font-weight: 800; color: var(--accent-primary); }
+        .cr-metric .l { font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-top: 0.2rem; }
+        .cr-orig { line-height: 1.9; font-size: 0.95rem; color: #e2e8f0; }
+        .cr-orig mark { border-radius: 4px; padding: 0 2px; }
+        .cr-orig mark.sev-3 { background: rgba(239,68,68,0.45); }
+        .cr-orig mark.sev-2 { background: rgba(245,158,11,0.4); }
+        .cr-orig mark.sev-1 { background: rgba(59,130,246,0.35); }
+        .cr-sugg { margin: 0.6rem 0 0 1.2rem; color: #cbd5e1; font-size: 0.9rem; }
+        .cr-sugg li { margin-bottom: 0.4rem; }
+        .cr-clean { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1.2rem; font-size: 0.93rem; line-height: 1.7; color: #e2e8f0; white-space: pre-wrap; }
+        .cr-drill { background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.2); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
+        .cr-drill .before { font-size: 0.9rem; color: #cbd5e1; font-style: italic; }
+        .cr-drill .issues { font-size: 0.78rem; color: #f59e0b; margin-top: 0.4rem; }
+        .cr-h3 { font-size: 1.05rem; margin: 1.4rem 0 0.6rem; color: var(--accent-primary); }
+        .cr-h3.fix { color: #f59e0b; }
+        .cr-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .cr-btn { display: inline-block; background: var(--gradient-primary); color: #04120c; font-weight: 700; border: none; border-radius: 12px; padding: 0.8rem 1.5rem; font-size: 0.95rem; cursor: pointer; text-decoration: none; }
+        .cr-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main, #f8fafc); }
+        @media (max-width: 700px) { .cr-wrap { padding-top: 5.5rem; } .cr-card { padding: 1.4rem; } .cr-bar-row { grid-template-columns: 110px 1fr 44px; } }
+        @media (prefers-reduced-motion: reduce) { .cr-bar > div { transition: none; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/resume" class="logo">Resume<span>AI</span></a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/interview">Interviews</a></li>
+            <li><a href="/coach" class="active">Coach</a></li>
+            <li><a href="/tracker">Tracker</a></li>
+        </ul>
+    </nav>
+
+    <div class="cr-wrap">
+        <div class="cr-card">
+            <h1 style="font-size:1.6rem;margin-bottom:0.3rem;">Communication Coach Report</h1>
+            <div class="cr-meta">{{ created_at.strftime('%d %b %Y, %I:%M %p') }}{% if report.ai_powered %} &middot; AI-polished rewrite{% endif %}</div>
+
+            {% set score = report.clarity_score or 0 %}
+            <div class="cr-score-ring" style="border: 6px solid {% if score >= 75 %}#10b981{% elif score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">{{ '%.0f' % score }}</div>
+            <p style="text-align:center;color:var(--text-muted,#94a3b8);font-size:0.9rem;">Clarity score / 100</p>
+
+            <h3 class="cr-h3">Score breakdown</h3>
+            {% for label, key, maxv in [('Filler load', 'filler_load', 40), ('Pacing', 'pacing', 25), ('Voice & hedges', 'voice_and_hedges', 20), ('Structure', 'structure', 15)] %}
+            {% set v = report.breakdown[key] if report.breakdown else 0 %}
+            <div class="cr-bar-row">
+                <span>{{ label }}</span>
+                <div class="cr-bar"><div style="width:{{ (v / maxv * 100) | round(1) }}%"></div></div>
+                <span>{{ '%.1f' % v }}/{{ maxv }}</span>
+            </div>
+            {% endfor %}
+
+            <h3 class="cr-h3">Metrics</h3>
+            <div class="cr-metrics">
+                {% set m = report.metrics or {} %}
+                <div class="cr-metric"><div class="v">{{ m.word_count or 0 }}</div><div class="l">Words</div></div>
+                <div class="cr-metric"><div class="v">{{ m.sentence_count or 0 }}</div><div class="l">Sentences</div></div>
+                <div class="cr-metric"><div class="v">{{ m.avg_words_per_sentence or 0 }}</div><div class="l">Avg words/sentence</div></div>
+                <div class="cr-metric"><div class="v">{{ m.filler_events or 0 }}</div><div class="l">Filler events</div></div>
+                <div class="cr-metric"><div class="v">{{ m.passive_constructions or 0 }}</div><div class="l">Passive voice</div></div>
+                <div class="cr-metric"><div class="v">{{ m.hedge_events or 0 }}</div><div class="l">Hedges</div></div>
+            </div>
+        </div>
+
+        {% if report.original_text %}
+        <div class="cr-card">
+            <h3 class="cr-h3">Your answer — problem spots</h3>
+            <p class="cr-orig">{{ report.original_text }}</p>
+            <p style="font-size:0.8rem;color:var(--text-muted,#94a3b8);margin-top:0.8rem;">Red = severe filler, amber = moderate, blue = mild. (Highlights shown in the live analyzer.)</p>
+        </div>
+        {% endif %}
+
+        {% if report.filler_hits %}
+        <div class="cr-card">
+            <h3 class="cr-h3 fix">Top filler patterns</h3>
+            <ul class="cr-sugg">
+                {% for h in report.filler_hits[:10] %}
+                <li><strong>{{ h.word }}</strong> ({{ h.count }}x, severity {{ h.severity }}/3){% if h.alternatives %} — try: {{ h.alternatives[:2] | join(', ') }}{% endif %}{% if h.note %} — {{ h.note }}{% endif %}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if report.suggestions %}
+        <div class="cr-card">
+            <h3 class="cr-h3 fix">What to improve</h3>
+            <ul class="cr-sugg">
+                {% for s in report.suggestions %}
+                <li>{{ s }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if report.cleaned_version %}
+        <div class="cr-card">
+            <h3 class="cr-h3">Cleaned version</h3>
+            <div class="cr-clean">{{ report.cleaned_version }}</div>
+        </div>
+        {% endif %}
+
+        {% if report.drills %}
+        <div class="cr-card">
+            <h3 class="cr-h3">Practice drills</h3>
+            <p style="font-size:0.88rem;color:var(--text-muted,#94a3b8);margin-bottom:1rem;">Rewrite each sentence below without the flagged issue.</p>
+            {% for d in report.drills %}
+            <div class="cr-drill">
+                <div class="before">&ldquo;{{ d.sentence }}&rdquo;</div>
+                <div class="issues">Issues: {{ (d.issues or []) | join(', ') }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="cr-actions">
+            <a class="cr-btn" href="{{ url_for('coach_home') }}">Analyze Another Answer</a>
+            <a class="cr-btn cr-btn-ghost" href="{{ url_for('dashboard') }}#history">My History</a>
+        </div>
+    </div>
+</body>
+</html>

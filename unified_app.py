@@ -238,6 +238,7 @@ from opportunities import (list_opportunities, get_meta as opp_meta,
 from portfolio import validate_portfolio_payload, unique_slug
 from mock_interview import (interview_options, pick_questions, score_answer,
                             generate_rule_based_feedback, validate_interview_setup)
+from communication_coach import analyze_transcript, validate_coach_inputs
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -422,6 +423,18 @@ class InterviewSession(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("interview_sessions", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class CommunicationAnalysis(db.Model):
+    """A communication-coach analysis belonging to a user (Wave 2 #14)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    clarity_score = db.Column(db.Float)
+    analysis_json = db.Column(db.JSON)  # full analysis payload
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("communication_analyses", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -973,6 +986,51 @@ def _interview_feedback(scored_answers, questions):
         except (ValueError, json.JSONDecodeError):
             log.warning("Interview feedback: non-JSON model output, retrying")
     return fallback, False
+
+
+def _coach_polish(report, text):
+    """Polish the cleaned rewrite + drills via Gemini, rule-based fallback.
+
+    Returns (cleaned_version, drills, ai_powered). Scores never depend on
+    the LLM.
+    """
+    fallback_cleaned = report.get("cleaned_version") or ""
+    fallback_drills = report.get("drills") or []
+    prompt = (
+        "You are a communication coach for job interviews. A candidate wrote "
+        "this answer (clarity score {}/100; top issues: {}):\n{}\n\n"
+        "1) Rewrite it cleanly: same meaning, confident active voice, no filler, "
+        "tight sentences. 2) Give 5 rewrite drills as short 'before' sentences "
+        "with the issue named.\n"
+        'Return ONLY JSON like {{"cleaned": "...", "drills": '
+        '[{{"sentence": "...", "issues": ["..."]}}]}}.'
+    ).format(
+        report.get("clarity_score"),
+        ", ".join(h["word"] for h in (report.get("filler_hits") or [])[:6]) or "none",
+        (text or "")[:4000],
+    )
+    for _attempt in range(2):
+        try:
+            raw = call_gemini_ai(prompt)
+        except GeminiError as e:
+            log.warning("Coach polish: Gemini unavailable: %s", e)
+            return fallback_cleaned, fallback_drills, False
+        try:
+            parsed = _parse_json_safely(raw)
+            if isinstance(parsed, dict) and parsed.get("cleaned"):
+                drills = []
+                for d in (parsed.get("drills") or [])[:5]:
+                    if isinstance(d, dict) and d.get("sentence"):
+                        drills.append({
+                            "sentence": str(d["sentence"])[:500],
+                            "issues": [str(x)[:60] for x in (d.get("issues") or [])[:4]],
+                        })
+                return (str(parsed["cleaned"])[:8000],
+                        drills or fallback_drills, True)
+            log.warning("Coach polish: model returned unusable shape")
+        except (ValueError, json.JSONDecodeError):
+            log.warning("Coach polish: non-JSON model output, retrying")
+    return fallback_cleaned, fallback_drills, False
 
 
 def _assessment_explanations(clusters):
@@ -2329,6 +2387,60 @@ def register_routes(app):
                                questions=row.questions_json or [],
                                answers=row.answers_json or [])
 
+    # ---------- COMMUNICATION COACH (Wave 2 #14) ----------
+    @app.route('/coach')
+    def coach_home():
+        """Communication coach: paste an answer, get filler/pacing/clarity analysis."""
+        return render_template('coach.html',
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/coach/analyze', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def coach_analyze():
+        """Analyze a pasted answer. Login required (analyses are persisted).
+
+        Accepts JSON or form data: text. CSRF token via X-CSRFToken header,
+        so this route is NOT CSRF-exempt.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to use the communication coach.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        text, error = validate_coach_inputs(payload or {})
+        if error:
+            return jsonify({'error': error}), 400
+
+        report = analyze_transcript(text)
+        cleaned, drills, ai_powered = _coach_polish(report, text)
+        report['cleaned_version'] = cleaned
+        report['drills'] = drills
+        report['ai_powered'] = ai_powered
+        report['original_text'] = text  # needed to render highlights on the saved report
+
+        try:
+            row = CommunicationAnalysis(
+                user_id=current_user.id,
+                clarity_score=report.get('clarity_score'),
+                analysis_json=json_safe(report),
+            )
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Coach analysis persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your analysis. Please try again.'}), 500
+        return jsonify({'success': True, 'analysis_id': row.id,
+                        'report': json_safe(report),
+                        'report_url': url_for('view_coach_report', analysis_id=row.id)})
+
+    @app.route('/coach/<int:analysis_id>')
+    @login_required
+    def view_coach_report(analysis_id):
+        """Render a saved coach analysis (owner only)."""
+        row = CommunicationAnalysis.query.filter_by(id=analysis_id,
+                                                   user_id=current_user.id).first_or_404()
+        return render_template('coach_report.html', report=row.analysis_json,
+                               analysis_id=row.id, created_at=row.created_at)
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -2374,13 +2486,16 @@ def register_routes(app):
         interviews = (InterviewSession.query
                       .filter_by(user_id=current_user.id)
                       .order_by(InterviewSession.created_at.desc()).all())
+        coach_reports = (CommunicationAnalysis.query
+                         .filter_by(user_id=current_user.id)
+                         .order_by(CommunicationAnalysis.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
                                jd_matches=jd_matches, rewrites=rewrites,
                                cover_docs=cover_docs, linkedin_reports=linkedin_reports,
                                tracker_stats=tracker_stats, assessments=assessments,
-                               interviews=interviews)
+                               interviews=interviews, coach_reports=coach_reports)
 
     # ---------- INDIA SALARY EXPLORER (Wave 1 #8) ----------
     @app.route('/salary')
