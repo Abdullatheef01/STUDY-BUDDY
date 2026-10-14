@@ -249,6 +249,10 @@ from aptitude_test import (categories as aptitude_categories,
                            pick_questions as aptitude_pick,
                            validate_test_setup, score_attempt,
                            SUBMIT_GRACE_SEC, all_questions as aptitude_all)
+from star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
+                          SECTION_GUIDE, all_examples, examples_for,
+                          get_example, validate_draft, score_draft,
+                          generate_rule_based_rewrite_tip)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -2747,6 +2751,158 @@ def register_routes(app):
                                results=row.results_json or [],
                                summary=row.summary_json or {})
 
+    # ---------- STAR ANSWER BUILDER (Wave 2 #17) ----------
+    def _star_suggestions(scored, sections, competency):
+        """Polish per-section rewrite suggestions via Gemini, rule-based
+        fallback. Returns (suggestions, ai_powered). Scores never depend on
+        the LLM."""
+        fallback = {}
+        for s in SECTIONS:
+            tip = generate_rule_based_rewrite_tip(s, sections.get(s) or "")
+            existing = scored["sections"][s]["suggestions"]
+            fallback[s] = ([tip] + existing)[:4]
+        comp_label = dict((c[0], c[1]) for c in COMPETENCIES).get(competency,
+                                                                 competency)
+        compact = {
+            "competency": comp_label,
+            "sections": {s: (sections.get(s) or "")[:800] for s in SECTIONS},
+            "scores": {s: scored["sections"][s]["score"] for s in SECTIONS},
+        }
+        prompt = (
+            "You are an interview coach. A candidate drafted a STAR answer "
+            f"for the competency '{comp_label}'. Section scores are out of 25. "
+            "For EACH of situation/task/action/result, give up to 2 specific "
+            "rewrite suggestions referencing their actual text - no generic "
+            "advice. Return ONLY JSON like "
+            '{"suggestions": {"situation": ["..."], "task": ["..."], '
+            '"action": ["..."], "result": ["..."]}}.\n'
+            "DRAFT:\n" + json.dumps(compact)[:6000]
+        )
+        for _attempt in range(2):
+            try:
+                raw = call_gemini_ai(prompt)
+            except GeminiError as e:
+                log.warning("STAR suggestions: Gemini unavailable: %s", e)
+                return fallback, False
+            try:
+                parsed = _parse_json_safely(raw)
+                items = parsed.get("suggestions") if isinstance(parsed, dict) else None
+                if isinstance(items, dict) and all(
+                        isinstance(items.get(s), list) for s in SECTIONS):
+                    cleaned = {s: [str(x)[:400] for x in items[s][:3]]
+                               for s in SECTIONS}
+                    return cleaned, True
+                log.warning("STAR suggestions: model returned unusable shape")
+            except (ValueError, json.JSONDecodeError):
+                log.warning("STAR suggestions: non-JSON model output, retrying")
+        return fallback, False
+
+    @app.route('/star')
+    def star_home():
+        """STAR builder: competency picker, examples, guided editor."""
+        return render_template('star.html', competencies=COMPETENCIES,
+                               guide=SECTION_GUIDE,
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/api/star/examples')
+    def star_examples_api():
+        """Annotated STAR examples, optionally filtered by competency."""
+        comp = (request.args.get('competency') or '').strip().lower()[:40]
+        if comp and comp not in COMPETENCY_IDS:
+            return jsonify({'error': 'Unknown competency.'}), 400
+        examples = examples_for(comp) if comp else all_examples()
+        return jsonify({'examples': json_safe(examples),
+                        'count': len(examples)})
+
+    @app.route('/star/score', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def star_score():
+        """Score a STAR draft per section + rewrite suggestions.
+
+        Login required. CSRF token via X-CSRFToken header.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to score your answer.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        cleaned, error = validate_draft(payload or {})
+        if error:
+            return jsonify({'error': error}), 400
+        scored = score_draft(cleaned["sections"])
+        suggestions, ai_powered = _star_suggestions(
+            scored, cleaned["sections"], cleaned["competency"])
+        return jsonify({'success': True, 'scores': json_safe(scored),
+                        'suggestions': json_safe(suggestions),
+                        'ai_powered': ai_powered,
+                        'competency': cleaned["competency"]})
+
+    @app.route('/star/save', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def star_save():
+        """Persist a STAR draft (with its latest scores, if scored)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to save drafts.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        cleaned, error = validate_draft(payload or {})
+        if error:
+            return jsonify({'error': error}), 400
+        scores = payload.get("scores") if isinstance(payload, dict) else None
+        suggestions = payload.get("suggestions") if isinstance(payload, dict) else None
+        try:
+            row = STARDraft(
+                user_id=current_user.id,
+                competency=cleaned["competency"],
+                situation=cleaned["sections"]["situation"],
+                task=cleaned["sections"]["task"],
+                action=cleaned["sections"]["action"],
+                result=cleaned["sections"]["result"],
+                scores_json=json_safe(scores) if isinstance(scores, dict) else None,
+                suggestions_json=json_safe(suggestions) if isinstance(suggestions, dict) else None,
+                ai_powered=bool(payload.get("ai_powered")) if isinstance(payload, dict) else False,
+            )
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("STAR draft save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your draft. Please try again.'}), 500
+        return jsonify({'success': True, 'draft_id': row.id})
+
+    @app.route('/star/drafts')
+    @login_required
+    def star_drafts():
+        """List the user's saved STAR drafts."""
+        rows = (STARDraft.query.filter_by(user_id=current_user.id)
+                .order_by(STARDraft.updated_at.desc()).all())
+        out = [{
+            "id": r.id,
+            "competency": r.competency,
+            "overall": (r.scores_json or {}).get("overall"),
+            "updated_at": r.updated_at.isoformat() if r.updated_at else None,
+            "preview": (r.situation or "")[:120],
+        } for r in rows]
+        if request.args.get("format") == "json":
+            return jsonify({"drafts": out})
+        return render_template('star_drafts.html', drafts=out,
+                               competencies=dict((c[0], c[1]) for c in COMPETENCIES))
+
+    @app.route('/star/drafts/<int:draft_id>/delete', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def star_draft_delete(draft_id):
+        """Delete one of the user's STAR drafts (owner only)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        row = db.session.get(STARDraft, draft_id)
+        if not row or row.user_id != current_user.id:
+            return jsonify({'error': 'Draft not found.'}), 404
+        try:
+            db.session.delete(row)
+            db.session.commit()
+        except Exception:
+            log.exception("STAR draft delete failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not delete the draft.'}), 500
+        return jsonify({'success': True})
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -2799,6 +2955,10 @@ def register_routes(app):
                              .filter(AptitudeAttempt.user_id == current_user.id,
                                      AptitudeAttempt.submitted_at.isnot(None))
                              .order_by(AptitudeAttempt.created_at.desc()).all())
+        star_drafts = (STARDraft.query
+                       .filter_by(user_id=current_user.id)
+                       .order_by(STARDraft.updated_at.desc())
+                       .limit(12).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
@@ -2806,7 +2966,9 @@ def register_routes(app):
                                cover_docs=cover_docs, linkedin_reports=linkedin_reports,
                                tracker_stats=tracker_stats, assessments=assessments,
                                interviews=interviews, coach_reports=coach_reports,
-                               aptitude_attempts=aptitude_attempts)
+                               aptitude_attempts=aptitude_attempts,
+                               star_drafts=star_drafts,
+                               star_competencies=dict((c[0], c[1]) for c in COMPETENCIES))
 
     # ---------- INDIA SALARY EXPLORER (Wave 1 #8) ----------
     @app.route('/salary')

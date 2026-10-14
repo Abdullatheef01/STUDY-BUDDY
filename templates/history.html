@@ -270,6 +270,25 @@
 </div>
 
 <div class="section">
+    <h2>&#11088; STAR Answer Drafts</h2>
+    {% if star_drafts %}
+    <div class="card-grid">
+        {% for d in star_drafts %}
+        <a class="hist-card" href="{{ url_for('star_drafts', _anchor='draft-' ~ d.id) }}">
+            <div class="fname">&#11088; {{ star_competencies.get(d.competency, d.competency)|title }}{% if d.scores_json and d.scores_json.overall is not none %} &mdash; {{ d.scores_json.overall }}/100{% endif %}</div>
+            <div class="meta">{{ (d.situation or '')[:90] }}{% if d.situation and d.situation|length > 90 %}&hellip;{% endif %}</div>
+            <div class="meta">{{ d.updated_at.strftime('%d %b %Y, %I:%M %p') if d.updated_at else '' }}</div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        No STAR drafts yet. <a href="{{ url_for('star_home') }}">Build a STAR answer</a> and your drafts will appear here.
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
     <h2>&#127919; Career Goals</h2>    <form class="goal-form" method="POST" action="{{ url_for('goal_add') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" name="title" placeholder="e.g. Crack SDE-1 interviews by March" maxlength="255" required>

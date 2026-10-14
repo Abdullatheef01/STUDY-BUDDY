@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>STAR Answer Builder | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+    <style>
+        .st-wrap { max-width: 880px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .st-head h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+        .st-head h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .st-head p { color: var(--text-muted, #94a3b8); margin-bottom: 1.4rem; }
+        .st-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 2rem; backdrop-filter: blur(12px); margin-bottom: 1.2rem; }
+        .st-field { margin-bottom: 1rem; }
+        .st-field label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; }
+        .st-field select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; color: var(--text-main, #f8fafc); padding: 0.8rem 1rem; font-size: 0.95rem; }
+        .st-field select option { background: #0b1220; }
+        .st-sec { border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.4rem; margin-bottom: 1rem; }
+        .st-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+        .st-sec-head h3 { font-size: 1.05rem; }
+        .st-sec-head h3 .letter { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; background: rgba(16,185,129,0.16); color: var(--accent-primary); align-items: center; justify-content: center; font-weight: 800; margin-right: 0.5rem; }
+        .st-tip { font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.7rem; line-height: 1.55; }
+        .st-tip-toggle { font-size: 0.8rem; color: var(--accent-secondary); cursor: pointer; background: none; border: none; padding: 0; margin-bottom: 0.7rem; font-weight: 600; }
+        .st-example-box { display: none; font-size: 0.85rem; margin-bottom: 0.8rem; }
+        .st-example-box.open { display: block; }
+        .st-good, .st-bad { border-radius: 10px; padding: 0.7rem 0.9rem; margin-bottom: 0.5rem; line-height: 1.55; }
+        .st-good { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); }
+        .st-bad { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); }
+        .st-good strong, .st-bad strong { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+        .st-good strong { color: #10b981; } .st-bad strong { color: var(--accent-danger); }
+        .st-why { font-size: 0.8rem; color: var(--text-muted, #94a3b8); margin-top: 0.4rem; font-style: italic; }
+        .st-area { width: 100%; min-height: 130px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; color: var(--text-main, #f8fafc); padding: 1rem; font-size: 0.95rem; font-family: inherit; resize: vertical; line-height: 1.6; }
+        .st-score { display: flex; align-items: center; gap: 0.7rem; margin-top: 0.7rem; font-size: 0.85rem; }
+        .st-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+        .st-bar > div { height: 100%; background: var(--gradient-primary); border-radius: 999px; }
+        .st-sugg { margin-top: 0.6rem; font-size: 0.85rem; color: #cbd5e1; }
+        .st-sugg li { margin-bottom: 0.35rem; margin-left: 1.2rem; }
+        .st-btn { display: inline-block; background: var(--gradient-primary); color: #04120c; font-weight: 700; border: none; border-radius: 12px; padding: 0.9rem 1.8rem; font-size: 1rem; cursor: pointer; }
+        .st-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .st-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main, #f8fafc); }
+        .st-error { color: var(--accent-danger); font-size: 0.88rem; margin-top: 0.8rem; }
+        .st-login-cta { text-align: center; padding: 2rem; }
+        .st-login-cta a { color: var(--accent-primary); font-weight: 700; }
+        .st-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem; }
+        .st-overall { text-align: center; padding: 1.2rem; }
+        .st-overall .num { font-size: 2.4rem; font-weight: 800; }
+        .st-ex { border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 0.7rem; overflow: hidden; }
+        .st-ex summary { cursor: pointer; padding: 0.9rem 1.1rem; font-weight: 600; font-size: 0.92rem; list-style: none; }
+        .st-ex summary::-webkit-details-marker { display: none; }
+        .st-ex summary:hover { background: rgba(255,255,255,0.04); }
+        .st-ex .body { padding: 0 1.1rem 1.1rem; font-size: 0.88rem; line-height: 1.6; color: #cbd5e1; }
+        .st-ex .body p { margin-bottom: 0.6rem; }
+        .st-ex .body strong { color: var(--text-main, #f8fafc); }
+        .st-ex .why li { margin-left: 1.2rem; margin-bottom: 0.3rem; font-size: 0.85rem; }
+        .st-use-ex { font-size: 0.8rem; margin-top: 0.6rem; }
+        @media (max-width: 700px) { .st-wrap { padding-top: 5.5rem; } .st-card, .st-sec { padding: 1.2rem; } }
+        @media (prefers-reduced-motion: reduce) { .st-bar > div { transition: none; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
+            <span>ResumeAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/practice">Practice</a></li>
+            <li><a href="/star" class="active">STAR Builder</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            {% include "_auth_links.html" %}
+        </ul>
+    </nav>
+
+    <div class="st-wrap">
+        <div class="st-head">
+            <h1><span class="gradient-text">STAR</span> Answer Builder</h1>
+            <p>Behavioral interviews run on stories. Pick a competency, study annotated examples, then draft your own Situation → Task → Action → Result and get it scored.</p>
+        </div>
+
+        {% if not is_authed %}
+        <div class="st-card st-login-cta">
+            <p><a href="{{ url_for('login', next='/star') }}">Log in</a> to score and save your STAR drafts.</p>
+        </div>
+        {% endif %}
+
+        <div class="st-card" {% if not is_authed %}style="display:none"{% endif %} id="builder-card">
+            <div class="st-field">
+                <label for="sel-comp">Competency</label>
+                <select id="sel-comp">
+                    {% for cid, label, desc in competencies %}
+                    <option value="{{ cid }}">{{ label }} — {{ desc }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="sections">
+                {% for sec in ['situation', 'task', 'action', 'result'] %}
+                <div class="st-sec" data-section="{{ sec }}">
+                    <div class="st-sec-head">
+                        <h3><span class="letter">{{ sec[0]|upper }}</span>{{ sec|title }}</h3>
+                    </div>
+                    <p class="st-tip">{{ guide[sec].tip }}</p>
+                    <button type="button" class="st-tip-toggle" data-toggle="{{ sec }}">Show good vs weak example</button>
+                    <div class="st-example-box" id="ex-{{ sec }}">
+                        <div class="st-good"><strong>Strong</strong><span>{{ guide[sec].good }}</span></div>
+                        <div class="st-bad"><strong>Weak</strong><span>{{ guide[sec].bad }}</span><div class="st-why">{{ guide[sec].why_bad }}</div></div>
+                    </div>
+                    <textarea class="st-area" id="area-{{ sec }}" maxlength="4000" placeholder="Write your {{ sec }} here..."></textarea>
+                    <div class="st-score" id="score-{{ sec }}" style="display:none">
+                        <span class="st-score-num"></span>
+                        <div class="st-bar"><div></div></div>
+                    </div>
+                    <ul class="st-sugg" id="sugg-{{ sec }}" style="display:none"></ul>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="st-overall" id="overall-box" style="display:none">
+                <div class="num" id="overall-num">0</div>
+                <div style="color:var(--text-muted,#94a3b8);font-size:0.9rem">overall score / 100</div>
+                <div id="ai-badge" style="font-size:0.8rem;margin-top:0.4rem;color:var(--text-muted,#94a3b8)"></div>
+            </div>
+
+            <div class="st-actions">
+                <button class="st-btn" id="btn-score">Score My Answer</button>
+                <button class="st-btn st-btn-ghost" id="btn-save">Save Draft</button>
+                <button class="st-btn st-btn-ghost" id="btn-copy">Copy Full Answer</button>
+                <a class="st-btn st-btn-ghost" href="{{ url_for('star_drafts') }}" style="text-decoration:none">My Drafts</a>
+            </div>
+            <div class="st-error" id="st-error" role="alert" style="display:none"></div>
+        </div>
+
+        <div class="st-card">
+            <h3 style="margin-bottom:0.8rem">Annotated examples <span style="font-weight:400;font-size:0.85rem;color:var(--text-muted,#94a3b8)">(<span id="ex-count">44</span> across 11 competencies)</span></h3>
+            <div class="st-field" style="max-width:320px">
+                <select id="sel-ex-comp">
+                    <option value="">All competencies</option>
+                    {% for cid, label, desc in competencies %}
+                    <option value="{{ cid }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="examples-list"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/star.js') }}"></script>
+</body>
+</html>

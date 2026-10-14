@@ -1,0 +1,618 @@
+[
+ {
+  "id": "star-001",
+  "competency": "leadership",
+  "title": "Shipping the fest app with a team of six",
+  "situation": "Our college tech fest was three weeks away and the event app had no working build. Half the volunteer developers had stopped showing up, and the fest coordinator was considering cancelling the app launch.",
+  "task": "As the elected tech lead, I had to get a working app shipped in time for 2,000 expected attendees.",
+  "action": "I split the remaining work into one-day deliverables and assigned each person exactly one owner-visible task. I ran a 15-minute standup every evening, unblocked the payment integration myself over a weekend, and paired the two least experienced members with seniors instead of letting them struggle alone.",
+  "result": "We shipped two days before the fest. The app handled 1,800 registrations with zero downtime, and the coordinator asked our team to run tech for next year's fest too.",
+  "why_it_works": [
+   "Names the crisis concretely instead of saying 'the project was hard'",
+   "Shows real leadership mechanics: scoping, standups, unblocking, pairing",
+   "Quantified outcome tied to the original goal"
+  ]
+ },
+ {
+  "id": "star-002",
+  "competency": "leadership",
+  "title": "Turning around a failing internship project",
+  "situation": "Midway through my internship, my team's dashboard project was two sprints behind. Requirements kept changing because two stakeholders disagreed, and engineers had started building conflicting versions.",
+  "task": "I needed to get both stakeholders aligned and the team shipping again within one sprint.",
+  "action": "I scheduled a single 45-minute alignment meeting, forced a written decision on the disputed requirements, and posted the decision log where everyone could see it. I then re-sequenced the backlog so the agreed scope came first and parked the disputed items.",
+  "result": "The team delivered the dashboard on the revised date, stakeholder escalations dropped to zero, and my manager cited the turnaround in my final review.",
+  "why_it_works": [
+   "Diagnoses the root cause (disagreement, not effort)",
+   "Action is a decision-making process, not just 'worked harder'",
+   "Result includes a leading indicator (escalations to zero)"
+  ]
+ },
+ {
+  "id": "star-003",
+  "competency": "leadership",
+  "title": "Leading volunteers during a donation drive",
+  "situation": "Our NGO chapter's annual donation drive had 40 volunteers but no coordination — three teams visited the same neighbourhoods while other areas were never covered.",
+  "task": "I volunteered to coordinate the 40 volunteers across the city for the two-week drive.",
+  "action": "I mapped the city into zones, assigned zone captains, and set up a shared tracker so no area was visited twice. I also created a simple pitch script after noticing volunteers struggled at the door.",
+  "result": "Collections rose 60% over the previous year to Rs. 3.2 lakh, and the chapter adopted my zone system permanently.",
+  "why_it_works": [
+   "Shows initiative without being asked",
+   "System-level thinking: zones, captains, tracker, script",
+   "Result quantified and shows lasting impact"
+  ]
+ },
+ {
+  "id": "star-004",
+  "competency": "leadership",
+  "title": "Mentoring juniors through placement season",
+  "situation": "In my final year, juniors in my department were failing coding rounds because they prepared randomly — solving hard problems before mastering basics, with no mock interview practice.",
+  "task": "I decided to run a structured 6-week prep program for around 30 juniors.",
+  "action": "I built a topic-wise plan, ran two mock interviews per student per week, and tracked everyone's weak topics on a shared sheet. I recruited three placed seniors to help with mocks.",
+  "result": "22 of the 30 cleared at least one company's coding round, up from 8 the previous year, and the department made the program official.",
+  "why_it_works": [
+   "Identifies a real gap and takes ownership of fixing it",
+   "Concrete operating cadence, not vague 'helped juniors'",
+   "Outcome measured against a baseline"
+  ]
+ },
+ {
+  "id": "star-005",
+  "competency": "teamwork",
+  "title": "Rescuing the hackathon demo at 3 AM",
+  "situation": "At a 36-hour hackathon, our backend crashed six hours before the demo. Our backend developer was asleep after 20 hours of work, and the rest of us only knew frontend.",
+  "task": "We had to get a working demo ready by 9 AM judging.",
+  "action": "Instead of waking him, I read his API code, found the failing database migration, and wrote a temporary in-memory fallback with my teammate. We left him a note explaining the change so he could review it fresh.",
+  "result": "We demoed on time, placed second out of 60 teams, and our teammate said the note was the first time someone had protected his rest during a crunch.",
+  "why_it_works": [
+   "Shows respect for a teammate under pressure, not heroics at their expense",
+   "Technical adaptability: frontend devs fixing a backend issue",
+   "Result covers both the outcome and the team relationship"
+  ]
+ },
+ {
+  "id": "star-006",
+  "competency": "teamwork",
+  "title": "Cross-functional launch with design and marketing",
+  "situation": "Our startup's new feature needed engineering, design, and marketing to ship together, but the three teams had never collaborated — handoffs happened over long email threads and things slipped.",
+  "task": "I was the engineering point of contact for the launch.",
+  "action": "I proposed a shared launch checklist with named owners and a twice-weekly 20-minute sync. When design was blocked on copy, I drafted placeholder copy myself so they could keep moving, and flagged the real copy as a launch-blocker for marketing.",
+  "result": "We launched on the announced date with zero last-minute surprises, and the checklist became the template for future launches.",
+  "why_it_works": [
+   "Bridges silos instead of blaming other teams",
+   "Unblocks others proactively (drafting placeholder copy)",
+   "Leaves behind a reusable process"
+  ]
+ },
+ {
+  "id": "star-007",
+  "competency": "teamwork",
+  "title": "Pairing with a struggling teammate",
+  "situation": "In a group database course project, one teammate couldn't write SQL joins and had gone quiet — the rest of us were close to just doing his part ourselves.",
+  "task": "We needed all four members contributing for the project viva.",
+  "action": "I spent two evenings pair-programming joins with him on small examples before touching project code. Once he could write basic queries, I gave him ownership of the reporting module with me as reviewer.",
+  "result": "He presented his module confidently in the viva, we scored an A, and he later told me those two evenings changed how he approaches new topics.",
+  "why_it_works": [
+   "Chooses teaching over doing someone's work for them",
+   "Scaffolded approach: basics first, then real ownership",
+   "Result shows the teammate's growth, not just the grade"
+  ]
+ },
+ {
+  "id": "star-008",
+  "competency": "teamwork",
+  "title": "Resolving a merge-conflict war",
+  "situation": "Four of us were building a club website and kept overwriting each other's work — every merge turned into a conflict, and people started working in separate copies.",
+  "task": "We needed a workflow that let everyone contribute without conflicts.",
+  "action": "I introduced a simple branch-per-feature rule with a 5-minute demo of rebasing, and set up a rule that no one merges their own pull request. I also split the single big CSS file into per-page files to reduce overlap.",
+  "result": "Conflicts dropped from daily to nearly zero, and the site launched a week early.",
+  "why_it_works": [
+   "Fixes the process, not just the symptoms",
+   "Small, teachable changes rather than heavy tooling",
+   "Measurable before/after"
+  ]
+ },
+ {
+  "id": "star-009",
+  "competency": "conflict_resolution",
+  "title": "Two seniors, one architecture decision",
+  "situation": "Two senior developers on my internship team disagreed for a week about whether to use REST or GraphQL for a new service. Discussion had stalled and the sprint was at risk.",
+  "task": "As the intern on the team, I wanted to help unblock the decision without taking sides.",
+  "action": "I wrote a one-page comparison of both options against our actual requirements — client types, caching needs, team familiarity — and shared it neutrally. The doc made it obvious REST fit better, and both seniors agreed within a day.",
+  "result": "The decision was made in 24 hours, the sprint stayed on track, and my mentor said the doc was the most useful thing an intern had produced that summer.",
+  "why_it_works": [
+   "An intern navigating senior conflict with a neutral artifact",
+   "Decides with criteria, not opinions",
+   "Shows influence without authority"
+  ]
+ },
+ {
+  "id": "star-010",
+  "competency": "conflict_resolution",
+  "title": "Teammate taking credit in presentations",
+  "situation": "In a semester project, one teammate presented our joint work as mostly his own in two reviews. The rest of the team was resentful but said nothing.",
+  "task": "I wanted the credit shared fairly without creating a hostile team.",
+  "action": "I spoke to him privately first, assuming it might be unintentional, and suggested we rotate presenters with a slide naming each person's contribution. He agreed, and the next review credited everyone.",
+  "result": "The tension dissolved, the project finished smoothly, and we stayed friends after the course.",
+  "why_it_works": [
+   "Private conversation before escalation — assumes good intent",
+   "Structural fix (rotating presenters) rather than a one-time complaint",
+   "Result preserves the relationship, not just the credit"
+  ]
+ },
+ {
+  "id": "star-011",
+  "competency": "conflict_resolution",
+  "title": "Customer angry about a delayed delivery",
+  "situation": "During a part-time support role, a customer called furious about a two-week delivery delay that wasn't our team's fault — the courier had lost the package.",
+  "task": "I needed to defuse the anger and get the customer their order.",
+  "action": "I let him speak without interrupting, acknowledged the frustration specifically ('two weeks is unacceptable, I'd be angry too'), then offered two concrete options: express re-shipment free, or full refund plus a discount code. He chose re-shipment.",
+  "result": "The package arrived in two days, he left a 5-star review mentioning my name, and my supervisor started using the 'two options' approach in training.",
+  "why_it_works": [
+   "De-escalation technique: listen, validate specifically, offer options",
+   "Takes ownership even when not at fault",
+   "Turns a complaint into a process improvement"
+  ]
+ },
+ {
+  "id": "star-012",
+  "competency": "conflict_resolution",
+  "title": "Design vs engineering on a deadline",
+  "situation": "Our designer wanted a custom animation for the onboarding flow; engineering said it would take two weeks we didn't have. Both sides were dug in a week before launch.",
+  "task": "I was asked to mediate as the feature owner.",
+  "action": "I asked the designer what feeling the animation was meant to create (delight, not the animation itself), then proposed a one-day CSS alternative that captured 80% of the effect. I had engineering prototype it in an afternoon for the designer to judge.",
+  "result": "The designer approved the simpler version, we shipped on time, and user feedback specifically praised the onboarding feel.",
+  "why_it_works": [
+   "Reframes from positions to underlying interests",
+   "Cheap prototype to resolve a debate with evidence",
+   "Both sides' core need was met"
+  ]
+ },
+ {
+  "id": "star-013",
+  "competency": "failure_setback",
+  "title": "The app nobody downloaded",
+  "situation": "I spent three months building a study-group app I was sure students wanted. At launch, fewer than 50 people signed up and almost no one returned.",
+  "task": "I had to figure out whether to persist, pivot, or shut it down.",
+  "action": "I interviewed 20 students and learned they didn't want another app — they wanted study partners, which a WhatsApp group already solved. I shut the app down, wrote up everything I learned, and shared the post-mortem publicly.",
+  "result": "The post-mortem got 2,000 views and two founders reached out for product feedback. More importantly, my next project started with user interviews instead of code.",
+  "why_it_works": [
+   "Honest about failure without self-pity",
+   "Did real research instead of guessing why it failed",
+   "Extracts a durable lesson and changed behavior"
+  ]
+ },
+ {
+  "id": "star-014",
+  "competency": "failure_setback",
+  "title": "Failing the first coding interview",
+  "situation": "I failed my first real coding interview badly — I froze on a medium dynamic programming problem and couldn't write a working solution in 45 minutes.",
+  "task": "I needed to convert that failure into a system that would work next time.",
+  "action": "I recorded exactly where I got stuck (recognizing the DP pattern), then did 40 DP problems over six weeks, always writing the recurrence first. I also did five timed mock interviews to practice thinking aloud.",
+  "result": "I cleared the next three coding rounds I faced, including the company that had rejected me — I reapplied after six months and got the offer.",
+  "why_it_works": [
+   "Specific diagnosis, not 'I need to practice more'",
+   "Deliberate practice targeting the exact weakness",
+   "Full-circle result: same company, offer earned"
+  ]
+ },
+ {
+  "id": "star-015",
+  "competency": "failure_setback",
+  "title": "Losing the debate finals",
+  "situation": "My debate team lost the state finals on a motion we had prepared for weeks. I blamed myself for a weak rebuttal in the final round.",
+  "task": "I wanted to understand exactly what went wrong rather than just feel bad.",
+  "action": "I got the judges' score sheets, which showed we lost on rebuttal structure, not content. For the next tournament I drilled a single skill: the three-point rebuttal format, recording myself daily.",
+  "result": "We won the next state-level tournament, and I was ranked best speaker.",
+  "why_it_works": [
+   "Seeks objective feedback (score sheets) instead of ruminating",
+   "Isolates one skill and drills it deliberately",
+   "Result directly addresses the diagnosed weakness"
+  ]
+ },
+ {
+  "id": "star-016",
+  "competency": "failure_setback",
+  "title": "A production bug I shipped",
+  "situation": "As an intern, I shipped a change that broke the checkout page for 40 minutes — the company lost an estimated Rs. 2 lakh in sales.",
+  "task": "I had to own the mistake and make sure it couldn't happen again.",
+  "action": "I wrote the incident report myself, including the exact line I got wrong and why the tests missed it. I then added the missing test case and proposed a checklist for high-risk deploys, which the team adopted.",
+  "result": "My manager told me the incident report was exemplary, and the checklist caught two similar issues in the following months.",
+  "why_it_works": [
+   "Full ownership, no excuses or blame-shifting",
+   "Fixes the system (tests + checklist), not just the bug",
+   "Turns a mistake into team infrastructure"
+  ]
+ },
+ {
+  "id": "star-017",
+  "competency": "ownership",
+  "title": "Owning the broken onboarding docs",
+  "situation": "New joiners at my internship took a week to set up their environment because the onboarding docs were two years out of date. Everyone complained; nobody fixed them.",
+  "task": "I decided the docs were my problem to fix, even though it wasn't my assigned work.",
+  "action": "I set up a fresh laptop from scratch, documented every step including every error I hit, and got two new joiners to follow the guide while I watched silently and noted where they stumbled.",
+  "result": "Setup time dropped from a week to under a day, and the guide became the official onboarding doc for all future interns.",
+  "why_it_works": [
+   "Sees an unowned problem and claims it",
+   "Tests the fix with real users (watched silently — great detail)",
+   "Quantified, lasting improvement"
+  ]
+ },
+ {
+  "id": "star-018",
+  "competency": "ownership",
+  "title": "The 2 AM database migration",
+  "situation": "Our club's event platform needed a database migration that would take the site down. Nobody wanted to do it during the fest week.",
+  "task": "I volunteered to own the migration end to end.",
+  "action": "I rehearsed the migration on a staging copy twice, wrote a rollback script first, scheduled it for 2 AM when traffic was lowest, and stayed on call until I verified every feature worked.",
+  "result": "Zero downtime was actually achieved — the rollback script was never needed, but having it let me act decisively instead of nervously.",
+  "why_it_works": [
+   "Volunteers for the scary, unglamorous work",
+   "Rollback-first thinking shows maturity",
+   "Preparation is the real story, not heroics"
+  ]
+ },
+ {
+  "id": "star-019",
+  "competency": "ownership",
+  "title": "Taking charge of a dead open-source issue",
+  "situation": "A popular open-source library I used had a bug affecting my project. The issue had been open for four months with no maintainer response.",
+  "task": "Instead of working around it forever, I decided to fix it upstream.",
+  "action": "I reproduced the bug, wrote a failing test, implemented the fix, and submitted a clean pull request with documentation. When the maintainer asked for changes, I iterated within a day.",
+  "result": "The PR was merged and shipped in the next release, fixing the issue for thousands of users — and it became the strongest talking point in my interviews.",
+  "why_it_works": [
+   "Doesn't wait for permission or for someone else",
+   "Follows the full contribution workflow properly",
+   "Result scales beyond personal benefit"
+  ]
+ },
+ {
+  "id": "star-020",
+  "competency": "ownership",
+  "title": "Running the placement cell single-handedly",
+  "situation": "Our department's placement coordinator graduated mid-year and no replacement was appointed. Companies were emailing with no one replying.",
+  "task": "I stepped in as interim coordinator for four months.",
+  "action": "I created a shared calendar of company visits, a resume review pipeline where seniors reviewed juniors' resumes, and a WhatsApp broadcast for deadlines. I personally replied to every company email within a day.",
+  "result": "That semester had the department's highest placement rate in three years (78%), and the faculty formalized the coordinator role afterward.",
+  "why_it_works": [
+   "Fills a vacuum without being asked",
+   "Builds systems (calendar, pipeline, broadcasts), not just effort",
+   "Institutional impact beyond the immediate term"
+  ]
+ },
+ {
+  "id": "star-021",
+  "competency": "adaptability",
+  "title": "Pivoting a project when the API died",
+  "situation": "Two weeks before our project demo, the third-party API we depended on shut down its free tier. Our entire data pipeline was built on it.",
+  "task": "We had to demo something working in 14 days with no budget.",
+  "action": "I evaluated three alternatives in one evening, picked one with a generous free tier, and rewrote our data layer over four days. I also added a caching layer so we'd never be fully dependent on one provider again.",
+  "result": "We demoed on schedule, and the caching layer actually made the app faster than before — the crisis produced a better architecture.",
+  "why_it_works": [
+   "Fast, decisive evaluation under time pressure",
+   "Builds resilience, not just a replacement",
+   "Reframes the setback as an upgrade"
+  ]
+ },
+ {
+  "id": "star-022",
+  "competency": "adaptability",
+  "title": "Switching stacks mid-internship",
+  "situation": "Two weeks into my internship, my team migrated from React to Svelte — a framework I had never used. My assigned tasks assumed React knowledge.",
+  "task": "I had to become productive in Svelte within days, not weeks.",
+  "action": "I spent evenings rebuilding one of my React side projects in Svelte, which taught me the framework's mental model fast. I asked my mentor for code reviews specifically on 'un-Svelte-like' patterns.",
+  "result": "Within two weeks I was shipping Svelte features independently, and my mentor noted my ramp-up was the fastest on the team.",
+  "why_it_works": [
+   "Proactive learning with a concrete method (rebuild a known project)",
+   "Seeks targeted feedback, not generic help",
+   "Measurable ramp-up outcome"
+  ]
+ },
+ {
+  "id": "star-023",
+  "competency": "adaptability",
+  "title": "Online exams during the network crisis",
+  "situation": "During end-semester exams, my area had daily power and network cuts. Two of my exams were online with strict time windows.",
+  "task": "I needed a setup that would survive outages.",
+  "action": "I arranged a backup location (a relative's house 20 minutes away), kept a charged power bank and mobile hotspot ready, downloaded all exam instructions offline, and did a full dry run the day before each exam.",
+  "result": "I completed both exams without interruption while several classmates had to apply for re-exams.",
+  "why_it_works": [
+   "Anticipates failure modes and prepares redundancies",
+   "Dry run shows thoroughness",
+   "Contrasts preparation with the default outcome"
+  ]
+ },
+ {
+  "id": "star-024",
+  "competency": "adaptability",
+  "title": "From mechanical to software in one semester",
+  "situation": "As a mechanical engineering student, I realized in my third year that I wanted software roles — with one year left and no CS background.",
+  "task": "I had to make myself employable for SDE roles in 12 months.",
+  "action": "I mapped the gap (DSA, one language, projects, DBMS basics), did 300+ DSA problems, built two full-stack projects, and treated every weekend as a study sprint. I skipped low-value coursework strategically.",
+  "result": "I received two SDE offers, and interviewers specifically asked about the self-directed transition.",
+  "why_it_works": [
+   "Honest about the gap, systematic about closing it",
+   "Volume + strategy, not just enthusiasm",
+   "The transition itself became a differentiator"
+  ]
+ },
+ {
+  "id": "star-025",
+  "competency": "communication",
+  "title": "Explaining a technical outage to non-technical users",
+  "situation": "Our app went down for three hours during a college fest, and 500+ users were flooding our support channel with angry messages.",
+  "task": "I had to communicate what was happening without jargon or excuses.",
+  "action": "I posted updates every 30 minutes in plain language: what broke (in one sentence), what we were doing, and when the next update would come. I avoided all technical terms and never blamed any person or team.",
+  "result": "Complaints dropped sharply after the second update, several users replied with encouragement, and our post-mortem praised the communication as the reason trust was preserved.",
+  "why_it_works": [
+   "Cadence + plain language + no blame: the three pillars",
+   "Anticipates what anxious users need (next update time)",
+   "Result measured in sentiment, not just uptime"
+  ]
+ },
+ {
+  "id": "star-026",
+  "competency": "communication",
+  "title": "Presenting to the board as an intern",
+  "situation": "I was asked to present my internship project to the company's leadership — the first intern ever given that slot. I had 10 minutes.",
+  "task": "I needed executives to understand and remember the project.",
+  "action": "I cut my 30-slide deck to 8 slides, opened with the business metric my project moved (not the tech), and rehearsed with a timer five times. I prepared a one-page handout for details.",
+  "result": "The CTO asked two follow-up questions and later referenced the project in a town hall. My manager said it was the clearest intern presentation she'd seen.",
+  "why_it_works": [
+   "Audience-first: metrics before tech, 8 slides not 30",
+   "Rehearsal is the unglamorous secret",
+   "Senior-leader recall as the success metric"
+  ]
+ },
+ {
+  "id": "star-027",
+  "competency": "communication",
+  "title": "Writing docs that people actually read",
+  "situation": "My team's API documentation was technically complete and completely unread — new developers kept asking the same questions in chat.",
+  "task": "I took on rewriting the docs so people would actually use them.",
+  "action": "I interviewed five developers about what confused them, then rewrote the docs as task-based recipes ('How to authenticate') instead of reference lists, with copy-paste examples for every endpoint.",
+  "result": "Support questions about the API dropped 70%, and two other teams copied the recipe format.",
+  "why_it_works": [
+   "Researches the audience before writing a word",
+   "Task-based structure beats reference dumps",
+   "Adoption by other teams proves the pattern"
+  ]
+ },
+ {
+  "id": "star-028",
+  "competency": "communication",
+  "title": "Saying no to a senior's request",
+  "situation": "A senior engineer asked me to add a feature that would have delayed our release by a week. Saying a flat no felt risky as an intern.",
+  "task": "I needed to decline without damaging the relationship.",
+  "action": "I explained the trade-off with dates ('this pushes release from Friday to next Friday'), proposed shipping it in the following release, and asked what outcome he actually needed — which turned out to be a much smaller change I could do in a day.",
+  "result": "He agreed to the smaller change, the release stayed on track, and he later told me the pushback earned his respect.",
+  "why_it_works": [
+   "No with data and alternatives, not just no",
+   "Uncovers the real need behind the request",
+   "Shows disagreement can build trust"
+  ]
+ },
+ {
+  "id": "star-029",
+  "competency": "time_management",
+  "title": "Juggling placements and a 9-CGPA semester",
+  "situation": "In my final semester I had placement interviews, a capstone project, and five theory subjects — and I refused to let my grades slip.",
+  "task": "I needed a weekly system that protected both goals.",
+  "action": "I time-blocked my calendar: mornings for interview prep, afternoons for coursework, Sundays for the capstone. I tracked everything in a simple sheet and reviewed every Sunday night, cutting whatever wasn't working.",
+  "result": "I finished with a 9.1 CGPA, completed the capstone a week early, and received two job offers.",
+  "why_it_works": [
+   "System over willpower: time-blocking + weekly review",
+   "Explicit trade-off management (cutting what doesn't work)",
+   "All three goals hit — no vague 'managed well'"
+  ]
+ },
+ {
+  "id": "star-030",
+  "competency": "time_management",
+  "title": "Shipping a fest website in 10 days",
+  "situation": "Our cultural fest's website contractor quit 10 days before the fest, with ticket sales depending on the site.",
+  "task": "I volunteered to build a replacement site in the remaining time.",
+  "action": "I cut scope ruthlessly: single page, ticket link, schedule, contact — nothing else. I used a template for styling and spent all effort on correctness and mobile layout. I deployed nightly so organizers could see progress.",
+  "result": "The site went live in 8 days, handled 3,000 ticket bookings without issues, and cost nothing.",
+  "why_it_works": [
+   "Ruthless scoping is the skill being demonstrated",
+   "Template for style, effort on what matters",
+   "Nightly deploys manage stakeholder anxiety"
+  ]
+ },
+ {
+  "id": "star-031",
+  "competency": "time_management",
+  "title": "Preparing for GATE alongside a job",
+  "situation": "I decided to prepare for GATE while working a full-time support job with rotating shifts — most people said it was impossible.",
+  "task": "I needed 15 quality study hours a week around unpredictable shifts.",
+  "action": "I studied in 90-minute blocks before shifts, used commute time for formula revision on flashcards, and took a full mock every Sunday morning without exception. I told friends I was unavailable on weekends.",
+  "result": "I scored in the 98th percentile and got interview calls from three PSUs.",
+  "why_it_works": [
+   "Designs around constraints instead of fighting them",
+   "Non-negotiable weekly mock as the anchor habit",
+   "Protects time socially (telling friends)"
+  ]
+ },
+ {
+  "id": "star-032",
+  "competency": "time_management",
+  "title": "The week of three deadlines",
+  "situation": "I once had three major submissions in a single week: a project report, a hackathon, and a scholarship application.",
+  "task": "I had to deliver all three without burning out.",
+  "action": "I ranked them by irreversibility (scholarship first — one shot), front-loaded the hardest work to my peak morning hours, and deliberately capped the hackathon scope to 'working demo' instead of 'polished product'.",
+  "result": "All three were submitted on time, the scholarship came through, and I slept at least 6 hours every night that week.",
+  "why_it_works": [
+   "Prioritizes by irreversibility — a genuinely senior heuristic",
+   "Scopes down the lowest-stakes item deliberately",
+   "Sustainable pace as part of the result"
+  ]
+ },
+ {
+  "id": "star-033",
+  "competency": "problem_solving",
+  "title": "Finding a memory leak in production",
+  "situation": "Our app's server memory grew 2 GB per day until it crashed weekly. Two developers had looked at it and found nothing.",
+  "task": "I took it on as a background task between sprint work.",
+  "action": "I added heap snapshots to the deploy pipeline and compared snapshots across 24 hours, which pointed to an event listener registered in a loop. I wrote a minimal reproduction, fixed the registration, and added a memory-growth alert.",
+  "result": "Crashes stopped entirely, and the alert caught a similar leak in another service a month later.",
+  "why_it_works": [
+   "Methodical: instrument, compare, reproduce — not guessing",
+   "Fixes the class of problem (alert), not just the instance",
+   "Shows debugging as a disciplined process"
+  ]
+ },
+ {
+  "id": "star-034",
+  "competency": "problem_solving",
+  "title": "Cutting API costs by 80%",
+  "situation": "My side project's OpenAI bill hit Rs. 8,000/month — more than the app earned. I couldn't afford to keep it running.",
+  "task": "I needed to slash costs without killing quality.",
+  "action": "I profiled usage and found 70% of calls were repeated questions, so I added semantic caching. Then I routed simple queries to a smaller model and reserved the big model for hard ones.",
+  "result": "Monthly cost dropped to Rs. 1,400 with no measurable quality drop, and response times improved because of the cache.",
+  "why_it_works": [
+   "Measure first (profiling), then optimize the biggest lever",
+   "Two complementary techniques, each justified",
+   "Quality guardrail: 'no measurable drop'"
+  ]
+ },
+ {
+  "id": "star-035",
+  "competency": "problem_solving",
+  "title": "The hostel Wi-Fi mystery",
+  "situation": "Our hostel's Wi-Fi died every evening at 8 PM for a month. The warden blamed 'too many users' and the ISP blamed the router.",
+  "task": "I decided to actually diagnose it instead of accepting the excuses.",
+  "action": "I logged signal strength and DHCP leases for a week and found the router's DHCP pool exhausted exactly when everyone returned — a configuration issue, not capacity. I showed the warden the logs and the one-line fix.",
+  "result": "Wi-Fi stabilized the same day, and I wrote a guide so other hostels could check their own setups.",
+  "why_it_works": [
+   "Data over opinions: logged for a week",
+   "Finds the real root cause both vendors missed",
+   "Shares the fix beyond personal benefit"
+  ]
+ },
+ {
+  "id": "star-036",
+  "competency": "problem_solving",
+  "title": "Automating a 3-hour weekly report",
+  "situation": "My manager spent 3 hours every Monday compiling a status report from five spreadsheets. Everyone accepted it as 'just how it is'.",
+  "task": "I wanted to eliminate the manual work entirely.",
+  "action": "I spent a weekend writing a script that pulled the five sheets, cleaned the data, and generated the report with charts. I ran it in parallel with the manual process for two weeks to prove accuracy.",
+  "result": "The report now takes 4 minutes, my manager reclaimed 150+ hours a year, and two other teams asked for the same automation.",
+  "why_it_works": [
+   "Questions 'just how it is'",
+   "Parallel run to earn trust before replacing",
+   "Impact quantified in hours, adopted by others"
+  ]
+ },
+ {
+  "id": "star-037",
+  "competency": "mentorship",
+  "title": "Onboarding three interns in two weeks",
+  "situation": "My team hired three interns at once and I was asked to onboard them while still delivering my own sprint work.",
+  "task": "I needed them productive quickly without sinking my own output.",
+  "action": "I created a two-week onboarding path: curated reading, one tiny well-scoped first ticket each, and daily 15-minute check-ins. I recorded short videos for repeated explanations instead of repeating myself.",
+  "result": "All three merged code in week one, and the onboarding path became the team's standard — my own sprint still shipped on time.",
+  "why_it_works": [
+   "Systems for leverage: path, tiny tickets, recorded videos",
+   "Balances mentoring with own delivery",
+   "Becomes team infrastructure"
+  ]
+ },
+ {
+  "id": "star-038",
+  "competency": "mentorship",
+  "title": "Teaching DSA to a non-CS friend",
+  "situation": "My friend from electronics wanted SDE roles but found DSA intimidating and had failed two coding rounds.",
+  "task": "I committed to getting her interview-ready in two months.",
+  "action": "Instead of dumping problems on her, I taught patterns: two pointers, sliding window, hash maps — one pattern per week with 10 curated problems each. We did a weekly mock where she explained her thinking aloud.",
+  "result": "She cleared her next coding round and later her full interview loop, and told me the pattern-first approach was what finally made it click.",
+  "why_it_works": [
+   "Teaches patterns, not problems — the transferable skill",
+   "Think-aloud practice targets the actual interview skill",
+   "Adapts to the learner's background"
+  ]
+ },
+ {
+  "id": "star-039",
+  "competency": "mentorship",
+  "title": "Code reviews that teach",
+  "situation": "Junior developers on my team dreaded my code reviews — they felt like exams. Good feedback wasn't landing.",
+  "task": "I wanted reviews that leveled people up instead of intimidating them.",
+  "action": "I changed my style: every review now has one 'why this matters' explanation, one suggested alternative with code, and I started approving with optional follow-ups instead of blocking on style nits.",
+  "result": "Juniors started requesting my reviews, review turnaround dropped, and two of them told me they now write code anticipating my comments.",
+  "why_it_works": [
+   "Redesigns the interaction, not just the tone",
+   "Teaches principles ('why'), not just corrections",
+   "The ultimate metric: they internalize the standard"
+  ]
+ },
+ {
+  "id": "star-040",
+  "competency": "mentorship",
+  "title": "Running weekend workshops for freshmen",
+  "situation": "Freshmen in my college were intimidated by programming and dropping the coding club after one session.",
+  "task": "I started weekend workshops to make coding feel approachable.",
+  "action": "I designed every session around building something visible in 90 minutes — a game, a bot, a website — with zero lectures. I recruited seniors as roaming helpers so nobody stayed stuck.",
+  "result": "Attendance grew from 15 to 120 across the semester, and club retention tripled.",
+  "why_it_works": [
+   "Designs for the emotional barrier (intimidation), not just content",
+   "Visible output in 90 minutes keeps beginners hooked",
+   "Retention as the success metric"
+  ]
+ },
+ {
+  "id": "star-041",
+  "competency": "customer_focus",
+  "title": "The feature users didn't ask for (but needed)",
+  "situation": "Support tickets showed users struggling with our export feature, but everyone requested 'more export formats' — which felt wrong.",
+  "task": "I dug into what users were actually trying to accomplish.",
+  "action": "I watched five session recordings and found users exported just to reformat data in Excel — so I built one-click formatted reports instead of more formats. I tested the prototype with three of the ticket authors.",
+  "result": "Export-related tickets dropped 80%, and one customer wrote in specifically to thank us for 'finally understanding' their workflow.",
+  "why_it_works": [
+   "Looks past stated requests to underlying jobs-to-be-done",
+   "Validates with the actual ticket authors",
+   "Solves the problem instead of the request"
+  ]
+ },
+ {
+  "id": "star-042",
+  "competency": "customer_focus",
+  "title": "Saving a churn-risk enterprise client",
+  "situation": "An enterprise client threatened to churn, citing 'poor support'. The account team wanted to offer a discount.",
+  "task": "I asked to investigate the real cause before discounting.",
+  "action": "I reviewed their last 20 tickets and found slow responses on just one integration issue that kept bouncing between teams. I took personal ownership, fixed it in three days, and set up a direct channel.",
+  "result": "They renewed for two more years at full price, and the 'one owner per escalation' rule became standard.",
+  "why_it_works": [
+   "Resists the easy discount; diagnoses instead",
+   "Personal ownership of the resolution",
+   "Full-price renewal proves the real fix worked"
+  ]
+ },
+ {
+  "id": "star-043",
+  "competency": "customer_focus",
+  "title": "Building for visually impaired users",
+  "situation": "A blind student wrote to our club saying our event site was unusable with his screen reader — we'd never considered accessibility.",
+  "task": "I made the site properly accessible before the next event.",
+  "action": "I learned WCAG basics over a weekend, added semantic HTML, labels, focus states, and keyboard navigation, then asked him to test it and iterated on his feedback twice.",
+  "result": "He registered independently for the first time, and accessibility checks became part of our club's definition of done.",
+  "why_it_works": [
+   "Responds to an excluded user with urgency, not defensiveness",
+   "Tests with the actual affected user, twice",
+   "Makes it permanent (definition of done)"
+  ]
+ },
+ {
+  "id": "star-044",
+  "competency": "customer_focus",
+  "title": "The 1-star review that changed our roadmap",
+  "situation": "Our app had a 1-star review complaining about a confusing checkout — the team dismissed it as 'one angry user'.",
+  "task": "I decided to check whether it was actually an isolated complaint.",
+  "action": "I analyzed 200 reviews and found 30 mentioned the same confusion. I prototyped a simplified checkout, A/B tested it, and it lifted conversion 12%.",
+  "result": "The redesign shipped to all users, and the reviewer updated to 5 stars saying the team 'actually listens'.",
+  "why_it_works": [
+   "Treats one complaint as a possible signal, verifies with data",
+   "A/B test before full rollout",
+   "Closes the loop with the original reviewer"
+  ]
+ }
+]

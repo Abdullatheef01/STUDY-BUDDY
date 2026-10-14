@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>My STAR Drafts | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+    <style>
+        .st-wrap { max-width: 860px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .st-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 1.6rem; backdrop-filter: blur(12px); margin-bottom: 1rem; }
+        .st-card h3 { margin-bottom: 0.4rem; }
+        .st-meta { font-size: 0.82rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.7rem; }
+        .st-preview { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 0.8rem; }
+        .st-actions { display: flex; gap: 0.6rem; }
+        .st-btn-sm { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main, #f8fafc); border-radius: 10px; padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; }
+        .st-btn-sm.danger { border-color: rgba(239,68,68,0.5); color: var(--accent-danger); }
+        .st-empty { text-align: center; padding: 2.5rem; color: var(--text-muted, #94a3b8); }
+        .st-empty a { color: var(--accent-primary); font-weight: 700; }
+        @media (max-width: 700px) { .st-wrap { padding-top: 5.5rem; } .st-card { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
+            <span>ResumeAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/practice">Practice</a></li>
+            <li><a href="/star" class="active">STAR Builder</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            {% include "_auth_links.html" %}
+        </ul>
+    </nav>
+
+    <div class="st-wrap">
+        <h1 style="font-size:1.9rem;margin-bottom:1.2rem">My <span style="background:var(--gradient-primary);-webkit-background-clip:text;background-clip:text;color:transparent">STAR</span> Drafts</h1>
+        {% if drafts %}
+            {% for d in drafts %}
+            <div class="st-card" id="draft-{{ d.id }}">
+                <h3>{{ competencies.get(d.competency, d.competency)|title }}{% if d.overall is not none %} — {{ d.overall }}/100{% endif %}</h3>
+                <div class="st-meta">{{ d.updated_at[:10] if d.updated_at else '' }}</div>
+                <div class="st-preview">{{ d.preview }}{% if d.preview|length >= 120 %}…{% endif %}</div>
+                <div class="st-actions">
+                    <button class="st-btn-sm danger" data-del="{{ d.id }}">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="st-card st-empty">
+                No drafts yet. <a href="{{ url_for('star_home') }}">Build your first STAR answer</a>.
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+        function csrfHeaders(extra) {
+            var headers = extra || {};
+            var m = document.querySelector('meta[name="csrf-token"]');
+            if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+            return headers;
+        }
+        document.querySelectorAll('[data-del]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Delete this draft?')) return;
+                var id = btn.getAttribute('data-del');
+                fetch('/star/drafts/' + id + '/delete', {
+                    method: 'POST', headers: csrfHeaders()
+                }).then(function (r) { return r.json(); }).then(function (d) {
+                    if (d.success) {
+                        var card = document.getElementById('draft-' + id);
+                        if (card) card.remove();
+                    }
+                });
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
