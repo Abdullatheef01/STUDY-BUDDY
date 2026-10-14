@@ -82,7 +82,10 @@
                 <h1>Application <span class="b-grad">Tracker</span></h1>
                 <p>Drag cards between stages, or use the move dropdown on any card. Everything is private to you.</p>
             </div>
-            <button class="tk-btn b-magnet" id="tkAddBtn" type="button">+ Add application</button>
+            <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+                <a class="tk-mini" href="{{ url_for('retrospectives_hub') }}" style="text-decoration:none;">Rejection retrospectives</a>
+                <button class="tk-btn b-magnet" id="tkAddBtn" type="button">+ Add application</button>
+            </div>
         </div>
 
         <div class="tk-stats" id="tkStats" aria-live="polite">
@@ -115,6 +118,7 @@
                             </select>
                             <button class="tk-mini tk-edit" type="button">Edit</button>
                             <button class="tk-mini danger tk-del" type="button">Delete</button>
+                            {% if a.stage == 'rejected' %}<a class="tk-mini" href="{{ url_for('retro_wizard', application_id=a.id) }}" style="text-decoration:none;">Reflect</a>{% endif %}
                         </div>
                     </div>
                     {% else %}

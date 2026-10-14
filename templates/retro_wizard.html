@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'career' %}
+{% block title %}Rejection retrospective — {{ application.company }} | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        .rw-steps { display: flex; gap: .5rem; margin: 1.2rem 0 1.6rem; flex-wrap: wrap; }
+        .rw-step { flex: 1; min-width: 140px; padding: .7rem .9rem; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03);
+            font-size: .85rem; color: var(--b-muted); cursor: pointer; text-align: left; }
+        .rw-step strong { display: block; color: inherit; font-size: .9rem; }
+        .rw-step--active { border-color: var(--b-a1); color: #fff; background: rgba(99,102,241,.12); }
+        .rw-step--done { border-color: rgba(52,211,153,.5); color: #a7f3d0; }
+        .rw-pane { display: none; }
+        .rw-pane--active { display: block; }
+        .rw-field { display: grid; gap: .4rem; margin-bottom: 1rem; }
+        .rw-field label { font-size: .82rem; font-weight: 700; color: var(--b-muted); }
+        .rw-field textarea, .rw-field input, .rw-field select { width: 100%; background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.14); border-radius: 10px; color: inherit;
+            padding: .65rem .85rem; font-size: .92rem; font-family: inherit; }
+        .rw-field textarea { min-height: 120px; resize: vertical; }
+        .rw-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: .7rem; margin: .8rem 0; }
+        .rw-card { border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: .8rem .9rem;
+            background: rgba(255,255,255,.03); cursor: pointer; font-size: .86rem; text-align: left; color: inherit; }
+        .rw-card:hover { border-color: var(--b-a1); }
+        .rw-card--sel { border-color: var(--b-a1); background: rgba(99,102,241,.12); }
+        .rw-card .rw-cat { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
+            color: var(--b-a2); font-weight: 800; margin-bottom: .3rem; }
+        .rw-cat-filter { display: flex; gap: .4rem; flex-wrap: wrap; margin: .6rem 0; }
+        .rw-cat-filter button { font-size: .76rem; padding: .3rem .7rem; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.16); background: transparent; color: var(--b-muted); cursor: pointer; }
+        .rw-cat-filter button.rw-cat--on { color: #fff; border-color: var(--b-a1); background: rgba(99,102,241,.15); }
+        .rw-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .6rem; margin: .8rem 0; }
+        .rw-stat { border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: .7rem .9rem; font-size: .82rem; }
+        .rw-stat strong { display: block; font-size: 1.15rem; }
+        .rw-err { display: none; color: #f87171; font-size: .85rem; margin-top: .6rem; }
+        .rw-ok { display: none; color: #34d399; font-size: .85rem; margin-top: .6rem; }
+        .rw-nav { display: flex; gap: .7rem; margin-top: 1.2rem; flex-wrap: wrap; align-items: center; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-card b-reveal">
+        <span class="b-pill"><span class="b-pulse"></span>Rejection retrospective</span>
+        <h1 style="margin-bottom:.3rem;">{{ application.company }} — <span class="b-grad">{{ application.role }}</span></h1>
+        <p style="color:var(--b-muted);">Turn this outcome into hypotheses, one controlled change, and your next best experiment. Nothing here is a verdict on you.</p>
+
+        <div class="rw-steps" role="tablist" aria-label="Wizard steps">
+            <button class="rw-step rw-step--active" data-pane="1" type="button" role="tab"><strong>1 · Facts</strong>What happened</button>
+            <button class="rw-step" data-pane="2" type="button" role="tab"><strong>2 · Patterns</strong>Compare with your funnel</button>
+            <button class="rw-step" data-pane="3" type="button" role="tab"><strong>3 · Hypotheses</strong>Guesses, not facts</button>
+            <button class="rw-step" data-pane="4" type="button" role="tab"><strong>4 · Experiment</strong>One controlled change</button>
+        </div>
+
+        {# ---- Step 1: facts ---- #}
+        <div class="rw-pane rw-pane--active" data-pane-body="1">
+            <div class="rw-field">
+                <label for="rw-stage">How far did the process get?</label>
+                <select id="rw-stage">
+                    <option value="">— not sure / prefer not to say —</option>
+                    {% for sid, label in stages %}
+                    <option value="{{ sid }}" {% if retro and retro.stage_reached == sid %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="rw-field">
+                <label for="rw-timeline">Timeline (applied when? heard back when? key dates)</label>
+                <input id="rw-timeline" type="text" maxlength="2000" placeholder="Applied 2 Oct · OA on 8 Oct · rejection mail 12 Oct" value="{{ timeline_prefill | e }}">
+            </div>
+            <div class="rw-field">
+                <label for="rw-facts">What happened — in your own words</label>
+                <textarea id="rw-facts" maxlength="5000" placeholder="The facts only: what you did, what they did, what the outcome was. No self-judgment needed.">{{ facts_prefill | e }}</textarea>
+            </div>
+            <div class="rw-nav">
+                <button class="b-btn b-btn--primary" data-save="facts" type="button">Save facts</button>
+                <button class="b-btn b-btn--ghost" data-goto="2" type="button">Next: patterns →</button>
+                <span class="rw-ok" id="rw-ok-facts">Saved.</span><span class="rw-err" id="rw-err-facts" role="alert"></span>
+            </div>
+        </div>
+
+        {# ---- Step 2: patterns ---- #}
+        <div class="rw-pane" data-pane-body="2">
+            <p style="color:var(--b-muted);">Your funnel, computed from your tracked applications. Compare this rejection against it — then note any pattern <em>you</em> see. The numbers are observations; the pattern is your call.</p>
+            <div class="rw-stats" aria-label="Your funnel stats">
+                {% for s in funnel.stages %}
+                <div class="rw-stat"><strong>{{ s.reached }}</strong>{{ s.label }} reached</div>
+                {% endfor %}
+                <div class="rw-stat"><strong>{{ funnel.rejected }}</strong>rejected (side-track)</div>
+            </div>
+            {% for c in funnel.conversions %}
+            {% if c.rate is not none %}
+            <p style="font-size:.85rem;color:var(--b-muted);margin:.2rem 0;">{{ c.from_label }} → {{ c.to_label }}: <strong>{{ c.rate }}%</strong></p>
+            {% endif %}
+            {% endfor %}
+            <div class="rw-field" style="margin-top:1rem;">
+                <label for="rw-patterns">Observed patterns (your words — what do you notice?)</label>
+                <textarea id="rw-patterns" maxlength="5000" placeholder="e.g. This is my third rejection after the OA stage this month. My wishlist is growing but few move past screening.">{% if retro and retro.observed_patterns %}{{ retro.observed_patterns | e }}{% endif %}</textarea>
+            </div>
+            <div class="rw-nav">
+                <button class="b-btn b-btn--ghost" data-goto="1" type="button">← Back</button>
+                <button class="b-btn b-btn--primary" data-save="patterns" type="button">Save patterns</button>
+                <button class="b-btn b-btn--ghost" data-goto="3" type="button">Next: hypotheses →</button>
+                <span class="rw-ok" id="rw-ok-patterns">Saved.</span><span class="rw-err" id="rw-err-patterns" role="alert"></span>
+            </div>
+        </div>
+
+        {# ---- Step 3: hypotheses ---- #}
+        <div class="rw-pane" data-pane-body="3">
+            <p style="color:var(--b-muted);">Tap starters to add them, then edit freely. Everything here is a <strong>hypothesis</strong> — a guess to test, never a fact about you.</p>
+            <div class="rw-cat-filter" id="rw-h-filter">
+                <button type="button" data-cat="all" class="rw-cat--on">All</button>
+                {% for key, label in categories %}
+                <button type="button" data-cat="{{ key }}">{{ label }}</button>
+                {% endfor %}
+            </div>
+            <div class="rw-cards" id="rw-h-cards">
+                {% for key, label in categories %}
+                {% for s in starters.get(key, []) %}
+                <button type="button" class="rw-card" data-cat="{{ key }}" data-text="{{ s.text | e }}"><span class="rw-cat">{{ label }} · hypothesis</span>{{ s.text }}</button>
+                {% endfor %}
+                {% endfor %}
+            </div>
+            <div class="rw-field">
+                <label for="rw-hyps">My hypotheses</label>
+                <textarea id="rw-hyps" maxlength="5000" placeholder="Selected starters appear here — keep, edit, or write your own.">{% if retro and retro.hypotheses %}{{ retro.hypotheses | e }}{% endif %}</textarea>
+            </div>
+            <div class="rw-nav">
+                <button class="b-btn b-btn--ghost" data-goto="2" type="button">← Back</button>
+                <button class="b-btn b-btn--primary" data-save="hypotheses" type="button">Save hypotheses</button>
+                <button class="b-btn b-btn--ghost" data-goto="4" type="button">Next: experiment →</button>
+                <span class="rw-ok" id="rw-ok-hypotheses">Saved.</span><span class="rw-err" id="rw-err-hypotheses" role="alert"></span>
+            </div>
+        </div>
+
+        {# ---- Step 4: experiment ---- #}
+        <div class="rw-pane" data-pane-body="4">
+            <p style="color:var(--b-muted);">Pick a template to pre-fill the form, then customize it. One experiment = one controlled change + one measurable target.</p>
+            <div class="rw-cat-filter" id="rw-t-filter">
+                <button type="button" data-cat="all" class="rw-cat--on">All</button>
+                {% for key, label in categories %}
+                <button type="button" data-cat="{{ key }}">{{ label }}</button>
+                {% endfor %}
+            </div>
+            <div class="rw-cards" id="rw-t-cards">
+                {% for key, label in categories %}
+                {% for t in templates.get(key, []) %}
+                <button type="button" class="rw-card" data-cat="{{ key }}"
+                        data-hypothesis="{{ t.hypothesis | e }}" data-change="{{ t.change | e }}"
+                        data-target="{{ t.target | e }}" data-duration="{{ t.duration | e }}">
+                    <span class="rw-cat">{{ label }} · {{ t.duration }}</span>
+                    <strong>Change:</strong> {{ t.change }}<br><span style="color:var(--b-muted);">Target: {{ t.target }}</span>
+                </button>
+                {% endfor %}
+                {% endfor %}
+            </div>
+            <div class="rw-field">
+                <label for="rw-e-hyp">Hypothesis (a guess, not a fact)</label>
+                <input id="rw-e-hyp" type="text" maxlength="2000" placeholder="Maybe…">
+            </div>
+            <div class="rw-field">
+                <label for="rw-e-change">The one controlled change</label>
+                <input id="rw-e-change" type="text" maxlength="2000" placeholder="What exactly will you do differently?">
+            </div>
+            <div class="rw-field">
+                <label for="rw-e-target">What to measure</label>
+                <input id="rw-e-target" type="text" maxlength="1000" placeholder="e.g. Response rate on the next 10 applications.">
+            </div>
+            <div class="rw-field">
+                <label for="rw-e-dur">Duration</label>
+                <input id="rw-e-dur" type="text" maxlength="50" placeholder="3 weeks">
+            </div>
+            <div class="rw-nav">
+                <button class="b-btn b-btn--ghost" data-goto="3" type="button">← Back</button>
+                <button class="b-btn b-btn--primary" data-save="experiment" type="button">Save experiment</button>
+                <button class="b-btn b-btn--primary" id="rw-complete" type="button" style="border:1px solid var(--b-a1);">Complete retrospective · +15 XP</button>
+                <span class="rw-ok" id="rw-ok-experiment">Saved.</span><span class="rw-err" id="rw-err-experiment" role="alert"></span>
+            </div>
+            <p style="color:var(--b-muted);font-size:.82rem;">Completing logs the retrospective and awards +15 momentum XP (once per application).</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.RT_APP_ID = {{ application.id }};
+    window.RT_COMPLETED = {{ 'true' if retro and retro.completed else 'false' }};
+</script>
+<script src="{{ url_for('static', filename='js/retrospectives.js') }}" defer></script>
+{% endblock %}

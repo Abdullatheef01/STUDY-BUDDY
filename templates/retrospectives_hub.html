@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'career' %}
+{% block title %}Rejection Retrospectives | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        .rt-funnel { display: flex; flex-direction: column; gap: .55rem; margin-top: 1rem; }
+        .rt-fstage { display: grid; grid-template-columns: 150px 1fr 130px; gap: .8rem; align-items: center; }
+        .rt-fstage .rt-label { font-weight: 700; font-size: .9rem; }
+        .rt-fstage .rt-count { color: var(--b-muted); font-size: .82rem; text-align: right; white-space: nowrap; }
+        .rt-bar { height: 14px; border-radius: 999px; background: rgba(255,255,255,.07); overflow: hidden; }
+        .rt-bar > span { display: block; height: 100%; border-radius: 999px;
+            background: linear-gradient(90deg, var(--b-a1), var(--b-a2)); }
+        .rt-conv { font-size: .78rem; color: var(--b-muted); margin-left: 150px; }
+        .rt-side { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px dashed rgba(255,255,255,.25);
+            border-radius: 14px; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+        .rt-tag { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+            padding: .25rem .6rem; border-radius: 999px; background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.14); color: var(--b-muted); }
+        .rt-tag--warn { color: #fbbf24; border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.08); }
+        .rt-tag--ok { color: #34d399; border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.08); }
+        .rt-sug { border-left: 3px solid var(--b-a1); }
+        .rt-sug dl { margin: .6rem 0 0; display: grid; gap: .5rem; }
+        .rt-sug dt { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
+            color: var(--b-a2); }
+        .rt-sug dd { margin: 0; font-size: .9rem; color: #e2e8f0; }
+        .rt-table { width: 100%; border-collapse: collapse; font-size: .88rem; margin-top: .6rem; }
+        .rt-table th { text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em;
+            color: var(--b-muted); padding: .45rem .5rem; border-bottom: 1px solid rgba(255,255,255,.1); }
+        .rt-table td { padding: .5rem; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: top; }
+        .rt-status { font-size: .75rem; font-weight: 700; padding: .2rem .6rem; border-radius: 999px; }
+        .rt-status--planned { background: rgba(148,163,184,.15); color: #94a3b8; }
+        .rt-status--running { background: rgba(96,165,250,.15); color: #60a5fa; }
+        .rt-status--done { background: rgba(52,211,153,.15); color: #34d399; }
+        .rt-exp-form { display: grid; gap: .7rem; margin-top: 1rem; }
+        .rt-exp-form input, .rt-exp-form textarea { width: 100%; background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.14); border-radius: 10px; color: inherit;
+            padding: .6rem .8rem; font-size: .9rem; }
+        .rt-exp-form label { font-size: .8rem; font-weight: 700; color: var(--b-muted); }
+        .rt-err { display: none; color: #f87171; font-size: .85rem; margin-top: .6rem; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Rejection retrospectives</span>
+            <h1>Turn rejections into <span class="b-grad">experiments</span>.</h1>
+            <p class="b-lede">Compare your conversion by role, stage, and source. Every suggestion below is framed as a hypothesis — observed patterns are yours, causes are guesses, and the next step is always a test.</p>
+            <div class="b-cta-row">
+                <a class="b-btn b-btn--primary" href="{{ url_for('tracker_board') }}">Open application tracker</a>
+                {% if total_retros == 0 %}
+                <span class="b-pill">Log one retrospective to unlock your first insight</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ---------- Funnel ---------- #}
+<section class="b-section" aria-label="Application funnel">
+    <div class="b-card b-reveal">
+        <div class="b-sec-head" style="margin-top:0;">
+            <h2>Your <span class="b-grad">funnel</span></h2>
+            <p>Where applications sit now, and how many advanced between stages. "Reached" counts every application currently at that stage or beyond.</p>
+        </div>
+        {% set max_reached = funnel.stages[0].reached if funnel.stages else 0 %}
+        <div class="rt-funnel">
+            {% for s in funnel.stages %}
+            <div class="rt-fstage">
+                <span class="rt-label">{{ s.label }}</span>
+                <div class="rt-bar" role="img" aria-label="{{ s.label }}: {{ s.reached }} reached"><span style="width:{{ (100 * s.reached / max_reached) | round(0) if max_reached else 0 }}%;"></span></div>
+                <span class="rt-count">{{ s.reached }} reached · {{ s.count }} here</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% for c in funnel.conversions %}
+        <p class="rt-conv">{{ c.from_label }} &rarr; {{ c.to_label }}: <strong>{% if c.rate is not none %}{{ c.rate }}%{% else %}—{% endif %}</strong> ({{ c.numerator }}/{{ c.denominator }})</p>
+        {% endfor %}
+        <div class="rt-side">
+            <span class="b-pill">Rejected side-track: {{ funnel.rejected }}</span>
+            <span style="color:var(--b-muted);font-size:.85rem;">Rejections are outcomes to learn from, not funnel drop-offs. Reflect on one below.</span>
+        </div>
+        {% if funnel.total == 0 %}
+        <p style="color:var(--b-muted);margin-top:1rem;">No applications tracked yet — <a href="{{ url_for('tracker_board') }}">add some in the tracker</a> and this funnel will come alive.</p>
+        {% endif %}
+    </div>
+</section>
+
+{# ---------- Breakdowns ---------- #}
+<section class="b-section" aria-label="Breakdowns">
+    <div class="b-sec-head"><h2>Break<span class="b-grad">downs</span></h2><p>Conversion compared across roles, stages, and sources. Samples under {{ small_n }} are flagged as hints, not conclusions.</p></div>
+    <div class="b-bento">
+        <div class="b-card b-span-2 b-reveal">
+            <h3 style="margin-top:0;">By role</h3>
+            {% if roles %}
+            <table class="rt-table">
+                <thead><tr><th>Role</th><th>Apps</th><th>Rejection rate</th><th>Response rate</th><th></th></tr></thead>
+                <tbody>
+                {% for r in roles %}
+                <tr>
+                    <td>{{ r.role }}</td><td>{{ r.applications }}</td>
+                    <td>{{ r.rejection_rate }}%</td><td>{{ r.response_rate }}%</td>
+                    <td>{% if r.small_sample %}<span class="rt-tag rt-tag--warn">Small sample — treat as a hint, not a conclusion</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:var(--b-muted);">No roles yet.</p>
+            {% endif %}
+        </div>
+        <div class="b-card b-span-2 b-reveal">
+            <h3 style="margin-top:0;">Where rejections cluster</h3>
+            <p style="color:var(--b-muted);font-size:.82rem;margin-top:-.4rem;">From your retrospectives — the stage the process reached before the rejection.</p>
+            {% if rejection_stages.total %}
+            <table class="rt-table">
+                <thead><tr><th>Stage reached</th><th>Rejections</th><th></th></tr></thead>
+                <tbody>
+                {% for r in rejection_stages.rows %}
+                <tr>
+                    <td>{{ r.label }}</td><td>{{ r.rejections }}</td>
+                    <td>{% if r.rejections and r.small_sample %}<span class="rt-tag rt-tag--warn">Small sample — treat as a hint, not a conclusion</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% if rejection_stages.unknown %}
+            <p style="color:var(--b-muted);font-size:.82rem;">{{ rejection_stages.unknown }} retrospective(s) didn't record a stage.</p>
+            {% endif %}
+            {% else %}
+            <p style="color:var(--b-muted);">No retrospectives yet — complete the wizard for a rejected application and the cluster will appear here.</p>
+            {% endif %}
+        </div>
+        <div class="b-card b-span-2 b-reveal">
+            <h3 style="margin-top:0;">By source <span class="rt-tag">Best-effort detection</span></h3>
+            <p style="color:var(--b-muted);font-size:.82rem;margin-top:-.4rem;">Derived from the job-posting domain, or keywords in your notes. Approximate — treat directionally.</p>
+            {% if sources %}
+            <table class="rt-table">
+                <thead><tr><th>Source</th><th>Apps</th><th>Rejection rate</th><th>Response rate</th><th></th></tr></thead>
+                <tbody>
+                {% for s in sources %}
+                <tr>
+                    <td>{{ s.source }}</td><td>{{ s.applications }}</td>
+                    <td>{{ s.rejection_rate }}%</td><td>{{ s.response_rate }}%</td>
+                    <td>{% if s.small_sample %}<span class="rt-tag rt-tag--warn">Small sample — treat as a hint, not a conclusion</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:var(--b-muted);">No sources yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{# ---------- Suggestions (trust-rule cards) ---------- #}
+<section class="b-section" aria-label="Suggestions">
+    <div class="b-sec-head"><h2>Sugges<span class="b-grad">tions</span></h2><p>Labeled honestly: what we observed, what might explain it, and one test to run. Hypotheses, never facts.</p></div>
+    {% if suggestions %}
+    <div class="b-bento">
+        {% for s in suggestions %}
+        <div class="b-card rt-sug b-span-2 b-reveal">
+            {% if s.small_sample %}<span class="rt-tag rt-tag--warn">Small sample — treat as a hint, not a conclusion (n={{ s.sample_size }})</span>{% endif %}
+            <dl>
+                <div><dt>Observed pattern</dt><dd>{{ s.observed_pattern }}</dd></div>
+                <div><dt>Plausible cause (hypothesis)</dt><dd>{{ s.plausible_cause }}</dd></div>
+                <div><dt>Recommended test</dt><dd>{{ s.recommended_test }}</dd></div>
+            </dl>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">Not enough data for suggestions yet — track a few more applications and log a retrospective or two.</p></div>
+    {% endif %}
+</section>
+
+{# ---------- Recent retrospectives ---------- #}
+<section class="b-section" aria-label="Recent retrospectives">
+    <div class="b-sec-head"><h2>Recent <span class="b-grad">retrospectives</span></h2><p>{{ total_retros }} logged. Open one to continue the wizard.</p></div>
+    {% if recent %}
+    <div class="b-bento">
+        {% for r in recent %}
+        <div class="b-card b-reveal">
+            <div style="display:flex;justify-content:space-between;gap:.6rem;align-items:start;">
+                <div>
+                    <h3 style="margin:0;">{{ r.company }}</h3>
+                    <p style="color:var(--b-muted);font-size:.85rem;margin:.25rem 0 0;">{{ r.role }}{% if r.stage_reached %} · reached {{ r.stage_reached }}{% endif %}</p>
+                </div>
+                {% if r.completed %}<span class="rt-tag rt-tag--ok">Completed</span>{% else %}<span class="rt-tag">In progress</span>{% endif %}
+            </div>
+            {% if r.wizard_url %}<div class="b-cta-row" style="margin-top:.8rem;"><a class="b-btn b-btn--ghost" href="{{ r.wizard_url }}">{% if r.completed %}Review{% else %}Continue{% endif %}</a></div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">None yet. Move a rejected application through the wizard from the tracker.</p></div>
+    {% endif %}
+</section>
+
+{# ---------- Experiment log ---------- #}
+<section class="b-section" aria-label="Experiment log">
+    <div class="b-sec-head"><h2>Experiment <span class="b-grad">log</span></h2><p>One controlled change at a time, with a measurable target. Log the outcome when the run is done.</p></div>
+    <div class="b-card b-reveal">
+        {% if experiments %}
+        <table class="rt-table">
+            <thead><tr><th>Hypothesis</th><th>Change</th><th>Target</th><th>Status</th><th>Result</th><th>Advance</th></tr></thead>
+            <tbody>
+            {% for e in experiments %}
+            <tr data-exp="{{ e.id }}">
+                <td><span class="rt-tag">Hypothesis</span> {{ e.hypothesis }}</td>
+                <td>{{ e.change }}</td>
+                <td>{{ e.target }}</td>
+                <td><span class="rt-status rt-status--{{ e.status }}">{{ e.status }}</span></td>
+                <td>{% if e.result %}{{ e.result }}{% else %}<span style="color:var(--b-muted);">—</span>{% endif %}</td>
+                <td>
+                    {% if e.status == 'planned' %}
+                    <button class="b-btn b-btn--ghost rt-adv" data-to="running" data-id="{{ e.id }}" type="button">Start</button>
+                    {% elif e.status == 'running' %}
+                    <button class="b-btn b-btn--ghost rt-adv" data-to="done" data-id="{{ e.id }}" type="button">Finish</button>
+                    {% else %}
+                    <span style="color:var(--b-muted);font-size:.8rem;">Done</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:var(--b-muted);">No experiments yet — create one below or from the wizard.</p>
+        {% endif %}
+
+        <h3 style="margin:1.6rem 0 0;">New experiment</h3>
+        <form class="rt-exp-form" id="rt-exp-form">
+            <div><label for="rt-hyp">Hypothesis (a guess, not a fact)</label><input id="rt-hyp" name="hypothesis" maxlength="2000" required placeholder="Maybe my resume leads with experience instead of outcomes."></div>
+            <div><label for="rt-change">The one controlled change</label><input id="rt-change" name="change" maxlength="2000" required placeholder="Rewrite the top 3 bullets to start with a quantified result."></div>
+            <div><label for="rt-target">What to measure</label><input id="rt-target" name="target" maxlength="1000" required placeholder="Response rate on the next 10 applications."></div>
+            <div><label for="rt-dur">Duration</label><input id="rt-dur" name="duration" maxlength="50" placeholder="3 weeks"></div>
+            <div class="b-cta-row"><button class="b-btn b-btn--primary" type="submit">Log experiment</button></div>
+            <p class="rt-err" id="rt-exp-error" role="alert"></p>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/retrospectives.js') }}" defer></script>
+{% endblock %}

@@ -287,6 +287,7 @@ from flashcards import (generate_deck as fc_generate_deck,
                         grade_mcq as fc_grade_mcq,
                         mastery_stats as fc_mastery_stats)
 import momentum as momentum_mod
+import retrospective_data as retro_data
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -443,6 +444,65 @@ class JobApplication(db.Model):
 
     user = db.relationship("User", backref=db.backref("job_applications", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
+
+
+class Retrospective(db.Model):
+    """A guided per-rejection retrospective (Wave 5 #29).
+
+    One row per JobApplication (unique application_id); the wizard edits it
+    step by step (facts -> observed patterns -> hypotheses -> experiment).
+    All free-text fields are the user's own words; any auto-computed stats
+    are shown alongside but stored only if the user writes them down.
+    """
+    __tablename__ = "retrospective"
+
+    id = db.Column(db.Integer, primary_key=True)
+    application_id = db.Column(db.Integer, db.ForeignKey("job_application.id"),
+                               nullable=False, unique=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    facts = db.Column(db.Text)               # step 1: what happened, user-written
+    observed_patterns = db.Column(db.Text)   # step 2: patterns the user noticed
+    hypotheses = db.Column(db.Text)          # step 3: hypothesis starters + free text
+    stage_reached = db.Column(db.String(20))  # step 1: pipeline stage reached
+    completed = db.Column(db.Boolean, nullable=False, default=False)
+    completed_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    application = db.relationship("JobApplication",
+                                  backref=db.backref("retrospective", uselist=False,
+                                                     cascade="all, delete-orphan"))
+    user = db.relationship("User", backref=db.backref("retrospectives", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class Experiment(db.Model):
+    """One controlled change derived from a retrospective hypothesis (Wave 5 #29).
+
+    The hypothesis is always labeled as a hypothesis, never a fact; the
+    target must be measurable so the experiment can be judged.
+    """
+    __tablename__ = "experiment"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    hypothesis = db.Column(db.Text, nullable=False)   # labeled as hypothesis
+    change = db.Column(db.Text, nullable=False)      # the one controlled change
+    target = db.Column(db.Text, nullable=False)      # what to measure
+    duration = db.Column(db.String(50))               # e.g. "3 weeks"
+    result = db.Column(db.Text)                       # logged when done
+    status = db.Column(db.String(20), nullable=False, default="planned", index=True)
+    linked_application_id = db.Column(db.Integer, db.ForeignKey("job_application.id"))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("experiments", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+    linked_application = db.relationship("JobApplication",
+                                         backref=db.backref("experiments",
+                                                            cascade="all, delete-orphan"))
 
 
 class CareerAssessment(db.Model):
@@ -993,6 +1053,281 @@ def json_safe(obj):
     """Round-trip through JSON so DB-stored payloads are always serializable
     (numpy types from the ML pipeline become plain python types)."""
     return json.loads(json.dumps(obj, default=str))
+
+
+# --- Wave 5 #29: rejection retrospectives (pure helpers) ---
+# ========================================================
+# Pure functions over lists of JobApplication/Retrospective rows — no Flask
+# request context needed, so they are unit-testable in isolation.
+
+RETRO_PIPELINE = ("wishlist", "applied", "oa", "interview", "offer")
+RETRO_PIPELINE_LABELS = {sid: label for sid, label in TRACKER_STAGES}
+RETRO_WIZARD_STEPS = ("facts", "patterns", "hypotheses", "experiment")
+RETRO_EXPERIMENT_STATUSES = ("planned", "running", "done")
+RETRO_SMALL_SAMPLE_N = 5
+RETRO_MAX_TEXT = 5000
+
+# Valid forward transitions for Experiment.status (same-status allowed).
+RETRO_STATUS_TRANSITIONS = {
+    "planned": ("running", "done"),
+    "running": ("done",),
+    "done": (),
+}
+
+# Keywords scanned in application notes when jd_url yields no domain.
+_RETRO_SOURCE_KEYWORDS = ("linkedin", "naukri", "indeed", "referral",
+                          "wellfound", "angel", "unstop", "hackathon",
+                          "cold email", "company website", "careers page",
+                          "campus")
+
+
+def retro_source_of(app_row):
+    """Best-effort application source: the jd_url domain when present, else a
+    keyword scan of the notes, else "unknown". Clearly labeled best-effort
+    wherever it is shown."""
+    url = (app_row.jd_url or "").strip()
+    if url:
+        try:
+            from urllib.parse import urlparse
+            parsed = urlparse(url if "://" in url else "https://" + url)
+            netloc = (parsed.netloc or "").lower()
+            if netloc.startswith("www."):
+                netloc = netloc[4:]
+            if netloc:
+                return netloc
+        except Exception:
+            pass
+    notes = (app_row.notes or "").lower()
+    for kw in _RETRO_SOURCE_KEYWORDS:
+        if kw in notes:
+            return kw
+    return "unknown"
+
+
+def retro_funnel_stats(apps):
+    """Funnel over the pipeline stages; "rejected" is a side-track.
+
+    reached[s] = applications whose CURRENT stage is s or any later pipeline
+    stage (an application sitting in "offer" necessarily passed through the
+    earlier stages). conversions[i] gives reached[to]/reached[from] between
+    successive stages.
+    """
+    counts = {sid: 0 for sid in RETRO_PIPELINE}
+    rejected = 0
+    for a in apps:
+        if a.stage in counts:
+            counts[a.stage] += 1
+        elif a.stage == "rejected":
+            rejected += 1
+    order = {sid: i for i, sid in enumerate(RETRO_PIPELINE)}
+    reached = {}
+    for sid in RETRO_PIPELINE:
+        reached[sid] = sum(c for t, c in counts.items() if order[t] >= order[sid])
+    conversions = []
+    for i in range(len(RETRO_PIPELINE) - 1):
+        prev, nxt = RETRO_PIPELINE[i], RETRO_PIPELINE[i + 1]
+        denom, num = reached[prev], reached[nxt]
+        rate = round(100.0 * num / denom, 1) if denom else None
+        conversions.append({
+            "from": prev, "to": nxt,
+            "from_label": RETRO_PIPELINE_LABELS.get(prev, prev),
+            "to_label": RETRO_PIPELINE_LABELS.get(nxt, nxt),
+            "rate": rate, "numerator": num, "denominator": denom,
+        })
+    return {
+        "stages": [{"id": sid, "label": RETRO_PIPELINE_LABELS.get(sid, sid),
+                    "count": counts[sid], "reached": reached[sid]}
+                   for sid in RETRO_PIPELINE],
+        "conversions": conversions,
+        "rejected": rejected,
+        "total": len(apps),
+    }
+
+
+def retro_role_breakdown(apps, top_n=8):
+    """Top roles by application volume with rejection/response rates.
+
+    Each row carries a small_sample flag when n < RETRO_SMALL_SAMPLE_N —
+    the trust rule for every breakdown."""
+    rows = {}
+    for a in apps:
+        key = (a.role or "").strip().lower() or "(no role)"
+        row = rows.setdefault(key, {"role": (a.role or "").strip() or "(no role)",
+                                    "applications": 0, "rejected": 0,
+                                    "responded": 0, "offers": 0})
+        row["applications"] += 1
+        if a.stage == "rejected":
+            row["rejected"] += 1
+        if a.stage in ("oa", "interview", "offer"):
+            row["responded"] += 1
+        if a.stage == "offer":
+            row["offers"] += 1
+    out = []
+    for row in rows.values():
+        n = row["applications"]
+        row["rejection_rate"] = round(100.0 * row["rejected"] / n, 1) if n else 0.0
+        row["response_rate"] = round(100.0 * row["responded"] / n, 1) if n else 0.0
+        row["small_sample"] = n < RETRO_SMALL_SAMPLE_N
+        out.append(row)
+    out.sort(key=lambda r: (-r["applications"], r["role"]))
+    return out[:top_n]
+
+
+def retro_rejection_stage_breakdown(retrospectives):
+    """Where rejections cluster: retrospectives grouped by the user-reported
+    stage the process reached. Blank/invalid stages land in "unknown" —
+    reported separately, never silently dropped."""
+    counts = {}
+    unknown = 0
+    for r in retrospectives:
+        key = (r.stage_reached or "").strip().lower()
+        if not key or key not in RETRO_PIPELINE:
+            unknown += 1
+            continue
+        counts[key] = counts.get(key, 0) + 1
+    rows = [{"stage": sid, "label": RETRO_PIPELINE_LABELS.get(sid, sid),
+             "rejections": counts.get(sid, 0),
+             "small_sample": counts.get(sid, 0) < RETRO_SMALL_SAMPLE_N}
+            for sid in RETRO_PIPELINE]
+    return {"rows": rows, "unknown": unknown,
+            "total": sum(counts.values()) + unknown}
+
+
+def retro_source_breakdown(apps, top_n=8):
+    """Applications grouped by best-effort source with rates. Every row is
+    flagged best_effort=True so the UI can say so."""
+    rows = {}
+    for a in apps:
+        src = retro_source_of(a)
+        row = rows.setdefault(src, {"source": src, "applications": 0,
+                                    "rejected": 0, "responded": 0,
+                                    "best_effort": True})
+        row["applications"] += 1
+        if a.stage == "rejected":
+            row["rejected"] += 1
+        if a.stage in ("oa", "interview", "offer"):
+            row["responded"] += 1
+    out = []
+    for row in rows.values():
+        n = row["applications"]
+        row["rejection_rate"] = round(100.0 * row["rejected"] / n, 1) if n else 0.0
+        row["response_rate"] = round(100.0 * row["responded"] / n, 1) if n else 0.0
+        row["small_sample"] = n < RETRO_SMALL_SAMPLE_N
+        out.append(row)
+    out.sort(key=lambda r: (-r["applications"], r["source"]))
+    return out[:top_n]
+
+
+def retro_suggestions(funnel, roles, rejection_stages, sources):
+    """Trust-rule suggestion cards. EVERY card carries three labels:
+
+      - "Observed pattern"  — a number from the user's own data
+      - "Plausible cause (hypothesis)" — explicitly a hypothesis, never a fact
+      - "Recommended test" — one concrete experiment to run
+
+    Nothing is stated as a fact; every cause is framed as a hypothesis."""
+    cards = []
+
+    def _add(pattern, cause, test, n):
+        cards.append({
+            "observed_pattern": pattern,
+            "plausible_cause": cause,
+            "recommended_test": test,
+            "sample_size": n,
+            "small_sample": n < RETRO_SMALL_SAMPLE_N,
+        })
+
+    # 1. Weakest funnel conversion.
+    measurable = [c for c in funnel["conversions"]
+                  if c["rate"] is not None and c["denominator"] >= 2]
+    if measurable:
+        weak = min(measurable, key=lambda c: c["rate"])
+        _add(
+            "Only {rate}% of applications that reached {frm} advanced to "
+            "{to} (n={d} reached {frm}).".format(
+                rate=weak["rate"], frm=weak["from_label"],
+                to=weak["to_label"], d=weak["denominator"]),
+            "Hypothesis: the materials that got you to {frm} may not be tuned "
+            "for what the {to} stage screens for.".format(
+                frm=weak["from_label"], to=weak["to_label"]),
+            "Log a retrospective for one such rejection, pick the matching "
+            "hypothesis starter, and run a 3-week experiment targeting the "
+            "{frm}-to-{to} step.".format(frm=weak["from_label"],
+                                         to=weak["to_label"]),
+            weak["denominator"],
+        )
+
+    # 2. Role with the highest rejection rate.
+    scored = [r for r in roles if r["applications"] >= 2 and r["rejected"] > 0]
+    if scored:
+        worst = max(scored, key=lambda r: (r["rejection_rate"], r["rejected"]))
+        _add(
+            '"{role}" has the highest rejection rate: {rate}% '
+            "({rej} of {n} applications).".format(
+                role=worst["role"], rate=worst["rejection_rate"],
+                rej=worst["rejected"], n=worst["applications"]),
+            "Hypothesis: the resume/portfolio emphasis may be misaligned with "
+            "what this role title typically screens for — or the role-fit bar "
+            "is simply higher.",
+            'Do a JD-vs-resume keyword pass for the next 5 "{role}" '
+            "applications and compare the response rate.".format(role=worst["role"]),
+            worst["applications"],
+        )
+
+    # 3. Where rejections cluster by stage reached.
+    clustered = [r for r in rejection_stages["rows"] if r["rejections"] > 0]
+    if clustered:
+        top = max(clustered, key=lambda r: r["rejections"])
+        _add(
+            "Most logged rejections happened after reaching the {label} stage "
+            "({n} rejections).".format(label=top["label"], n=top["rejections"]),
+            "Hypothesis: something specific to the {label} stage — preparation, "
+            "materials, or expectations — may be the bottleneck.".format(
+                label=top["label"]),
+            "Pick one experiment template for stage preparation and run it for "
+            "your next 3 processes that reach this stage.",
+            top["rejections"],
+        )
+
+    # 4. Source with the lowest response rate (best-effort detection).
+    resp = [s for s in sources
+            if s["applications"] >= 2 and s["source"] != "unknown"]
+    if resp:
+        low = min(resp, key=lambda s: s["response_rate"])
+        _add(
+            'Applications via "{src}" (best-effort source detection) show the '
+            "lowest response rate: {rate}% (n={n}).".format(
+                src=low["source"], rate=low["response_rate"],
+                n=low["applications"]),
+            "Hypothesis: this channel may surface roles with higher "
+            "competition or poorer fit — or your materials may not be tuned "
+            "for its audience.",
+            "Shift your next 10 applications toward your best-responding "
+            "source and compare response rates.",
+            low["applications"],
+        )
+    return cards
+
+
+def _retro_experiment_to_dict(exp):
+    """JSON-serializable Experiment row (safe for API responses)."""
+    linked = exp.linked_application
+    created = exp.created_at
+    updated = exp.updated_at
+    return {
+        "id": exp.id,
+        "hypothesis": exp.hypothesis,
+        "change": exp.change,
+        "target": exp.target,
+        "duration": exp.duration,
+        "result": exp.result,
+        "status": exp.status,
+        "linked_application_id": exp.linked_application_id,
+        "linked_company": linked.company if linked else None,
+        "linked_role": linked.role if linked else None,
+        "created_at": created.isoformat() if created else None,
+        "updated_at": updated.isoformat() if updated else None,
+    }
 
 
 def _momentum_hook(user_id, event_type):
@@ -4883,6 +5218,329 @@ def register_routes(app):
             return jsonify({'error': 'Could not update your preference.'}), 400
         return jsonify({'success': True,
                         'opted_out': result.get('opted_out')})
+
+    # ================= Wave 5 #29: rejection retrospectives =================
+    def _retro_get_app_or_json404(application_id):
+        """The user's own application, or None (caller returns a graceful
+        404 — including for other users' applications)."""
+        return JobApplication.query.filter_by(id=application_id,
+                                              user_id=current_user.id).first()
+
+    @app.route('/retrospectives')
+    @login_required
+    def retrospectives_hub():
+        """Hub: funnel visualization, breakdowns, hypothesis-labeled
+        suggestions, recent retrospectives, experiment log.
+
+        Trust rule: every suggestion card carries "Observed pattern" /
+        "Plausible cause (hypothesis)" / "Recommended test" — nothing is
+        presented as a fact."""
+        try:
+            apps = JobApplication.query.filter_by(user_id=current_user.id).all()
+            retros = (Retrospective.query.filter_by(user_id=current_user.id)
+                      .order_by(Retrospective.updated_at.desc()).all())
+            experiments = (Experiment.query.filter_by(user_id=current_user.id)
+                           .order_by(Experiment.created_at.desc())
+                           .limit(20).all())
+            funnel = retro_funnel_stats(apps)
+            roles = retro_role_breakdown(apps)
+            rej_stages = retro_rejection_stage_breakdown(retros)
+            sources = retro_source_breakdown(apps)
+            suggestions = retro_suggestions(funnel, roles, rej_stages, sources)
+            recent = []
+            for r in retros[:10]:
+                a = r.application
+                recent.append({
+                    "id": r.id,
+                    "company": a.company if a else "—",
+                    "role": a.role if a else "—",
+                    "stage_reached": r.stage_reached,
+                    "completed": r.completed,
+                    "updated_at": r.updated_at,
+                    "wizard_url": (url_for('retro_wizard', application_id=r.application_id)
+                                   if a else None),
+                })
+            ctx = {
+                "funnel": funnel, "roles": roles,
+                "rejection_stages": rej_stages, "sources": sources,
+                "suggestions": suggestions, "recent": recent,
+                "experiments": [_retro_experiment_to_dict(e) for e in experiments],
+                "total_retros": len(retros),
+                "small_n": RETRO_SMALL_SAMPLE_N,
+            }
+        except Exception:
+            log.exception("Retrospectives hub failed")
+            ctx = {
+                "funnel": retro_funnel_stats([]), "roles": [],
+                "rejection_stages": retro_rejection_stage_breakdown([]),
+                "sources": [], "suggestions": [], "recent": [],
+                "experiments": [], "total_retros": 0,
+                "small_n": RETRO_SMALL_SAMPLE_N,
+            }
+        return render_template('retrospectives_hub.html', **ctx)
+
+    @app.route('/retrospectives/new/<int:application_id>')
+    @login_required
+    def retro_wizard(application_id):
+        """4-step guided wizard for one rejection. Graceful 404 unless the
+        application belongs to the current user."""
+        app_row = _retro_get_app_or_json404(application_id)
+        if app_row is None:
+            abort(404)
+        try:
+            retro = (Retrospective.query
+                     .filter_by(application_id=app_row.id,
+                                user_id=current_user.id).first())
+            apps = JobApplication.query.filter_by(user_id=current_user.id).all()
+            funnel = retro_funnel_stats(apps)
+        except Exception:
+            log.exception("Retrospective wizard failed")
+            retro, funnel = None, retro_funnel_stats([])
+        # Split the stored "Timeline: ..." head back out for the step-1 form.
+        timeline_prefill, facts_prefill = "", ""
+        if retro and retro.facts:
+            facts_prefill = retro.facts
+            if facts_prefill.startswith("Timeline:"):
+                head, sep, rest = facts_prefill.partition("\n\n")
+                if sep:
+                    timeline_prefill = head[len("Timeline:"):].strip()
+                    facts_prefill = rest
+        return render_template(
+            'retro_wizard.html',
+            application=app_row,
+            retro=retro,
+            funnel=funnel,
+            timeline_prefill=timeline_prefill,
+            facts_prefill=facts_prefill,
+            starters=retro_data.starters_by_category(),
+            templates=retro_data.templates_by_category(),
+            categories=retro_data.RETRO_CATEGORIES,
+            stages=TRACKER_STAGES,
+        )
+
+    @app.route('/retrospectives/api/save', methods=['POST'])
+    @login_required
+    @limiter.limit("60 per hour")
+    def retro_save():
+        """Save one wizard step (upsert the per-application Retrospective).
+
+        JSON: {"application_id": int, "step": "facts"|"patterns"|"hypotheses"|"experiment",
+               "facts": str, "stage_reached": str, "timeline": str,
+               "observed_patterns": str, "hypotheses": str,
+               "experiment": {"hypothesis":..,"change":..,"target":..,"duration":..,"experiment_id":..}}
+        CSRF via X-CSRFToken header (not exempt)."""
+        payload = request.get_json(silent=True) or {}
+        step = (payload.get('step') or '').strip()
+        if step not in RETRO_WIZARD_STEPS:
+            return jsonify({'error': 'Invalid step.'}), 400
+        try:
+            application_id = int(payload.get('application_id') or 0)
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid application.'}), 400
+        app_row = _retro_get_app_or_json404(application_id)
+        if app_row is None:
+            return jsonify({'error': 'Application not found.'}), 404
+
+        def _text(value, limit=RETRO_MAX_TEXT):
+            return (value or '').strip()[:limit]
+
+        retro = (Retrospective.query
+                 .filter_by(application_id=app_row.id,
+                            user_id=current_user.id).first())
+        if retro is None:
+            retro = Retrospective(application_id=app_row.id,
+                                  user_id=current_user.id)
+            db.session.add(retro)
+
+        try:
+            if step == 'facts':
+                facts = _text(payload.get('facts'))
+                timeline = _text(payload.get('timeline'))
+                stage_reached = (payload.get('stage_reached') or '').strip().lower()
+                if stage_reached and stage_reached not in TRACKER_STAGE_IDS:
+                    return jsonify({'error': 'Invalid stage reached.'}), 400
+                retro.stage_reached = stage_reached or None
+                # Timeline is stored at the head of the facts text so the
+                # wizard can re-render from a single field.
+                if timeline and not facts.startswith('Timeline:'):
+                    facts = 'Timeline: ' + timeline + ('\n\n' + facts if facts else '')
+                retro.facts = facts or None
+            elif step == 'patterns':
+                retro.observed_patterns = _text(payload.get('observed_patterns')) or None
+            elif step == 'hypotheses':
+                retro.hypotheses = _text(payload.get('hypotheses')) or None
+            elif step == 'experiment':
+                exp_payload = payload.get('experiment') or {}
+                hypothesis = _text(exp_payload.get('hypothesis'), 2000)
+                change = _text(exp_payload.get('change'), 2000)
+                target = _text(exp_payload.get('target'), 1000)
+                duration = (exp_payload.get('duration') or '').strip()[:50]
+                if not hypothesis or not change or not target:
+                    return jsonify({'error': 'Hypothesis, change, and target '
+                                             'are all required.'}), 400
+                experiment_id = exp_payload.get('experiment_id')
+                exp_row = None
+                if experiment_id not in (None, ''):
+                    try:
+                        experiment_id = int(experiment_id)
+                    except (TypeError, ValueError):
+                        return jsonify({'error': 'Invalid experiment.'}), 400
+                    exp_row = Experiment.query.filter_by(
+                        id=experiment_id, user_id=current_user.id).first()
+                    if exp_row is None:
+                        return jsonify({'error': 'Experiment not found.'}), 404
+                if exp_row is None:
+                    exp_row = Experiment(
+                        user_id=current_user.id,
+                        hypothesis=hypothesis, change=change, target=target,
+                        duration=duration or None, status='planned',
+                        linked_application_id=app_row.id)
+                    db.session.add(exp_row)
+                else:
+                    exp_row.hypothesis = hypothesis
+                    exp_row.change = change
+                    exp_row.target = target
+                    exp_row.duration = duration or None
+            db.session.commit()
+        except Exception:
+            log.exception("Retrospective save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save this step.'}), 500
+        return jsonify({'success': True, 'step': step,
+                        'retrospective_id': retro.id,
+                        'completed': retro.completed})
+
+    @app.route('/retrospectives/api/complete/<int:application_id>', methods=['POST'])
+    @login_required
+    @limiter.limit("60 per hour")
+    def retro_complete(application_id):
+        """Finalize a retrospective: mark complete and award the
+        'retrospective_logged' momentum XP (once per application).
+        CSRF via X-CSRFToken header (not exempt)."""
+        app_row = _retro_get_app_or_json404(application_id)
+        if app_row is None:
+            return jsonify({'error': 'Application not found.'}), 404
+        try:
+            retro = (Retrospective.query
+                     .filter_by(application_id=app_row.id,
+                                user_id=current_user.id).first())
+            if retro is None:
+                retro = Retrospective(application_id=app_row.id,
+                                      user_id=current_user.id)
+                db.session.add(retro)
+            first = not retro.completed
+            retro.completed = True
+            retro.completed_at = datetime.now(timezone.utc)
+            db.session.commit()
+        except Exception:
+            log.exception("Retrospective completion failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not complete the retrospective.'}), 500
+        if first:
+            # Worker 1's helper: calls momentum.record_event (never raises).
+            _momentum_hook(current_user.id, 'retrospective_logged')
+        return jsonify({'success': True, 'first_completion': first,
+                        'xp': 15 if first else 0})
+
+    @app.route('/retrospectives/api/funnel')
+    @login_required
+    def retro_funnel_api():
+        """JSON funnel stats for chart rendering."""
+        try:
+            apps = JobApplication.query.filter_by(user_id=current_user.id).all()
+            funnel = retro_funnel_stats(apps)
+        except Exception:
+            log.exception("Retrospective funnel API failed")
+            funnel = retro_funnel_stats([])
+        return jsonify({'success': True, 'funnel': funnel})
+
+    @app.route('/retrospectives/api/experiments', methods=['POST'])
+    @login_required
+    @limiter.limit("60 per hour")
+    def retro_experiment_create():
+        """Create an experiment from a template or custom values. The
+        hypothesis is stored as a hypothesis, never as a fact.
+        CSRF via X-CSRFToken header (not exempt)."""
+        payload = request.get_json(silent=True) or {}
+        hypothesis = (payload.get('hypothesis') or '').strip()
+        change = (payload.get('change') or '').strip()
+        target = (payload.get('target') or '').strip()
+        duration = (payload.get('duration') or '').strip()[:50]
+        if not hypothesis or not change or not target:
+            return jsonify({'error': 'Hypothesis, change, and target are '
+                                     'all required.'}), 400
+        if len(hypothesis) > 2000 or len(change) > 2000 or len(target) > 1000:
+            return jsonify({'error': 'One of the fields is too long.'}), 400
+        linked_id = payload.get('linked_application_id')
+        linked_row = None
+        if linked_id not in (None, ''):
+            try:
+                linked_id = int(linked_id)
+            except (TypeError, ValueError):
+                return jsonify({'error': 'Invalid linked application.'}), 400
+            linked_row = _retro_get_app_or_json404(linked_id)
+            if linked_row is None:
+                return jsonify({'error': 'Application not found.'}), 404
+        try:
+            exp = Experiment(
+                user_id=current_user.id, hypothesis=hypothesis,
+                change=change, target=target, duration=duration or None,
+                status='planned',
+                linked_application_id=linked_row.id if linked_row else None)
+            db.session.add(exp)
+            db.session.commit()
+        except Exception:
+            log.exception("Experiment creation failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not create the experiment.'}), 500
+        return jsonify({'success': True,
+                        'experiment': _retro_experiment_to_dict(exp)}), 201
+
+    @app.route('/retrospectives/api/experiments/<int:exp_id>/result', methods=['POST'])
+    @login_required
+    @limiter.limit("60 per hour")
+    def retro_experiment_result(exp_id):
+        """Log an experiment outcome and/or move it along
+        planned -> running -> done. CSRF via X-CSRFToken header (not exempt)."""
+        exp = Experiment.query.filter_by(id=exp_id,
+                                         user_id=current_user.id).first()
+        if exp is None:
+            return jsonify({'error': 'Experiment not found.'}), 404
+        payload = request.get_json(silent=True) or {}
+        status = (payload.get('status') or '').strip()
+        if status not in RETRO_EXPERIMENT_STATUSES:
+            return jsonify({'error': 'Invalid status.'}), 400
+        result = (payload.get('result') or '').strip()
+        if len(result) > RETRO_MAX_TEXT:
+            return jsonify({'error': 'Result is too long.'}), 400
+        if (status != exp.status
+                and status not in RETRO_STATUS_TRANSITIONS.get(exp.status, ())):
+            return jsonify({'error': 'Cannot move an experiment from %s to %s.'
+                                     % (exp.status, status)}), 400
+        try:
+            exp.status = status
+            if result:
+                exp.result = result
+            db.session.commit()
+        except Exception:
+            log.exception("Experiment result save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save the outcome.'}), 500
+        return jsonify({'success': True,
+                        'experiment': _retro_experiment_to_dict(exp)})
+
+    @app.route('/retrospectives/api/experiments')
+    @login_required
+    def retro_experiments_list():
+        """List the user's experiments, newest first."""
+        try:
+            exps = (Experiment.query.filter_by(user_id=current_user.id)
+                    .order_by(Experiment.created_at.desc()).all())
+            items = [_retro_experiment_to_dict(e) for e in exps]
+        except Exception:
+            log.exception("Experiment list failed")
+            items = []
+        return jsonify({'success': True, 'experiments': items})
 
     # ---------- API ENDPOINTS (Shared) ----------
     @app.route('/api/interview-questions/<company>')
