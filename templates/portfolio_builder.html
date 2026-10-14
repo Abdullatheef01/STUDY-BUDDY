@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Portfolio Builder | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2314b8a6'/><path d='M28 72V44l22-14 22 14v28' stroke='white' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <style>
+        .pb-wrap { max-width: 1280px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .pb-head h1 { font-size: 1.9rem; }
+        .pb-head h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .pb-head p { color: var(--text-muted, #94a3b8); margin-top: 0.3rem; max-width: 640px; }
+        .pb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1.5rem; align-items: start; }
+        @media (max-width: 960px) { .pb-grid { grid-template-columns: 1fr; } }
+        .pb-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.22); border-radius: 16px; padding: 1.4rem; }
+        .pb-card h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+        .pb-card label { display: block; font-size: 0.82rem; font-weight: 700; margin: 0.9rem 0 0.35rem; color: var(--text-muted, #94a3b8); }
+        .pb-card input[type=text], .pb-card input[type=url], .pb-card textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; color: var(--text-main, #f8fafc); padding: 0.6rem 0.7rem; font-size: 0.9rem; font-family: inherit; }
+        .pb-card input:focus, .pb-card textarea:focus { outline: none; border-color: var(--accent-primary); }
+        .pb-card textarea { min-height: 90px; resize: vertical; }
+        .pb-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.6rem; margin-bottom: 0.6rem; align-items: end; }
+        .pb-row3 { grid-template-columns: 1fr 2fr 1fr auto; }
+        .pb-mini { background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text-muted, #94a3b8); border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+        .pb-mini:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+        .pb-add { margin-top: 0.4rem; }
+        .pb-check { display: flex; align-items: center; gap: 0.55rem; margin: 0.7rem 0; font-size: 0.9rem; }
+        .pb-check small { color: var(--text-muted, #94a3b8); }
+        .pb-actions { display: flex; gap: 0.7rem; margin-top: 1.4rem; flex-wrap: wrap; }
+        .pb-btn { background: var(--gradient-primary); color: #fff; border: none; border-radius: 12px; padding: 0.7rem 1.4rem; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+        .pb-btn:hover { filter: brightness(1.1); }
+        .pb-btn:disabled { opacity: 0.6; cursor: wait; }
+        .pb-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main, #f8fafc); border-radius: 12px; padding: 0.7rem 1.2rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; }
+        .pb-msg { margin-top: 0.9rem; font-size: 0.88rem; min-height: 1.4em; }
+        .pb-msg.ok { color: var(--accent-primary); }
+        .pb-msg.err { color: var(--accent-danger); }
+        .pb-preview { position: sticky; top: 5.5rem; background: #f8fafc; color: #0f172a; border-radius: 16px; overflow: hidden; border: 1px solid rgba(16,185,129,0.3); max-height: calc(100vh - 7rem); overflow-y: auto; }
+        .pb-preview .pv-hero { background: linear-gradient(135deg, #0f766e, #0e7490 60%, #1d4ed8); color: #fff; padding: 2rem 1.5rem; text-align: center; }
+        .pv-hero h1 { font-size: 1.6rem; }
+        .pv-hero .pv-hl { opacity: 0.9; font-size: 0.95rem; margin-top: 0.3rem; }
+        .pv-hero .pv-bio { opacity: 0.8; font-size: 0.85rem; margin-top: 0.6rem; white-space: pre-wrap; }
+        .pv-links { margin-top: 0.9rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+        .pv-links span { border: 1px solid rgba(255,255,255,0.45); border-radius: 999px; padding: 0.25rem 0.8rem; font-size: 0.78rem; font-weight: 600; }
+        .pv-body { padding: 1.5rem; }
+        .pv-body h2 { font-size: 1.05rem; margin: 1.2rem 0 0.7rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.4rem; }
+        .pv-body h2:first-child { margin-top: 0; }
+        .pv-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .pv-chip { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.78rem; font-weight: 600; border-radius: 999px; padding: 0.25rem 0.75rem; }
+        .pv-proj { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.7rem; }
+        .pv-proj h3 { font-size: 0.95rem; }
+        .pv-proj p { font-size: 0.82rem; color: #475569; white-space: pre-wrap; }
+        .pv-proj .pv-plink { font-size: 0.78rem; color: #0d9488; font-weight: 600; }
+        .pv-empty { color: #94a3b8; font-size: 0.85rem; font-style: italic; }
+        .pb-pub { margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted, #94a3b8); }
+        .pb-pub a { color: var(--accent-primary); font-weight: 700; word-break: break-all; }
+        @media (prefers-reduced-motion: reduce) { .pb-btn:hover { filter: none; } }
+    </style>
+</head>
+<body>
+    <div class="pb-wrap">
+        <div class="pb-head">
+            <h1>Portfolio <span class="gradient-text">Builder</span></h1>
+            <p>Turn your profile into a polished one-page portfolio. Edit on the left, watch the live preview on the right, then publish to get a shareable link.</p>
+        </div>
+
+        <div class="pb-grid">
+            <div class="pb-card">
+                <h2>Your details</h2>
+                <label for="fName">Display name *</label>
+                <input type="text" id="fName" maxlength="80" value="{{ (portfolio.display_name if portfolio else '') or prefill.name }}">
+                <label for="fHeadline">Headline</label>
+                <input type="text" id="fHeadline" maxlength="140" placeholder="e.g. CS undergrad · aspiring backend engineer" value="{{ portfolio.headline if portfolio else '' }}">
+                <label for="fBio">Bio</label>
+                <textarea id="fBio" maxlength="600" placeholder="A few lines about you...">{{ portfolio.bio if portfolio else '' }}</textarea>
+                <label for="fSkills">Skills (comma separated)</label>
+                <input type="text" id="fSkills" placeholder="Python, Flask, SQL" value="{{ portfolio.skills|join(', ') if portfolio else '' }}">
+
+                <h2 style="margin-top:1.4rem;">Projects</h2>
+                <div id="projRows"></div>
+                <button class="pb-mini pb-add" type="button" id="addProj">+ Add project</button>
+
+                <h2 style="margin-top:1.4rem;">Links</h2>
+                <div id="linkRows"></div>
+                <button class="pb-mini pb-add" type="button" id="addLink">+ Add link</button>
+
+                <h2 style="margin-top:1.4rem;">Coding profiles</h2>
+                {% if prefill.github.linked %}
+                <label class="pb-check"><input type="checkbox" id="fGithub" {% if portfolio and portfolio.show_github %}checked{% endif %}> Show GitHub stats <small>(score {{ prefill.github.score }}/100 · @{{ prefill.github.username }})</small></label>
+                {% else %}
+                <p class="pb-pub">Connect GitHub on your <a href="{{ url_for('profile') }}" style="color:var(--accent-primary);">profile page</a> to feature it here.</p>
+                {% endif %}
+                {% if prefill.leetcode.linked %}
+                <label class="pb-check"><input type="checkbox" id="fLeetcode" {% if portfolio and portfolio.show_leetcode %}checked{% endif %}> Show LeetCode stats <small>({{ prefill.leetcode.solved }} solved{% if prefill.leetcode.rating %} · rating {{ prefill.leetcode.rating }}{% endif %} · @{{ prefill.leetcode.username }})</small></label>
+                {% else %}
+                <p class="pb-pub">Connect LeetCode on your <a href="{{ url_for('profile') }}" style="color:var(--accent-primary);">profile page</a> to feature it here.</p>
+                {% endif %}
+
+                <label class="pb-check"><input type="checkbox" id="fPublish" {% if portfolio and portfolio.is_published %}checked{% endif %}> <strong>Publish</strong> <small>— makes your portfolio public at your shareable link</small></label>
+
+                <div class="pb-actions">
+                    <button class="pb-btn" type="button" id="saveBtn">Save portfolio</button>
+                    {% if portfolio and portfolio.slug %}
+                    <a class="pb-btn-ghost" href="{{ url_for('portfolio_download') }}">Download HTML</a>
+                    {% endif %}
+                </div>
+                <div class="pb-msg" id="pbMsg" role="status"></div>
+                {% if portfolio and portfolio.slug %}
+                <p class="pb-pub">Shareable link: <a id="pubLink" href="{{ url_for('public_portfolio', slug=portfolio.slug, _external=True) }}">{{ url_for('public_portfolio', slug=portfolio.slug, _external=True) }}</a></p>
+                {% else %}
+                <p class="pb-pub" id="pubLinkWrap" style="display:none;">Shareable link: <a id="pubLink" href="#"></a></p>
+                {% endif %}
+            </div>
+
+            <div class="pb-preview" aria-label="Live preview">
+                <div class="pv-hero">
+                    <h1 id="pvName"></h1>
+                    <p class="pv-hl" id="pvHeadline"></p>
+                    <p class="pv-bio" id="pvBio"></p>
+                    <div class="pv-links" id="pvLinks"></div>
+                </div>
+                <div class="pv-body">
+                    <h2>Skills</h2>
+                    <div class="pv-chips" id="pvSkills"></div>
+                    <h2>Projects</h2>
+                    <div id="pvProjects"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.PORTFOLIO_EXISTING = {{ (portfolio_payload|tojson) if portfolio_payload else 'null' }};
+    </script>
+    <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ portfolio.display_name }} | Portfolio</title>
+    <meta name="description" content="{{ portfolio.headline }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #0f172a; line-height: 1.65; }
+        .pf-hero { background: linear-gradient(135deg, #0f766e 0%, #0e7490 60%, #1d4ed8 100%); color: #fff; padding: 4.5rem 1.5rem 3.5rem; text-align: center; }
+        .pf-hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.02em; }
+        .pf-hero .pf-headline { font-size: 1.1rem; opacity: 0.92; margin-top: 0.5rem; font-weight: 500; }
+        .pf-hero .pf-bio { max-width: 640px; margin: 1rem auto 0; opacity: 0.85; font-size: 0.98rem; white-space: pre-wrap; }
+        .pf-links { margin-top: 1.4rem; display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+        .pf-links a { color: #fff; text-decoration: none; font-weight: 600; font-size: 0.88rem; border: 1px solid rgba(255,255,255,0.45); border-radius: 999px; padding: 0.45rem 1.1rem; }
+        .pf-links a:hover { background: rgba(255,255,255,0.15); }
+        .pf-body { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+        .pf-sec { margin-bottom: 2.5rem; }
+        .pf-sec h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        .pf-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .pf-chip { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.85rem; font-weight: 600; border-radius: 999px; padding: 0.35rem 0.9rem; }
+        .pf-proj { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.2rem 1.3rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(15,23,42,0.06); }
+        .pf-proj h3 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+        .pf-proj p { font-size: 0.92rem; color: #475569; white-space: pre-wrap; }
+        .pf-proj a { display: inline-block; margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600; color: #0d9488; text-decoration: none; }
+        .pf-proj a:hover { text-decoration: underline; }
+        .pf-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+        .pf-stat { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.2rem; text-align: center; }
+        .pf-stat .num { font-size: 1.8rem; font-weight: 800; color: #0f766e; }
+        .pf-stat .lbl { font-size: 0.82rem; color: #64748b; margin-top: 0.2rem; }
+        .pf-stat a { font-size: 0.82rem; color: #0d9488; font-weight: 600; }
+        .pf-foot { text-align: center; color: #94a3b8; font-size: 0.8rem; padding: 2rem 1rem; }
+        @media (max-width: 560px) { .pf-hero h1 { font-size: 1.8rem; } .pf-hero { padding: 3rem 1rem 2.5rem; } }
+    </style>
+</head>
+<body>
+    <header class="pf-hero">
+        <h1>{{ portfolio.display_name }}</h1>
+        {% if portfolio.headline %}<p class="pf-headline">{{ portfolio.headline }}</p>{% endif %}
+        {% if portfolio.bio %}<p class="pf-bio">{{ portfolio.bio }}</p>{% endif %}
+        {% if portfolio.links %}
+        <nav class="pf-links">
+            {% for l in portfolio.links %}<a href="{{ l.url }}" target="_blank" rel="noopener">{{ l.label }}</a>{% endfor %}
+        </nav>
+        {% endif %}
+    </header>
+
+    <main class="pf-body">
+        {% if portfolio.skills %}
+        <section class="pf-sec">
+            <h2>Skills</h2>
+            <div class="pf-chips">
+                {% for s in portfolio.skills %}<span class="pf-chip">{{ s }}</span>{% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if portfolio.projects %}
+        <section class="pf-sec">
+            <h2>Projects</h2>
+            {% for p in portfolio.projects %}
+            <article class="pf-proj">
+                <h3>{{ p.title }}</h3>
+                {% if p.description %}<p>{{ p.description }}</p>{% endif %}
+                {% if p.link %}<a href="{{ p.link }}" target="_blank" rel="noopener">View project ↗</a>{% endif %}
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if github or leetcode %}
+        <section class="pf-sec">
+            <h2>Coding Profiles</h2>
+            <div class="pf-stats">
+                {% if github %}
+                <div class="pf-stat">
+                    <div class="num">{{ github.score }}/100</div>
+                    <div class="lbl">GitHub profile score · {{ github.username }}</div>
+                    <a href="https://github.com/{{ github.username }}" target="_blank" rel="noopener">View on GitHub ↗</a>
+                </div>
+                {% endif %}
+                {% if leetcode %}
+                <div class="pf-stat">
+                    <div class="num">{{ leetcode.solved_total }}</div>
+                    <div class="lbl">LeetCode problems solved · {{ leetcode.username }}{% if leetcode.rating %} · rating {{ leetcode.rating }}{% endif %}</div>
+                    <a href="https://leetcode.com/{{ leetcode.username }}/" target="_blank" rel="noopener">View on LeetCode ↗</a>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="pf-foot">Built with AI Career &amp; Research Assistant</footer>
+</body>
+</html>

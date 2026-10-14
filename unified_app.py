@@ -235,6 +235,7 @@ from salary_data import (get_options as salary_options, query as salary_query,
                           SalaryDataError)
 from opportunities import (list_opportunities, get_meta as opp_meta,
                            opp_exists, TYPES as OPP_TYPES, OpportunityDataError)
+from portfolio import validate_portfolio_payload, unique_slug
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -444,6 +445,29 @@ class OpportunityBookmark(db.Model):
                                          name="uq_bookmark_user_opp"),)
 
     user = db.relationship("User", backref=db.backref("opportunity_bookmarks", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class Portfolio(db.Model):
+    """A user's one-page portfolio (Wave 1 #12). One row per user."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                       unique=True, index=True)
+    slug = db.Column(db.String(60), nullable=False, unique=True, index=True)
+    display_name = db.Column(db.String(80), nullable=False)
+    headline = db.Column(db.String(140))
+    bio = db.Column(db.Text)
+    skills = db.Column(db.JSON)
+    projects = db.Column(db.JSON)
+    links = db.Column(db.JSON)
+    show_github = db.Column(db.Boolean, default=False, nullable=False)
+    show_leetcode = db.Column(db.Boolean, default=False, nullable=False)
+    is_published = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("portfolio", uselist=False,
                                                       cascade="all, delete-orphan"))
 
 
@@ -2271,6 +2295,132 @@ def register_routes(app):
         db.session.delete(row)
         db.session.commit()
         return jsonify({'success': True, 'opp_id': opp_id})
+
+    # ---------- PORTFOLIO BUILDER (Wave 1 #12) ----------
+    def _portfolio_prefill(user):
+        """Prefill data for the builder: name + connected coding profiles."""
+        prefill = {"name": user.name or "",
+                   "github": {"linked": False}, "leetcode": {"linked": False}}
+        if user.github_username:
+            snap = ProfileSnapshot.query.filter_by(
+                user_id=user.id, provider="github").first()
+            score = None
+            if snap and snap.data:
+                try:
+                    score = round(float(snap.data.get("score") or 0))
+                except (TypeError, ValueError):
+                    score = None
+            prefill["github"] = {"linked": True, "username": user.github_username,
+                                 "score": score}
+        if user.leetcode_username:
+            snap = ProfileSnapshot.query.filter_by(
+                user_id=user.id, provider="leetcode").first()
+            solved = rating = None
+            if snap and snap.data:
+                solved = ((snap.data.get("solved") or {}).get("total"))
+                rating = snap.data.get("rating")
+            prefill["leetcode"] = {"linked": True, "username": user.leetcode_username,
+                                   "solved": solved, "rating": rating}
+        return prefill
+
+    def _portfolio_to_dict(row):
+        return {
+            "display_name": row.display_name, "headline": row.headline or "",
+            "bio": row.bio or "", "skills": row.skills or [],
+            "projects": row.projects or [], "links": row.links or [],
+            "show_github": row.show_github, "show_leetcode": row.show_leetcode,
+            "is_published": row.is_published, "slug": row.slug,
+        }
+
+    def _portfolio_public_context(row):
+        """Build the render context for the public page / download."""
+        github = leetcode = None
+        if row.show_github and row.user.github_username:
+            snap = ProfileSnapshot.query.filter_by(
+                user_id=row.user_id, provider="github").first()
+            if snap and snap.data:
+                try:
+                    score = round(float(snap.data.get("score") or 0))
+                except (TypeError, ValueError):
+                    score = None
+                github = {"username": row.user.github_username, "score": score}
+        if row.show_leetcode and row.user.leetcode_username:
+            snap = ProfileSnapshot.query.filter_by(
+                user_id=row.user_id, provider="leetcode").first()
+            if snap and snap.data:
+                solved = (snap.data.get("solved") or {}).get("total")
+                leetcode = {"username": row.user.leetcode_username,
+                            "solved_total": solved,
+                            "rating": snap.data.get("rating")}
+        return {"portfolio": _portfolio_to_dict(row),
+                "github": github, "leetcode": leetcode}
+
+    @app.route('/portfolio')
+    @login_required
+    def portfolio_builder():
+        """Portfolio builder page (login required)."""
+        row = Portfolio.query.filter_by(user_id=current_user.id).first()
+        return render_template('portfolio_builder.html',
+                               portfolio=row,
+                               portfolio_payload=_portfolio_to_dict(row) if row else None,
+                               prefill=_portfolio_prefill(current_user))
+
+    @app.route('/portfolio/save', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def portfolio_save():
+        """Create/update the user's portfolio. CSRF via X-CSRFToken header."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to build your portfolio.'}), 401
+        payload = request.get_json(silent=True)
+        data, error = validate_portfolio_payload(payload or {})
+        if error:
+            return jsonify({'error': error}), 400
+        # Only feature coding profiles the user actually connected.
+        if data["show_github"] and not current_user.github_username:
+            data["show_github"] = False
+        if data["show_leetcode"] and not current_user.leetcode_username:
+            data["show_leetcode"] = False
+        row = Portfolio.query.filter_by(user_id=current_user.id).first()
+        if row is None:
+            taken = {p.slug for p in Portfolio.query.with_entities(Portfolio.slug).all()}
+            row = Portfolio(user_id=current_user.id,
+                            slug=unique_slug(data["display_name"], taken))
+            db.session.add(row)
+        row.display_name = data["display_name"]
+        row.headline = data["headline"]
+        row.bio = data["bio"]
+        row.skills = data["skills"]
+        row.projects = data["projects"]
+        row.links = data["links"]
+        row.show_github = data["show_github"]
+        row.show_leetcode = data["show_leetcode"]
+        row.is_published = data["is_published"]
+        row.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+        return jsonify({'success': True, 'slug': row.slug,
+                        'is_published': row.is_published,
+                        'public_url': url_for('public_portfolio', slug=row.slug,
+                                              _external=True)})
+
+    @app.route('/p/<slug>')
+    def public_portfolio(slug):
+        """Public portfolio page — only what the user chose to publish."""
+        row = Portfolio.query.filter_by(slug=slug).first()
+        if not row or not row.is_published:
+            abort(404)
+        return render_template('portfolio_public.html',
+                               **_portfolio_public_context(row))
+
+    @app.route('/portfolio/download')
+    @login_required
+    def portfolio_download():
+        """Download the portfolio as a standalone HTML file."""
+        row = Portfolio.query.filter_by(user_id=current_user.id).first_or_404()
+        html = render_template('portfolio_public.html',
+                               **_portfolio_public_context(row))
+        return Response(html, mimetype='text/html', headers={
+            'Content-Disposition':
+                f'attachment; filename="portfolio-{row.slug}.html"'})
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])
