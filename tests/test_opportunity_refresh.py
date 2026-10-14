@@ -13,14 +13,14 @@ from unittest.mock import patch
 
 import pytest
 
-import opportunities
-from opportunities import (
+from studybuddy import opportunities
+from studybuddy.opportunities import (
     TYPES, STALE_AFTER_DAYS, MAX_AUTO_ENTRIES,
     _normalize_link, _is_stale,
     merge_opportunities, freshness_label, _is_curated,
     refresh_opportunities, load_dataset,
 )
-from opportunity_sources import (
+from studybuddy.opportunity_sources import (
     DevpostSource, SimplifyJobsSource, parse_age_days, fetch_all,
     parse_devpost_deadline,
 )
@@ -75,7 +75,7 @@ def test_parse_age_days_garbage_returns_none(bad):
 
 def test_devpost_source_parses_fixture():
     raw = open(os.path.join(FIX, "devpost_sample.json")).read()
-    with patch("opportunity_sources._http_get") as mock_get:
+    with patch("studybuddy.opportunity_sources._http_get") as mock_get:
         mock_get.return_value.json.return_value = json.loads(raw)
         out = DevpostSource().fetch()
     # 5 in fixture: 3 open real + 1 closed (skipped) + 1 year-rollover open
@@ -90,16 +90,16 @@ def test_devpost_source_parses_fixture():
 
 
 def test_devpost_source_never_raises():
-    with patch("opportunity_sources._http_get", side_effect=RuntimeError("boom")):
+    with patch("studybuddy.opportunity_sources._http_get", side_effect=RuntimeError("boom")):
         assert DevpostSource().fetch() == []
-    with patch("opportunity_sources._http_get") as mock_get:
+    with patch("studybuddy.opportunity_sources._http_get") as mock_get:
         mock_get.return_value.json.side_effect = ValueError("bad json")
         assert DevpostSource().fetch() == []
 
 
 def test_simplify_source_parses_fixture():
     raw = open(os.path.join(FIX, "simplify_sample.html")).read()
-    with patch("opportunity_sources._http_get") as mock_get:
+    with patch("studybuddy.opportunity_sources._http_get") as mock_get:
         mock_get.return_value.text = raw
         out = SimplifyJobsSource().fetch()
     # fixture: 0d x2, 5d, 29d, 30d kept; 1mo (30d) kept; rows > 30d skipped
@@ -119,15 +119,15 @@ def test_simplify_source_skips_old_rows():
             "<tr><td>Old Co</td><td>Intern</td><td>Remote</td>"
             '<td><a href="https://example.com/apply">x</a></td><td>2mo</td></tr>'
             "</table>")
-    with patch("opportunity_sources._http_get") as mock_get:
+    with patch("studybuddy.opportunity_sources._http_get") as mock_get:
         mock_get.return_value.text = html
         assert SimplifyJobsSource().fetch() == []
 
 
 def test_simplify_source_never_raises():
-    with patch("opportunity_sources._http_get", side_effect=RuntimeError("x")):
+    with patch("studybuddy.opportunity_sources._http_get", side_effect=RuntimeError("x")):
         assert SimplifyJobsSource().fetch() == []
-    with patch("opportunity_sources._http_get") as mock_get:
+    with patch("studybuddy.opportunity_sources._http_get") as mock_get:
         mock_get.side_effect = Exception("nope")
         assert fetch_all() == []
 
@@ -291,7 +291,7 @@ def test_no_auto_refresh_env_disables(monkeypatch):
 def test_refresh_never_raises_on_source_failure(monkeypatch, tmp_path):
     def _boom():
         raise RuntimeError("down")
-    monkeypatch.setattr("opportunity_sources.fetch_all", _boom)
+    monkeypatch.setattr("studybuddy.opportunity_sources.fetch_all", _boom)
     assert refresh_opportunities() is False
 
 
@@ -313,7 +313,7 @@ def test_refresh_rewrites_file_atomically(tmp_path, monkeypatch):
             "opportunities": [_curated("c1")]}
     data_path.write_text(json.dumps(seed))
     monkeypatch.setattr(opportunities, "DATA_PATH", str(data_path))
-    monkeypatch.setattr("opportunity_sources.fetch_all",
+    monkeypatch.setattr("studybuddy.opportunity_sources.fetch_all",
                         lambda: [_auto("a1", "https://x.com/a1")])
     assert refresh_opportunities() is True
     out = json.loads(data_path.read_text())

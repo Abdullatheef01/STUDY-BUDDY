@@ -31,7 +31,7 @@ def extract_contact(resume_text):
 
 
 def _jd_keywords(jd_text, top_n=8):
-    from jd_matcher import extract_jd_keywords
+    from studybuddy.jd_matcher import extract_jd_keywords
     try:
         kws = extract_jd_keywords(jd_text or "", top_n=top_n)
         return [k["keyword"] for k in kws]

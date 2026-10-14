@@ -35,9 +35,9 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
-from github_integration import (analyze_github_profile, GithubAPIError,
+from studybuddy.github_integration import (analyze_github_profile, GithubAPIError,
                                 validate_github_username)
-from leetcode_integration import (fetch_leetcode_stats, get_card_stats,
+from studybuddy.leetcode_integration import (fetch_leetcode_stats, get_card_stats,
                                   render_leetcode_card_svg, render_error_svg,
                                   LeetCodeAPIError, validate_leetcode_username)
 
@@ -222,77 +222,77 @@ from parser.section_extractor import extract_sections, extract_education_details
 from models.skill_extractor import extract_skills, get_skills_by_category, get_skill_names
 from models.ats_scorer import calculate_ats_score
 from models.resume_feedback import generate_feedback, get_overall_summary
-from jd_matcher import (score_jd_match, generate_rule_based_suggestions,
+from studybuddy.jd_matcher import (score_jd_match, generate_rule_based_suggestions,
                         JD_MIN_CHARS, JD_MAX_CHARS)
-from bullet_rewriter import (improve_bullet, BULLET_MIN_CHARS, BULLET_MAX_CHARS)
-from cover_generator import (rule_based_cover_letter, rule_based_outreach,
+from studybuddy.bullet_rewriter import (improve_bullet, BULLET_MIN_CHARS, BULLET_MAX_CHARS)
+from studybuddy.cover_generator import (rule_based_cover_letter, rule_based_outreach,
                              validate_cover_inputs, TONES)
-from linkedin_grader import (grade_linkedin_profile, generate_rule_based_summary,
+from studybuddy.linkedin_grader import (grade_linkedin_profile, generate_rule_based_summary,
                              validate_linkedin_inputs)
-from career_assessment import (score_assessment, rule_based_why,
+from studybuddy.career_assessment import (score_assessment, rule_based_why,
                                validate_assessment_inputs, public_questions,
                                QUESTIONS, TOP_N_CLUSTERS)
-from salary_data import (get_options as salary_options, query as salary_query,
+from studybuddy.salary_data import (get_options as salary_options, query as salary_query,
                           SalaryDataError)
-from opportunities import (list_opportunities, get_meta as opp_meta,
+from studybuddy.opportunities import (list_opportunities, get_meta as opp_meta,
                            opp_exists, TYPES as OPP_TYPES, OpportunityDataError)
-from portfolio import validate_portfolio_payload, unique_slug
-from mock_interview import (interview_options, pick_questions, score_answer,
+from studybuddy.portfolio import validate_portfolio_payload, unique_slug
+from studybuddy.mock_interview import (interview_options, pick_questions, score_answer,
                             generate_rule_based_feedback, validate_interview_setup)
-from communication_coach import analyze_transcript, validate_coach_inputs
-from dsa_practice import (all_problems, get_problem, topics as dsa_topics,
+from studybuddy.communication_coach import analyze_transcript, validate_coach_inputs
+from studybuddy.dsa_practice import (all_problems, get_problem, topics as dsa_topics,
                           difficulties as dsa_difficulties,
                           filter_problems, public_problem, reveal_hint,
                           reveal_approach, validate_status_payload,
                           weak_topic_diagnosis, VALID_STATUSES)
-from aptitude_test import (categories as aptitude_categories,
+from studybuddy.aptitude_test import (categories as aptitude_categories,
                            pick_questions as aptitude_pick,
                            validate_test_setup, score_attempt,
                            SUBMIT_GRACE_SEC, all_questions as aptitude_all)
-from star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
+from studybuddy.star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
                           SECTION_GUIDE, all_examples, examples_for,
                           get_example, validate_draft, score_draft,
                           generate_rule_based_rewrite_tip)
-from learning_roadmaps import (list_skills as roadmap_skills,
+from studybuddy.learning_roadmaps import (list_skills as roadmap_skills,
                                list_domains as roadmap_domains,
                                get_skill as get_roadmap_skill,
                                list_roles as roadmap_roles,
                                analyze_gap, build_personal_roadmap,
                                validate_progress_payload, validate_gap_payload,
                                progress_summary as roadmap_progress_summary)
-from skill_quizzes import (quiz_skills, skill_topics, public_question,
+from studybuddy.skill_quizzes import (quiz_skills, skill_topics, public_question,
                            build_quiz, check_answer, grade_quiz,
                            validate_start_payload, best_scores as quiz_best_scores,
                            get_question as get_quiz_question)
-from cert_guide import (all_certs, get_cert, domains as cert_domains,
+from studybuddy.cert_guide import (all_certs, get_cert, domains as cert_domains,
                         filter_certs, recommend as recommend_certs,
                         build_study_plan, validate_recommend_payload,
                         validate_plan_payload)
-from pdf_qa import (validate_upload as pdfqa_validate_upload,
+from studybuddy.pdf_qa import (validate_upload as pdfqa_validate_upload,
                     parse_pdf_pages as pdfqa_parse_pages,
                     chunk_pages as pdfqa_chunk_pages,
                     retrieve as pdfqa_retrieve,
                     answer_question as pdfqa_answer)
-from arxiv_import import (validate_arxiv_id, validate_doi,
+from studybuddy.arxiv_import import (validate_arxiv_id, validate_doi,
                           fetch_arxiv, fetch_doi, normalize_metadata,
                           fetch_citation_graph, download_pdf as arxiv_download_pdf)
-from citation_fmt import (format_citation, format_bibliography,
+from studybuddy.citation_fmt import (format_citation, format_bibliography,
                           to_bibtex, from_bibtex, style_guide,
                           STYLES as CITATION_STYLES)
-from lit_review import (generate_review as lr_generate_review,
+from studybuddy.lit_review import (generate_review as lr_generate_review,
                         review_to_markdown as lr_to_markdown,
                         review_to_html as lr_to_html)
-from gap_finder import generate_gap_report as gf_generate_report
-from flashcards import (generate_deck as fc_generate_deck,
+from studybuddy.gap_finder import generate_gap_report as gf_generate_report
+from studybuddy.flashcards import (generate_deck as fc_generate_deck,
                         grade_mcq as fc_grade_mcq,
                         mastery_stats as fc_mastery_stats)
-import momentum as momentum_mod
-import retrospective_data as retro_data
-from health_review import (DIMENSIONS as HR_DIMENSIONS,
+import studybuddy.momentum as momentum_mod
+import studybuddy.retrospective_data as retro_data
+from studybuddy.health_review import (DIMENSIONS as HR_DIMENSIONS,
                            generate_review as hr_generate_review,
                            valid_month_key as hr_valid_month_key,
                            current_month_key as hr_current_month_key)
-import community as community_mod
+import studybuddy.community as community_mod
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -1678,7 +1678,7 @@ PEER_RUBRIC_DIMS = ("clarity", "structure", "depth", "relevance",
 
 def _peer_bank():
     """The shared 339-question interview bank (mock_interview.py)."""
-    from mock_interview import _load_bank
+    from studybuddy.mock_interview import _load_bank
     return _load_bank()
 
 
@@ -3507,7 +3507,7 @@ def register_routes(app):
     @app.route('/interview')
     def interview_home():
         """Mock interview setup: pick company, role, category."""
-        from mock_interview import _load_bank
+        from studybuddy.mock_interview import _load_bank
         return render_template('interview.html', options=interview_options(),
                                total_questions=len(_load_bank()),
                                is_authed=current_user.is_authenticated)
@@ -4619,7 +4619,7 @@ def register_routes(app):
                 opps = [o for o in opps if o["id"] in bookmarked]
         for o in opps:
             o["deadline_label"], o["countdown_label"] = _opp_labels(o)
-        from opportunities import freshness_label as _freshness_label
+        from studybuddy.opportunities import freshness_label as _freshness_label
         return render_template('opportunities.html', opps=opps, meta=meta,
                                types=OPP_TYPES, active_type=opp_type,
                                saved_only=saved_only, bookmarked=bookmarked,

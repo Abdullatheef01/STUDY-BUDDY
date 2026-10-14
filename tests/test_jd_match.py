@@ -5,7 +5,7 @@ import json
 import pytest
 
 from unified_app import create_app, db, JDMatchReport, ResumeAnalysis
-from jd_matcher import (extract_jd_keywords, parse_jd_requirements,
+from studybuddy.jd_matcher import (extract_jd_keywords, parse_jd_requirements,
                         score_jd_match, generate_rule_based_suggestions,
                         JD_MIN_CHARS, JD_MAX_CHARS)
 from tests.conftest import register, login, make_pdf_bytes, SAMPLE_RESUME_LINES

@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-import community as community_mod
+import studybuddy.community as community_mod
 from unified_app import (
     Mentor,
     MentorApplication,
@@ -943,7 +943,7 @@ def test_mentor_is_admin(monkeypatch):
 
 
 def test_xp_rules_registered():
-    from momentum import XP_RULES
+    from studybuddy.momentum import XP_RULES
     assert XP_RULES["mentor_session_attended"] == 30
     assert XP_RULES["mentor_feedback_given"] == 10
     assert XP_RULES["health_review_completed"] == 20

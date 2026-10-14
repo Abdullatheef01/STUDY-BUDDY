@@ -4,7 +4,7 @@ import json
 import pytest
 
 from unified_app import create_app, db, InterviewSession
-from mock_interview import (interview_options, pick_questions, score_answer,
+from studybuddy.mock_interview import (interview_options, pick_questions, score_answer,
                             generate_rule_based_feedback, validate_interview_setup,
                             _load_bank)
 from tests.conftest import register, login

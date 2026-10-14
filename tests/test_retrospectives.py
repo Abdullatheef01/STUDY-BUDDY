@@ -7,7 +7,7 @@ CSRF rejections, and invalid-input handling.
 """
 import pytest
 
-import retrospective_data as retro_data
+import studybuddy.retrospective_data as retro_data
 from unified_app import (
     Experiment,
     JobApplication,

@@ -10,7 +10,7 @@ import json
 import os
 from functools import lru_cache
 
-DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "salary_ranges.json")
 
 

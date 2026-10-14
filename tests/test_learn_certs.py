@@ -1,7 +1,7 @@
 """Tests for Wave 3 #20: certification guidance."""
 import pytest
 
-from cert_guide import (
+from studybuddy.cert_guide import (
     all_certs, get_cert, domains, filter_certs, recommend, build_study_plan,
     validate_recommend_payload, validate_plan_payload)
 
@@ -178,7 +178,7 @@ def test_certs_plans_page(authed_client):
 
 
 def test_main_dashboard_learning_section(authed_client):
-    from learning_roadmaps import skill_ids
+    from studybuddy.learning_roadmaps import skill_ids
     sid = skill_ids()[0]
     authed_client.post("/learn/roadmaps/progress", json={
         "skill_id": sid, "stage": "beginner", "status": "completed"})

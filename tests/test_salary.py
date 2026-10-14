@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from salary_data import get_options, query, lookup, load_dataset
+from studybuddy.salary_data import get_options, query, lookup, load_dataset
 from tests.conftest import register, login
 
 

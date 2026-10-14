@@ -15,7 +15,7 @@ import tempfile
 import pytest
 
 from conftest import make_pdf_bytes
-from pdf_qa import (
+from studybuddy.pdf_qa import (
     CHUNK_CAP,
     NO_RESULT_ANSWER,
     ChunkList,

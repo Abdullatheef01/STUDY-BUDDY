@@ -9,8 +9,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-import momentum
-from momentum import (
+from studybuddy import momentum
+from studybuddy.momentum import (
     ALL_EVENT_TYPES,
     DAY_ONE_BONUS_XP,
     DIRECT_EVENTS,
@@ -795,7 +795,7 @@ def test_hook_star_save_still_works_if_momentum_broken(authed_client, app,
 
 
 def test_hook_dsa_solved_only_on_solved(authed_client, app):
-    from dsa_practice import all_problems
+    from studybuddy.dsa_practice import all_problems
     uid = _uid(app)
     pid = all_problems()[0]["id"]
     r = authed_client.post(f"/dsa/{pid}/status",
@@ -810,7 +810,7 @@ def test_hook_dsa_solved_only_on_solved(authed_client, app):
 
 
 def test_hook_skill_quiz_submit_mints_xp(authed_client, app):
-    from skill_quizzes import quiz_skills, get_question
+    from studybuddy.skill_quizzes import quiz_skills, get_question
     uid = _uid(app)
     skill = quiz_skills()[0][0]
     r = authed_client.post("/learn/quizzes/start",
@@ -828,7 +828,7 @@ def test_hook_skill_quiz_submit_mints_xp(authed_client, app):
 
 
 def test_hook_roadmap_step_only_on_completed(authed_client, app):
-    from learning_roadmaps import list_skills
+    from studybuddy.learning_roadmaps import list_skills
     uid = _uid(app)
     skill = list_skills()[0]["id"]
     r = authed_client.post("/learn/roadmaps/progress",

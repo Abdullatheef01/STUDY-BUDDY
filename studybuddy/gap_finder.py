@@ -53,7 +53,7 @@ import re
 from collections import Counter
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from pdf_qa import _excerpt, _tokenize, retrieve
+from studybuddy.pdf_qa import _excerpt, _tokenize, retrieve
 
 # ---------------------------------------------------------------------------
 # Tunables

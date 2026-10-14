@@ -10,8 +10,8 @@ Split per the zero-error protocol:
 """
 import pytest
 
-import flashcards
-from flashcards import (
+from studybuddy import flashcards
+from studybuddy.flashcards import (
     generate_deck,
     grade_mcq,
     key_terms,

@@ -13,7 +13,7 @@ excerpt must be a verbatim substring of the referenced chunk.
 """
 import pytest
 
-from lit_review import (
+from studybuddy.lit_review import (
     cluster_themes,
     extract_claims,
     generate_review,

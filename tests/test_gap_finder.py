@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from gap_finder import (
+from studybuddy.gap_finder import (
     find_conflicts,
     find_single_paper_topics,
     find_underexplored,

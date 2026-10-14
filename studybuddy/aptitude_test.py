@@ -9,7 +9,7 @@ import json
 import os
 import random
 
-BANK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+BANK_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "aptitude_questions.json")
 
 CATEGORIES = ("quantitative", "logical", "verbal")

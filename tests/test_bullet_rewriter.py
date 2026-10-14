@@ -4,7 +4,7 @@ import json
 import pytest
 
 from unified_app import create_app, db, BulletRewrite
-from bullet_rewriter import (improve_bullet, strengthen_verbs,
+from studybuddy.bullet_rewriter import (improve_bullet, strengthen_verbs,
                              quantified_version, concise_version,
                              BULLET_MIN_CHARS, BULLET_MAX_CHARS)
 from tests.conftest import register, login

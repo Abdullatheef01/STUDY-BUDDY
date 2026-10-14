@@ -54,9 +54,9 @@ from urllib.parse import urlsplit, urlunsplit
 
 log = logging.getLogger(__name__)
 
-DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "opportunities.json")
-_LOCK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+_LOCK_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                           "data", ".refresh_lock")
 
 TYPES = ("internship", "scholarship", "exam", "hackathon", "competition")
@@ -308,7 +308,7 @@ def _atomic_write(data):
 def refresh_opportunities():
     """Fetch sources, merge, atomically rewrite the dataset. Never raises."""
     try:
-        from opportunity_sources import fetch_all  # local import: no cycle
+        from studybuddy.opportunity_sources import fetch_all  # local import: no cycle
         fetched = fetch_all()
     except Exception as exc:
         log.warning("Opportunity refresh: source fetch failed: %s", exc)

@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from portfolio import validate_portfolio_payload, slugify, unique_slug
+from studybuddy.portfolio import validate_portfolio_payload, slugify, unique_slug
 from unified_app import create_app, db, Portfolio
 from tests.conftest import register, login
 

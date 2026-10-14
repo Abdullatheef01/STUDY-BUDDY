@@ -2,7 +2,7 @@
 import pytest
 
 from unified_app import create_app, db, STARDraft
-from star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
+from studybuddy.star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
                           SECTION_GUIDE, all_examples, examples_for,
                           validate_draft, score_draft, score_section)
 from tests.conftest import register, login

@@ -14,7 +14,7 @@ import json
 import os
 import re
 
-BANK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+BANK_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "filler_words.json")
 
 _bank = None

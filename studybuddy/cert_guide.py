@@ -13,7 +13,7 @@ topics when available) across N weeks.
 import json
 import os
 
-BANK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+BANK_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "certifications.json")
 
 DIFFICULTY_RANK = {"Beginner": 0, "Intermediate": 1, "Advanced": 2}
@@ -145,7 +145,7 @@ def recommend(skills=None, target_role=None, budget_inr=None, top_n=8):
 def _roadmap_lookup():
     """Lazy import of the roadmap bank for study-plan enrichment."""
     try:
-        from learning_roadmaps import get_skill
+        from studybuddy.learning_roadmaps import get_skill
         return get_skill
     except Exception:
         return None
@@ -174,7 +174,7 @@ def build_study_plan(cert_id, weeks=8):
     get_skill = _roadmap_lookup()
     if get_skill:
         try:
-            from learning_roadmaps import get_role as _get_role
+            from studybuddy.learning_roadmaps import get_role as _get_role
             for role_id in (cert.get("roles") or [])[:2]:
                 role = _get_role(role_id)
                 if not role:

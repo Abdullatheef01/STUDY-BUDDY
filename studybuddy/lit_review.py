@@ -67,8 +67,8 @@ import math
 import re
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from pdf_qa import _tokenize
-from citation_fmt import to_bibtex
+from studybuddy.pdf_qa import _tokenize
+from studybuddy.citation_fmt import to_bibtex
 
 # ---------------------------------------------------------------------------
 # Tunables

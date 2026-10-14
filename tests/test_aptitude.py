@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 import pytest
 
 from unified_app import create_app, db, AptitudeAttempt
-from aptitude_test import (all_questions, categories, pick_questions,
+from studybuddy.aptitude_test import (all_questions, categories, pick_questions,
                            validate_test_setup, score_attempt,
                            public_question, get_question)
 from tests.conftest import register, login

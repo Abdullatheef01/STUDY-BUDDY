@@ -9,16 +9,16 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-import health_review
-import momentum
-from health_review import (
+from studybuddy import health_review
+import studybuddy.momentum
+from studybuddy.health_review import (
     DIMENSION_IDS,
     current_month_key,
     generate_review,
     prev_month_key,
     valid_month_key,
 )
-from momentum import XP_RULES
+from studybuddy.momentum import XP_RULES
 from unified_app import (
     AptitudeAttempt,
     CareerAssessment,

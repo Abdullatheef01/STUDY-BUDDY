@@ -565,7 +565,7 @@ def fetch_citation_graph(openalex_id: str, max_nodes: int = 25) -> dict:
 # 6. File cache (data/cache/, 24h TTL)
 # --------------------------------------------------------------------------
 
-_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "cache")
+_CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "cache")
 
 
 def _cache_path(key: str) -> str:

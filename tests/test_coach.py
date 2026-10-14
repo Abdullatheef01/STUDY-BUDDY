@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from communication_coach import (analyze_transcript, find_filler_hits,
+from studybuddy.communication_coach import (analyze_transcript, find_filler_hits,
                                  validate_coach_inputs)
 
 

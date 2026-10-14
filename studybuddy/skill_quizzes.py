@@ -12,7 +12,7 @@ import json
 import os
 import random
 
-BANK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+BANK_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "skill_quizzes.json")
 
 DIFFICULTIES = ("easy", "medium", "hard")

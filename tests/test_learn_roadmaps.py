@@ -1,14 +1,14 @@
 """Tests for Wave 3 #18: skill-gap learning roadmaps."""
 import pytest
 
-from learning_roadmaps import (
+from studybuddy.learning_roadmaps import (
     list_skills, list_domains, get_skill, list_roles, get_role, skill_ids,
     analyze_gap, build_personal_roadmap, validate_progress_payload,
     validate_gap_payload, STAGE_ORDER)
 
 
 def test_bank_size_and_schema():
-    from learning_roadmaps import _skills, _roles
+    from studybuddy.learning_roadmaps import _skills, _roles
     skills, roles = _skills(), _roles()
     assert len(skills) >= 20, f"need 20+ skills, got {len(skills)}"
     assert len(roles) >= 6, f"need 6+ roles, got {len(roles)}"

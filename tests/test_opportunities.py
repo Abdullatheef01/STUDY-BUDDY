@@ -4,7 +4,7 @@ from datetime import date
 
 import pytest
 
-from opportunities import (load_dataset, list_opportunities, get_opportunity,
+from studybuddy.opportunities import (load_dataset, list_opportunities, get_opportunity,
                            opp_exists, CLOSING_SOON_DAYS)
 from unified_app import create_app, db, OpportunityBookmark
 from tests.conftest import register, login
@@ -31,7 +31,7 @@ def test_dataset_loads():
         "internship", "scholarship", "exam"}
     # auto-refresh may have added hackathon/competition/internship entries;
     # every type in the file must still be a known type.
-    from opportunities import TYPES
+    from studybuddy.opportunities import TYPES
     assert set(o["type"] for o in data["opportunities"]) <= set(TYPES)
     import re
     # last_updated changes whenever the auto-refresh runs; just check format.

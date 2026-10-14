@@ -2,7 +2,7 @@
 import pytest
 
 from unified_app import create_app, db, CoverDoc, ResumeVersion
-from cover_generator import (rule_based_cover_letter, rule_based_outreach,
+from studybuddy.cover_generator import (rule_based_cover_letter, rule_based_outreach,
                              extract_contact, validate_cover_inputs, TONES)
 from tests.conftest import register, login
 

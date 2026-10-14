@@ -19,7 +19,7 @@ import os
 import random
 import re
 
-BANK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+BANK_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "interview_questions.json")
 
 _bank = None
@@ -34,7 +34,7 @@ def _load_bank():
 
 
 def _filler_entries():
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                         "data", "filler_words.json")
     try:
         with open(path, encoding="utf-8") as f:

@@ -1,13 +1,13 @@
 """Tests for Wave 3 #19: skill quizzes."""
 import pytest
 
-from skill_quizzes import (
+from studybuddy.skill_quizzes import (
     quiz_skills, skill_topics, public_question, build_quiz, check_answer,
     grade_quiz, validate_start_payload, get_question)
 
 
 def test_bank_size_and_schema():
-    from skill_quizzes import _load
+    from studybuddy.skill_quizzes import _load
     bank = _load()
     assert len(bank) >= 300, f"need 300+ questions, got {len(bank)}"
     skills = {s for s, _ in quiz_skills()}
@@ -24,7 +24,7 @@ def test_bank_size_and_schema():
 
 
 def test_bank_id_uniqueness():
-    from skill_quizzes import _load
+    from studybuddy.skill_quizzes import _load
     ids = [q["id"] for q in _load()]
     assert len(ids) == len(set(ids))
 

@@ -10,7 +10,7 @@ import re
 
 import pytest
 
-from citation_fmt import (STYLES, format_bibliography, format_citation,
+from studybuddy.citation_fmt import (STYLES, format_bibliography, format_citation,
                           from_bibtex, style_guide, to_bibtex)
 
 # ---------------------------------------------------------------------------

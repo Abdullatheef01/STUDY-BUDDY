@@ -8,8 +8,8 @@ import os
 
 import pytest
 
-import arxiv_import
-from arxiv_import import (
+from studybuddy import arxiv_import
+from studybuddy.arxiv_import import (
     cache_get,
     cache_set,
     download_pdf,

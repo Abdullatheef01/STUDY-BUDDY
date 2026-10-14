@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from dsa_practice import (all_problems, get_problem, topics, difficulties,
+from studybuddy.dsa_practice import (all_problems, get_problem, topics, difficulties,
                           filter_problems, public_problem, reveal_hint,
                           reveal_approach, validate_status_payload,
                           weak_topic_diagnosis)

@@ -4,8 +4,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-import github_integration
-import leetcode_integration
+from studybuddy import github_integration
+from studybuddy import leetcode_integration
 import unified_app
 from unified_app import create_app, db, User, ProfileSnapshot
 

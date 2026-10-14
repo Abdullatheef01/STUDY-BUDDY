@@ -4,7 +4,7 @@ import json
 import pytest
 
 from unified_app import create_app, db, LinkedInReport
-from linkedin_grader import (grade_linkedin_profile, validate_linkedin_inputs,
+from studybuddy.linkedin_grader import (grade_linkedin_profile, validate_linkedin_inputs,
                              generate_rule_based_summary, MAX_FIELD_CHARS)
 from tests.conftest import register, login
 

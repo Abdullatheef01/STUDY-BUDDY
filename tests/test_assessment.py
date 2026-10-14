@@ -4,7 +4,7 @@ import json
 import pytest
 
 from unified_app import create_app, db, CareerAssessment
-from career_assessment import (score_assessment, validate_assessment_inputs,
+from studybuddy.career_assessment import (score_assessment, validate_assessment_inputs,
                                rule_based_why, QUESTIONS, CLUSTERS,
                                TOP_N_CLUSTERS)
 from tests.conftest import register, login
