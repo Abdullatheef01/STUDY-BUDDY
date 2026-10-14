@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'career' %}
+{% block title %}Become a mentor | STUDY-BUDDY{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Mentor applications</span>
+            <h1>Give back <span class="b-grad">an hour a month</span>.</h1>
+            <p class="b-lede">Mentors host small, bounded office hours (up to 12 students, ~45 minutes) and answer the questions they wish someone had answered for them. Applications are reviewed by the STUDY-BUDDY team — you'll hear back within a week.</p>
+        </div>
+    </div>
+</section>
+
+{% if existing and existing.status == 'pending' %}
+<section class="b-section" aria-label="Application status">
+    <div class="b-card b-reveal">
+        <span class="b-pill"><span class="b-pulse"></span>Under review</span>
+        <p style="margin:.8rem 0 0;">Your application for <strong>{{ existing.name }}</strong> ({{ existing.headline }}) is being reviewed. We'll email you at your account address when it's decided.</p>
+    </div>
+</section>
+{% elif existing and existing.status == 'approved' %}
+<section class="b-section" aria-label="Application status">
+    <div class="b-card b-reveal">
+        <span class="b-pill">✓ Approved</span>
+        <p style="margin:.8rem 0 0;">Your mentor application was approved — welcome aboard! Your profile is live in the <a href="{{ url_for('mentors_hub') }}">mentor directory</a>.</p>
+    </div>
+</section>
+{% else %}
+<section class="b-section" aria-label="Application form">
+    <div class="b-card b-card--form b-reveal">
+        <form id="mentor-apply-form" onsubmit="return false;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+                <div>
+                    <label class="b-label" for="m-name">Full name *</label>
+                    <input id="m-name" class="b-input" style="width:100%;" value="{{ current_user.name or '' }}" maxlength="120">
+                </div>
+                <div>
+                    <label class="b-label" for="m-headline">Headline *</label>
+                    <input id="m-headline" class="b-input" style="width:100%;" placeholder="e.g. SDE-2 at Razorpay" maxlength="200">
+                </div>
+                <div>
+                    <label class="b-label" for="m-path">Career path *</label>
+                    <select id="m-path" class="b-input" style="width:100%;">
+                        {% for key, label in paths %}
+                        <option value="{{ key }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="b-label" for="m-company">Company / organisation</label>
+                    <input id="m-company" class="b-input" style="width:100%;" maxlength="120">
+                </div>
+                <div>
+                    <label class="b-label" for="m-college">College</label>
+                    <input id="m-college" class="b-input" style="width:100%;" maxlength="160">
+                </div>
+                <div>
+                    <label class="b-label" for="m-linkedin">LinkedIn URL</label>
+                    <input id="m-linkedin" class="b-input" style="width:100%;" placeholder="https://www.linkedin.com/in/you">
+                </div>
+            </div>
+            <div style="margin-top:1rem;">
+                <label class="b-label" for="m-bio">Your story * <span style="color:var(--b-muted);">(min 30 characters — what can you help students with?)</span></label>
+                <textarea id="m-bio" class="b-input" rows="4" style="width:100%;" maxlength="2000" placeholder="Your background, what you do now, and what kinds of questions you love answering."></textarea>
+            </div>
+            <div class="b-cta-row" style="margin-top:1.2rem;">
+                <button class="b-btn b-btn--primary" id="m-submit" type="submit">Submit application</button>
+                <span class="b-pill" id="m-status" style="display:none;"></span>
+            </div>
+            <p class="b-form-error" id="m-error" style="display:none;" role="alert"></p>
+        </form>
+    </div>
+</section>
+{% endif %}
+
+<script>
+(function () {
+    'use strict';
+    var form = document.getElementById('mentor-apply-form');
+    if (!form) return;
+    function csrfHeaders(extra) {
+        var headers = extra || {};
+        var m = document.querySelector('meta[name="csrf-token"]');
+        if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+        return headers;
+    }
+    form.addEventListener('submit', function () {
+        var err = document.getElementById('m-error');
+        var status = document.getElementById('m-status');
+        err.style.display = 'none'; status.style.display = 'none';
+        fetch('/mentors/api/apply', {
+            method: 'POST',
+            headers: csrfHeaders({'Content-Type': 'application/json'}),
+            body: JSON.stringify({
+                name: document.getElementById('m-name').value,
+                headline: document.getElementById('m-headline').value,
+                path: document.getElementById('m-path').value,
+                company: document.getElementById('m-company').value,
+                college: document.getElementById('m-college').value,
+                linkedin_url: document.getElementById('m-linkedin').value,
+                bio: document.getElementById('m-bio').value
+            })
+        }).then(function (r) { return r.json().then(function (j) { return {status: r.status, body: j}; }); })
+        .then(function (res) {
+            if (res.status === 201 && res.body.success) {
+                status.textContent = 'Application submitted! We\'ll be in touch within a week.';
+                status.style.display = 'inline-block';
+                form.querySelectorAll('input, textarea, select, button').forEach(function (el) { el.disabled = true; });
+            } else {
+                err.textContent = (res.body && res.body.error) || 'Submission failed.';
+                err.style.display = 'block';
+            }
+        }).catch(function () {
+            err.textContent = 'Network error. Please try again.';
+            err.style.display = 'block';
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -292,6 +292,7 @@ from health_review import (DIMENSIONS as HR_DIMENSIONS,
                            generate_review as hr_generate_review,
                            valid_month_key as hr_valid_month_key,
                            current_month_key as hr_current_month_key)
+import community as community_mod
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -948,6 +949,164 @@ class PeerBlock(db.Model):
     blocked_id = db.Column(db.Integer, db.ForeignKey("user.id"),
                           nullable=False, index=True)
     reason = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+
+class Mentor(db.Model):
+    """A mentor profile for Wave 6 #27 office hours.
+
+    Seed profiles (is_seed=True) ship with the app and are marked verified;
+    real mentors join via MentorApplication and get verified=True only after
+    an admin approves them. user_id links the profile to the mentor's own
+    STUDY-BUDDY account when one exists (null for seed rows).
+    """
+    __tablename__ = "mentor"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    headline = db.Column(db.String(200), nullable=False)
+    path = db.Column(db.String(30), nullable=False, default="other", index=True)
+    company = db.Column(db.String(120))
+    college = db.Column(db.String(160))
+    bio = db.Column(db.Text)
+    linkedin_url = db.Column(db.String(300))
+    avatar_url = db.Column(db.String(300), nullable=True)
+    verified = db.Column(db.Boolean, nullable=False, default=False)
+    is_seed = db.Column(db.Boolean, nullable=False, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True,
+                        index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    user = db.relationship("User", foreign_keys=[user_id])
+
+
+class MentorApplication(db.Model):
+    """A student's application to become a mentor. Status moves
+    pending -> approved | rejected; approval creates the Mentor row."""
+    __tablename__ = "mentor_application"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        index=True)
+    name = db.Column(db.String(120), nullable=False)
+    headline = db.Column(db.String(200), nullable=False)
+    path = db.Column(db.String(30), nullable=False, default="other")
+    company = db.Column(db.String(120))
+    college = db.Column(db.String(160))
+    bio = db.Column(db.Text)
+    linkedin_url = db.Column(db.String(300))
+    status = db.Column(db.String(20), nullable=False, default="pending",
+                       index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    user = db.relationship("User", foreign_keys=[user_id])
+
+
+class OfficeHour(db.Model):
+    """One mentor office-hour session: a scheduled, capacity-bounded slot
+    students book seats in."""
+    __tablename__ = "office_hour"
+
+    id = db.Column(db.Integer, primary_key=True)
+    mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False,
+                          index=True)
+    topic = db.Column(db.String(200), nullable=False)
+    path = db.Column(db.String(30), nullable=False, default="other", index=True)
+    scheduled_at = db.Column(db.DateTime, nullable=False, index=True)
+    duration_min = db.Column(db.Integer, nullable=False, default=45)
+    capacity = db.Column(db.Integer, nullable=False, default=12)
+    status = db.Column(db.String(20), nullable=False, default="open", index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    mentor = db.relationship("Mentor",
+                             backref=db.backref("office_hours", lazy="dynamic",
+                                                cascade="all, delete-orphan"))
+
+
+class OHBooking(db.Model):
+    """A student's seat in an office hour. The unique constraint prevents
+    double-booking; cancelled seats don't count against capacity."""
+    __tablename__ = "oh_booking"
+
+    __table_args__ = (db.UniqueConstraint("user_id", "office_hour_id",
+                                         name="uq_oh_booking_user_session"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        index=True)
+    office_hour_id = db.Column(db.Integer, db.ForeignKey("office_hour.id"),
+                               nullable=False, index=True)
+    question_text = db.Column(db.Text)
+    status = db.Column(db.String(20), nullable=False, default="booked", index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    user = db.relationship("User", foreign_keys=[user_id])
+    session = db.relationship("OfficeHour",
+                              backref=db.backref("bookings", lazy="dynamic",
+                                                 cascade="all, delete-orphan"))
+
+
+class OHNote(db.Model):
+    """Post-session action notes a student writes for themselves after
+    attending an office hour."""
+    __tablename__ = "oh_note"
+
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey("oh_booking.id"),
+                           nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        index=True)
+    note_text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    booking = db.relationship("OHBooking",
+                              backref=db.backref("notes", lazy="dynamic",
+                                                 cascade="all, delete-orphan"))
+
+
+class OHFeedback(db.Model):
+    """One rating per booking: 1-5 stars plus what helped most."""
+    __tablename__ = "oh_feedback"
+
+    __table_args__ = (db.UniqueConstraint("booking_id",
+                                         name="uq_oh_feedback_booking"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey("oh_booking.id"),
+                           nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        index=True)
+    rating = db.Column(db.Integer, nullable=False)
+    what_helped = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    booking = db.relationship("OHBooking",
+                              backref=db.backref("feedback", uselist=False,
+                                                 cascade="all, delete-orphan"))
+
+
+class OHReport(db.Model):
+    """A safety report against a mentor or a session: spam, harassment,
+    fake profiles, no-shows. Reviewed by admins."""
+    __tablename__ = "oh_report"
+
+    id = db.Column(db.Integer, primary_key=True)
+    reporter_user_id = db.Column(db.Integer, db.ForeignKey("user.id"),
+                                 nullable=False, index=True)
+    mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=True,
+                          index=True)
+    office_hour_id = db.Column(db.Integer, db.ForeignKey("office_hour.id"),
+                               nullable=True, index=True)
+    reason = db.Column(db.String(40), nullable=False)
+    details = db.Column(db.Text)
+    status = db.Column(db.String(20), nullable=False, default="open", index=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
                            nullable=False)
 
@@ -6703,6 +6862,544 @@ def register_routes(app):
                                      "Please try again."}), 500
 
     csrf.exempt(api_constructor_generate)
+
+    # ================= Wave 6 #27: mentor & alumni office hours =================
+    # Connect students to lived experience through structured, bounded
+    # conversations: mentor directory (path-filtered), bookable office-hour
+    # sessions with capacity + double-book protection, structured question
+    # templates, post-session action notes, 1-5 feedback, XP hooks, mentor
+    # applications, and report/admin-verify safety. JSON POSTs take the
+    # X-CSRFToken header (not exempt); all write routes are rate-limited.
+
+    def _mentor_api_error(message, code):
+        return jsonify({'error': message}), code
+
+    def _mentor_admin_required():
+        """Return a 403 response when the caller is not an admin, else None.
+
+        Admins are the emails in the STUDYBUDDY_ADMINS comma-separated env
+        var — a deliberate admin-lite check, no roles table needed."""
+        if not community_mod.mentor_is_admin(current_user.email):
+            return _mentor_api_error(
+                'Admin access required. Set your email in STUDYBUDDY_ADMINS.',
+                403)
+        return None
+
+    def _oh_session_or_404(oh_id):
+        return OfficeHour.query.get(oh_id)
+
+    def _oh_active_booking_count(oh_id):
+        return (OHBooking.query
+                .filter(OHBooking.office_hour_id == oh_id,
+                        OHBooking.status != 'cancelled')
+                .count())
+
+    def _oh_to_dict(oh):
+        scheduled = oh.scheduled_at
+        if scheduled is not None and scheduled.tzinfo is None:
+            scheduled = scheduled.replace(tzinfo=timezone.utc)
+        return {
+            'id': oh.id,
+            'mentor_id': oh.mentor_id,
+            'mentor_name': oh.mentor.name if oh.mentor else None,
+            'mentor_headline': oh.mentor.headline if oh.mentor else None,
+            'topic': oh.topic,
+            'path': oh.path,
+            'path_label': community_mod.path_label(oh.path),
+            'scheduled_at': scheduled.isoformat() if scheduled else None,
+            'scheduled_display': scheduled.strftime('%a, %b %d · %I:%M %p')
+                                 if scheduled else 'TBA',
+            'duration_min': oh.duration_min,
+            'capacity': oh.capacity,
+            'booked': _oh_active_booking_count(oh.id),
+            'status': oh.status,
+        }
+
+    @app.route('/mentors')
+    @login_required
+    def mentors_hub():
+        """Hub: mentor directory (path filter), upcoming office hours,
+        and the student's own bookings."""
+        # Defensive seeding: first real visit creates the 14 seed mentors
+        # and a starter set of upcoming office hours.
+        try:
+            if Mentor.query.first() is None:
+                community_mod.seed_mentors()
+            community_mod.seed_office_hours()
+        except Exception:
+            log.exception("Mentor seeding failed on hub load")
+            db.session.rollback()
+        path_filter = (request.args.get('path') or '').strip().lower()
+        if path_filter and path_filter not in community_mod.PATH_KEYS:
+            path_filter = ''
+        try:
+            mentors_q = Mentor.query.order_by(Mentor.verified.desc(),
+                                              Mentor.name.asc())
+            if path_filter:
+                mentors_q = mentors_q.filter_by(path=path_filter)
+            mentors = mentors_q.limit(60).all()
+            upcoming = (OfficeHour.query
+                        .filter(OfficeHour.status.in_(('open', 'full')),
+                                OfficeHour.scheduled_at >= datetime.now(timezone.utc))
+                        .order_by(OfficeHour.scheduled_at.asc())
+                        .limit(40).all())
+            my_bookings = (OHBooking.query
+                           .filter_by(user_id=current_user.id)
+                           .filter(OHBooking.status != 'cancelled')
+                           .order_by(OHBooking.created_at.desc())
+                           .limit(30).all())
+        except Exception:
+            log.exception("Mentors hub query failed")
+            db.session.rollback()
+            mentors, upcoming, my_bookings = [], [], []
+        return render_template('mentors_hub.html',
+                               mentors=mentors,
+                               upcoming=upcoming,
+                               my_bookings=my_bookings,
+                               paths=community_mod.PATHS,
+                               path_filter=path_filter,
+                               path_label=community_mod.path_label,
+                               nav_active='career')
+
+    @app.route('/mentors/<int:mentor_id>')
+    @login_required
+    def mentor_profile(mentor_id):
+        """Mentor profile + their upcoming office hours."""
+        mentor = Mentor.query.get(mentor_id)
+        if mentor is None:
+            return render_template('error.html',
+                                   message='Mentor not found.'), 404
+        try:
+            upcoming = (OfficeHour.query
+                        .filter_by(mentor_id=mentor.id)
+                        .filter(OfficeHour.status.in_(('open', 'full')),
+                                OfficeHour.scheduled_at >= datetime.now(timezone.utc))
+                        .order_by(OfficeHour.scheduled_at.asc())
+                        .limit(20).all())
+            past = (OfficeHour.query
+                    .filter_by(mentor_id=mentor.id)
+                    .filter(OfficeHour.status == 'completed')
+                    .order_by(OfficeHour.scheduled_at.desc())
+                    .limit(6).all())
+            my_booking_ids = {b.office_hour_id
+                              for b in OHBooking.query
+                              .filter_by(user_id=current_user.id)
+                              .filter(OHBooking.status != 'cancelled')
+                              .all()}
+        except Exception:
+            log.exception("Mentor profile query failed")
+            db.session.rollback()
+            upcoming, past, my_booking_ids = [], [], set()
+        return render_template('mentor_profile.html',
+                               mentor=mentor,
+                               upcoming=upcoming,
+                               past=past,
+                               my_booking_ids=my_booking_ids,
+                               paths=community_mod.PATHS,
+                               path_label=community_mod.path_label,
+                               templates=community_mod.QUESTION_TEMPLATES,
+                               nav_active='career')
+
+    @app.route('/mentors/api/office-hours/<int:oh_id>/book', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def mentor_book_session(oh_id):
+        """Book a seat. JSON: {question_text?, template_id?}. Enforces
+        past/double-book/capacity rules. CSRF via X-CSRFToken header."""
+        oh = _oh_session_or_404(oh_id)
+        if oh is None:
+            return _mentor_api_error('Office hour not found.', 404)
+        payload = request.get_json(silent=True) or {}
+        question_text = (payload.get('question_text') or '').strip()
+        template_id = (payload.get('template_id') or '').strip()
+        if template_id and template_id not in community_mod.QUESTION_TEMPLATE_IDS:
+            return _mentor_api_error('Unknown question template.', 400)
+        if len(question_text) > community_mod.BOOKING_MAX_QUESTION_CHARS:
+            return _mentor_api_error(
+                'Your question is too long (max %d characters).'
+                % community_mod.BOOKING_MAX_QUESTION_CHARS, 400)
+        try:
+            active = _oh_active_booking_count(oh.id)
+            existing = (OHBooking.query
+                        .filter_by(user_id=current_user.id, office_hour_id=oh.id)
+                        .filter(OHBooking.status != 'cancelled')
+                        .first())
+            ok, err = community_mod.booking_eligibility(oh, active, existing)
+            if not ok:
+                return _mentor_api_error(err, 400)
+            booking = OHBooking(user_id=current_user.id,
+                               office_hour_id=oh.id,
+                               question_text=question_text or None,
+                               status='booked')
+            db.session.add(booking)
+            db.session.flush()
+            community_mod.refresh_session_status(oh, active + 1)
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor booking failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not complete the booking. '
+                                     'Please try again.', 500)
+        return jsonify({'success': True, 'booking_id': booking.id,
+                        'session_status': oh.status}), 201
+
+    @app.route('/mentors/api/bookings/<int:booking_id>/cancel', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def mentor_cancel_booking(booking_id):
+        """Cancel a booking until 1 hour before the session. Frees the seat
+        and re-opens the session when it was full."""
+        booking = (OHBooking.query
+                   .filter_by(id=booking_id, user_id=current_user.id).first())
+        if booking is None:
+            return _mentor_api_error('Booking not found.', 404)
+        if booking.status == 'cancelled':
+            return _mentor_api_error('This booking is already cancelled.', 400)
+        oh = booking.session
+        ok, err = community_mod.can_cancel(oh)
+        if not ok:
+            return _mentor_api_error(err, 400)
+        try:
+            booking.status = 'cancelled'
+            db.session.flush()
+            active = _oh_active_booking_count(oh.id)
+            community_mod.refresh_session_status(oh, active)
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor cancel failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not cancel the booking.', 500)
+        return jsonify({'success': True, 'session_status': oh.status})
+
+    @app.route('/mentors/api/bookings/<int:booking_id>/attend', methods=['POST'])
+    @login_required
+    @limiter.limit("60 per hour")
+    def mentor_mark_attended(booking_id):
+        """Mark attendance (for demo/testing: the student self-reports
+        attendance). Awards XP via momentum."""
+        booking = (OHBooking.query
+                   .filter_by(id=booking_id, user_id=current_user.id).first())
+        if booking is None:
+            return _mentor_api_error('Booking not found.', 404)
+        if booking.status == 'cancelled':
+            return _mentor_api_error('A cancelled booking cannot be marked '
+                                     'as attended.', 400)
+        if booking.status == 'attended':
+            return _mentor_api_error('Attendance already recorded.', 400)
+        try:
+            booking.status = 'attended'
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor attend marking failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not record attendance.', 500)
+        try:
+            momentum_mod.record_event(current_user.id, "mentor_session_attended")
+        except Exception:
+            log.exception("Mentor attendance XP failed")
+        return jsonify({'success': True})
+
+    @app.route('/mentors/api/bookings/<int:booking_id>/note', methods=['POST'])
+    @login_required
+    @limiter.limit("60 per hour")
+    def mentor_save_note(booking_id):
+        """Save post-session action notes. JSON: {note_text}."""
+        booking = (OHBooking.query
+                   .filter_by(id=booking_id, user_id=current_user.id).first())
+        if booking is None:
+            return _mentor_api_error('Booking not found.', 404)
+        if booking.status == 'cancelled':
+            return _mentor_api_error('A cancelled booking has no notes.', 400)
+        payload = request.get_json(silent=True) or {}
+        note_text = (payload.get('note_text') or '').strip()
+        if not note_text:
+            return _mentor_api_error('Write your action notes first.', 400)
+        if len(note_text) > community_mod.NOTE_MAX_CHARS:
+            return _mentor_api_error('Notes are too long (max %d characters).'
+                                     % community_mod.NOTE_MAX_CHARS, 400)
+        try:
+            note = OHNote(booking_id=booking.id, user_id=current_user.id,
+                          note_text=note_text)
+            db.session.add(note)
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor note save failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not save the note.', 500)
+        return jsonify({'success': True, 'note_id': note.id}), 201
+
+    @app.route('/mentors/api/bookings/<int:booking_id>/feedback', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def mentor_submit_feedback(booking_id):
+        """Submit 1-5 feedback for a booking. JSON: {rating, what_helped?}.
+        Awards XP via momentum."""
+        booking = (OHBooking.query
+                   .filter_by(id=booking_id, user_id=current_user.id).first())
+        if booking is None:
+            return _mentor_api_error('Booking not found.', 404)
+        if booking.status != 'attended':
+            return _mentor_api_error('Feedback opens after you attend the '
+                                     'session.', 400)
+        payload = request.get_json(silent=True) or {}
+        try:
+            rating = int(payload.get('rating'))
+        except (TypeError, ValueError):
+            return _mentor_api_error('rating must be an integer 1-5.', 400)
+        if not (community_mod.FEEDBACK_MIN_RATING
+                <= rating <= community_mod.FEEDBACK_MAX_RATING):
+            return _mentor_api_error('rating must be between 1 and 5.', 400)
+        what_helped = (payload.get('what_helped') or '').strip()
+        if len(what_helped) > community_mod.FEEDBACK_MAX_CHARS:
+            return _mentor_api_error('what_helped is too long (max %d '
+                                     'characters).'
+                                     % community_mod.FEEDBACK_MAX_CHARS, 400)
+        try:
+            existing = (OHFeedback.query
+                        .filter_by(booking_id=booking.id).first())
+            if existing:
+                return _mentor_api_error('Feedback already submitted for '
+                                         'this booking.', 400)
+            fb = OHFeedback(booking_id=booking.id, user_id=current_user.id,
+                            rating=rating, what_helped=what_helped or None)
+            db.session.add(fb)
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor feedback save failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not save the feedback.', 500)
+        try:
+            momentum_mod.record_event(current_user.id, "mentor_feedback_given")
+        except Exception:
+            log.exception("Mentor feedback XP failed")
+        return jsonify({'success': True, 'feedback_id': fb.id}), 201
+
+    @app.route('/mentors/api/my-bookings')
+    @login_required
+    def mentor_my_bookings():
+        """The student's bookings, optionally filtered to one mentor.
+        JSON: {bookings: [{id, topic, scheduled_display, status,
+        question_text, notes}]}."""
+        mentor_id = request.args.get('mentor_id', type=int)
+        try:
+            q = OHBooking.query.filter_by(user_id=current_user.id)
+            if mentor_id:
+                q = q.join(OfficeHour).filter(OfficeHour.mentor_id == mentor_id)
+            rows = (q.order_by(OHBooking.created_at.desc()).limit(50).all())
+            items = []
+            for b in rows:
+                sched = b.session.scheduled_at
+                if sched is not None and sched.tzinfo is None:
+                    sched = sched.replace(tzinfo=timezone.utc)
+                items.append({
+                    'id': b.id,
+                    'topic': b.session.topic,
+                    'scheduled_display': (sched.strftime('%a, %b %d · %I:%M %p')
+                                          if sched else 'TBA'),
+                    'status': b.status,
+                    'question_text': b.question_text,
+                    'notes': [{'id': n.id, 'note_text': n.note_text}
+                              for n in b.notes.order_by(OHNote.created_at.desc())],
+                    'has_feedback': OHFeedback.query.filter_by(booking_id=b.id).first() is not None,
+                })
+        except Exception:
+            log.exception("Mentor my-bookings query failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not load your bookings.', 500)
+        return jsonify({'success': True, 'bookings': items})
+
+    @app.route('/mentors/apply')
+    @login_required
+    def mentor_apply_form():
+        """Mentor application form (GET renders the form)."""
+        existing = (MentorApplication.query
+                    .filter_by(user_id=current_user.id)
+                    .order_by(MentorApplication.created_at.desc())
+                    .first())
+        return render_template('mentor_apply.html',
+                               existing=existing,
+                               paths=community_mod.PATHS,
+                               path_label=community_mod.path_label,
+                               nav_active='career')
+
+    @app.route('/mentors/api/apply', methods=['POST'])
+    @login_required
+    @limiter.limit("5 per hour")
+    def mentor_apply_submit():
+        """Submit a mentor application. JSON or form-encoded fields:
+        name, headline, path, company?, college?, bio, linkedin_url?."""
+        payload = request.get_json(silent=True)
+        if payload is None:
+            payload = request.form
+        get = payload.get
+        name = (get('name') or '').strip() or current_user.name
+        headline = (get('headline') or '').strip()
+        path = (get('path') or 'other').strip().lower()
+        company = (get('company') or '').strip() or None
+        college = (get('college') or '').strip() or None
+        bio = (get('bio') or '').strip()
+        linkedin_url = (get('linkedin_url') or '').strip() or None
+        errors = []
+        if not name or len(name) > community_mod.APPLY_NAME_MAX_CHARS:
+            errors.append('Name is required (max %d characters).'
+                          % community_mod.APPLY_NAME_MAX_CHARS)
+        if not headline or len(headline) > 200:
+            errors.append('Headline is required (max 200 characters).')
+        if path not in community_mod.PATH_KEYS:
+            errors.append('Pick a valid career path.')
+        if not bio or len(bio) < 30:
+            errors.append('Bio needs at least 30 characters — tell us your '
+                          'story and what you can help with.')
+        if len(bio) > community_mod.APPLY_MAX_BIO_CHARS:
+            errors.append('Bio is too long (max %d characters).'
+                          % community_mod.APPLY_MAX_BIO_CHARS)
+        if linkedin_url and not linkedin_url.startswith(('http://', 'https://')):
+            errors.append('LinkedIn URL must start with http:// or https://.')
+        if errors:
+            return _mentor_api_error(' '.join(errors), 400)
+        try:
+            pending = (MentorApplication.query
+                       .filter_by(user_id=current_user.id, status='pending')
+                       .first())
+            if pending:
+                return _mentor_api_error('You already have a pending '
+                                         'application.', 400)
+            app_row = MentorApplication(user_id=current_user.id, name=name,
+                                        headline=headline, path=path,
+                                        company=company, college=college,
+                                        bio=bio, linkedin_url=linkedin_url,
+                                        status='pending')
+            db.session.add(app_row)
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor application failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not submit the application.', 500)
+        return jsonify({'success': True, 'application_id': app_row.id}), 201
+
+    @app.route('/mentors/api/report', methods=['POST'])
+    @login_required
+    @limiter.limit("10 per hour")
+    def mentor_report():
+        """Report a mentor or session. JSON: {mentor_id?, office_hour_id?,
+        reason, details?}."""
+        payload = request.get_json(silent=True) or {}
+        reason = (payload.get('reason') or '').strip().lower()
+        if reason not in community_mod.REPORT_REASONS:
+            return _mentor_api_error('Unknown reason. Pick one of: %s.'
+                                     % ', '.join(community_mod.REPORT_REASONS),
+                                     400)
+        details = (payload.get('details') or '').strip() or None
+        if details and len(details) > community_mod.REPORT_MAX_CHARS:
+            return _mentor_api_error('Details are too long (max %d characters).'
+                                     % community_mod.REPORT_MAX_CHARS, 400)
+        mentor_id = payload.get('mentor_id')
+        oh_id = payload.get('office_hour_id')
+        if mentor_id is not None:
+            try:
+                mentor_id = int(mentor_id)
+            except (TypeError, ValueError):
+                return _mentor_api_error('mentor_id must be an integer.', 400)
+            if Mentor.query.get(mentor_id) is None:
+                return _mentor_api_error('Mentor not found.', 404)
+        if oh_id is not None:
+            try:
+                oh_id = int(oh_id)
+            except (TypeError, ValueError):
+                return _mentor_api_error('office_hour_id must be an integer.',
+                                         400)
+            if OfficeHour.query.get(oh_id) is None:
+                return _mentor_api_error('Office hour not found.', 404)
+        if mentor_id is None and oh_id is None:
+            return _mentor_api_error('Report a mentor, a session, or both.',
+                                     400)
+        try:
+            report = OHReport(reporter_user_id=current_user.id,
+                              mentor_id=mentor_id, office_hour_id=oh_id,
+                              reason=reason, details=details, status='open')
+            db.session.add(report)
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor report failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not file the report.', 500)
+        return jsonify({'success': True, 'report_id': report.id}), 201
+
+    @app.route('/mentors/api/admin/verify/<int:mentor_id>', methods=['POST'])
+    @login_required
+    @limiter.limit("30 per hour")
+    def mentor_admin_verify(mentor_id):
+        """Admin-lite: verify a mentor (set verified=True). 403 unless the
+        user's email is in the STUDYBUDDY_ADMINS env var."""
+        forbidden = _mentor_admin_required()
+        if forbidden is not None:
+            return forbidden
+        mentor = Mentor.query.get(mentor_id)
+        if mentor is None:
+            return _mentor_api_error('Mentor not found.', 404)
+        try:
+            mentor.verified = True
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor verify failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not verify the mentor.', 500)
+        return jsonify({'success': True})
+
+    @app.route('/mentors/api/admin/office-hours', methods=['POST'])
+    @login_required
+    @limiter.limit("30 per hour")
+    def mentor_admin_create_session():
+        """Admin-lite: schedule an office hour for a mentor. JSON:
+        {mentor_id, topic, scheduled_at ("YYYY-MM-DD HH:MM", UTC),
+        duration_min?, capacity?}. 403 unless the user's email is in
+        STUDYBUDDY_ADMINS."""
+        forbidden = _mentor_admin_required()
+        if forbidden is not None:
+            return forbidden
+        payload = request.get_json(silent=True) or {}
+        try:
+            mentor_id = int(payload.get('mentor_id'))
+        except (TypeError, ValueError):
+            return _mentor_api_error('mentor_id must be an integer.', 400)
+        mentor = Mentor.query.get(mentor_id)
+        if mentor is None:
+            return _mentor_api_error('Mentor not found.', 404)
+        topic = (payload.get('topic') or '').strip()
+        if not topic or len(topic) > 200:
+            return _mentor_api_error('topic is required (max 200 characters).',
+                                     400)
+        raw_when = (payload.get('scheduled_at') or '').strip()
+        try:
+            scheduled = datetime.strptime(raw_when, "%Y-%m-%d %H:%M")
+            scheduled = scheduled.replace(tzinfo=timezone.utc)
+        except ValueError:
+            return _mentor_api_error('scheduled_at must look like '
+                                     '"YYYY-MM-DD HH:MM" (UTC).', 400)
+        if scheduled <= datetime.now(timezone.utc):
+            return _mentor_api_error('scheduled_at must be in the future.',
+                                     400)
+        try:
+            duration_min = int(payload.get('duration_min', 45))
+            capacity = int(payload.get('capacity', 12))
+        except (TypeError, ValueError):
+            return _mentor_api_error('duration_min and capacity must be '
+                                     'integers.', 400)
+        if not 15 <= duration_min <= 180:
+            return _mentor_api_error('duration_min must be 15-180.', 400)
+        if not 1 <= capacity <= 100:
+            return _mentor_api_error('capacity must be 1-100.', 400)
+        try:
+            oh = OfficeHour(mentor_id=mentor.id, topic=topic, path=mentor.path,
+                            scheduled_at=scheduled, duration_min=duration_min,
+                            capacity=capacity, status='open')
+            db.session.add(oh)
+            db.session.commit()
+        except Exception:
+            log.exception("Mentor session creation failed")
+            db.session.rollback()
+            return _mentor_api_error('Could not schedule the session.', 500)
+        return jsonify({'success': True, 'office_hour': _oh_to_dict(oh)}), 201
 
 
 def _save_research_exchange(user_id, client_session_id, user_msg, ai_response, doc_text):

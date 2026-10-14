@@ -87,12 +87,14 @@ def test_xp_rules_exact_values():
         "flashcards_reviewed": 15, "aptitude_completed": 20,
         "coach_analyzed": 15, "star_saved": 10,
         "paper_quiz_completed": 20, "peer_session_completed": 40,
-        "retrospective_logged": 15, "quest_completed": 50,
+        "retrospective_logged": 15, "mentor_session_attended": 30,
+        "mentor_feedback_given": 10, "health_review_completed": 20,
+        "quest_completed": 50,
     }
 
 
 def test_xp_rules_all_positive_ints():
-    assert len(XP_RULES) == 13
+    assert len(XP_RULES) == 16
     for ev, xp in XP_RULES.items():
         assert isinstance(xp, int) and xp > 0, ev
 

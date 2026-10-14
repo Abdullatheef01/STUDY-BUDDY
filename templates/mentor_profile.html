@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'career' %}
+{% block title %}{{ mentor.name }} | Mentors | STUDY-BUDDY{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill">{{ path_label(mentor.path) }}</span>
+            <div style="display:flex;align-items:center;gap:1rem;margin-top:1rem;">
+                <div class="b-avatar" style="width:3.5rem;height:3.5rem;font-size:1.4rem;" aria-hidden="true">{{ mentor.name[0] }}</div>
+                <div>
+                    <h1 style="margin:0;">{{ mentor.name }} {% if mentor.verified %}<span class="b-pill" title="Verified by the STUDY-BUDDY team">✓ Verified</span>{% endif %}</h1>
+                    <p class="b-lede" style="margin:.3rem 0 0;">{{ mentor.headline }}{% if mentor.company %} · {{ mentor.company }}{% endif %}{% if mentor.college %} · {{ mentor.college }}{% endif %}</p>
+                </div>
+            </div>
+            {% if mentor.bio %}<p style="max-width:60rem;margin-top:1rem;">{{ mentor.bio }}</p>{% endif %}
+            <div class="b-cta-row" style="margin-top:1rem;">
+                <a class="b-btn b-btn--sm" href="{{ url_for('mentors_hub') }}">← All mentors</a>
+                {% if mentor.linkedin_url %}<a class="b-btn b-btn--sm" href="{{ mentor.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ---------- Upcoming office hours ---------- #}
+<section class="b-section" aria-label="Upcoming office hours">
+    <div class="b-sec-head"><h2>Upcoming <span class="b-grad">office hours</span></h2><p>Pick a session and book your seat.</p></div>
+    {% if upcoming %}
+    <div class="b-bento">
+        {% for oh in upcoming %}
+        <article class="b-card b-reveal" id="oh-{{ oh.id }}">
+            <span class="b-pill">{{ path_label(oh.path) }}</span>
+            <h3 style="margin:.6rem 0 .2rem;">{{ oh.topic }}</h3>
+            <p style="color:var(--b-muted);font-size:.88rem;margin:.2rem 0;">{{ oh.scheduled_at.strftime('%a, %b %d · %I:%M %p') }} · {{ oh.duration_min }} min</p>
+            <p style="font-size:.86rem;color:var(--b-muted);margin:.2rem 0 0;">Seats: <span id="seats-{{ oh.id }}">{{ oh.bookings.filter_by(status='booked').count() + oh.bookings.filter_by(status='attended').count() }} / {{ oh.capacity }}</span>{% if oh.status == 'full' %} — <strong>FULL</strong>{% endif %}</p>
+            {% if oh.id in my_booking_ids %}
+            <p class="b-pill" style="margin-top:.8rem;"><span class="b-pulse"></span>You're booked in</p>
+            {% elif oh.status == 'full' %}
+            <p style="color:var(--b-muted);font-size:.88rem;margin-top:.8rem;">This session is full — try another slot.</p>
+            {% else %}
+            <form class="mentor-book-form" data-oh="{{ oh.id }}" onsubmit="return false;" style="margin-top:.8rem;">
+                <label class="b-label" for="tmpl-{{ oh.id }}">Start from a template</label>
+                <select id="tmpl-{{ oh.id }}" class="b-input tmpl-select" style="width:100%;" data-oh="{{ oh.id }}">
+                    <option value="">— Choose a question prompt (optional) —</option>
+                    {% for t in templates %}
+                    <option value="{{ t.id }}">{{ t.category }}: {{ t.text }}</option>
+                    {% endfor %}
+                </select>
+                <label class="b-label" for="q-{{ oh.id }}" style="margin-top:.6rem;">Your question</label>
+                <textarea id="q-{{ oh.id }}" class="b-input question-box" rows="2" style="width:100%;" placeholder="What do you want to ask {{ mentor.name.split(' ')[0] }}?"></textarea>
+                <div class="b-cta-row" style="margin-top:.8rem;">
+                    <button class="b-btn b-btn--primary b-btn--sm" type="submit">Book this session</button>
+                </div>
+                <p class="b-form-error" id="err-{{ oh.id }}" style="display:none;" role="alert"></p>
+                <p class="b-pill" id="ok-{{ oh.id }}" style="display:none;"></p>
+            </form>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">No upcoming office hours from {{ mentor.name }} right now.</p></div>
+    {% endif %}
+</section>
+
+{# ---------- My bookings with this mentor ---------- #}
+{% set mine = [] %}
+<section class="b-section" aria-label="My bookings">
+    <div class="b-sec-head"><h2>My <span class="b-grad">sessions</span></h2><p>Manage your bookings with {{ mentor.name }}.</p></div>
+    <div id="mentor-my-bookings" data-mentor="{{ mentor.id }}">
+        <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">Loading your bookings…</p></div>
+    </div>
+</section>
+
+{# ---------- Past sessions ---------- #}
+{% if past %}
+<section class="b-section" aria-label="Past sessions">
+    <div class="b-sec-head"><h2>Past <span class="b-grad">sessions</span></h2><p>Previously hosted by {{ mentor.name }}.</p></div>
+    <div class="b-bento">
+        {% for oh in past %}
+        <article class="b-card b-reveal">
+            <h3 style="margin:.2rem 0;font-size:1rem;">{{ oh.topic }}</h3>
+            <p style="color:var(--b-muted);font-size:.88rem;margin:.2rem 0;">{{ oh.scheduled_at.strftime('%b %d, %Y') }} · completed</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{# ---------- Report ---------- #}
+<section class="b-section" aria-label="Report">
+    <div class="b-card b-reveal">
+        <h2 style="margin-top:0;">Something wrong?</h2>
+        <p style="color:var(--b-muted);">Report this mentor or a session — our team reviews every report.</p>
+        <form id="mentor-report-form" onsubmit="return false;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+                <div>
+                    <label class="b-label" for="report-reason">Reason</label>
+                    <select id="report-reason" class="b-input" style="width:100%;">
+                        <option value="spam">Spam</option>
+                        <option value="harassment">Harassment</option>
+                        <option value="fake_profile">Fake profile</option>
+                        <option value="inappropriate">Inappropriate content</option>
+                        <option value="no_show">Mentor didn't show up</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:1rem;">
+                <label class="b-label" for="report-details">Details (optional)</label>
+                <textarea id="report-details" class="b-input" rows="2" style="width:100%;" placeholder="What happened?"></textarea>
+            </div>
+            <div class="b-cta-row" style="margin-top:1rem;">
+                <button class="b-btn b-btn--sm" id="report-btn" type="submit">File report</button>
+                <span class="b-pill" id="report-status" style="display:none;"></span>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+(function () {
+    'use strict';
+    var MENTOR_ID = {{ mentor.id }};
+    var TEMPLATES = {{ templates|tojson }};
+
+    function csrfHeaders(extra) {
+        var headers = extra || {};
+        var m = document.querySelector('meta[name="csrf-token"]');
+        if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+        return headers;
+    }
+    function api(url, body) {
+        return fetch(url, {
+            method: 'POST',
+            headers: csrfHeaders({'Content-Type': 'application/json'}),
+            body: JSON.stringify(body || {})
+        }).then(function (r) { return r.json().then(function (j) { return {status: r.status, body: j}; }); });
+    }
+
+    // Template picker fills the question box.
+    document.querySelectorAll('.tmpl-select').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+            var ohId = sel.getAttribute('data-oh');
+            var q = document.getElementById('q-' + ohId);
+            var t = TEMPLATES.filter(function (x) { return x.id === sel.value; })[0];
+            if (t && q && !q.value) q.value = t.text;
+        });
+    });
+
+    // Booking.
+    document.querySelectorAll('.mentor-book-form').forEach(function (form) {
+        form.addEventListener('submit', function () {
+            var ohId = form.getAttribute('data-oh');
+            var err = document.getElementById('err-' + ohId);
+            var ok = document.getElementById('ok-' + ohId);
+            err.style.display = 'none'; ok.style.display = 'none';
+            var tmpl = document.getElementById('tmpl-' + ohId).value;
+            var question = document.getElementById('q-' + ohId).value;
+            api('/mentors/api/office-hours/' + ohId + '/book',
+                {question_text: question, template_id: tmpl}).then(function (res) {
+                if (res.status === 201 && res.body.success) {
+                    ok.textContent = 'Seat booked! See you there.';
+                    ok.style.display = 'inline-block';
+                    form.querySelector('button[type="submit"]').disabled = true;
+                    loadBookings();
+                } else {
+                    err.textContent = (res.body && res.body.error) || 'Booking failed.';
+                    err.style.display = 'block';
+                }
+            }).catch(function () {
+                err.textContent = 'Network error. Please try again.';
+                err.style.display = 'block';
+            });
+        });
+    });
+
+    // My bookings panel: cancel / attend / note / feedback.
+    var panel = document.getElementById('mentor-my-bookings');
+
+    function starRow(selected) {
+        var html = '';
+        for (var i = 1; i <= 5; i++) {
+            html += '<button type="button" class="star-btn" data-v="' + i + '" style="font-size:1.5rem;background:none;border:none;cursor:pointer;color:' + (i <= selected ? 'var(--b-accent)' : 'var(--b-muted)') + ';" aria-label="' + i + ' stars">★</button>';
+        }
+        return html;
+    }
+
+    function loadBookings() {
+        panel.innerHTML = '<div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">Loading your bookings…</p></div>';
+        fetch('/mentors/api/my-bookings?mentor_id=' + MENTOR_ID, {headers: csrfHeaders()})
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var items = (data && data.bookings) || [];
+                if (!items.length) {
+                    panel.innerHTML = '<div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">No bookings with this mentor yet.</p></div>';
+                    return;
+                }
+                var html = '<div class="b-bento">';
+                items.forEach(function (b) {
+                    html += '<article class="b-card b-reveal">';
+                    html += '<span class="b-pill">' + b.status + '</span>';
+                    html += '<h3 style="margin:.6rem 0 .2rem;font-size:1rem;">' + escapeHtml(b.topic) + '</h3>';
+                    html += '<p style="color:var(--b-muted);font-size:.88rem;margin:.2rem 0;">' + escapeHtml(b.scheduled_display) + '</p>';
+                    if (b.question_text) html += '<p style="font-size:.88rem;"><em>Your question:</em> ' + escapeHtml(b.question_text) + '</p>';
+                    html += '<div class="b-cta-row" style="margin-top:.8rem;">';
+                    if (b.status === 'booked') {
+                        html += '<button class="b-btn b-btn--sm" data-act="attend" data-id="' + b.id + '">I attended</button>';
+                        html += '<button class="b-btn b-btn--sm" data-act="cancel" data-id="' + b.id + '">Cancel seat</button>';
+                    }
+                    html += '</div>';
+                    if (b.status === 'attended') {
+                        html += '<div style="margin-top:.8rem;"><label class="b-label">Action notes — what will you do with what you learned?</label>';
+                        html += '<textarea class="b-input note-box" data-id="' + b.id + '" rows="2" style="width:100%;"></textarea>';
+                        html += '<div class="b-cta-row" style="margin-top:.6rem;"><button class="b-btn b-btn--sm" data-act="note" data-id="' + b.id + '">Save notes</button></div></div>';
+                        html += '<div style="margin-top:.8rem;"><label class="b-label">Rate this session</label><div class="stars" data-id="' + b.id + '">' + starRow(0) + '</div>';
+                        html += '<textarea class="b-input help-box" data-id="' + b.id + '" rows="2" style="width:100%;margin-top:.4rem;" placeholder="What helped most?"></textarea>';
+                        html += '<div class="b-cta-row" style="margin-top:.6rem;"><button class="b-btn b-btn--sm" data-act="feedback" data-id="' + b.id + '">Send feedback</button></div></div>';
+                    }
+                    html += '<p class="b-form-error" id="berr-' + b.id + '" style="display:none;" role="alert"></p>';
+                    html += '<p class="b-pill" id="bok-' + b.id + '" style="display:none;"></p>';
+                    html += '</article>';
+                });
+                html += '</div>';
+                panel.innerHTML = html;
+                wireActions();
+            })
+            .catch(function () {
+                panel.innerHTML = '<div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">Could not load your bookings.</p></div>';
+            });
+    }
+
+    function escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+        });
+    }
+
+    function showErr(id, msg) {
+        var el = document.getElementById('berr-' + id);
+        el.textContent = msg; el.style.display = 'block';
+        document.getElementById('bok-' + id).style.display = 'none';
+    }
+    function showOk(id, msg) {
+        var el = document.getElementById('bok-' + id);
+        el.textContent = msg; el.style.display = 'inline-block';
+        document.getElementById('berr-' + id).style.display = 'none';
+    }
+
+    var pendingRating = {};
+
+    function wireActions() {
+        panel.querySelectorAll('.star-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var wrap = btn.closest('.stars');
+                var id = wrap.getAttribute('data-id');
+                pendingRating[id] = parseInt(btn.getAttribute('data-v'), 10);
+                wrap.querySelectorAll('.star-btn').forEach(function (b2) {
+                    var v = parseInt(b2.getAttribute('data-v'), 10);
+                    b2.style.color = v <= pendingRating[id] ? 'var(--b-accent)' : 'var(--b-muted)';
+                });
+            });
+        });
+        panel.querySelectorAll('button[data-act]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-id');
+                var act = btn.getAttribute('data-act');
+                if (act === 'cancel' && !confirm('Cancel this booking?')) return;
+                var url = '/mentors/api/bookings/' + id + '/' + act;
+                var body = {};
+                if (act === 'note') {
+                    body.note_text = panel.querySelector('.note-box[data-id="' + id + '"]').value;
+                } else if (act === 'feedback') {
+                    var rating = pendingRating[id];
+                    if (!rating) { showErr(id, 'Pick a star rating first.'); return; }
+                    body.rating = rating;
+                    body.what_helped = panel.querySelector('.help-box[data-id="' + id + '"]').value;
+                }
+                api(url, body).then(function (res) {
+                    if ((res.status === 200 || res.status === 201) && res.body.success) {
+                        var msgs = {cancel: 'Booking cancelled.', attend: 'Attendance recorded. +30 XP!', note: 'Notes saved.', feedback: 'Feedback sent. +10 XP!'};
+                        showOk(id, msgs[act] || 'Done.');
+                        setTimeout(loadBookings, 900);
+                    } else {
+                        showErr(id, (res.body && res.body.error) || 'Request failed.');
+                    }
+                }).catch(function () { showErr(id, 'Network error. Please try again.'); });
+            });
+        });
+    }
+
+    document.getElementById('mentor-report-form').addEventListener('submit', function () {
+        var status = document.getElementById('report-status');
+        status.style.display = 'none';
+        api('/mentors/api/report', {
+            mentor_id: MENTOR_ID,
+            reason: document.getElementById('report-reason').value,
+            details: document.getElementById('report-details').value
+        }).then(function (res) {
+            if (res.status === 201 && res.body.success) {
+                status.textContent = 'Report filed. Thank you — our team will review it.';
+                status.style.display = 'inline-block';
+                document.getElementById('report-details').value = '';
+            }
+        });
+    });
+
+    loadBookings();
+})();
+</script>
+{% endblock %}

@@ -50,6 +50,9 @@ XP_RULES = {
     "paper_quiz_completed": 20,
     "peer_session_completed": 40,
     "retrospective_logged": 15,
+    "mentor_session_attended": 30,
+    "mentor_feedback_given": 10,
+    "health_review_completed": 20,
     "quest_completed": 50,  # awarded only via claim_quest(), never directly
 }
 
