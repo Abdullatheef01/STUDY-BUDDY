@@ -33,6 +33,10 @@
         .opp-badge.internship { background: rgba(16,185,129,0.16); color: var(--accent-primary); }
         .opp-badge.scholarship { background: rgba(56,189,248,0.14); color: var(--accent-info); }
         .opp-badge.exam { background: rgba(245,158,11,0.14); color: var(--accent-warning); }
+        .opp-badge.hackathon { background: rgba(168,85,247,0.16); color: #c4b5fd; }
+        .opp-badge.competition { background: rgba(236,72,153,0.14); color: #f9a8d4; }
+        .opp-fresh { display: inline-flex; align-items: center; gap: 0.45rem; margin: 0 0 1.2rem; font-size: 0.8rem; font-weight: 600; color: #a7f3d0; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 999px; padding: 0.4rem 0.9rem; }
+        .opp-fresh .b-pulse { width: 7px; height: 7px; }
         .opp-soon { font-size: 0.72rem; font-weight: 800; border-radius: 999px; padding: 0.2rem 0.65rem; background: rgba(245,158,11,0.18); color: var(--accent-warning); }
         .opp-card h3 { font-size: 1.05rem; line-height: 1.35; }
         .opp-org { font-size: 0.83rem; color: var(--text-muted, #94a3b8); }
@@ -63,31 +67,17 @@
         <div class="b-blob b-b3"></div>
         <div class="b-gridlines"></div>
     </div>
-    <header class="b-nav" id="navbar">
-        <div class="b-wrap b-nav-in">
-            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
-                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#14b8a6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#14b8a6"/><circle cx="31" cy="10" r="3.4" fill="#fbbf24"/></svg>
-                Unified<span class="b-grad">AI</span>
-            </a>
-            <nav aria-label="Primary">
-                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
-                    <li><a href="/">Hub</a></li>
-                    <li><a href="/resume">Resume</a></li>
-                    <li><a href="/salary">Salaries</a></li>
-                    <li><a href="/opportunities" class="b-active">Radar</a></li>
-                    {% include "_auth_links.html" %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+    {% set nav_active = 'career' %}
+    {% include "_site_nav.html" %}
 
     <div class="opp-wrap">
         <div class="opp-head b-reveal">
             <h1>Opportunity <span class="b-grad">Radar</span></h1>
-            <p>Internships, scholarships and competitive exams with deadlines — sorted so the closest deadlines surface first.</p>
+            <p>Internships, hackathons, scholarships, competitions and exams — auto-refreshed every 2 days, sorted so the closest deadlines surface first.</p>
         </div>
 
         <div class="opp-notice">{{ meta.notice }} <strong>Last updated: {{ meta.last_updated }}.</strong></div>
+        <p class="opp-fresh"><span class="b-pulse"></span>{{ freshness }}</p>
 
         <form class="opp-filters b-card b-reveal" method="get" action="{{ url_for('opportunity_board') }}">
             <div>
@@ -124,6 +114,8 @@
                     {% if o.deadline %}
                         Deadline: {{ o.deadline_label }} ·
                         <span class="left {% if o.closing_soon %}urgent{% endif %}">{{ o.countdown_label }}</span>
+                    {% elif o.posted_days_ago is not none %}
+                        <span class="left">Rolling · posted {{ o.posted_days_ago }}d ago</span>
                     {% else %}
                         <span class="left">Rolling — check the official site</span>
                     {% endif %}

@@ -23,26 +23,8 @@
     </div>
 
     <!-- Navigation -->
-    <header class="b-nav" id="navbar">
-        <div class="b-wrap b-nav-in">
-            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
-                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#14b8a6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#14b8a6"/><circle cx="31" cy="10" r="3.4" fill="#fbbf24"/></svg>
-                Unified<span class="b-grad">AI</span>
-            </a>
-            <nav aria-label="Primary">
-                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
-                    <li><a href="/">Hub</a></li>
-                    <li><a href="/resume">Home</a></li>
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="/practice" class="b-active">Practice</a></li>
-                    <li><a href="/dsa">DSA</a></li>
-                    <li><a href="/aptitude">Aptitude</a></li>
-                    <li><a href="/star">STAR Builder</a></li>
-                    {% include "_auth_links.html" %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+    {% set nav_active = 'practice' %}
+    {% include "_site_nav.html" %}
 
     <div class="practice-page">
         <div class="practice-container">

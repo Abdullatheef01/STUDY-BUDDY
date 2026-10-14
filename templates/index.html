@@ -20,34 +20,8 @@
         <div class="b-gridlines"></div>
     </div>
 
-    <header class="b-nav" id="navbar">
-        <div class="b-wrap b-nav-in">
-            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
-                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                    <defs>
-                        <linearGradient id="b-lg1" x1="0" y1="0" x2="40" y2="40">
-                            <stop offset="0" stop-color="#6366f1"/>
-                            <stop offset="1" stop-color="#22d3ee"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="20" cy="20" r="17" stroke="url(#b-lg1)" stroke-width="3"/>
-                    <circle cx="20" cy="20" r="7" fill="url(#b-lg1)"/>
-                    <circle cx="31" cy="10" r="3.4" fill="#22d3ee"/>
-                </svg>
-                Unified<span class="b-grad">AI</span>
-            </a>
-            <nav aria-label="Primary">
-                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;">
-                    <li><a href="{{ url_for('index') }}" class="b-active">Hub</a></li>
-                    <li><a href="{{ url_for('resume_home') }}">Resume</a></li>
-                    <li><a href="{{ url_for('practice') }}">Practice</a></li>
-                    <li><a href="{{ url_for('learn_hub') }}">Learn</a></li>
-                    <li><a href="{{ url_for('research_home') }}">Research</a></li>
-                    {% include "_auth_links.html" %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+    {% set nav_active = 'hub' %}
+    {% include "_site_nav.html" %}
 
     <main class="b-wrap">
         <!-- HERO -->
@@ -56,7 +30,7 @@
                 <div class="b-card b-card--hero b-span-4 b-reveal">
                     <div class="b-hero-grid">
                     <div>
-                    <span class="b-pill"><span class="b-pulse"></span>Wave 2 &mdash; live now</span>
+                    <span class="b-pill"><span class="b-pulse"></span>Learn hub &mdash; live now</span>
                     <h1>Your AI <span class="b-grad">career co-pilot</span>,<br>from campus to offer letter.</h1>
                     <p class="b-lede">AI-powered career intelligence and research intelligence for students &mdash; analyze resumes, match job descriptions, practice interviews, track applications, and build your portfolio, all in one place.</p>
                     <div class="b-cta-row" style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.6rem;">
@@ -65,23 +39,29 @@
                         </a>
                         <a class="b-btn b-btn--ghost b-magnet" href="{{ url_for('research_home') }}">Explore Research</a>
                     </div>
+                    <div class="b-hero-stats" aria-label="Content library at a glance">
+                        <div class="b-hero-stat"><b>339</b><span>interview questions</span></div>
+                        <div class="b-hero-stat"><b>338</b><span>aptitude questions</span></div>
+                        <div class="b-hero-stat"><b>320</b><span>skill quiz questions</span></div>
+                        <div class="b-hero-stat"><b>132</b><span>DSA problems</span></div>
                     </div>
-                    <div class="b-hero-visual" aria-hidden="true">
-                        <svg class="b-ring" viewBox="0 0 120 120" role="img">
+                    </div>
+                    <div class="b-hero-visual">
+                        <svg class="b-ring" viewBox="0 0 120 120" aria-hidden="true">
                             <defs>
                                 <linearGradient id="bentoHeroGrad" x1="0" y1="0" x2="1" y2="1">
                                     <stop offset="0" stop-color="#6366f1"/><stop offset=".5" stop-color="#22d3ee"/><stop offset="1" stop-color="#ec4899"/>
                                 </linearGradient>
                             </defs>
                             <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/>
-                            <circle cx="60" cy="60" r="52" fill="none" stroke="url(#bentoHeroGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="49" transform="rotate(-90 60 60)"/>
-                            <text x="60" y="60" text-anchor="middle" dominant-baseline="central" class="b-ring-num">85</text>
-                            <text x="60" y="82" text-anchor="middle" class="b-ring-sub">ATS score</text>
+                            <circle class="b-ring-fg" cx="60" cy="60" r="52" fill="none" stroke="url(#bentoHeroGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="49" transform="rotate(-90 60 60)"/>
+                            <text x="60" y="55" text-anchor="middle" dominant-baseline="central" class="b-ring-num">85</text>
+                            <text x="60" y="80" text-anchor="middle" class="b-ring-sub">ATS score</text>
                         </svg>
-                        <span class="b-chip-float" style="top:4%;left:2%;"><span class="b-dot"></span>Mock interviews</span>
-                        <span class="b-chip-float" style="top:14%;right:0;animation-delay:1.2s;"><span class="b-dot"></span>DSA &middot; 132 problems</span>
-                        <span class="b-chip-float" style="bottom:16%;left:0;animation-delay:2.1s;"><span class="b-dot"></span>STAR builder</span>
-                        <span class="b-chip-float" style="bottom:5%;right:4%;animation-delay:.6s;"><span class="b-dot"></span>JD match</span>
+                        <a class="b-chip-float" style="top:4%;left:2%;animation-delay:.15s,1.4s;" href="{{ url_for('interview_home') }}"><span class="b-dot"></span>Mock interviews</a>
+                        <a class="b-chip-float" style="top:14%;right:0;animation-delay:.35s,2.2s;" href="{{ url_for('dsa_home') }}"><span class="b-dot"></span>DSA &middot; 132 problems</a>
+                        <a class="b-chip-float" style="bottom:16%;left:0;animation-delay:.55s,2.8s;" href="{{ url_for('star_home') }}"><span class="b-dot"></span>STAR builder</a>
+                        <a class="b-chip-float" style="bottom:5%;right:4%;animation-delay:.75s,1.8s;" href="{{ url_for('resume_home') }}"><span class="b-dot"></span>JD match</a>
                     </div>
                     </div>
                 </div>

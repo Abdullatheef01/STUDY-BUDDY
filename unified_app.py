@@ -645,6 +645,65 @@ class PaperImport(db.Model):
                                                       cascade="all, delete-orphan"))
 
 
+class LitReview(db.Model):
+    """A generated multi-paper literature review (Wave 4 #22)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    title = db.Column(db.String(255), nullable=False)
+    doc_ids = db.Column(db.JSON)  # [study_doc ids]
+    data = db.Column(db.JSON)  # {"per_paper": [...], "themes": [...],
+                               #  "claims_table": [...], "coverage_gaps": str,
+                               #  "bibtex": str}
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("lit_reviews", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class GapReport(db.Model):
+    """A cached research-gap analysis over a user's paper collection (Wave 4 #23)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    doc_ids = db.Column(db.JSON)  # [study_doc ids] analyzed
+    data = db.Column(db.JSON)  # {"gaps": [{"title","type","evidence":[...],
+                               #  "suggested_questions":[]}], "next_papers": [...]}
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("gap_reports", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class FlashcardSet(db.Model):
+    """Flashcards + MCQs generated from a StudyDoc (Wave 4 #26)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    doc_id = db.Column(db.Integer, db.ForeignKey("study_doc.id"), nullable=False, index=True)
+    card_count = db.Column(db.Integer, default=0)
+    data = db.Column(db.JSON)  # {"cards": [{"id","kind","question","answer",
+                               #  "options":[],"chunk":i,"page":n,"doc_title":""}],
+                               #  "progress": {card_id: {"known": bool, "reviews": int}}}
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("flashcard_sets", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+    doc = db.relationship("StudyDoc", backref=db.backref("flashcard_sets", lazy="dynamic",
+                                                         cascade="all, delete-orphan"))
+
+
+class PaperQuizAttempt(db.Model):
+    """A scored MCQ quiz attempt from a paper's generated questions (Wave 4 #26)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    set_id = db.Column(db.Integer, db.ForeignKey("flashcard_set.id"), nullable=False, index=True)
+    score = db.Column(db.Integer, default=0)
+    total = db.Column(db.Integer, default=0)
+    data = db.Column(db.JSON)  # {"answers": {card_id: chosen_idx}, "details": [...]}
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("paper_quiz_attempts", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
 class ResearchSession(db.Model):
     """A saved research-chat conversation belonging to a user."""
     id = db.Column(db.Integer, primary_key=True)
@@ -4119,6 +4178,28 @@ def register_routes(app):
     def cite_page():
         """Citation formatter page (public utility)."""
         return render_template('study_cite.html')
+
+    # --- Wave 4 batch-2 stubs (real implementations land in #22/#23/#26) ---
+    @app.route('/research/review')
+    @login_required
+    def litreview_home():
+        """Literature review generator (stub until feature #22 lands)."""
+        return render_template('study_stub.html', title='Literature Reviews',
+                               blurb='Turn two or more papers into a structured, fully-cited literature review. This section is being built right now — check back soon.')
+
+    @app.route('/research/gaps')
+    @login_required
+    def gapfinder_home():
+        """Research-gap finder (stub until feature #23 lands)."""
+        return render_template('study_stub.html', title='Research-Gap Finder',
+                               blurb='Underexplored topics, conflicting claims and single-paper gaps across your library — every gap backed by evidence. This section is being built right now — check back soon.')
+
+    @app.route('/research/flashcards')
+    @login_required
+    def flashcards_home():
+        """Flashcards & quizzes (stub until feature #26 lands)."""
+        return render_template('study_stub.html', title='Flashcards & Quizzes',
+                               blurb='Auto-generated flashcards and MCQs from your papers, with spaced-repetition review. This section is being built right now — check back soon.')
 
     @app.route('/api/cite/format', methods=['POST'])
     @limiter.limit("60 per hour")

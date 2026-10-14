@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block theme %}research{% endblock %}
+{% set nav_active = 'research' %}
+{% block title %}{{ title }} | AI Career &amp; Research Assistant{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Study Lab</span>
+            <h1>{{ title }}</h1>
+            <p class="b-lede">{{ blurb }}</p>
+            <div class="b-cta-row">
+                <a class="b-btn b-btn--primary" href="{{ url_for('study_library') }}">Open document library</a>
+                <a class="b-btn b-btn--ghost" href="{{ url_for('research_home') }}">Back to Research hub</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

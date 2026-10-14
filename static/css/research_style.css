@@ -689,6 +689,7 @@ input:focus {
     justify-content: center;
     font-size: 0.9rem;
 }
+.message .avatar svg { width: 18px; height: 18px; flex: 0 0 auto; }
 
 .message.system .avatar {
     background: var(--primary);

@@ -70,22 +70,8 @@
         <div class="b-blob b-b3"></div>
         <div class="b-gridlines"></div>
     </div>
-    <header class="b-nav" id="navbar">
-        <div class="b-wrap b-nav-in">
-            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
-                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#14b8a6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#14b8a6"/><circle cx="31" cy="10" r="3.4" fill="#fbbf24"/></svg>
-                Unified<span class="b-grad">AI</span>
-            </a>
-            <nav aria-label="Primary">
-                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
-                    <li><a href="/">Hub</a></li>
-                    <li><a href="/resume">Resume</a></li>
-                    <li><a href="/portfolio" class="b-active">Portfolio</a></li>
-                    {% include "_auth_links.html" %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+    {% set nav_active = 'career' %}
+    {% include "_site_nav.html" %}
 
     <div class="pb-wrap">
         <div class="pb-head b-reveal">
