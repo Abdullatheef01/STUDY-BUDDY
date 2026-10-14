@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="resume">
+<html lang="en" class="no-js" data-theme="resume">
 <head>
     <meta charset="UTF-8">
+    <script>document.documentElement.classList.replace('no-js', 'js');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Portfolio Builder | AI Resume Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bento.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2314b8a6'/><path d='M28 72V44l22-14 22 14v28' stroke='white' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <style>
@@ -58,14 +63,38 @@
     </style>
 </head>
 <body>
+    <div class="b-scroll-progress" data-scroll-progress aria-hidden="true"></div>
+    <div class="b-ambient" aria-hidden="true">
+        <div class="b-blob b-b1"></div>
+        <div class="b-blob b-b2"></div>
+        <div class="b-blob b-b3"></div>
+        <div class="b-gridlines"></div>
+    </div>
+    <header class="b-nav" id="navbar">
+        <div class="b-wrap b-nav-in">
+            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
+                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#14b8a6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#14b8a6"/><circle cx="31" cy="10" r="3.4" fill="#fbbf24"/></svg>
+                Unified<span class="b-grad">AI</span>
+            </a>
+            <nav aria-label="Primary">
+                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
+                    <li><a href="/">Hub</a></li>
+                    <li><a href="/resume">Resume</a></li>
+                    <li><a href="/portfolio" class="b-active">Portfolio</a></li>
+                    {% include "_auth_links.html" %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
     <div class="pb-wrap">
-        <div class="pb-head">
-            <h1>Portfolio <span class="gradient-text">Builder</span></h1>
+        <div class="pb-head b-reveal">
+            <h1>Portfolio <span class="b-grad">Builder</span></h1>
             <p>Turn your profile into a polished one-page portfolio. Edit on the left, watch the live preview on the right, then publish to get a shareable link.</p>
         </div>
 
         <div class="pb-grid">
-            <div class="pb-card">
+            <div class="pb-card b-card b-reveal">
                 <h2>Your details</h2>
                 <label for="fName">Display name *</label>
                 <input type="text" id="fName" maxlength="80" value="{{ (portfolio.display_name if portfolio else '') or prefill.name }}">
@@ -127,10 +156,20 @@
                 </div>
             </div>
         </div>
-    </div>
+    <footer class="b-footer">
+        <div class="b-wrap b-foot-in">
+            <span>&copy; 2026 Unified AI Excellence Platform</span>
+            <span>
+                <a href="{{ url_for('privacy') }}">Privacy</a>
+                <a href="{{ url_for('terms') }}">Terms</a>
+                <a href="{{ url_for('index') }}">Home</a>
+            </span>
+        </div>
+    </footer>
     <script>
         window.PORTFOLIO_EXISTING = {{ (portfolio_payload|tojson) if portfolio_payload else 'null' }};
     </script>
     <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bento.js') }}" defer></script>
 </body>
 </html>

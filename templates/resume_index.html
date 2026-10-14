@@ -10,57 +10,56 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="bg-animated"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    
-    <!-- Particles -->
-    <div class="particles" id="particles"></div>
-    <div class="career-grid" aria-hidden="true"></div>
-    <div class="scan-beam" aria-hidden="true"></div>
+        <div class="b-scroll-progress" data-scroll-progress aria-hidden="true"></div>
+    <div class="b-ambient" aria-hidden="true">
+        <div class="b-blob b-b1"></div>
+        <div class="b-blob b-b2"></div>
+        <div class="b-blob b-b3"></div>
+        <div class="b-gridlines"></div>
+    </div>
+    <div class="particles" id="particles" aria-hidden="true"></div>
 
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <a href="/" class="nav-brand">
-            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
-            <span>ResumeAI</span>
-        </a>
-        <ul class="nav-links">
-            <li><a href="/">Hub</a></li>
-            <li><a href="/resume" class="active">Home</a></li>
-            <li><a href="/practice">Practice</a></li>
-            <li><a href="/dsa">DSA</a></li>
-            <li><a href="/interview">Interviews</a></li>
-            <li><a href="/coach">Coach</a></li>
-            <li><a href="/tracker">Tracker</a></li>
-            <li><a href="/assessment">Discover</a></li>
-            <li><a href="/salary">Salaries</a></li>
-            <li><a href="/opportunities">Radar</a></li>
-            <li><a href="/portfolio">Portfolio</a></li>
-            <li><a href="#features">Features</a></li>
-            {% include "_auth_links.html" %}
-        </ul>
-    </nav>
+    <header class="b-nav" id="navbar">
+        <div class="b-wrap b-nav-in">
+            <a href="{{ url_for('index') }}" class="b-brand" aria-label="Unified AI home">
+                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#14b8a6" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#14b8a6"/><circle cx="31" cy="10" r="3.4" fill="#fbbf24"/></svg>
+                Unified<span class="b-grad">AI</span>
+            </a>
+            <nav aria-label="Primary">
+                <ul class="b-nav-links" style="list-style:none;margin:0;padding:0;flex-wrap:wrap;row-gap:.4rem;">
+                    <li><a href="/">Hub</a></li>
+                    <li><a href="/resume" class="b-active">Home</a></li>
+                    <li><a href="/practice">Practice</a></li>
+                    <li><a href="/dsa">DSA</a></li>
+                    <li><a href="/interview">Interviews</a></li>
+                    <li><a href="/coach">Coach</a></li>
+                    <li><a href="/tracker">Tracker</a></li>
+                    <li><a href="/assessment">Discover</a></li>
+                    <li><a href="/salary">Salaries</a></li>
+                    <li><a href="/opportunities">Radar</a></li>
+                    <li><a href="/portfolio">Portfolio</a></li>
+                    <li><a href="#features">Features</a></li>
+                    {% include "_auth_links.html" %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-badge">
-                <span class="pulse"></span>
-                AI-Powered Career Intelligence
-            </div>
+            <div style="margin-bottom:1.2rem;"><span class="b-pill"><span class="b-pulse"></span>AI-Powered Career Intelligence</span></div>
             <h1>
                 Unlock Your Career<br>
-                <span class="gradient-text">Potential with AI</span>
+                <span class="b-grad">Potential with AI</span>
             </h1>
             <p>Upload your resume and get instant ATS scoring, intelligent job matching powered by BERT, skill gap analysis, and personalized career guidance — all in seconds.</p>
 
             <!-- Upload Card -->
             <div class="upload-container">
                 <form id="uploadForm" enctype="multipart/form-data">
-                    <div class="upload-card" id="uploadCard">
+                    <div class="upload-card b-card b-reveal" id="uploadCard">
                         <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg></div>
                         <h3>Drop your resume here</h3>
                         <p>or click to browse files</p>
@@ -85,7 +84,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn-analyze" id="analyzeBtn">
+                    <button type="submit" class="btn-analyze b-magnet" id="analyzeBtn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c3 2 5 6 5 10l3 3-4 1c-1 2-2 3-4 4-2-1-3-2-4-4l-4-1 3-3c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.6"/></svg><span>Analyze My Resume</span>
                     </button>
                 </form>
@@ -94,9 +93,9 @@
     </section>
 
     <!-- JD-Matched ATS Scoring (Wave 1, feature #1) -->
-    <section class="jd-section" id="jd-match">
-        <div class="jd-card">
-            <h2>Match My Resume <span class="gradient-text">to a Job Description</span></h2>
+    <section class="jd-section b-reveal" id="jd-match">
+        <div class="jd-card b-card">
+            <h2>Match My Resume <span class="b-grad">to a Job Description</span></h2>
             <p>Paste any job posting and get a transparent 0&ndash;100 ATS-style match score: keyword coverage, required-skills hit rate, experience alignment, and formatting checks &mdash; plus exactly what's missing and how to fix it.</p>
             {% if current_user.is_authenticated %}
             <form id="jdMatchForm" enctype="multipart/form-data" novalidate>
@@ -134,8 +133,8 @@
     </section>
 
     <!-- AI Bullet Rewriter (Wave 1, feature #2) -->
-    <section class="jd-section" id="bullet-rewriter">
-        <div class="jd-card">
+    <section class="jd-section b-reveal" id="bullet-rewriter">
+        <div class="jd-card b-card">
             <h2>Rewrite Any <span class="gradient-text">Resume Bullet</span></h2>
             <p>Paste one bullet from your resume and get 2&ndash;3 stronger versions: punchier action verbs, quantified impact, and an ATS-friendly tightened line. Accept or edit any variant &mdash; every rewrite is saved to your dashboard.</p>
             {% if current_user.is_authenticated %}
@@ -164,8 +163,8 @@
     </section>
 
     <!-- Saved Resume Versions (Wave 1, feature #3) -->
-    <section class="jd-section" id="resume-versions">
-        <div class="jd-card">
+    <section class="jd-section b-reveal" id="resume-versions">
+        <div class="jd-card b-card">
             <h2>Saved <span class="gradient-text">Resume Versions</span></h2>
             <p>Keep named versions of your resume &mdash; one per target role. Set a default, compare any two versions line-by-line, and use a version directly in JD matching.</p>
             {% if current_user.is_authenticated %}
@@ -192,9 +191,9 @@
     </section>
 
     <!-- Cover Letter + Cold Outreach Generator (Wave 1, feature #4) -->
-    <section class="jd-section" id="cover-generator">
-        <div class="jd-card">
-            <h2>Cover Letter <span class="gradient-text">& Cold Outreach</span></h2>
+    <section class="jd-section b-reveal" id="cover-generator">
+        <div class="jd-card b-card">
+            <h2>Cover Letter <span class="b-grad">& Cold Outreach</span></h2>
             <p>Pick a resume version, paste the job description (or describe the company and role), choose a tone — get a tailored cover letter plus a short LinkedIn/email outreach message. Both are saved to your dashboard.</p>
             {% if current_user.is_authenticated %}
             <form id="coverForm" novalidate>
@@ -227,9 +226,9 @@
     </section>
 
     <!-- LinkedIn Profile Grader (Wave 1, feature #5) -->
-    <section class="jd-section" id="linkedin-grader">
-        <div class="jd-card">
-            <h2>LinkedIn Profile <span class="gradient-text">Grader</span></h2>
+    <section class="jd-section b-reveal" id="linkedin-grader">
+        <div class="jd-card b-card">
+            <h2>LinkedIn Profile <span class="b-grad">Grader</span></h2>
             <p>Paste your LinkedIn profile sections as plain text (we never scrape LinkedIn) and get a transparent 0&ndash;100 grade: headline strength, About quality, experience quantification, skills relevance, and completeness &mdash; plus prioritized fixes. Reports are saved to your dashboard.</p>
             {% if current_user.is_authenticated %}
             <form id="linkedinForm" novalidate>
@@ -260,58 +259,67 @@
     </section>
 
     <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="section-header">
-            <h2>Powerful <span class="gradient-text">AI Features</span></h2>
+    <section id="features">
+        <div class="b-wrap">
+        <div class="b-sec-head b-reveal">
+            <h2>Powerful <span class="b-grad">AI Features</span></h2>
             <p>Everything you need to supercharge your career, powered by cutting-edge NLP and machine learning.</p>
         </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg></div>
+        <div class="b-bento">
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg></span>
                 <h3>ATS Score Analysis</h3>
                 <p>Get a detailed ATS compatibility score with breakdown across sections, skills, content quality, and formatting.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></div>
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span>
                 <h3>BERT Semantic Matching</h3>
                 <p>AI-powered job matching using BERT embeddings to find roles that truly fit your experience, not just keywords.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></div>
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></span>
                 <h3>Skill Gap Detection</h3>
                 <p>Instantly identify missing skills for your target roles, prioritized by demand across top matching jobs.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></div>
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></span>
                 <h3>Resume Improvement</h3>
                 <p>Receive AI-generated suggestions to enhance your resume's impact, from structure to content to keywords.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg></div>
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg></span>
                 <h3>Career Path Guidance</h3>
                 <p>Discover career paths aligned with your skills, with progression roadmaps and growth recommendations.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg></div>
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg></span>
                 <h3>Interview Preparation</h3>
                 <p>Practice with role-specific and company-specific interview questions plus curated coding challenges.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg></div>
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg></span>
                 <h3><a href="/tracker" style="color:inherit;text-decoration:none;">Application Tracker</a></h3>
                 <p>Kanban board for every application: wishlist to offer, with response-rate stats and stage insights.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg></div>
+            <div class="b-card b-card--feature b-reveal">
+                <span class="b-icon" aria-hidden="true" style="margin-bottom:.4rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg></span>
                 <h3><a href="/assessment" style="color:inherit;text-decoration:none;">Career Discovery Quiz</a></h3>
                 <p>16 questions, 8 career paths: find where you fit with transparent match scores and next steps.</p>
             </div>
         </div>
+        </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <p>Built with AI for students | AI Resume Analyzer &amp; Job Recommendation System</p>
+    <footer class="b-footer">
+        <div class="b-wrap b-foot-in">
+            <span>&copy; 2026 Unified AI Excellence Platform</span>
+            <span>
+                <a href="{{ url_for('privacy') }}">Privacy</a>
+                <a href="{{ url_for('terms') }}">Terms</a>
+                <a href="{{ url_for('index') }}">Home</a>
+            </span>
+        </div>
     </footer>
 
     <!-- Loading Overlay -->
@@ -348,5 +356,6 @@
     <script src="{{ url_for('static', filename='js/resume_versions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cover_generator.js') }}"></script>
     <script src="{{ url_for('static', filename='js/linkedin_grader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bento.js') }}" defer></script>
 </body>
 </html>

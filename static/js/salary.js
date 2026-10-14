@@ -45,7 +45,7 @@
     function fmt(n) { return '₹' + n + ' LPA'; }
 
     function renderCard(e) {
-        var card = el('div', 'sal-card');
+        var card = el('div', 'sal-card b-card b-card--lite');
         card.appendChild(el('h3', null, e.role));
         card.appendChild(el('div', 'sal-sub',
             e.tier_label + ' · ' + e.cities.join(', ') + ' · ' + e.experience_band + ' yrs exp'));
