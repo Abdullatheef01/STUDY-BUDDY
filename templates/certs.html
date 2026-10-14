@@ -11,6 +11,7 @@
         <span class="b-pill"><span class="b-pulse"></span>Feature 20 &mdash; Certifications</span>
         <h1>Certification <span class="b-grad">guidance</span></h1>
         <p class="b-lede">Which certification is actually worth your time and money? Get ranked recommendations with honest ROI reasoning — costs shown in approximate INR.</p>
+        {% if freshness %}<span class="b-pill b-pill--sm" title="{{ freshness.label }}"><span class="b-pulse"></span>{{ freshness.label }}</span>{% endif %}
     </div>
     {% if is_authed %}
     <div><a class="b-btn b-btn--ghost b-btn--sm" href="{{ url_for('certs_plans') }}">My saved study plans</a></div>

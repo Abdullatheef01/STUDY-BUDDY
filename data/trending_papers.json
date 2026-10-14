@@ -1,0 +1,822 @@
+{
+  "meta": {
+    "sources": [
+      "arXiv",
+      "OpenAlex"
+    ],
+    "notice": "Live trending papers, refreshed daily. Falls back to cache when sources are unreachable.",
+    "last_updated": "2026-10-14"
+  },
+  "papers": [
+    {
+      "id": "1909.07930v1",
+      "title": "Ludwig: a type-based declarative deep learning toolbox",
+      "abstract": "In this work we present Ludwig, a flexible, extensible and easy to use toolbox which allows users to train deep learning models and use them for obtaining predictions without writing code. Ludwig implements a novel approach to deep learning model building based on two main abstractions: data types and declarative configuration files. The data type abstraction allows for easier code and sub-model reuse, and the standardized interfaces imposed by this abstraction allow for encapsulation and make the code easy to extend. Declarative model definition configuration files enable inexperienced users ",
+      "authors": [
+        "Piero Molino",
+        "Yaroslav Dudin",
+        "Sai Sumanth Miryala"
+      ],
+      "published": "2019-09-17",
+      "url": "http://arxiv.org/abs/1909.07930v1",
+      "source": "arXiv",
+      "category": "cs.LG"
+    },
+    {
+      "id": "1904.12848v6",
+      "title": "Unsupervised Data Augmentation for Consistency Training",
+      "abstract": "Semi-supervised learning lately has shown much promise in improving deep learning models when labeled data is scarce. Common among recent approaches is the use of consistency training on a large amount of unlabeled data to constrain model predictions to be invariant to input noise. In this work, we present a new perspective on how to effectively noise unlabeled examples and argue that the quality of noising, specifically those produced by advanced data augmentation methods, plays a crucial role in semi-supervised learning. By substituting simple noising operations with advanced data augmentati",
+      "authors": [
+        "Qizhe Xie",
+        "Zihang Dai",
+        "Eduard Hovy",
+        "Minh-Thang Luong",
+        "Quoc V. Le"
+      ],
+      "published": "2019-04-29",
+      "url": "http://arxiv.org/abs/1904.12848v6",
+      "source": "arXiv",
+      "category": "cs.LG"
+    },
+    {
+      "id": "1806.00047v1",
+      "title": "Following High-level Navigation Instructions on a Simulated Quadcopter with Imitation Learning",
+      "abstract": "We introduce a method for following high-level navigation instructions by mapping directly from images, instructions and pose estimates to continuous low-level velocity commands for real-time control. The Grounded Semantic Mapping Network (GSMN) is a fully-differentiable neural network architecture that builds an explicit semantic map in the world reference frame by incorporating a pinhole camera projection model within the network. The information stored in the map is learned from experience, while the local-to-world transformation is computed explicitly. We train the model using DAggerFM, a ",
+      "authors": [
+        "Valts Blukis",
+        "Nataly Brukhim",
+        "Andrew Bennett",
+        "Ross A. Knepper",
+        "Yoav Artzi"
+      ],
+      "published": "2018-05-31",
+      "url": "http://arxiv.org/abs/1806.00047v1",
+      "source": "arXiv",
+      "category": "cs.AI"
+    },
+    {
+      "id": "1903.03166v2",
+      "title": "CLEVR-Dialog: A Diagnostic Dataset for Multi-Round Reasoning in Visual Dialog",
+      "abstract": "Visual Dialog is a multimodal task of answering a sequence of questions grounded in an image, using the conversation history as context. It entails challenges in vision, language, reasoning, and grounding. However, studying these subtasks in isolation on large, real datasets is infeasible as it requires prohibitively-expensive complete annotation of the 'state' of all images and dialogs. We develop CLEVR-Dialog, a large diagnostic dataset for studying multi-round reasoning in visual dialog. Specifically, we construct a dialog grammar that is grounded in the scene graphs of the images from the ",
+      "authors": [
+        "Satwik Kottur",
+        "José M. F. Moura",
+        "Devi Parikh",
+        "Dhruv Batra",
+        "Marcus Rohrbach"
+      ],
+      "published": "2019-03-07",
+      "url": "http://arxiv.org/abs/1903.03166v2",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "1902.09705v1",
+      "title": "Beyond the Self: Using Grounded Affordances to Interpret and Describe Others' Actions",
+      "abstract": "We propose a developmental approach that allows a robot to interpret and describe the actions of human agents by reusing previous experience. The robot first learns the association between words and object affordances by manipulating the objects in its environment. It then uses this information to learn a mapping between its own actions and those performed by a human in a shared environment. It finally fuses the information from these two models to interpret and describe human actions in light of its own experience. In our experiments, we show that the model can be used flexibly to do inferenc",
+      "authors": [
+        "Giovanni Saponaro",
+        "Lorenzo Jamone",
+        "Alexandre Bernardino",
+        "Giampiero Salvi"
+      ],
+      "published": "2019-02-26",
+      "url": "http://arxiv.org/abs/1902.09705v1",
+      "source": "arXiv",
+      "category": "cs.RO"
+    },
+    {
+      "id": "1805.09701v2",
+      "title": "R-VQA: Learning Visual Relation Facts with Semantic Attention for Visual Question Answering",
+      "abstract": "Recently, Visual Question Answering (VQA) has emerged as one of the most significant tasks in multimodal learning as it requires understanding both visual and textual modalities. Existing methods mainly rely on extracting image and question features to learn their joint feature embedding via multimodal fusion or attention mechanism. Some recent studies utilize external VQA-independent models to detect candidate entities or attributes in images, which serve as semantic knowledge complementary to the VQA task. However, these candidate entities or attributes might be unrelated to the VQA task and",
+      "authors": [
+        "Pan Lu",
+        "Lei Ji",
+        "Wei Zhang",
+        "Nan Duan",
+        "Ming Zhou"
+      ],
+      "published": "2018-05-24",
+      "url": "http://arxiv.org/abs/1805.09701v2",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2011.07384v1",
+      "title": "Few-shot Object Grounding and Mapping for Natural Language Robot Instruction Following",
+      "abstract": "We study the problem of learning a robot policy to follow natural language instructions that can be easily extended to reason about new objects. We introduce a few-shot language-conditioned object grounding method trained from augmented reality data that uses exemplars to identify objects and align them to their mentions in instructions. We present a learned map representation that encodes object locations and their instructed use, and construct it from our few-shot grounding output. We integrate this mapping approach into an instruction-following policy, thereby allowing it to reason about pr",
+      "authors": [
+        "Valts Blukis",
+        "Ross A. Knepper",
+        "Yoav Artzi"
+      ],
+      "published": "2020-11-14",
+      "url": "http://arxiv.org/abs/2011.07384v1",
+      "source": "arXiv",
+      "category": "cs.RO"
+    },
+    {
+      "id": "2401.09454v1",
+      "title": "Voila-A: Aligning Vision-Language Models with User's Gaze Attention",
+      "abstract": "In recent years, the integration of vision and language understanding has led to significant advancements in artificial intelligence, particularly through Vision-Language Models (VLMs). However, existing VLMs face challenges in handling real-world applications with complex scenes and multiple objects, as well as aligning their focus with the diverse attention patterns of human users. In this paper, we introduce gaze information, feasibly collected by AR or VR devices, as a proxy for human attention to guide VLMs and propose a novel approach, Voila-A, for gaze alignment to enhance the interpret",
+      "authors": [
+        "Kun Yan",
+        "Lei Ji",
+        "Zeyu Wang",
+        "Yuntao Wang",
+        "Nan Duan"
+      ],
+      "published": "2023-12-22",
+      "url": "http://arxiv.org/abs/2401.09454v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2312.03818v2",
+      "title": "Alpha-CLIP: A CLIP Model Focusing on Wherever You Want",
+      "abstract": "Contrastive Language-Image Pre-training (CLIP) plays an essential role in extracting valuable content information from images across diverse tasks. It aligns textual and visual modalities to comprehend the entire image, including all the details, even those irrelevant to specific tasks. However, for a finer understanding and controlled editing of images, it becomes crucial to focus on specific regions of interest, which can be indicated as points, masks, or boxes by humans or perception models. To fulfill the requirements, we introduce Alpha-CLIP, an enhanced version of CLIP with an auxiliary ",
+      "authors": [
+        "Zeyi Sun",
+        "Ye Fang",
+        "Tong Wu",
+        "Pan Zhang",
+        "Yuhang Zang"
+      ],
+      "published": "2023-12-06",
+      "url": "http://arxiv.org/abs/2312.03818v2",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2401.08577v1",
+      "title": "MultiPLY: A Multisensory Object-Centric Embodied Large Language Model in 3D World",
+      "abstract": "Human beings possess the capability to multiply a melange of multisensory cues while actively exploring and interacting with the 3D world. Current multi-modal large language models, however, passively absorb sensory data as inputs, lacking the capacity to actively interact with the objects in the 3D environment and dynamically collect their multisensory information. To usher in the study of this area, we propose MultiPLY, a multisensory embodied large language model that could incorporate multisensory interactive data, including visual, audio, tactile, and thermal information into large langua",
+      "authors": [
+        "Yining Hong",
+        "Zishuo Zheng",
+        "Peihao Chen",
+        "Yian Wang",
+        "Junyan Li"
+      ],
+      "published": "2024-01-16",
+      "url": "http://arxiv.org/abs/2401.08577v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2311.11090v1",
+      "title": "Beyond Images: An Integrative Multi-modal Approach to Chest X-Ray Report Generation",
+      "abstract": "Image-to-text radiology report generation aims to automatically produce radiology reports that describe the findings in medical images. Most existing methods focus solely on the image data, disregarding the other patient information accessible to radiologists. In this paper, we present a novel multi-modal deep neural network framework for generating chest X-rays reports by integrating structured patient data, such as vital signs and symptoms, alongside unstructured clinical notes.We introduce a conditioned cross-multi-head attention module to fuse these heterogeneous data modalities, bridging ",
+      "authors": [
+        "Nurbanu Aksoy",
+        "Serge Sharoff",
+        "Selcuk Baser",
+        "Nishant Ravikumar",
+        "Alejandro F Frangi"
+      ],
+      "published": "2023-11-18",
+      "url": "http://arxiv.org/abs/2311.11090v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2311.17076v3",
+      "title": "Compositional Chain-of-Thought Prompting for Large Multimodal Models",
+      "abstract": "The combination of strong visual backbones and Large Language Model (LLM) reasoning has led to Large Multimodal Models (LMMs) becoming the current standard for a wide range of vision and language (VL) tasks. However, recent research has shown that even the most advanced LMMs still struggle to capture aspects of compositional visual reasoning, such as attributes and relationships between objects. One solution is to utilize scene graphs (SGs)--a formalization of objects and their relations and attributes that has been extensively used as a bridge between the visual and textual domains. Yet, scen",
+      "authors": [
+        "Chancharik Mitra",
+        "Brandon Huang",
+        "Trevor Darrell",
+        "Roei Herzig"
+      ],
+      "published": "2023-11-27",
+      "url": "http://arxiv.org/abs/2311.17076v3",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2311.17593v1",
+      "title": "LanGWM: Language Grounded World Model",
+      "abstract": "Recent advances in deep reinforcement learning have showcased its potential in tackling complex tasks. However, experiments on visual control tasks have revealed that state-of-the-art reinforcement learning models struggle with out-of-distribution generalization. Conversely, expressing higher-level concepts and global contexts is relatively easy using language. Building upon recent success of the large language models, our main objective is to improve the state abstraction technique in reinforcement learning by leveraging language for robust action selection. Specifically, we focus on learning",
+      "authors": [
+        "Rudra P. K. Poudel",
+        "Harit Pandya",
+        "Chao Zhang",
+        "Roberto Cipolla"
+      ],
+      "published": "2023-11-29",
+      "url": "http://arxiv.org/abs/2311.17593v1",
+      "source": "arXiv",
+      "category": "cs.LG"
+    },
+    {
+      "id": "2311.10111v1",
+      "title": "VideoCon: Robust Video-Language Alignment via Contrast Captions",
+      "abstract": "Despite being (pre)trained on a massive amount of data, state-of-the-art video-language alignment models are not robust to semantically-plausible contrastive changes in the video captions. Our work addresses this by identifying a broad spectrum of contrast misalignments, such as replacing entities, actions, and flipping event order, which alignment models should be robust against. To this end, we introduce the VideoCon, a video-language alignment dataset constructed by a large language model that generates plausible contrast video captions and explanations for differences between original and ",
+      "authors": [
+        "Hritik Bansal",
+        "Yonatan Bitton",
+        "Idan Szpektor",
+        "Kai-Wei Chang",
+        "Aditya Grover"
+      ],
+      "published": "2023-11-15",
+      "url": "http://arxiv.org/abs/2311.10111v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2403.10499v1",
+      "title": "Benchmarking Zero-Shot Robustness of Multimodal Foundation Models: A Pilot Study",
+      "abstract": "Pre-training image representations from the raw text about images enables zero-shot vision transfer to downstream tasks. Through pre-training on millions of samples collected from the internet, multimodal foundation models, such as CLIP, produce state-of-the-art zero-shot results that often reach competitiveness with fully supervised methods without the need for task-specific training. Besides the encouraging performance on classification accuracy, it is reported that these models close the robustness gap by matching the performance of supervised models trained on ImageNet under natural distri",
+      "authors": [
+        "Chenguang Wang",
+        "Ruoxi Jia",
+        "Xin Liu",
+        "Dawn Song"
+      ],
+      "published": "2024-03-15",
+      "url": "http://arxiv.org/abs/2403.10499v1",
+      "source": "arXiv",
+      "category": "cs.LG"
+    },
+    {
+      "id": "2312.03025v1",
+      "title": "Training on Synthetic Data Beats Real Data in Multimodal Relation Extraction",
+      "abstract": "The task of multimodal relation extraction has attracted significant research attention, but progress is constrained by the scarcity of available training data. One natural thought is to extend existing datasets with cross-modal generative models. In this paper, we consider a novel problem setting, where only unimodal data, either text or image, are available during training. We aim to train a multimodal classifier from synthetic data that perform well on real multimodal test data. However, training with synthetic data suffers from two obstacles: lack of data diversity and label information lo",
+      "authors": [
+        "Zilin Du",
+        "Haoxin Li",
+        "Xu Guo",
+        "Boyang Li"
+      ],
+      "published": "2023-12-05",
+      "url": "http://arxiv.org/abs/2312.03025v1",
+      "source": "arXiv",
+      "category": "cs.AI"
+    },
+    {
+      "id": "2402.07023v1",
+      "title": "Gemini Goes to Med School: Exploring the Capabilities of Multimodal Large Language Models on Medical Challenge Problems & Hallucinations",
+      "abstract": "Large language models have the potential to be valuable in the healthcare industry, but it's crucial to verify their safety and effectiveness through rigorous evaluation. For this purpose, we comprehensively evaluated both open-source LLMs and Google's new multimodal LLM called Gemini across Medical reasoning, hallucination detection, and Medical Visual Question Answering tasks. While Gemini showed competence, it lagged behind state-of-the-art models like MedPaLM 2 and GPT-4 in diagnostic accuracy. Additionally, Gemini achieved an accuracy of 61.45\\% on the medical VQA dataset, significantly l",
+      "authors": [
+        "Ankit Pal",
+        "Malaikannan Sankarasubbu"
+      ],
+      "published": "2024-02-10",
+      "url": "http://arxiv.org/abs/2402.07023v1",
+      "source": "arXiv",
+      "category": "cs.CL"
+    },
+    {
+      "id": "2403.01248v1",
+      "title": "SceneCraft: An LLM Agent for Synthesizing 3D Scene as Blender Code",
+      "abstract": "This paper introduces SceneCraft, a Large Language Model (LLM) Agent converting text descriptions into Blender-executable Python scripts which render complex scenes with up to a hundred 3D assets. This process requires complex spatial planning and arrangement. We tackle these challenges through a combination of advanced abstraction, strategic planning, and library learning. SceneCraft first models a scene graph as a blueprint, detailing the spatial relationships among assets in the scene. SceneCraft then writes Python scripts based on this graph, translating relationships into numerical constr",
+      "authors": [
+        "Ziniu Hu",
+        "Ahmet Iscen",
+        "Aashi Jain",
+        "Thomas Kipf",
+        "Yisong Yue"
+      ],
+      "published": "2024-03-02",
+      "url": "http://arxiv.org/abs/2403.01248v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2404.09516v1",
+      "title": "State Space Model for New-Generation Network Alternative to Transformers: A Survey",
+      "abstract": "In the post-deep learning era, the Transformer architecture has demonstrated its powerful performance across pre-trained big models and various downstream tasks. However, the enormous computational demands of this architecture have deterred many researchers. To further reduce the complexity of attention models, numerous efforts have been made to design more efficient methods. Among them, the State Space Model (SSM), as a possible replacement for the self-attention based Transformer model, has drawn more and more attention in recent years. In this paper, we give the first comprehensive review o",
+      "authors": [
+        "Xiao Wang",
+        "Shiao Wang",
+        "Yuhe Ding",
+        "Yuehang Li",
+        "Wentao Wu"
+      ],
+      "published": "2024-04-15",
+      "url": "http://arxiv.org/abs/2404.09516v1",
+      "source": "arXiv",
+      "category": "cs.LG"
+    },
+    {
+      "id": "2404.16030v1",
+      "title": "MoDE: CLIP Data Experts via Clustering",
+      "abstract": "The success of contrastive language-image pretraining (CLIP) relies on the supervision from the pairing between images and captions, which tends to be noisy in web-crawled data. We present Mixture of Data Experts (MoDE) and learn a system of CLIP data experts via clustering. Each data expert is trained on one data cluster, being less sensitive to false negative noises in other clusters. At inference time, we ensemble their outputs by applying weights determined through the correlation between task metadata and cluster conditions. To estimate the correlation precisely, the samples in one cluste",
+      "authors": [
+        "Jiawei Ma",
+        "Po-Yao Huang",
+        "Saining Xie",
+        "Shang-Wen Li",
+        "Luke Zettlemoyer"
+      ],
+      "published": "2024-04-24",
+      "url": "http://arxiv.org/abs/2404.16030v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2404.02183v1",
+      "title": "Self-Organized Agents: A LLM Multi-Agent Framework toward Ultra Large-Scale Code Generation and Optimization",
+      "abstract": "Recent advancements in automatic code generation using large language model (LLM) agent have brought us closer to the future of automated software development. However, existing single-agent approaches face limitations in generating and improving large-scale, complex codebases due to constraints in context length. To tackle this challenge, we propose Self-Organized multi-Agent framework (SoA), a novel multi-agent framework that enables the scalable and efficient generation and optimization of large-scale code. In SoA, self-organized agents operate independently to generate and modify code comp",
+      "authors": [
+        "Yoichi Ishibashi",
+        "Yoshimasa Nishimura"
+      ],
+      "published": "2024-04-02",
+      "url": "http://arxiv.org/abs/2404.02183v1",
+      "source": "arXiv",
+      "category": "cs.SE"
+    },
+    {
+      "id": "2303.00855v2",
+      "title": "Grounded Decoding: Guiding Text Generation with Grounded Models for Embodied Agents",
+      "abstract": "Recent progress in large language models (LLMs) has demonstrated the ability to learn and leverage Internet-scale knowledge through pre-training with autoregressive models. Unfortunately, applying such models to settings with embodied agents, such as robots, is challenging due to their lack of experience with the physical world, inability to parse non-language observations, and ignorance of rewards or safety constraints that robots may require. On the other hand, language-conditioned robotic policies that learn from interaction data can provide the necessary grounding that allows the agent to ",
+      "authors": [
+        "Wenlong Huang",
+        "Fei Xia",
+        "Dhruv Shah",
+        "Danny Driess",
+        "Andy Zeng"
+      ],
+      "published": "2023-03-01",
+      "url": "http://arxiv.org/abs/2303.00855v2",
+      "source": "arXiv",
+      "category": "cs.RO"
+    },
+    {
+      "id": "2309.12460v2",
+      "title": "Multimodal Deep Learning for Scientific Imaging Interpretation",
+      "abstract": "In the domain of scientific imaging, interpreting visual data often demands an intricate combination of human expertise and deep comprehension of the subject materials. This study presents a novel methodology to linguistically emulate and subsequently evaluate human-like interactions with Scanning Electron Microscopy (SEM) images, specifically of glass materials. Leveraging a multimodal deep learning framework, our approach distills insights from both textual and visual data harvested from peer-reviewed articles, further augmented by the capabilities of GPT-4 for refined data synthesis and eva",
+      "authors": [
+        "Abdulelah S. Alshehri",
+        "Franklin L. Lee",
+        "Shihu Wang"
+      ],
+      "published": "2023-09-21",
+      "url": "http://arxiv.org/abs/2309.12460v2",
+      "source": "arXiv",
+      "category": "cs.LG"
+    },
+    {
+      "id": "2307.11434v1",
+      "title": "Batching for Green AI -- An Exploratory Study on Inference",
+      "abstract": "The batch size is an essential parameter to tune during the development of new neural networks. Amongst other quality indicators, it has a large degree of influence on the model's accuracy, generalisability, training times and parallelisability. This fact is generally known and commonly studied. However, during the application phase of a deep learning model, when the model is utilised by an end-user for inference, we find that there is a disregard for the potential benefits of introducing a batch size. In this study, we examine the effect of input batching on the energy consumption and respons",
+      "authors": [
+        "Tim Yarally",
+        "Luís Cruz",
+        "Daniel Feitosa",
+        "June Sallou",
+        "Arie van Deursen"
+      ],
+      "published": "2023-07-21",
+      "url": "http://arxiv.org/abs/2307.11434v1",
+      "source": "arXiv",
+      "category": "cs.LG"
+    },
+    {
+      "id": "2310.18348v3",
+      "title": "Meaning Representations from Trajectories in Autoregressive Models",
+      "abstract": "We propose to extract meaning representations from autoregressive language models by considering the distribution of all possible trajectories extending an input text. This strategy is prompt-free, does not require fine-tuning, and is applicable to any pre-trained autoregressive model. Moreover, unlike vector-based representations, distribution-based representations can also model asymmetric relations (e.g., direction of logical entailment, hypernym/hyponym relations) by using algebraic operations between likelihood functions. These ideas are grounded in distributional perspectives on semantic",
+      "authors": [
+        "Tian Yu Liu",
+        "Matthew Trager",
+        "Alessandro Achille",
+        "Pramuditha Perera",
+        "Luca Zancato"
+      ],
+      "published": "2023-10-23",
+      "url": "http://arxiv.org/abs/2310.18348v3",
+      "source": "arXiv",
+      "category": "cs.CL"
+    },
+    {
+      "id": "2311.07766v1",
+      "title": "Vision-Language Integration in Multimodal Video Transformers (Partially) Aligns with the Brain",
+      "abstract": "Integrating information from multiple modalities is arguably one of the essential prerequisites for grounding artificial intelligence systems with an understanding of the real world. Recent advances in video transformers that jointly learn from vision, text, and sound over time have made some progress toward this goal, but the degree to which these models integrate information from modalities still remains unclear. In this work, we present a promising approach for probing a pre-trained multimodal video transformer model by leveraging neuroscientific evidence of multimodal information processin",
+      "authors": [
+        "Dota Tianai Dong",
+        "Mariya Toneva"
+      ],
+      "published": "2023-11-13",
+      "url": "http://arxiv.org/abs/2311.07766v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2311.03365v1",
+      "title": "Leveraging Generative AI: Improving Software Metadata Classification with Generated Code-Comment Pairs",
+      "abstract": "In software development, code comments play a crucial role in enhancing code comprehension and collaboration. This research paper addresses the challenge of objectively classifying code comments as \"Useful\" or \"Not Useful.\" We propose a novel solution that harnesses contextualized embeddings, particularly BERT, to automate this classification process. We address this task by incorporating generated code and comment pairs. The initial dataset comprised 9048 pairs of code and comments written in C, labeled as either Useful or Not Useful. To augment this dataset, we sourced an additional 739 line",
+      "authors": [
+        "Samah Syed",
+        "Angel Deborah S"
+      ],
+      "published": "2023-10-14",
+      "url": "http://arxiv.org/abs/2311.03365v1",
+      "source": "arXiv",
+      "category": "cs.SE"
+    },
+    {
+      "id": "2310.13362v1",
+      "title": "Towards General Error Diagnosis via Behavioral Testing in Machine Translation",
+      "abstract": "Behavioral testing offers a crucial means of diagnosing linguistic errors and assessing capabilities of NLP models. However, applying behavioral testing to machine translation (MT) systems is challenging as it generally requires human efforts to craft references for evaluating the translation quality of such systems on newly generated test cases. Existing works in behavioral testing of MT systems circumvent this by evaluating translation quality without references, but this restricts diagnosis to specific types of errors, such as incorrect translation of single numeric or currency words. In or",
+      "authors": [
+        "Junjie Wu",
+        "Lemao Liu",
+        "Dit-Yan Yeung"
+      ],
+      "published": "2023-10-20",
+      "url": "http://arxiv.org/abs/2310.13362v1",
+      "source": "arXiv",
+      "category": "cs.CL"
+    },
+    {
+      "id": "2310.16035v1",
+      "title": "What's Left? Concept Grounding with Logic-Enhanced Foundation Models",
+      "abstract": "Recent works such as VisProg and ViperGPT have smartly composed foundation models for visual reasoning-using large language models (LLMs) to produce programs that can be executed by pre-trained vision-language models. However, they operate in limited domains, such as 2D images, not fully exploiting the generalization of language: abstract concepts like \"left\" can also be grounded in 3D, temporal, and action data, as in moving to your left. This limited generalization stems from these inference-only methods' inability to learn or adapt pre-trained models to a new domain. We propose the Logic-En",
+      "authors": [
+        "Joy Hsu",
+        "Jiayuan Mao",
+        "Joshua B. Tenenbaum",
+        "Jiajun Wu"
+      ],
+      "published": "2023-10-24",
+      "url": "http://arxiv.org/abs/2310.16035v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2310.14670v2",
+      "title": "Dataset Bias Mitigation in Multiple-Choice Visual Question Answering and Beyond",
+      "abstract": "Vision-language (VL) understanding tasks evaluate models' comprehension of complex visual scenes through multiple-choice questions. However, we have identified two dataset biases that models can exploit as shortcuts to resolve various VL tasks correctly without proper understanding. The first type of dataset bias is \\emph{Unbalanced Matching} bias, where the correct answer overlaps the question and image more than the incorrect answers. The second type of dataset bias is \\emph{Distractor Similarity} bias, where incorrect answers are overly dissimilar to the correct answer but significantly sim",
+      "authors": [
+        "Zhecan Wang",
+        "Long Chen",
+        "Haoxuan You",
+        "Keyang Xu",
+        "Yicheng He"
+      ],
+      "published": "2023-10-23",
+      "url": "http://arxiv.org/abs/2310.14670v2",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2311.02236v1",
+      "title": "Robust Fine-Tuning of Vision-Language Models for Domain Generalization",
+      "abstract": "Transfer learning enables the sharing of common knowledge among models for a variety of downstream tasks, but traditional methods suffer in limited training data settings and produce narrow models incapable of effectively generalizing under distribution shifts. Foundation models have recently demonstrated impressive zero-shot inference capabilities and robustness under distribution shifts. However, zero-shot evaluation for these models has been predominantly confined to benchmarks with simple distribution shifts, limiting our understanding of their effectiveness under the more realistic shifts",
+      "authors": [
+        "Kevin Vogt-Lowell",
+        "Noah Lee",
+        "Theodoros Tsiligkaridis",
+        "Marc Vaillant"
+      ],
+      "published": "2023-11-03",
+      "url": "http://arxiv.org/abs/2311.02236v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2210.01191v1",
+      "title": "Extending Compositional Attention Networks for Social Reasoning in Videos",
+      "abstract": "We propose a novel deep architecture for the task of reasoning about social interactions in videos. We leverage the multi-step reasoning capabilities of Compositional Attention Networks (MAC), and propose a multimodal extension (MAC-X). MAC-X is based on a recurrent cell that performs iterative mid-level fusion of input modalities (visual, auditory, text) over multiple reasoning steps, by use of a temporal attention mechanism. We then combine MAC-X with LSTMs for temporal input processing in an end-to-end architecture. Our ablation studies show that the proposed MAC-X architecture can effectiv",
+      "authors": [
+        "Christina Sartzetaki",
+        "Georgios Paraskevopoulos",
+        "Alexandros Potamianos"
+      ],
+      "published": "2022-10-03",
+      "url": "http://arxiv.org/abs/2210.01191v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2112.03857v2",
+      "title": "Grounded Language-Image Pre-training",
+      "abstract": "This paper presents a grounded language-image pre-training (GLIP) model for learning object-level, language-aware, and semantic-rich visual representations. GLIP unifies object detection and phrase grounding for pre-training. The unification brings two benefits: 1) it allows GLIP to learn from both detection and grounding data to improve both tasks and bootstrap a good grounding model; 2) GLIP can leverage massive image-text pairs by generating grounding boxes in a self-training fashion, making the learned representation semantic-rich. In our experiments, we pre-train GLIP on 27M grounding dat",
+      "authors": [
+        "Liunian Harold Li",
+        "Pengchuan Zhang",
+        "Haotian Zhang",
+        "Jianwei Yang",
+        "Chunyuan Li"
+      ],
+      "published": "2021-12-07",
+      "url": "http://arxiv.org/abs/2112.03857v2",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2112.03227v4",
+      "title": "CALVIN: A Benchmark for Language-Conditioned Policy Learning for Long-Horizon Robot Manipulation Tasks",
+      "abstract": "General-purpose robots coexisting with humans in their environment must learn to relate human language to their perceptions and actions to be useful in a range of daily tasks. Moreover, they need to acquire a diverse repertoire of general-purpose skills that allow composing long-horizon tasks by following unconstrained language instructions. In this paper, we present CALVIN (Composing Actions from Language and Vision), an open-source simulated benchmark to learn long-horizon language-conditioned tasks. Our aim is to make it possible to develop agents that can solve many robotic manipulation ta",
+      "authors": [
+        "Oier Mees",
+        "Lukas Hermann",
+        "Erick Rosete-Beas",
+        "Wolfram Burgard"
+      ],
+      "published": "2021-12-06",
+      "url": "http://arxiv.org/abs/2112.03227v4",
+      "source": "arXiv",
+      "category": "cs.RO"
+    },
+    {
+      "id": "2210.04802v2",
+      "title": "SimSCOOD: Systematic Analysis of Out-of-Distribution Generalization in Fine-tuned Source Code Models",
+      "abstract": "Large code datasets have become increasingly accessible for pre-training source code models. However, for the fine-tuning phase, obtaining representative training data that fully covers the code distribution for specific downstream tasks remains challenging due to the task-specific nature and limited labeling resources. Moreover, fine-tuning pretrained models can result in forgetting previously acquired pre-training knowledge. These lead to out-of-distribution (OOD) generalization issues with unexpected model inference behaviors that have not been systematically studied yet. In this paper, we ",
+      "authors": [
+        "Hossein Hajipour",
+        "Ning Yu",
+        "Cristian-Alexandru Staicu",
+        "Mario Fritz"
+      ],
+      "published": "2022-10-10",
+      "url": "http://arxiv.org/abs/2210.04802v2",
+      "source": "arXiv",
+      "category": "cs.SE"
+    },
+    {
+      "id": "2303.16133v2",
+      "title": "Exposing and Addressing Cross-Task Inconsistency in Unified Vision-Language Models",
+      "abstract": "As general purpose vision models get increasingly effective at a wide set of tasks, it is imperative that they be consistent across the tasks they support. Inconsistent AI models are considered brittle and untrustworthy by human users and are more challenging to incorporate into larger systems that take dependencies on their outputs. Measuring consistency between very heterogeneous tasks that might include outputs in different modalities is challenging since it is difficult to determine if the predictions are consistent with one another. As a solution, we introduce a benchmark dataset, CocoCon",
+      "authors": [
+        "Adyasha Maharana",
+        "Amita Kamath",
+        "Christopher Clark",
+        "Mohit Bansal",
+        "Aniruddha Kembhavi"
+      ],
+      "published": "2023-03-28",
+      "url": "http://arxiv.org/abs/2303.16133v2",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2303.16406v1",
+      "title": "Hierarchical Video-Moment Retrieval and Step-Captioning",
+      "abstract": "There is growing interest in searching for information from large video corpora. Prior works have studied relevant tasks, such as text-based video retrieval, moment retrieval, video summarization, and video captioning in isolation, without an end-to-end setup that can jointly search from video corpora and generate summaries. Such an end-to-end setup would allow for many interesting applications, e.g., a text-based search that finds a relevant video from a video corpus, extracts the most relevant moment from that video, and segments the moment into important steps with captions. To address this",
+      "authors": [
+        "Abhay Zala",
+        "Jaemin Cho",
+        "Satwik Kottur",
+        "Xilun Chen",
+        "Barlas Oğuz"
+      ],
+      "published": "2023-03-29",
+      "url": "http://arxiv.org/abs/2303.16406v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "2212.06817v2",
+      "title": "RT-1: Robotics Transformer for Real-World Control at Scale",
+      "abstract": "By transferring knowledge from large, diverse, task-agnostic datasets, modern machine learning models can solve specific downstream tasks either zero-shot or with small task-specific datasets to a high level of performance. While this capability has been demonstrated in other fields such as computer vision, natural language processing or speech recognition, it remains to be shown in robotics, where the generalization capabilities of the models are particularly critical due to the difficulty of collecting real-world robotic data. We argue that one of the keys to the success of such general robo",
+      "authors": [
+        "Anthony Brohan",
+        "Noah Brown",
+        "Justice Carbajal",
+        "Yevgen Chebotar",
+        "Joseph Dabis"
+      ],
+      "published": "2022-12-13",
+      "url": "http://arxiv.org/abs/2212.06817v2",
+      "source": "arXiv",
+      "category": "cs.RO"
+    },
+    {
+      "id": "2303.07522v2",
+      "title": "Audio Visual Language Maps for Robot Navigation",
+      "abstract": "While interacting in the world is a multi-sensory experience, many robots continue to predominantly rely on visual perception to map and navigate in their environments. In this work, we propose Audio-Visual-Language Maps (AVLMaps), a unified 3D spatial map representation for storing cross-modal information from audio, visual, and language cues. AVLMaps integrate the open-vocabulary capabilities of multimodal foundation models pre-trained on Internet-scale data by fusing their features into a centralized 3D voxel grid. In the context of navigation, we show that AVLMaps enable robot systems to i",
+      "authors": [
+        "Chenguang Huang",
+        "Oier Mees",
+        "Andy Zeng",
+        "Wolfram Burgard"
+      ],
+      "published": "2023-03-13",
+      "url": "http://arxiv.org/abs/2303.07522v2",
+      "source": "arXiv",
+      "category": "cs.RO"
+    },
+    {
+      "id": "2309.00615v1",
+      "title": "Point-Bind & Point-LLM: Aligning Point Cloud with Multi-modality for 3D Understanding, Generation, and Instruction Following",
+      "abstract": "We introduce Point-Bind, a 3D multi-modality model aligning point clouds with 2D image, language, audio, and video. Guided by ImageBind, we construct a joint embedding space between 3D and multi-modalities, enabling many promising applications, e.g., any-to-3D generation, 3D embedding arithmetic, and 3D open-world understanding. On top of this, we further present Point-LLM, the first 3D large language model (LLM) following 3D multi-modal instructions. By parameter-efficient fine-tuning techniques, Point-LLM injects the semantics of Point-Bind into pre-trained LLMs, e.g., LLaMA, which requires ",
+      "authors": [
+        "Ziyu Guo",
+        "Renrui Zhang",
+        "Xiangyang Zhu",
+        "Yiwen Tang",
+        "Xianzheng Ma"
+      ],
+      "published": "2023-09-01",
+      "url": "http://arxiv.org/abs/2309.00615v1",
+      "source": "arXiv",
+      "category": "cs.CV"
+    },
+    {
+      "id": "W4390529182",
+      "title": "Beyond Efficiency: A Systematic Survey of Resource-Efficient Large Language Models",
+      "abstract": "",
+      "authors": [
+        "Guangji Bai",
+        "Zheng Chai",
+        "Ling Chen",
+        "Shiyu Wang",
+        "Jiaying Lu"
+      ],
+      "published": "2026-09-15",
+      "url": "https://doi.org/10.1145/3845797",
+      "source": "OpenAlex",
+      "cited_by": 38
+    },
+    {
+      "id": "W2906409796",
+      "title": "Flatline constructs : Gothic materialism and cybernetic theory-fiction",
+      "abstract": "",
+      "authors": [
+        "Mark Fisher"
+      ],
+      "published": "2026-09-14",
+      "url": "https://doi.org/10.82444/warw.33768781",
+      "source": "OpenAlex",
+      "cited_by": 33
+    },
+    {
+      "id": "W4231219438",
+      "title": "Transactions on Machine Learning and Artificial Intelligence",
+      "abstract": "",
+      "authors": [],
+      "published": "2026-10-04",
+      "url": "https://doi.org/10.14738/tmlai",
+      "source": "OpenAlex",
+      "cited_by": 29
+    },
+    {
+      "id": "W7221037795",
+      "title": "Tangermeme: a toolkit for understanding cis-regulatory logic using deep learning models",
+      "abstract": "",
+      "authors": [
+        "Jacob Matthew Schreiber"
+      ],
+      "published": "2026-10-08",
+      "url": "https://doi.org/10.1038/s41592-026-03254-z",
+      "source": "OpenAlex",
+      "cited_by": 15
+    },
+    {
+      "id": "W7213552506",
+      "title": "Immune signatures of common exposures through co-occurrence of T-cell receptors in tens of thousands of donors",
+      "abstract": "",
+      "authors": [
+        "Damon May",
+        "Steven Woodhouse",
+        "Matthew T. Noakes",
+        "KATHRYN DOROSCHAK",
+        "Rebecca Elyanow"
+      ],
+      "published": "2026-09-18",
+      "url": "https://doi.org/10.3389/fimmu.2026.1944643",
+      "source": "OpenAlex",
+      "cited_by": 15
+    },
+    {
+      "id": "W4239701864",
+      "title": "Interaction Studies. Social Behaviour and Communication in Biological and Artificial Systems",
+      "abstract": "",
+      "authors": [],
+      "published": "2026-09-15",
+      "url": "https://doi.org/10.1075/is",
+      "source": "OpenAlex",
+      "cited_by": 15
+    },
+    {
+      "id": "W2896065471",
+      "title": "Faster Hamiltonian Monte Carlo by learning leapfrog scale: an offline randomized solution",
+      "abstract": "",
+      "authors": [
+        "Changye Wu",
+        "Pierre Pudlo",
+        "Christian P. Robert",
+        "Julien Stoehr"
+      ],
+      "published": "2026-09-23",
+      "url": "https://doi.org/10.1007/s11222-026-10972-z",
+      "source": "OpenAlex",
+      "cited_by": 13
+    },
+    {
+      "id": "W3012223884",
+      "title": "Picturing the West India regiments: race, empire, and photography c.1850-1914",
+      "abstract": "",
+      "authors": [
+        "Melissa Bennett"
+      ],
+      "published": "2026-09-15",
+      "url": "https://doi.org/10.82444/warw.33802132",
+      "source": "OpenAlex",
+      "cited_by": 12
+    },
+    {
+      "id": "W4412042650",
+      "title": "Inferring the Landscapes of Mutation and Recombination in the Common Marmoset ( Callithrix jacchus ) in the Presence of Twinning and Hematopoietic Chimerism",
+      "abstract": "",
+      "authors": [
+        "Vivak Soni",
+        "Cyril J. Versoza",
+        "Jeffrey D. Jensen",
+        "Susanne P. Pfeifer"
+      ],
+      "published": "2026-10-01",
+      "url": "https://doi.org/10.1002/ajp.70208",
+      "source": "OpenAlex",
+      "cited_by": 11
+    },
+    {
+      "id": "W7221000185",
+      "title": "Validation and analysis of 12,000 AI-driven CAR-T designs in the Bits to Binders competition",
+      "abstract": "",
+      "authors": [
+        "Clayton W. Kosonocky",
+        "Alex M. Abel",
+        "Aaron L. Feller",
+        "Amanda Cifuentes Rieffer",
+        "Phillip R. Woolley"
+      ],
+      "published": "2026-10-08",
+      "url": "https://doi.org/10.1038/s44320-026-00246-1",
+      "source": "OpenAlex",
+      "cited_by": 10
+    },
+    {
+      "id": "W2157546348",
+      "title": "Style analysis for source code plagiarism detection",
+      "abstract": "",
+      "authors": [
+        "Olfat M. Mirza"
+      ],
+      "published": "2026-09-15",
+      "url": "https://doi.org/10.82444/warw.33800911",
+      "source": "OpenAlex",
+      "cited_by": 10
+    },
+    {
+      "id": "W160784936",
+      "title": "Seer: Maximum Likelihood Regression for Learning-Speed Curves",
+      "abstract": "",
+      "authors": [
+        "Carl Myers Kadie"
+      ],
+      "published": "2026-10-02",
+      "url": "https://doi.org/10.48550/arxiv.2610.02610",
+      "source": "OpenAlex",
+      "cited_by": 9
+    },
+    {
+      "id": "W4386114105",
+      "title": "Quantum-inspired machine learning: a survey",
+      "abstract": "",
+      "authors": [
+        "Larry Huynh",
+        "Jin B. Hong",
+        "Ajmal Saeed Mian",
+        "Hajime Suzuki",
+        "Harish J. Vallury"
+      ],
+      "published": "2026-09-23",
+      "url": "https://doi.org/10.1016/j.cosrev.2026.101072",
+      "source": "OpenAlex",
+      "cited_by": 9
+    },
+    {
+      "id": "W4403048355",
+      "title": "What is the Role of Small Models in the LLM Era: A Survey",
+      "abstract": "",
+      "authors": [
+        "Lihu Chen",
+        "Gaël Varoquaux"
+      ],
+      "published": "2026-09-18",
+      "url": "https://doi.org/10.1162/coli.a.652",
+      "source": "OpenAlex",
+      "cited_by": 9
+    },
+    {
+      "id": "W4392539763",
+      "title": "Training Machine Learning Models at the Edge: A Survey",
+      "abstract": "",
+      "authors": [
+        "Aymen Rayane Khouas",
+        "Mohamed Reda Bouadjenek",
+        "Hakim Hacid",
+        "Sunil Aryal"
+      ],
+      "published": "2026-09-17",
+      "url": "https://doi.org/10.1145/3848509",
+      "source": "OpenAlex",
+      "cited_by": 9
+    }
+  ]
+}

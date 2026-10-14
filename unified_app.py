@@ -233,7 +233,7 @@ from studybuddy.career_assessment import (score_assessment, rule_based_why,
                                validate_assessment_inputs, public_questions,
                                QUESTIONS, TOP_N_CLUSTERS)
 from studybuddy.salary_data import (get_options as salary_options, query as salary_query,
-                          SalaryDataError)
+                          get_freshness as salary_freshness, SalaryDataError)
 from studybuddy.opportunities import (list_opportunities, get_meta as opp_meta,
                            opp_exists, TYPES as OPP_TYPES, OpportunityDataError)
 from studybuddy.portfolio import validate_portfolio_payload, unique_slug
@@ -265,6 +265,7 @@ from studybuddy.skill_quizzes import (quiz_skills, skill_topics, public_question
                            validate_start_payload, best_scores as quiz_best_scores,
                            get_question as get_quiz_question)
 from studybuddy.cert_guide import (all_certs, get_cert, domains as cert_domains,
+                        get_freshness as cert_freshness,
                         filter_certs, recommend as recommend_certs,
                         build_study_plan, validate_recommend_payload,
                         validate_plan_payload)
@@ -4379,6 +4380,7 @@ def register_routes(app):
         return render_template('certs.html',
                                domains=cert_domains(),
                                roles=roadmap_roles(),
+                               freshness=cert_freshness(),
                                is_authed=current_user.is_authenticated)
 
     @app.route('/learn/certs/browse')
@@ -4571,6 +4573,7 @@ def register_routes(app):
             return render_template('error.html',
                                    message="Salary data is temporarily unavailable. Please try again later."), 503
         return render_template('salary.html', options=options,
+                               freshness=salary_freshness(),
                                is_authed=current_user.is_authenticated)
 
     @app.route('/salary/data')
@@ -5162,6 +5165,16 @@ def register_routes(app):
     def cite_page():
         """Citation formatter page (public utility)."""
         return render_template('study_cite.html')
+
+    # ================= Live Data Engine: trending research =================
+    @app.route('/research/trending')
+    def trending_page():
+        """Live trending papers from arXiv + OpenAlex (public)."""
+        from studybuddy import trending as trending_mod
+        papers = trending_mod.get_trending(40)
+        freshness = trending_mod.get_freshness()
+        return render_template('study_trending.html', papers=papers,
+                               freshness=freshness)
 
     # ================= Wave 4 #22: literature reviews =================
     def _review_paper_metas(user_id, docs):

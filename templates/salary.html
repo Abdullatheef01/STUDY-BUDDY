@@ -66,6 +66,7 @@
         <div class="sal-head b-reveal">
             <h1>India <span class="b-grad">Salary Explorer</span></h1>
             <p>What do roles like yours pay across Indian cities? Explore indicative salary ranges by role, city tier and experience.</p>
+            {% if freshness %}<span class="b-pill b-pill--sm" title="{{ freshness.label }}"><span class="b-pulse"></span>{{ freshness.label }}</span>{% endif %}
         </div>
 
         <div class="sal-filters b-card b-reveal">

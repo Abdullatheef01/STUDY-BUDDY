@@ -89,3 +89,16 @@ def lookup(role, tier, band):
     """Return the single entry for an exact role/tier/band, or None."""
     rows = query(role=role, tier=tier, band=band)
     return rows[0] if rows else None
+
+
+# ---- Live Data Engine: freshness ----
+SALARY_STALE_AFTER_DAYS = 90  # curated indicative ranges; review quarterly
+
+def get_freshness():
+    """Freshness badge info for the salary explorer."""
+    from studybuddy.live_data import freshness_badge
+    try:
+        meta = load_dataset().get("meta", {})
+    except SalaryDataError:
+        meta = {}
+    return freshness_badge(meta, SALARY_STALE_AFTER_DAYS)

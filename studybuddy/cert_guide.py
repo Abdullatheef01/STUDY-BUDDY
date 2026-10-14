@@ -284,3 +284,18 @@ def validate_plan_payload(payload):
     except (TypeError, ValueError):
         return None, "weeks must be a number."
     return {"cert_id": cert_id, "weeks": max(2, min(weeks, 24))}, None
+
+
+# ---- Live Data Engine: freshness ----
+CERT_STALE_AFTER_DAYS = 60  # exam fees/syllabi change; review bi-monthly
+
+def get_freshness():
+    """Freshness badge info for the certification hub."""
+    import json as _json
+    from studybuddy.live_data import freshness_badge, data_path
+    try:
+        with open(data_path("certifications.meta.json"), encoding="utf-8") as f:
+            meta = _json.load(f)
+    except Exception:
+        meta = {}
+    return freshness_badge(meta, CERT_STALE_AFTER_DAYS)

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% set nav_active = 'research' %}
+{% block theme %}research{% endblock %}
+{% block title %}Trending Research | STUDY-BUDDY{% endblock %}
+
+{% block content %}
+<section style="padding-top:2.6rem;">
+    <div class="b-sec-head b-reveal">
+        <span class="b-pill"><span class="b-pulse"></span>Live &mdash; {{ freshness.label }}</span>
+        <h1>Trending <span class="b-grad">research</span></h1>
+        <p class="b-lede">The freshest AI/ML papers from arXiv and the most-cited recent works from OpenAlex — refreshed daily, automatically.</p>
+    </div>
+
+    {% if freshness.stale %}
+    <div class="b-card b-reveal" style="border-color:var(--b-warn);margin-bottom:1.2rem;">
+        <p style="margin:0;">Heads up: this feed hasn't refreshed recently. Showing the last cached snapshot.</p>
+    </div>
+    {% endif %}
+
+    <div class="b-bento">
+        {% for p in papers %}
+        <article class="b-card b-reveal" aria-label="{{ p.title }}">
+            <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem;">
+                <span class="b-pill b-pill--sm">{{ p.source }}</span>
+                {% if p.category %}<span class="b-pill b-pill--sm b-pill--ghost">{{ p.category }}</span>{% endif %}
+                {% if p.published %}<span style="color:var(--b-muted);font-size:.8rem;">{{ p.published }}</span>{% endif %}
+                {% if p.cited_by %}<span style="color:var(--b-muted);font-size:.8rem;">{{ p.cited_by }} citations</span>{% endif %}
+            </div>
+            <h3 style="margin:.2rem 0 .5rem;font-size:1.02rem;line-height:1.35;">{{ p.title }}</h3>
+            {% if p.authors %}
+            <p style="color:var(--b-muted);font-size:.85rem;margin:.2rem 0 .5rem;">{{ p.authors|join(', ') }}</p>
+            {% endif %}
+            {% if p.abstract %}
+            <p style="font-size:.9rem;color:var(--b-muted);margin:.2rem 0 .8rem;">{{ p.abstract[:280] }}{% if p.abstract|length > 280 %}&hellip;{% endif %}</p>
+            {% endif %}
+            <a class="b-btn b-btn--sm b-btn--ghost" href="{{ p.url }}" target="_blank" rel="noopener">Read paper</a>
+        </article>
+        {% else %}
+        <div class="b-card b-reveal">
+            <p style="margin:0;">No trending papers right now — the feed refreshes automatically. Check back soon.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <p style="color:var(--b-muted);font-size:.8rem;margin-top:1.5rem;">Sources: arXiv (export.arxiv.org) &middot; OpenAlex (api.openalex.org) &middot; {{ freshness.label }}</p>
+</section>
+{% endblock %}
