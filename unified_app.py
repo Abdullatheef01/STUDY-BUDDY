@@ -279,6 +279,13 @@ from arxiv_import import (validate_arxiv_id, validate_doi,
 from citation_fmt import (format_citation, format_bibliography,
                           to_bibtex, from_bibtex, style_guide,
                           STYLES as CITATION_STYLES)
+from lit_review import (generate_review as lr_generate_review,
+                        review_to_markdown as lr_to_markdown,
+                        review_to_html as lr_to_html)
+from gap_finder import generate_gap_report as gf_generate_report
+from flashcards import (generate_deck as fc_generate_deck,
+                        grade_mcq as fc_grade_mcq,
+                        mastery_stats as fc_mastery_stats)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -4179,13 +4186,130 @@ def register_routes(app):
         """Citation formatter page (public utility)."""
         return render_template('study_cite.html')
 
-    # --- Wave 4 batch-2 stubs (real implementations land in #22/#23/#26) ---
+    # ================= Wave 4 #22: literature reviews =================
+    def _review_paper_metas(user_id, docs):
+        """Best-effort PaperImport metadata per doc (for BibTeX enrichment)."""
+        metas = {}
+        try:
+            imports = PaperImport.query.filter_by(user_id=user_id).all()
+        except Exception:
+            return metas
+        for d in docs:
+            ref = (d.source_ref or '').strip().lower()
+            if not ref:
+                continue
+            for pi in imports:
+                if (pi.arxiv_id or '').strip().lower() == ref or \
+                   (pi.doi or '').strip().lower() == ref:
+                    metas[d.id] = {'title': pi.title, 'authors': pi.authors or [],
+                                   'year': pi.year, 'venue': pi.venue, 'doi': pi.doi}
+                    break
+        return metas
+
     @app.route('/research/review')
     @login_required
     def litreview_home():
-        """Literature review generator (stub until feature #22 lands)."""
-        return render_template('study_stub.html', title='Literature Reviews',
-                               blurb='Turn two or more papers into a structured, fully-cited literature review. This section is being built right now — check back soon.')
+        """Literature review generator page."""
+        docs = StudyDoc.query.filter_by(user_id=current_user.id).order_by(
+            StudyDoc.created_at.desc()).all()
+        reviews = LitReview.query.filter_by(user_id=current_user.id).order_by(
+            LitReview.created_at.desc()).all()
+        return render_template('litreview_home.html',
+                               documents=[{'id': d.id, 'title': d.title,
+                                           'chunks': d.num_chunks} for d in docs],
+                               reviews=[{'id': r.id, 'title': r.title,
+                                         'docs': len(r.doc_ids or []),
+                                         'created': r.created_at.strftime('%Y-%m-%d')}
+                                        for r in reviews])
+
+    @app.route('/research/api/review/generate', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def litreview_generate():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Generate a cited literature review over 2+ library documents.
+
+        JSON body: {"doc_ids": [int], "title": str}.
+        CSRF via X-CSRFToken header (not exempt)."""
+        payload = request.get_json(silent=True) or {}
+        raw_ids = payload.get('doc_ids') or []
+        title = (payload.get('title') or '').strip()[:120]
+        if not isinstance(raw_ids, list) or len(raw_ids) < 2:
+            return jsonify({'error': 'Select at least 2 documents.'}), 400
+        try:
+            doc_ids = [int(d) for d in raw_ids[:10]]
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid document selection.'}), 400
+        try:
+            docs = StudyDoc.query.filter(
+                StudyDoc.id.in_(doc_ids),
+                StudyDoc.user_id == current_user.id).all()
+            if len(docs) < 2:
+                return jsonify({'error': 'Select at least 2 of your documents.'}), 400
+
+            def _polish(text):
+                return call_gemini_ai(
+                    "Polish this academic synthesis paragraph for clarity and flow. "
+                    "Do not add new claims or citations; keep every [Title, p.X] "
+                    "marker exactly as-is:\n\n" + text)
+
+            review = lr_generate_review(
+                docs, paper_metas=_review_paper_metas(current_user.id, docs),
+                gemini_polish=_polish)
+            if not isinstance(review, dict) or review.get('error'):
+                return jsonify({'error': (review or {}).get('error')
+                                or 'Could not build a review from these documents.'}), 400
+            lr = LitReview(user_id=current_user.id,
+                           title=title or 'Literature review',
+                           doc_ids=[d.id for d in docs], data=review)
+            db.session.add(lr)
+            db.session.commit()
+        except Exception:
+            log.exception("Review generation failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not generate the review. Please try again.'}), 500
+        return jsonify({'success': True, 'id': lr.id})
+
+    @app.route('/research/review/<int:rid>')
+    @login_required
+    def litreview_view(rid):
+        """View a saved literature review."""
+        lr = LitReview.query.filter_by(id=rid, user_id=current_user.id).first_or_404()
+        return render_template('litreview_view.html', review=lr)
+
+    @app.route('/research/review/<int:rid>/export')
+    @login_required
+    def litreview_export(rid):
+        """Download a review as markdown or HTML."""
+        lr = LitReview.query.filter_by(id=rid, user_id=current_user.id).first_or_404()
+        fmt = (request.args.get('format') or 'md').lower()
+        data = lr.data or {}
+        if fmt == 'html':
+            content, mimetype, ext = lr_to_html(data), 'text/html', 'html'
+        else:
+            content, mimetype, ext = lr_to_markdown(data), 'text/markdown', 'md'
+        safe = re.sub(r'[^a-zA-Z0-9_-]+', '-', (lr.title or 'review')).strip('-') or 'review'
+        return Response(content, mimetype=mimetype,
+                        headers={'Content-Disposition':
+                                 'attachment; filename=%s.%s' % (safe, ext)})
+
+    @app.route('/research/api/review/<int:rid>', methods=['DELETE'])
+    @limiter.limit("30 per hour")
+    def litreview_delete(rid):
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Delete a saved literature review. CSRF via X-CSRFToken header."""
+        try:
+            lr = LitReview.query.filter_by(id=rid, user_id=current_user.id).first()
+            if not lr:
+                return jsonify({'error': 'Review not found.'}), 404
+            db.session.delete(lr)
+            db.session.commit()
+        except Exception:
+            log.exception("Review delete failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not delete the review.'}), 500
+        return jsonify({'success': True})
 
     @app.route('/research/gaps')
     @login_required

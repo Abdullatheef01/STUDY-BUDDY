@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block theme %}research{% endblock %}
+{% set nav_active = 'research' %}
+{% block title %}{{ review.title }} — Literature Review | AI Career &amp; Research Assistant{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Literature review</span>
+            <h1>{{ review.title }}</h1>
+            <p class="b-lede">{{ (review.doc_ids or [])|length }} papers &middot; generated {{ review.created_at.strftime('%Y-%m-%d') }}</p>
+            <div class="b-cta-row">
+                <a class="b-btn b-btn--primary b-magnet" href="{{ url_for('litreview_export', rid=review.id, format='md') }}">Download Markdown</a>
+                <a class="b-btn b-btn--ghost b-magnet" href="{{ url_for('litreview_export', rid=review.id, format='html') }}">Download HTML</a>
+                <a class="b-btn b-btn--ghost" href="{{ url_for('litreview_home') }}">All reviews</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% set data = review.data or {} %}
+<section class="b-section" aria-label="Per-paper summaries">
+    <div class="b-sec-head"><h2>Per-paper <span class="b-grad">summaries</span></h2></div>
+    <div class="b-bento">
+        {% for p in data.get('per_paper', []) %}
+        <article class="b-card b-card--feature b-span-2 b-reveal">
+            <span class="b-tag">Paper {{ loop.index }}</span>
+            <h3 style="margin:0;">{{ p.title }}</h3>
+            <p style="white-space:pre-line;">{{ p.summary }}</p>
+            {% if p.citations %}
+            <details><summary style="cursor:pointer;color:var(--b-a3);">Cited passages ({{ p.citations|length }})</summary>
+                <ul style="color:var(--b-muted);font-size:.85rem;">
+                    {% for c in p.citations %}<li>[{{ c.doc }}, p.{{ c.page }}] — {{ c.excerpt }}</li>{% endfor %}
+                </ul>
+            </details>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="b-section" aria-label="Themes">
+    <div class="b-sec-head"><h2>Theme <span class="b-grad">clusters</span></h2><p>Topics that span your papers.</p></div>
+    <div class="b-bento">
+        {% for t in data.get('themes', []) %}
+        <article class="b-card b-card--feature b-span-2 b-reveal">
+            <span class="b-tag">{{ (t.papers or [])|length }} papers</span>
+            <h3 style="margin:0;text-transform:capitalize;">{{ t.name }}</h3>
+            <p style="white-space:pre-line;">{{ t.synthesis }}</p>
+            {% if t.citations %}
+            <details><summary style="cursor:pointer;color:var(--b-a3);">Cited passages ({{ t.citations|length }})</summary>
+                <ul style="color:var(--b-muted);font-size:.85rem;">
+                    {% for c in t.citations %}<li>[{{ c.doc }}, p.{{ c.page }}] — {{ c.excerpt }}</li>{% endfor %}
+                </ul>
+            </details>
+            {% endif %}
+        </article>
+        {% else %}
+        <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">No cross-paper themes detected.</p></div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="b-section" aria-label="Claims table">
+    <div class="b-sec-head"><h2>Claims <span class="b-grad">table</span></h2><p>Key findings and which papers support them.</p></div>
+    <div class="b-card b-reveal" style="overflow:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
+            <thead><tr style="text-align:left;color:var(--b-muted);">
+                <th style="padding:.6rem;border-bottom:1px solid var(--b-border);">Claim</th>
+                <th style="padding:.6rem;border-bottom:1px solid var(--b-border);">Papers</th>
+                <th style="padding:.6rem;border-bottom:1px solid var(--b-border);">Citations</th>
+            </tr></thead>
+            <tbody>
+                {% for row in data.get('claims_table', []) %}
+                <tr>
+                    <td style="padding:.6rem;border-bottom:1px solid var(--b-border);">{{ row.claim }}</td>
+                    <td style="padding:.6rem;border-bottom:1px solid var(--b-border);">{{ (row.papers or [])|join(', ') }}</td>
+                    <td style="padding:.6rem;border-bottom:1px solid var(--b-border);color:var(--b-muted);font-size:.82rem;">
+                        {% for c in row.citations or [] %}[{{ c.doc }}, p.{{ c.page }}]{% if not loop.last %} {% endif %}{% endfor %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" style="padding:.6rem;color:var(--b-muted);">No claims extracted.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if data.get('coverage_gaps') %}
+<section class="b-section" aria-label="Coverage gaps">
+    <div class="b-card b-reveal">
+        <div class="b-sec-head" style="margin-top:0;"><h2>Coverage <span class="b-grad">gaps</span></h2></div>
+        <p style="white-space:pre-line;margin:0;">{{ data.coverage_gaps }}</p>
+    </div>
+</section>
+{% endif %}
+
+{% if data.get('bibtex') %}
+<section class="b-section" aria-label="BibTeX">
+    <div class="b-card b-reveal">
+        <div class="b-sec-head" style="margin-top:0;"><h2>Cite <span class="b-grad">this review</span></h2><p>BibTeX for the included papers.</p></div>
+        <pre style="white-space:pre-wrap;font-size:.8rem;color:var(--b-muted);background:rgba(255,255,255,.03);padding:1rem;border-radius:12px;overflow:auto;">{{ data.bibtex }}</pre>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block theme %}research{% endblock %}
+{% set nav_active = 'research' %}
+{% block title %}Literature Reviews | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Study Lab</span>
+            <h1>Multi-paper <span class="b-grad">literature reviews</span>, fully cited.</h1>
+            <p class="b-lede">Select two or more papers from your library and get a structured review: per-paper summaries, theme clusters across papers, a claims table, synthesis paragraphs — every statement backed by a cited passage. Nothing is invented.</p>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Generate a review">
+    <div class="b-card b-card--form b-reveal">
+        <div class="b-sec-head" style="margin-top:0;">
+            <h2>Generate a <span class="b-grad">review</span></h2>
+            <p>Pick 2–10 documents. Reviews are extractive and citation-locked.</p>
+        </div>
+        <div class="b-field">
+            <label class="b-label" for="lr-title">Review title</label>
+            <input class="b-input" id="lr-title" type="text" maxlength="120" placeholder="e.g. Dropout regularization — a short survey">
+        </div>
+        <div class="b-field">
+            <span class="b-label">Documents</span>
+            <div id="lr-docs" style="display:grid;gap:.5rem;max-height:280px;overflow:auto;">
+                {% for d in documents %}
+                <label class="b-card b-card--lite" style="display:flex;gap:.6rem;align-items:center;cursor:pointer;margin:0;">
+                    <input type="checkbox" class="b-check lr-doc" value="{{ d.id }}">
+                    <span><strong>{{ d.title }}</strong><br><span style="color:var(--b-muted);font-size:.82rem;">{{ d.chunks }} passages</span></span>
+                </label>
+                {% else %}
+                <p style="color:var(--b-muted);">Your library is empty — <a href="{{ url_for('study_library') }}">upload a PDF</a> first.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="b-cta-row">
+            <button class="b-btn b-btn--primary" id="lr-generate" type="button">Generate review</button>
+            <span class="b-pill" id="lr-status" style="display:none;"></span>
+        </div>
+        <p class="b-form-error" id="lr-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Saved reviews">
+    <div class="b-sec-head">
+        <h2>Saved <span class="b-grad">reviews</span></h2>
+        <p>{{ reviews|length }} review{{ '' if reviews|length == 1 else 's' }}</p>
+    </div>
+    <div class="b-bento" id="lr-list">
+        {% for r in reviews %}
+        <article class="b-card b-card--feature b-reveal">
+            <span class="b-tag">{{ r.docs }} papers</span>
+            <h3 style="margin:0;">{{ r.title }}</h3>
+            <p style="color:var(--b-muted);font-size:.85rem;margin:0;">{{ r.created }}</p>
+            <div class="b-cta-row" style="margin-top:auto;">
+                <a class="b-btn b-btn--primary b-btn--sm" href="{{ url_for('litreview_view', rid=r.id) }}">Open</a>
+                <button class="b-btn b-btn--danger b-btn--sm lr-delete" type="button" data-id="{{ r.id }}">Delete</button>
+            </div>
+        </article>
+        {% else %}
+        <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">No reviews yet — generate your first one above.</p></div>
+        {% endfor %}
+    </div>
+</section>
+<script src="{{ url_for('static', filename='js/litreview.js') }}"></script>
+{% endblock %}
