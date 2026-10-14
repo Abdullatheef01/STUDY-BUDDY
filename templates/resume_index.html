@@ -218,6 +218,39 @@
         </div>
     </section>
 
+    <!-- LinkedIn Profile Grader (Wave 1, feature #5) -->
+    <section class="jd-section" id="linkedin-grader">
+        <div class="jd-card">
+            <h2>LinkedIn Profile <span class="gradient-text">Grader</span></h2>
+            <p>Paste your LinkedIn profile sections as plain text (we never scrape LinkedIn) and get a transparent 0&ndash;100 grade: headline strength, About quality, experience quantification, skills relevance, and completeness &mdash; plus prioritized fixes. Reports are saved to your dashboard.</p>
+            {% if current_user.is_authenticated %}
+            <form id="linkedinForm" novalidate>
+                <label class="jd-label" for="liHeadline">Headline</label>
+                <input class="jd-textarea" style="min-height:0;" id="liHeadline" name="headline" maxlength="10000"
+                    placeholder="e.g. CS Undergrad @ GEHU | Python & ML | Built 5+ projects">
+                <label class="jd-label" for="liAbout">About</label>
+                <textarea class="jd-textarea" id="liAbout" name="about" maxlength="10000" rows="5"
+                    placeholder="Paste your About section…"></textarea>
+                <label class="jd-label" for="liExperience">Experience</label>
+                <textarea class="jd-textarea" id="liExperience" name="experience" maxlength="10000" rows="5"
+                    placeholder="Paste your experience entries (roles, internships, projects)…"></textarea>
+                <label class="jd-label" for="liSkills">Skills</label>
+                <textarea class="jd-textarea" id="liSkills" name="skills" maxlength="10000" rows="3"
+                    placeholder="Comma-separated skills, e.g. Python, Flask, SQL, Data Analysis…"></textarea>
+                <div class="jd-error" id="liError" hidden></div>
+                <button type="submit" class="jd-submit" id="liBtn"><span>Grade My Profile</span></button>
+                <p class="jd-saved-link" id="liSavedLink" hidden>Report saved &mdash; <a href="#">view it anytime</a></p>
+            </form>
+            <div id="liResult" aria-live="polite"></div>
+            {% else %}
+            <div class="jd-login-cta">
+                <p>Log in to grade your LinkedIn profile. Your grading reports are saved to your dashboard.</p>
+                <a href="{{ url_for('login', next=url_for('resume_home')) }}">Log in to start grading</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
@@ -296,5 +329,6 @@
     <script src="{{ url_for('static', filename='js/bullet_rewriter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/resume_versions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cover_generator.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/linkedin_grader.js') }}"></script>
 </body>
 </html>

@@ -120,6 +120,25 @@
 </div>
 
 <div class="section">
+    <h2>&#128188; LinkedIn Grading Reports</h2>
+    {% if linkedin_reports %}
+    <div class="card-grid">
+        {% for r in linkedin_reports %}
+        <a class="hist-card" href="{{ url_for('view_linkedin_report', report_id=r.id) }}">
+            <div class="fname">&#128188; LinkedIn profile grade</div>
+            <div class="meta">{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+            <span class="score-pill">Grade {{ r.score if r.score is not none else '—' }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        No LinkedIn grading reports yet. <a href="{{ url_for('resume_home') }}#linkedin-grader">Grade your LinkedIn profile</a> and it will appear here.
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
     <h2>&#9998;&#65039; Bullet Rewrites</h2>
     {% if rewrites %}
     <div class="card-grid">

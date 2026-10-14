@@ -226,6 +226,8 @@ from jd_matcher import (score_jd_match, generate_rule_based_suggestions,
 from bullet_rewriter import (improve_bullet, BULLET_MIN_CHARS, BULLET_MAX_CHARS)
 from cover_generator import (rule_based_cover_letter, rule_based_outreach,
                              validate_cover_inputs, TONES)
+from linkedin_grader import (grade_linkedin_profile, generate_rule_based_summary,
+                             validate_linkedin_inputs)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -340,6 +342,18 @@ class CoverDoc(db.Model):
 
     user = db.relationship("User", backref=db.backref("cover_docs", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
+
+
+class LinkedInReport(db.Model):
+    """A LinkedIn profile grading report belonging to a user (Wave 1 #5)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    score = db.Column(db.Float)
+    report_json = db.Column(db.JSON)  # full grading report payload
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("linkedin_reports", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
 
 
 class ResearchSession(db.Model):
@@ -749,6 +763,57 @@ def _jd_match_suggestions(report, jd_text):
             log.warning("JD-match suggestions: model returned no usable items")
         except (ValueError, json.JSONDecodeError):
             log.warning("JD-match suggestions: non-JSON model output, retrying")
+    return fallback, False
+
+
+def _linkedin_suggestions(report, fields):
+    """Polished LinkedIn fixes via Gemini, with a rule-based fallback.
+
+    Returns (suggestions, ai_powered). The numeric score never depends on
+    the LLM, so a Gemini outage degrades suggestions only - never the
+    report itself.
+    """
+    fallback = [{"section": s["section"], "fix": s["fix"]}
+                for s in (report.get("suggestions") or [])]
+    weakest = sorted((report.get("breakdown") or {}).items(),
+                     key=lambda kv: kv[1])[:3]
+    prompt = (
+        "You are a LinkedIn profile coach. A profile scored {}/100 with the "
+        "weakest areas: {}. Profile sections (truncated):\n"
+        "HEADLINE: {}\nABOUT: {}\nEXPERIENCE: {}\nSKILLS: {}\n\n"
+        'Return ONLY a JSON object like {{"suggestions": [{{"section": "...", '
+        '"fix": "..."}}]}} with at most 8 concrete, prioritized fixes. Each '
+        "fix must reference the actual profile text above - no generic advice."
+    ).format(
+        report.get("score"),
+        ", ".join("{} ({})".format(k, v) for k, v in weakest) or "none",
+        (fields.get("headline") or "")[:600],
+        (fields.get("about") or "")[:1500],
+        (fields.get("experience") or "")[:2000],
+        (fields.get("skills") or "")[:800],
+    )
+    for _attempt in range(2):
+        try:
+            raw = call_gemini_ai(prompt)
+        except GeminiError as e:
+            log.warning("LinkedIn suggestions: Gemini unavailable: %s", e)
+            return fallback, False
+        try:
+            parsed = _parse_json_safely(raw)
+            items = parsed.get("suggestions") if isinstance(parsed, dict) else None
+            cleaned = []
+            for it in (items or [])[:8]:
+                if not isinstance(it, dict):
+                    continue
+                section = str(it.get("section") or "Profile")[:60]
+                fix = str(it.get("fix") or "").strip()[:600]
+                if fix:
+                    cleaned.append({"section": section, "fix": fix})
+            if cleaned:
+                return cleaned, True
+            log.warning("LinkedIn suggestions: model returned no usable items")
+        except (ValueError, json.JSONDecodeError):
+            log.warning("LinkedIn suggestions: non-JSON model output, retrying")
     return fallback, False
 
 
@@ -1663,6 +1728,64 @@ def register_routes(app):
             'preview': (d.content or '')[:200],
         } for d in docs]})
 
+    # ---------- LINKEDIN PROFILE GRADER (Wave 1 #5) ----------
+    @app.route('/linkedin-grade', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def linkedin_grade():
+        """Grade pasted LinkedIn profile text (TEXT ONLY - we never scrape LinkedIn).
+
+        Login required (reports are persisted per user). Accepts JSON or form
+        data: headline, about, experience, skills. The page sends the CSRF
+        token in the X-CSRFToken header, so this route is NOT CSRF-exempt.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to grade your LinkedIn profile.'}), 401
+
+        if request.is_json:
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = request.form.to_dict()
+        fields, error = validate_linkedin_inputs(payload)
+        if error:
+            return jsonify({'error': error}), 400
+
+        # --- Deterministic server-side grading ---
+        report = grade_linkedin_profile(**fields)
+        suggestions, ai_powered = _linkedin_suggestions(report, fields)
+        report['suggestions'] = suggestions
+        report['ai_powered'] = ai_powered
+        report['summary'] = generate_rule_based_summary(report)
+
+        # --- Persist per user ---
+        try:
+            row = LinkedInReport(
+                user_id=current_user.id,
+                score=report.get('score'),
+                report_json=json_safe(report),
+            )
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("LinkedIn report persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your report. Please try again.'}), 500
+
+        return jsonify({
+            'success': True,
+            'report_id': row.id,
+            'report': json_safe(report),
+            'saved_url': url_for('view_linkedin_report', report_id=row.id),
+        })
+
+    @app.route('/linkedin/<int:report_id>')
+    @login_required
+    def view_linkedin_report(report_id):
+        """Render a saved LinkedIn grading report (owner only)."""
+        row = LinkedInReport.query.filter_by(id=report_id,
+                                             user_id=current_user.id).first_or_404()
+        return render_template('linkedin_report.html', report=row.report_json,
+                               report_id=row.id, created_at=row.created_at)
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -1698,11 +1821,14 @@ def register_routes(app):
         cover_docs = (CoverDoc.query
                       .filter_by(user_id=current_user.id)
                       .order_by(CoverDoc.created_at.desc()).all())
+        linkedin_reports = (LinkedInReport.query
+                            .filter_by(user_id=current_user.id)
+                            .order_by(LinkedInReport.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
                                jd_matches=jd_matches, rewrites=rewrites,
-                               cover_docs=cover_docs)
+                               cover_docs=cover_docs, linkedin_reports=linkedin_reports)
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])
