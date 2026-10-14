@@ -2639,8 +2639,9 @@ def register_routes(app):
         """Handle resume upload and analysis. Works anonymously; when logged in
         the result is also persisted as a ResumeAnalysis row.
 
-        Note: fetch-based upload (resume_script.js); CSRF-exempt like the
-        other JSON APIs. Login/register/goals forms carry CSRF tokens."""
+        Note: fetch-based upload (resume_script.js) sends the session CSRF
+        token in the X-CSRFToken header. Login/register/goals forms carry
+        CSRF tokens in hidden inputs."""
         if 'resume' not in request.files:
             return jsonify({'error': 'No file uploaded'}), 400
 
@@ -2754,8 +2755,6 @@ def register_routes(app):
                 os.remove(filepath)
             except OSError:
                 pass
-
-    csrf.exempt(analyze)
 
     # ---------- JD-MATCHED ATS SCORING (Wave 1 #1) ----------
     @app.route('/jd-match', methods=['POST'])
@@ -6655,8 +6654,6 @@ def register_routes(app):
             log.exception("Research chat failed")
             return jsonify({'error': 'The research assistant hit an unexpected error. Please try again.'}), 500
 
-    csrf.exempt(api_chat_research)
-
     @app.route('/api/constructor_generate', methods=['POST'])
     @limiter.limit("10 per hour")
     def api_constructor_generate():
@@ -6860,8 +6857,6 @@ def register_routes(app):
             log.exception("health_review regenerate failed")
             return jsonify({"error": "Could not regenerate the review. "
                                      "Please try again."}), 500
-
-    csrf.exempt(api_constructor_generate)
 
     # ================= Wave 6 #27: mentor & alumni office hours =================
     # Connect students to lived experience through structured, bounded

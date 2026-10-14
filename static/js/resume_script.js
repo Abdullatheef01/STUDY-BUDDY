@@ -190,9 +190,16 @@ function initUpload() {
             const formData = new FormData();
             formData.append('resume', fileInput.files[0]);
 
+            // CSRF token (P2#11 follow-up: fetch-driven /analyze now sends the
+            // session token via X-CSRFToken instead of being exempt).
+            const headers = {};
+            const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+            if (tokenMeta) headers['X-CSRFToken'] = tokenMeta.getAttribute('content');
+
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
+                    headers: headers,
                     body: formData
                 });
 

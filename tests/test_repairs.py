@@ -286,6 +286,61 @@ def test_csrf_allows_form_with_token(csrf_client):
     assert b"Invalid email or password" in resp.data
 
 
+# ---------- P2#11 follow-up: token-based CSRF on fetch-driven endpoints ----------
+
+def _meta_csrf_token(client, page):
+    """Extract the csrf-token meta tag from a rendered page (same client keeps the session)."""
+    html = client.get(page).data.decode()
+    m = re.search(r'name="csrf-token" content="([^"]+)"', html)
+    assert m, f"{page} must render a csrf-token meta tag for fetch-driven POSTs"
+    return m.group(1)
+
+
+def test_csrf_blocks_analyze_without_token(csrf_client):
+    resp = csrf_client.post("/analyze")
+    assert resp.status_code == 400
+    assert b"Security check failed" in resp.data
+
+
+def test_csrf_allows_analyze_with_token(csrf_client):
+    token = _meta_csrf_token(csrf_client, "/resume")
+    resp = csrf_client.post("/analyze", headers={"X-CSRFToken": token})
+    # CSRF passed: reached app logic, which rejects the missing file.
+    assert resp.status_code == 400
+    assert resp.get_json()["error"] == "No file uploaded"
+
+
+def test_csrf_blocks_chat_research_without_token(csrf_client):
+    resp = csrf_client.post("/api/chat_research", json={"message": "hello"})
+    assert resp.status_code == 400
+    assert resp.get_json()["error"].startswith("Security check failed")
+
+
+def test_csrf_allows_chat_research_with_token(csrf_client):
+    token = _meta_csrf_token(csrf_client, "/research")
+    resp = csrf_client.post("/api/chat_research", json={},
+                            headers={"X-CSRFToken": token})
+    # CSRF passed: reached app logic, which rejects the empty message.
+    assert resp.status_code == 400
+    assert resp.get_json()["error"] == "Please type a question first."
+
+
+def test_csrf_blocks_constructor_without_token(csrf_client):
+    resp = csrf_client.post("/api/constructor_generate",
+                            json={"repo_url": "https://github.com/a/b"})
+    assert resp.status_code == 400
+    assert resp.get_json()["error"].startswith("Security check failed")
+
+
+def test_csrf_allows_constructor_with_token(csrf_client):
+    token = _meta_csrf_token(csrf_client, "/research")
+    resp = csrf_client.post("/api/constructor_generate", json={},
+                            headers={"X-CSRFToken": token})
+    # CSRF passed: reached app logic, which rejects the missing repo URL.
+    assert resp.status_code == 400
+    assert resp.get_json()["error"] == "Please paste a GitHub repository URL first."
+
+
 # ---------- P2#10: error handlers ----------
 
 def test_api_404_is_json(client):

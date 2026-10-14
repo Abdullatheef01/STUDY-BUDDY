@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // P2#11 follow-up: all fetch-driven POSTs send the session CSRF token via
+    // the X-CSRFToken header (read from the page's csrf-token meta tag), so no
+    // research endpoint needs a CSRF exemption anymore.
+    const csrfHeaders = (extra) => {
+        const headers = extra || {};
+        const m = document.querySelector('meta[name="csrf-token"]');
+        if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+        return headers;
+    };
+
     // Navigation Logic
     const navLinks = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('.page-section');
@@ -104,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/constructor_generate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: csrfHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ repo_url: repoUrl, author: author, institution: institution })
             });
 
@@ -417,7 +427,7 @@ I am now grounding my responses 100% in the text of this paper. Ask me anything 
             // Call the Gemini-powered backend with real conversation history (P1#4).
             const response = await fetch('/api/chat_research', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: csrfHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     message: text,
                     document_text: (currentPaperContext && currentPaperContext.fullText) || '',
