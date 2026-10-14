@@ -48,6 +48,7 @@
                     <li><a href="#home" class="nav-link active" data-section="home">Home</a></li>
                     <li><a href="#constructor" class="nav-link" data-section="constructor">Constructor</a></li>
                     <li><a href="#deconstructor" class="nav-link" data-section="deconstructor">Deconstructor</a></li>
+                    <li><a href="#study" class="nav-link" data-section="study">Study Lab</a></li>
                     {% include "_auth_links.html" %}
                 </ul>
             </nav>
@@ -225,6 +226,33 @@
                             <button class="btn btn-gradient btn-icon" id="btn-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Study Lab Section (Wave 4): PDF Q&A, paper import, citations -->
+        <section id="study" class="page-section">
+            <div class="section-wrapper">
+                <div class="section-header" style="text-align:center;margin-bottom:2rem;">
+                    <h2>Study <span class="gradient-text">Lab</span></h2>
+                    <p>Source-grounded answers from your PDFs, one-click paper imports, and perfect citations.</p>
+                </div>
+                <div class="features-grid b-bento">
+                    <a href="{{ url_for('study_library') }}" class="feature-card b-card b-card--feature b-reveal" style="text-decoration:none;color:inherit;">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg></div>
+                        <h3>PDF Q&amp;A Library</h3>
+                        <p>Upload papers and ask questions — every answer cites the exact page it came from.</p>
+                    </a>
+                    <a href="{{ url_for('study_import_page') }}" class="feature-card b-card b-card--feature b-reveal b-d1" style="text-decoration:none;color:inherit;">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg></div>
+                        <h3>Paper Import &amp; Graph</h3>
+                        <p>Import by arXiv ID or DOI, explore citation graphs, and pull PDFs into your library.</p>
+                    </a>
+                    <a href="{{ url_for('cite_page') }}" class="feature-card b-card b-card--feature b-reveal b-d2" style="text-decoration:none;color:inherit;">
+                        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></div>
+                        <h3>Citation Formatter</h3>
+                        <p>IEEE, APA, MLA, Vancouver, Chicago and BibTeX — verified against the official guides.</p>
+                    </a>
                 </div>
             </div>
         </section>

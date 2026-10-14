@@ -268,6 +268,11 @@ from cert_guide import (all_certs, get_cert, domains as cert_domains,
                         filter_certs, recommend as recommend_certs,
                         build_study_plan, validate_recommend_payload,
                         validate_plan_payload)
+from pdf_qa import (validate_upload as pdfqa_validate_upload,
+                    parse_pdf_pages as pdfqa_parse_pages,
+                    chunk_pages as pdfqa_chunk_pages,
+                    retrieve as pdfqa_retrieve,
+                    answer_question as pdfqa_answer)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -576,6 +581,40 @@ class CertPlan(db.Model):
 
     user = db.relationship("User", backref=db.backref("cert_plans", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
+
+
+class StudyDoc(db.Model):
+    """A PDF in a user's study library (Wave 4 #21). Chunks live in data."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    title = db.Column(db.String(255), nullable=False)
+    stored_filename = db.Column(db.String(255))  # uuid-prefixed name under UPLOAD_FOLDER
+    source = db.Column(db.String(20), default="upload", nullable=False)  # upload | arxiv | doi
+    source_ref = db.Column(db.String(255))  # arXiv ID or DOI when imported
+    num_pages = db.Column(db.Integer, default=0)
+    num_chunks = db.Column(db.Integer, default=0)
+    char_count = db.Column(db.Integer, default=0)
+    data = db.Column(db.JSON)  # {"chunks": [{"page":1,"index":0,"text":"...","heading":...}], "truncated": bool}
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("study_docs", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class StudyQuestion(db.Model):
+    """A cited Q&A exchange against a user's study library (Wave 4 #21)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    doc_id = db.Column(db.Integer, db.ForeignKey("study_doc.id"), nullable=True, index=True)
+    question = db.Column(db.Text, nullable=False)
+    answer = db.Column(db.Text)
+    citations = db.Column(db.JSON)  # [{"doc": title, "page": n, "chunk": i, "excerpt": str}]
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("study_questions", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+    doc = db.relationship("StudyDoc", backref=db.backref("questions", lazy="dynamic",
+                                                          cascade="all, delete-orphan"))
 
 
 class ResearchSession(db.Model):
@@ -3729,6 +3768,180 @@ def register_routes(app):
     def research_home():
         """Research Paper Assistant Page."""
         return render_template('research.html')
+
+    # ---------- STUDY INTELLIGENCE (Wave 4 batch 1) ----------
+    # Feature #21: source-grounded PDF Q&A with citations (NotebookLM-style)
+    @app.route('/research/library')
+    @login_required
+    def study_library():
+        """Per-user PDF study library page."""
+        docs = StudyDoc.query.filter_by(user_id=current_user.id).order_by(
+            StudyDoc.created_at.desc()).all()
+        return render_template('study_library.html', docs=[{
+            'id': d.id, 'title': d.title, 'pages': d.num_pages,
+            'chunks': d.num_chunks, 'source': d.source,
+            'created': d.created_at.strftime('%Y-%m-%d'),
+        } for d in docs])
+
+    @app.route('/study/api/upload', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def study_upload():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Upload a PDF into the study library. Multipart form with 'file'.
+
+        CSRF token via X-CSRFToken header (not exempt). Returns the doc summary.
+        """
+        file = request.files.get('file')
+        ok, err = pdfqa_validate_upload(file)
+        if not ok:
+            return jsonify({'error': err}), 400
+        filename = "{}_{}".format(uuid.uuid4().hex[:8], secure_filename(file.filename))
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        try:
+            file.save(filepath)
+        except Exception:
+            log.exception("Study upload save failed")
+            return jsonify({'error': 'Could not save the uploaded file.'}), 500
+        try:
+            pages = pdfqa_parse_pages(filepath)
+            if not any((p or '').strip() for p in pages):
+                raise ValueError("no-text")
+            chunks = pdfqa_chunk_pages(pages)
+            title = (request.form.get('title') or '').strip() or file.filename
+            doc = StudyDoc(
+                user_id=current_user.id, title=title[:255],
+                stored_filename=filename, source='upload',
+                num_pages=len(pages), num_chunks=len(chunks),
+                char_count=sum(len(c.get('text', '')) for c in chunks),
+                data={'chunks': [dict(c) for c in chunks],
+                      'truncated': bool(getattr(chunks, 'truncated', False))})
+            db.session.add(doc)
+            db.session.commit()
+        except ValueError as e:
+            if str(e) == "no-text":
+                try:
+                    os.remove(filepath)
+                except OSError:
+                    pass
+                return jsonify({'error': 'No extractable text found in this PDF '
+                                         '(it may be a scanned image).'}), 400
+            raise
+        except Exception:
+            log.exception("Study upload processing failed")
+            db.session.rollback()
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
+            return jsonify({'error': 'Could not process this PDF. Please try another file.'}), 500
+        return jsonify({'success': True, 'doc': {
+            'id': doc.id, 'title': doc.title, 'pages': doc.num_pages,
+            'chunks': doc.num_chunks}})
+
+    @app.route('/study/api/ask', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def study_ask():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Ask a cited question over one doc (doc_id) or the whole library.
+
+        JSON body: {"doc_id": int|null, "question": str}.
+        CSRF token via X-CSRFToken header (not exempt).
+        """
+        payload = request.get_json(silent=True) or {}
+        question = (payload.get('question') or '').strip()
+        if not question:
+            return jsonify({'error': 'Please type a question first.'}), 400
+        if len(question) > 2000:
+            return jsonify({'error': 'Question is too long (max 2000 characters).'}), 400
+        doc_id = payload.get('doc_id')
+        try:
+            if doc_id:
+                doc = StudyDoc.query.filter_by(id=int(doc_id),
+                                               user_id=current_user.id).first()
+                if not doc:
+                    return jsonify({'error': 'Document not found.'}), 404
+                candidates = [doc]
+            else:
+                candidates = StudyDoc.query.filter_by(
+                    user_id=current_user.id).order_by(
+                    StudyDoc.created_at.desc()).all()
+                if not candidates:
+                    return jsonify({'error': 'Your library is empty — upload a PDF first.'}), 400
+            # Pick the best-scoring doc for multi-doc queries (citation-clean).
+            # If chunks exist but nothing matches, still answer from the first
+            # doc so answer_question() can abstain honestly instead of 400ing.
+            best_doc, best_chunks, best_score = None, [], -1.0
+            first_with_chunks = None
+            for d in candidates:
+                chunks = (d.data or {}).get('chunks') or []
+                if not chunks:
+                    continue
+                if first_with_chunks is None:
+                    first_with_chunks = (d, chunks)
+                hits = pdfqa_retrieve(chunks, question, top_k=1)
+                score = hits[0]['score'] if hits else -1.0
+                if score > best_score:
+                    best_doc, best_chunks, best_score = d, chunks, score
+            if first_with_chunks is None:
+                return jsonify({'error': 'No indexed passages found in your library.'}), 400
+            if best_doc is None:
+                best_doc, best_chunks = first_with_chunks
+            result = pdfqa_answer(question, best_doc.title, best_chunks, top_k=5)
+            q = StudyQuestion(user_id=current_user.id, doc_id=best_doc.id,
+                              question=question[:2000],
+                              answer=result.get('answer'),
+                              citations=result.get('citations'))
+            db.session.add(q)
+            db.session.commit()
+        except Exception:
+            log.exception("Study ask failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not answer right now. Please try again.'}), 500
+        return jsonify({'success': True, 'doc_id': best_doc.id,
+                        'doc_title': best_doc.title,
+                        'answer': result.get('answer'),
+                        'citations': result.get('citations') or []})
+
+    @app.route('/study/api/documents/<int:doc_id>/history')
+    def study_history(doc_id):
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Per-doc question history for the library page."""
+        doc = StudyDoc.query.filter_by(id=doc_id, user_id=current_user.id).first()
+        if not doc:
+            return jsonify({'error': 'Document not found.'}), 404
+        qs = StudyQuestion.query.filter_by(
+            user_id=current_user.id, doc_id=doc_id).order_by(
+            StudyQuestion.created_at.desc()).limit(50).all()
+        return jsonify({'questions': [{
+            'id': q.id, 'question': q.question, 'answer': q.answer,
+            'citations': q.citations or [],
+            'created': q.created_at.strftime('%Y-%m-%d %H:%M')} for q in qs]})
+
+    @app.route('/study/api/documents/<int:doc_id>', methods=['DELETE'])
+    def study_delete(doc_id):
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Delete a doc, its stored file, and its question history."""
+        doc = StudyDoc.query.filter_by(id=doc_id, user_id=current_user.id).first()
+        if not doc:
+            return jsonify({'error': 'Document not found.'}), 404
+        try:
+            if doc.stored_filename:
+                try:
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'],
+                                           doc.stored_filename))
+                except OSError:
+                    pass
+            db.session.delete(doc)
+            db.session.commit()
+        except Exception:
+            log.exception("Study doc delete failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not delete this document.'}), 500
+        return jsonify({'success': True})
 
     # ---------- API ENDPOINTS (Shared) ----------
     @app.route('/api/interview-questions/<company>')
