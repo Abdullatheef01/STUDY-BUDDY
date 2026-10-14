@@ -228,6 +228,9 @@ from cover_generator import (rule_based_cover_letter, rule_based_outreach,
                              validate_cover_inputs, TONES)
 from linkedin_grader import (grade_linkedin_profile, generate_rule_based_summary,
                              validate_linkedin_inputs)
+from career_assessment import (score_assessment, rule_based_why,
+                               validate_assessment_inputs, public_questions,
+                               QUESTIONS, TOP_N_CLUSTERS)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -383,6 +386,18 @@ class JobApplication(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("job_applications", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class CareerAssessment(db.Model):
+    """A career-discovery assessment result belonging to a user (Wave 1 #7)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    top_clusters = db.Column(db.JSON)  # ranked cluster results
+    answers_json = db.Column(db.JSON)  # {question_id: option_index}
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("career_assessments", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -845,6 +860,56 @@ def _linkedin_suggestions(report, fields):
         except (ValueError, json.JSONDecodeError):
             log.warning("LinkedIn suggestions: non-JSON model output, retrying")
     return fallback, False
+
+
+def _assessment_explanations(clusters):
+    """Personalized 'why you fit' blurbs via Gemini, with rule-based fallback.
+
+    Returns (clusters_with_why, ai_powered). Scoring never depends on the
+    LLM - only the explanatory text does.
+    """
+    for c in clusters:
+        c["why"] = rule_based_why(c)
+    summaries = "; ".join(
+        "{} ({}% match, signals: {})".format(
+            c["name"], c["match"], ", ".join(c.get("top_signals") or [])[:2] or "general pattern")
+        for c in clusters
+    )
+    prompt = (
+        "You are a career counselor. A student took a career-discovery quiz. "
+        "Top matches: {}. For EACH career, write a 2-sentence 'why you fit' "
+        "blurb grounded in the signals shown, plus one concrete first step. "
+        'Return ONLY JSON like {{"blurbs": [{{"id": "<career-id>", '
+        '"why": "...", "first_step": "..."}}]}} using these ids: {}.'
+    ).format(summaries, ", ".join(c["id"] for c in clusters))
+    for _attempt in range(2):
+        try:
+            raw = call_gemini_ai(prompt)
+        except GeminiError as e:
+            log.warning("Assessment explanations: Gemini unavailable: %s", e)
+            return clusters, False
+        try:
+            parsed = _parse_json_safely(raw)
+            items = parsed.get("blurbs") if isinstance(parsed, dict) else None
+            by_id = {c["id"]: c for c in clusters}
+            applied = 0
+            for it in (items or [])[:len(clusters)]:
+                if not isinstance(it, dict):
+                    continue
+                c = by_id.get(str(it.get("id") or ""))
+                if not c:
+                    continue
+                why = str(it.get("why") or "").strip()[:500]
+                step = str(it.get("first_step") or "").strip()[:300]
+                if why:
+                    c["why"] = why + (" First step: " + step if step else "")
+                    applied += 1
+            if applied:
+                return clusters, True
+            log.warning("Assessment explanations: model returned no usable items")
+        except (ValueError, json.JSONDecodeError):
+            log.warning("Assessment explanations: non-JSON model output, retrying")
+    return clusters, False
 
 
 def _rewrite_bullet_ai(bullet):
@@ -1979,6 +2044,70 @@ def register_routes(app):
         """JSON stats for the user's tracker."""
         return jsonify({'success': True, 'stats': _tracker_stats(current_user.id)})
 
+    # ---------- CAREER-DISCOVERY ASSESSMENT (Wave 1 #7) ----------
+    @app.route('/assessment')
+    @login_required
+    def assessment_quiz():
+        """Guided career-discovery quiz (16 questions, stepper UI)."""
+        return render_template('assessment.html', questions=public_questions())
+
+    @app.route('/assessment/submit', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def assessment_submit():
+        """Score the assessment answers and persist the result.
+
+        Login required. Accepts JSON {answers: {question_id: option_index}}.
+        CSRF via X-CSRFToken header (not exempt).
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to take the assessment.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else {}
+        answers, error = validate_assessment_inputs(payload or {})
+        if error:
+            return jsonify({'error': error}), 400
+
+        # --- Deterministic server-side scoring ---
+        clusters = score_assessment(answers)
+        clusters, ai_powered = _assessment_explanations(clusters)
+        for c in clusters:
+            c["ai_powered"] = ai_powered
+        result = {
+            'clusters': clusters,
+            'ai_powered': ai_powered,
+            'total_questions': len(QUESTIONS),
+        }
+
+        # --- Persist per user (retakes create new rows) ---
+        try:
+            row = CareerAssessment(
+                user_id=current_user.id,
+                top_clusters=json_safe(clusters),
+                answers_json=json_safe(answers),
+            )
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Assessment persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your result. Please try again.'}), 500
+
+        return jsonify({
+            'success': True,
+            'assessment_id': row.id,
+            'result': json_safe(result),
+            'saved_url': url_for('view_assessment', assessment_id=row.id),
+        })
+
+    @app.route('/assessment/<int:assessment_id>')
+    @login_required
+    def view_assessment(assessment_id):
+        """Render a saved assessment result (owner only)."""
+        row = CareerAssessment.query.filter_by(id=assessment_id,
+                                               user_id=current_user.id).first_or_404()
+        return render_template('assessment_result.html',
+                               clusters=row.top_clusters,
+                               assessment_id=row.id, created_at=row.created_at)
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -2018,12 +2147,15 @@ def register_routes(app):
                             .filter_by(user_id=current_user.id)
                             .order_by(LinkedInReport.created_at.desc()).all())
         tracker_stats = _tracker_stats(current_user.id)
+        assessments = (CareerAssessment.query
+                       .filter_by(user_id=current_user.id)
+                       .order_by(CareerAssessment.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
                                jd_matches=jd_matches, rewrites=rewrites,
                                cover_docs=cover_docs, linkedin_reports=linkedin_reports,
-                               tracker_stats=tracker_stats)
+                               tracker_stats=tracker_stats, assessments=assessments)
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])

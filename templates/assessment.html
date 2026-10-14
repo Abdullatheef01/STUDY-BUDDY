@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Career Discovery Assessment | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <style>
+        .as-wrap { max-width: 760px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .as-head h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+        .as-head h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .as-head p { color: var(--text-muted, #94a3b8); margin-bottom: 1.4rem; }
+        .as-progress { height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; margin-bottom: 1.4rem; overflow: hidden; }
+        .as-progress > div { height: 100%; background: var(--gradient-primary); border-radius: 999px; transition: width 0.3s ease; }
+        .as-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 2rem; backdrop-filter: blur(12px); }
+        .as-dim { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-primary); font-weight: 700; margin-bottom: 0.5rem; }
+        .as-q { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.2rem; }
+        .as-opt { display: block; width: 100%; text-align: left; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: var(--text-main, #f8fafc); padding: 0.85rem 1rem; margin-bottom: 0.7rem; font-size: 0.95rem; cursor: pointer; }
+        .as-opt:hover { border-color: var(--accent-primary); background: rgba(16,185,129,0.08); }
+        .as-opt.selected { border-color: var(--accent-primary); background: rgba(16,185,129,0.14); }
+        .as-nav { display: flex; justify-content: space-between; margin-top: 1.4rem; }
+        .as-error { color: var(--accent-danger); font-size: 0.88rem; margin-top: 0.8rem; }
+        .as-result-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 18px; padding: 1.6rem; margin-bottom: 1.1rem; }
+        .as-result-card h3 { font-size: 1.2rem; margin-bottom: 0.2rem; }
+        .as-match { font-size: 2rem; font-weight: 800; color: var(--accent-primary); }
+        .as-tagline { color: var(--text-muted, #94a3b8); font-size: 0.92rem; margin-bottom: 0.8rem; }
+        .as-why { font-size: 0.94rem; color: #cbd5e1; margin-bottom: 0.8rem; }
+        .as-skills { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.8rem; }
+        .as-chip { background: rgba(16,185,129,0.14); color: var(--accent-primary); border-radius: 999px; padding: 0.28rem 0.75rem; font-size: 0.8rem; font-weight: 600; }
+        .as-tools { font-size: 0.88rem; }
+        .as-tools a { color: var(--accent-secondary); margin-right: 0.9rem; }
+        .as-ai-badge { display: inline-block; font-size: 0.75rem; background: rgba(56,189,248,0.14); color: var(--accent-info); border-radius: 999px; padding: 0.2rem 0.7rem; margin-bottom: 1rem; font-weight: 600; }
+        @media (max-width: 700px) { .as-wrap { padding-top: 5.5rem; } .as-card { padding: 1.4rem; } }
+        @media (prefers-reduced-motion: reduce) { .as-progress > div, .as-opt { transition: none; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
+            <span>ResumeAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/tracker">Tracker</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            {% include "_auth_links.html" %}
+        </ul>
+    </nav>
+
+    <div class="as-wrap">
+        <div class="as-head">
+            <h1>Career <span class="gradient-text">Discovery</span></h1>
+            <p>Answer 16 quick questions about your interests, strengths, work style, and favorite subjects. There are no wrong answers — go with your gut.</p>
+        </div>
+
+        <div id="asQuiz">
+            <div class="as-progress" aria-hidden="true"><div id="asBar" style="width:0%"></div></div>
+            <div class="as-card">
+                <div class="as-dim" id="asDim"></div>
+                <div class="as-q" id="asQ"></div>
+                <div id="asOpts"></div>
+                <div class="as-error" id="asError" hidden></div>
+                <div class="as-nav">
+                    <button class="tk-btn-ghost" id="asBack" type="button" style="background:transparent;border:1px solid rgba(255,255,255,0.18);color:var(--text-main,#f8fafc);border-radius:10px;padding:0.55rem 1.1rem;cursor:pointer;">Back</button>
+                    <button class="tk-btn" id="asNext" type="button" style="background:var(--gradient-primary);color:#fff;border:none;border-radius:12px;padding:0.65rem 1.4rem;font-weight:700;cursor:pointer;">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="asResult" hidden></div>
+    </div>
+
+    <footer class="footer">
+        <p>Built with AI for students | AI Resume Analyzer &amp; Job Recommendation System</p>
+    </footer>
+
+    <script>
+        window.__ASSESSMENT_QUESTIONS__ = {{ questions|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/assessment.js') }}"></script>
+</body>
+</html>
