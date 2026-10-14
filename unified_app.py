@@ -276,6 +276,9 @@ from pdf_qa import (validate_upload as pdfqa_validate_upload,
 from arxiv_import import (validate_arxiv_id, validate_doi,
                           fetch_arxiv, fetch_doi, normalize_metadata,
                           fetch_citation_graph, download_pdf as arxiv_download_pdf)
+from citation_fmt import (format_citation, format_bibliography,
+                          to_bibtex, from_bibtex, style_guide,
+                          STYLES as CITATION_STYLES)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -4110,6 +4113,76 @@ def register_routes(app):
         return jsonify({'success': True, 'doc': {
             'id': doc.id, 'title': doc.title, 'pages': doc.num_pages,
             'chunks': doc.num_chunks}})
+
+    # Feature #24: citation formatter (IEEE/APA/MLA/Vancouver/Chicago + BibTeX)
+    @app.route('/research/cite')
+    def cite_page():
+        """Citation formatter page (public utility)."""
+        return render_template('study_cite.html')
+
+    @app.route('/api/cite/format', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def cite_format():
+        """Format one citation. JSON body: {"meta": {...}, "style": "apa"}."""
+        payload = request.get_json(silent=True) or {}
+        style = (payload.get('style') or '').strip().lower()
+        if style not in CITATION_STYLES:
+            return jsonify({'error': 'Unknown style. Choose from: {}'.format(
+                ', '.join(CITATION_STYLES))}), 400
+        meta = payload.get('meta') or {}
+        if not isinstance(meta, dict):
+            return jsonify({'error': 'Invalid metadata.'}), 400
+        try:
+            citation = format_citation(meta, style)
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
+        except Exception:
+            log.exception("Citation format failed")
+            return jsonify({'error': 'Could not format this citation.'}), 500
+        return jsonify({'citation': citation, 'style': style})
+
+    @app.route('/api/cite/bibtex/export', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def cite_bibtex_export():
+        """Export metadata as BibTeX. JSON body: {"meta": {...}}."""
+        payload = request.get_json(silent=True) or {}
+        meta = payload.get('meta') or {}
+        if not isinstance(meta, dict):
+            return jsonify({'error': 'Invalid metadata.'}), 400
+        try:
+            bibtex = to_bibtex(meta)
+        except Exception:
+            log.exception("BibTeX export failed")
+            return jsonify({'error': 'Could not export BibTeX.'}), 500
+        return jsonify({'bibtex': bibtex})
+
+    @app.route('/api/cite/bibtex/import', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def cite_bibtex_import():
+        """Parse pasted BibTeX. JSON body: {"text": "..."}."""
+        payload = request.get_json(silent=True) or {}
+        text = payload.get('text') or ''
+        if not isinstance(text, str) or not text.strip():
+            return jsonify({'error': 'Paste some BibTeX first.'}), 400
+        try:
+            metas = from_bibtex(text[:50000])
+        except Exception:
+            log.exception("BibTeX import failed")
+            return jsonify({'error': 'Could not parse this BibTeX.'}), 400
+        return jsonify({'metas': json_safe(metas)})
+
+    @app.route('/api/cite/guide/<style>')
+    def cite_guide(style):
+        """In-app style-guide reference for one citation style."""
+        style = (style or '').strip().lower()
+        if style not in CITATION_STYLES:
+            return jsonify({'error': 'Unknown style.'}), 400
+        try:
+            guide = style_guide(style)
+        except Exception:
+            log.exception("Cite guide failed")
+            return jsonify({'error': 'Guide unavailable.'}), 500
+        return jsonify(json_safe(guide))
 
     # ---------- API ENDPOINTS (Shared) ----------
     @app.route('/api/interview-questions/<company>')
