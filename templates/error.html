@@ -1,57 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js" data-theme="hub">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>document.documentElement.classList.replace('no-js', 'js');</script>
     <title>{{ code }} — AI Career &amp; Research Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #050612; --primary: #6366f1; --secondary: #ec4899; --accent: #22d3ee;
-            --text: #f8fafc; --muted: #94a3b8;
-            --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.1);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: radial-gradient(circle at 50% 30%, #0a0b1e, #050612);
-            color: var(--text); font-family: 'Inter', sans-serif;
-            min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            padding: 2rem; text-align: center;
-        }
-        .card {
-            background: var(--glass); border: 1px solid var(--border); border-radius: 24px;
-            backdrop-filter: blur(18px); padding: 3.5rem 3rem; max-width: 520px; width: 100%;
-            box-shadow: 0 24px 80px rgba(99,102,241,0.18);
-        }
-        .code {
-            font-family: 'Outfit', sans-serif; font-size: 5rem; font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            line-height: 1;
-        }
-        h1 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin: 1rem 0 0.5rem; }
-        p { color: var(--muted); margin-bottom: 2rem; line-height: 1.6; }
-        .btn {
-            display: inline-block; padding: 0.8rem 2rem; border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #fff; text-decoration: none; font-weight: 600;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(99,102,241,0.4); }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bento.css') }}">
 </head>
 <body>
-    <div class="card">
-        <div class="code">{{ code }}</div>
-        <h1>
-            {% if code == 404 %}Page not found
-            {% elif code == 405 %}Action not allowed
-            {% elif code == 429 %}Slow down a little
-            {% else %}Something went wrong{% endif %}
-        </h1>
-        <p>{{ message }}</p>
-        <a class="btn" href="{{ url_for('index') }}">Back to the Hub</a>
+    <div class="b-ambient" aria-hidden="true">
+        <div class="b-blob b-b1"></div>
+        <div class="b-blob b-b2"></div>
+        <div class="b-blob b-b3"></div>
+        <div class="b-gridlines"></div>
     </div>
+    <main class="b-wrap" style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
+        <div class="b-card b-card--form b-reveal in" style="text-align:center;">
+            <div style="font-family:'Outfit',sans-serif;font-size:5rem;font-weight:700;line-height:1;"><span class="b-grad">{{ code }}</span></div>
+            <h1 style="font-family:'Outfit',sans-serif;font-size:1.5rem;margin:1rem 0 .5rem;">
+                {% if code == 404 %}Page not found
+                {% elif code == 405 %}Action not allowed
+                {% elif code == 429 %}Slow down a little
+                {% else %}Something went wrong{% endif %}
+            </h1>
+            <p style="color:var(--b-muted);margin-bottom:2rem;line-height:1.6;">{{ message }}</p>
+            <a class="b-btn b-btn--primary b-magnet" href="{{ url_for('index') }}">Back to the Hub</a>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/bento.js') }}" defer></script>
 </body>
 </html>

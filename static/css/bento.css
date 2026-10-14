@@ -428,6 +428,7 @@ a { color: var(--b-a3); }
 .b-opt.b-selected { background: var(--b-accent-soft); border-color: var(--b-a1); }
 
 /* ---------- motion ---------- */
+.no-js .b-reveal { opacity: 1; transform: none; }
 .b-reveal {
   opacity: 0; transform: translateY(26px);
   transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -486,10 +487,11 @@ a { color: var(--b-a3); }
 }
 .b-marquee-track {
   display: flex;
-  gap: var(--b-gap);
   width: max-content;
   animation: b-marquee 46s linear infinite;
 }
+/* margin (not gap) on items => exact -50% seamless loop */
+.b-marquee-item { flex: 0 0 auto; margin-right: var(--b-gap); }
 .b-marquee--reverse .b-marquee-track { animation-direction: reverse; animation-duration: 58s; }
 .b-marquee--fast .b-marquee-track { animation-duration: 30s; }
 .b-marquee:hover .b-marquee-track,
