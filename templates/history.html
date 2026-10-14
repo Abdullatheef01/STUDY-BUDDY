@@ -14,6 +14,34 @@
     <div class="b-card b-card--stat b-reveal b-d3"><div class="b-stat-num" data-count="{{ goals|length }}">{{ goals|length }}</div><div class="b-stat-label">Career goals</div></div>
 </div>
 
+{% if momentum_widget %}
+{# Wave 5 #27: humane momentum widget — streak, XP, quest preview. #}
+<div class="b-card b-reveal" style="margin-top:var(--b-gap);">
+    <div class="b-sec-head" style="margin:0 0 .8rem;">
+        <h2 style="font-size:1.15rem;">Your <span class="b-grad">momentum</span></h2>
+        <p>Progress toward evidence, not screen time.</p>
+    </div>
+    {% if momentum_widget.opted_out %}
+    <p style="color:var(--b-muted);font-size:.92rem;margin:0 0 .8rem;">Momentum is paused for you — no XP, no streaks, no pressure.</p>
+    <div class="b-cta-row"><a class="b-btn b-btn--primary b-btn--sm" href="{{ url_for('momentum_hub') }}" style="text-decoration:none;">Rejoin Momentum</a></div>
+    {% else %}
+    <div style="display:flex;gap:1.4rem;flex-wrap:wrap;align-items:center;">
+        <div class="b-score-ring" style="--b-score:{{ (momentum_widget.streak.current / (momentum_widget.streak.longest if momentum_widget.streak.longest > 0 else 1) * 100) | round(0) }};" role="img" aria-label="{{ momentum_widget.streak.current }} day streak"><span>{{ momentum_widget.streak.current }}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.1em;"><path d="M12 2c1 4-4 6-4 11a4 4 0 0 0 8 0c0-2-1-3-1-3s3 1 3 5a6 6 0 0 1-12 0C6 8 12 6 12 2z"/></svg></span></div>
+        <div style="flex:1;min-width:200px;">
+            <div style="font-weight:700;font-size:1.05rem;">Level {{ momentum_widget.level }} <span style="color:var(--b-muted);font-weight:400;">· {{ momentum_widget.total_xp }} XP</span></div>
+            <div class="b-bar" style="margin:.5rem 0;" role="progressbar" aria-valuenow="{{ momentum_widget.level_pct }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progress to next level"><i style="width:{{ momentum_widget.level_pct }}%;"></i></div>
+            <div style="color:var(--b-muted);font-size:.85rem;">
+                {% set _q = momentum_widget.quests | selectattr('completed') | list | length %}
+                {{ _q }} of {{ momentum_widget.quests | length }} weekly quests done
+                · {{ momentum_widget.streak.shields_left }} streak shield{{ '' if momentum_widget.streak.shields_left == 1 else 's' }} left
+            </div>
+        </div>
+        <div class="b-cta-row"><a class="b-btn b-btn--primary b-btn--sm" href="{{ url_for('momentum_hub') }}" style="text-decoration:none;">Open hub</a></div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
 <div class="b-card b-reveal" style="margin-top:var(--b-gap);">
     <div class="b-sec-head" style="margin:0 0 1rem;">
         <h2 style="font-size:1.3rem;">Connected Accounts</h2>

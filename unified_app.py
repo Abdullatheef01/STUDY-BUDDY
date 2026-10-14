@@ -286,6 +286,7 @@ from gap_finder import generate_gap_report as gf_generate_report
 from flashcards import (generate_deck as fc_generate_deck,
                         grade_mcq as fc_grade_mcq,
                         mastery_stats as fc_mastery_stats)
+import momentum as momentum_mod
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -816,6 +817,142 @@ class ProfileSnapshot(db.Model):
 _SNAPSHOT_TTL_SECONDS = 24 * 3600
 
 
+class XPLedger(db.Model):
+    """One XP-earning career action (Wave 5 #27: humane momentum system).
+
+    ``dedupe_key`` ("<user_id>:<event_type>:<YYYY-MM-DD>") is unique so each
+    daily event is recorded at most once — duplicates are skipped, never an
+    error. Weekly quest/league counting is derived from these keys.
+    """
+    __tablename__ = "xp_ledger"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    event_type = db.Column(db.String(40), nullable=False, index=True)
+    xp = db.Column(db.Integer, nullable=False, default=0)
+    dedupe_key = db.Column(db.String(120), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("xp_ledger", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class StreakState(db.Model):
+    """Per-user streak with monthly forgiveness shields (Wave 5 #27).
+
+    Two shields per calendar month auto-repair a missed day; when shields run
+    out the streak resets gracefully to 1, never 0.
+    """
+    __tablename__ = "streak_state"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        unique=True, index=True)
+    current = db.Column(db.Integer, default=0, nullable=False)
+    longest = db.Column(db.Integer, default=0, nullable=False)
+    last_active_date = db.Column(db.Date, nullable=True)
+    shields_used_month = db.Column(db.Integer, default=0, nullable=False)
+    shields_month = db.Column(db.String(7), nullable=True)  # "YYYY-MM"
+
+    user = db.relationship("User", backref=db.backref("streak_state", uselist=False,
+                                                      cascade="all, delete-orphan"))
+
+
+class LeagueMember(db.Model):
+    """Opt-in weekly league cohort membership (Wave 5 #27).
+
+    ``league_key`` is the ISO week of joining ("2026-W42"); cohorts stay
+    small (~8-12) by construction. ``opted_out`` hides the user from the
+    board without deleting history.
+    """
+    __tablename__ = "league_member"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        unique=True, index=True)
+    league_key = db.Column(db.String(16), nullable=False, index=True)
+    joined_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    opted_out = db.Column(db.Boolean, default=False, nullable=False)
+
+    user = db.relationship("User", backref=db.backref("league_member", uselist=False,
+                                                      cascade="all, delete-orphan"))
+
+
+class LeagueResult(db.Model):
+    """Finalized weekly standings for one league cohort (Wave 5 #27).
+
+    Written once per (league, week) by momentum.finalize_league_week().
+    ``won`` marks the week's consistency winner (streak days + quests, not
+    raw XP prestige).
+    """
+    __tablename__ = "league_result"
+    id = db.Column(db.Integer, primary_key=True)
+    league_key = db.Column(db.String(16), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    week_start = db.Column(db.Date, nullable=False, index=True)
+    xp = db.Column(db.Integer, default=0, nullable=False)
+    streak_days = db.Column(db.Integer, default=0, nullable=False)
+    quests_completed = db.Column(db.Integer, default=0, nullable=False)
+    won = db.Column(db.Boolean, default=False, nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("league_key", "user_id", "week_start",
+                                          name="uq_league_result"),)
+
+    user = db.relationship("User", backref=db.backref("league_results", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class QuestProgress(db.Model):
+    """Per-user weekly quest progress (Wave 5 #27). Counts are derived from
+    XPLedger rows; ``claimed`` guards the one-time 50 XP completion bonus."""
+    __tablename__ = "quest_progress"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    week_start = db.Column(db.Date, nullable=False, index=True)
+    quest_id = db.Column(db.String(40), nullable=False)
+    count = db.Column(db.Integer, default=0, nullable=False)
+    completed = db.Column(db.Boolean, default=False, nullable=False)
+    claimed = db.Column(db.Boolean, default=False, nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "week_start", "quest_id",
+                                          name="uq_quest_progress"),)
+
+    user = db.relationship("User", backref=db.backref("quest_progress", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class WeeklyReflection(db.Model):
+    """A user's 2-minute weekly reflection (Wave 5 #27). One per ISO week."""
+    __tablename__ = "weekly_reflection"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    week_start = db.Column(db.Date, nullable=False)
+    wins = db.Column(db.Text)
+    focus_next = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "week_start",
+                                          name="uq_weekly_reflection"),)
+
+    user = db.relationship("User", backref=db.backref("weekly_reflections", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class MomentumSettings(db.Model):
+    """Momentum preferences (Wave 5 #27). A separate table so the User model
+    stays untouched. When ``momentum_opt_out`` is true, record_event() is a
+    no-op and the hub shows a rejoin CTA."""
+    __tablename__ = "momentum_settings"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        unique=True, index=True)
+    momentum_opt_out = db.Column(db.Boolean, default=False, nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("momentum_settings", uselist=False,
+                                                      cascade="all, delete-orphan"))
+
+
 def _utcnow_naive():
     """UTC now without tzinfo (SQLite returns naive datetimes)."""
     return datetime.now(timezone.utc).replace(tzinfo=None)
@@ -856,6 +993,21 @@ def json_safe(obj):
     """Round-trip through JSON so DB-stored payloads are always serializable
     (numpy types from the ML pipeline become plain python types)."""
     return json.loads(json.dumps(obj, default=str))
+
+
+def _momentum_hook(user_id, event_type):
+    """Award momentum XP for a completed career action (Wave 5 #27).
+
+    Defensive by design: called AFTER the handler's own commit succeeds, and
+    never raises — momentum.record_event() itself swallows errors, and this
+    wrapper adds one more guard so an XP failure can never break the main
+    flow (the response is already decided by then).
+    """
+    try:
+        momentum_mod.record_event(user_id, event_type)
+    except Exception:
+        log.exception("Momentum hook failed for event %s (non-fatal)",
+                      event_type)
 
 
 def get_db_url():
@@ -1777,6 +1929,8 @@ def register_routes(app):
                 db.session.add(row)
                 db.session.commit()
                 _purge_expired_anonymous()
+                # Wave 5 #27: a completed resume analysis earns XP (logged-in only).
+                _momentum_hook(current_user.id, 'resume_analyzed')
                 return jsonify({'success': True,
                                 'redirect': url_for('view_result', analysis_id='db-{}'.format(row.id))})
 
@@ -2645,6 +2799,8 @@ def register_routes(app):
             log.exception("Interview result persistence failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save your results. Please try again.'}), 500
+        # Wave 5 #27: a finished mock interview earns XP.
+        _momentum_hook(current_user.id, 'mock_completed')
         return jsonify({'success': True, 'total_score': total,
                         'ai_powered': ai_powered,
                         'results': json_safe(scored),
@@ -2701,6 +2857,8 @@ def register_routes(app):
             log.exception("Coach analysis persistence failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save your analysis. Please try again.'}), 500
+        # Wave 5 #27: a completed coach analysis earns XP.
+        _momentum_hook(current_user.id, 'coach_analyzed')
         return jsonify({'success': True, 'analysis_id': row.id,
                         'report': json_safe(report),
                         'report_url': url_for('view_coach_report', analysis_id=row.id)})
@@ -2838,6 +2996,9 @@ def register_routes(app):
             log.exception("DSA status persistence failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save progress. Please try again.'}), 500
+        # Wave 5 #27: only a *solved* problem earns XP — attempts don't.
+        if row.status == 'solved':
+            _momentum_hook(current_user.id, 'dsa_solved')
         return jsonify({'success': True, 'status': row.status})
 
     # ---------- TIMED APTITUDE TESTS (Wave 2 #16) ----------
@@ -2934,6 +3095,8 @@ def register_routes(app):
             log.exception("Aptitude submit persistence failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save your attempt. Please try again.'}), 500
+        # Wave 5 #27: a completed aptitude test earns XP.
+        _momentum_hook(current_user.id, 'aptitude_completed')
         return jsonify({'success': True, 'expired': expired,
                         'summary': json_safe(summary),
                         'results': json_safe(results)})
@@ -3066,6 +3229,8 @@ def register_routes(app):
             log.exception("STAR draft save failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save your draft. Please try again.'}), 500
+        # Wave 5 #27: a saved STAR story earns XP.
+        _momentum_hook(current_user.id, 'star_saved')
         return jsonify({'success': True, 'draft_id': row.id})
 
     @app.route('/star/drafts')
@@ -3225,6 +3390,9 @@ def register_routes(app):
             log.exception("Roadmap progress save failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save progress. Please try again.'}), 500
+        # Wave 5 #27: a completed roadmap stage earns XP — starting one doesn't.
+        if cleaned["status"] == "completed":
+            _momentum_hook(current_user.id, 'roadmap_step')
         return jsonify({'success': True, 'status': cleaned["status"]})
 
     @app.route('/learn/roadmaps/dashboard')
@@ -3379,6 +3547,8 @@ def register_routes(app):
             log.exception("Quiz submit save failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save your results. Please try again.'}), 500
+        # Wave 5 #27: a submitted skill quiz is a meaningful career action.
+        _momentum_hook(current_user.id, 'quiz_completed')
         return jsonify({'success': True, 'summary': json_safe(summary),
                         'report_url': url_for('view_quiz_result', attempt_id=row.id)})
 
@@ -3574,6 +3744,13 @@ def register_routes(app):
         cert_names = {c["id"]: c["name"] for c in all_certs()}
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
+        # Wave 5 #27: small momentum widget (streak + XP + quest preview).
+        # Defensive: the dashboard must render even if momentum fails.
+        try:
+            momentum_widget = momentum_mod.get_momentum_summary(current_user.id)
+        except Exception:
+            log.exception("Momentum widget failed (non-fatal)")
+            momentum_widget = None
         return render_template('history.html', analyses=analyses, goals=goals,
                                jd_matches=jd_matches, rewrites=rewrites,
                                cover_docs=cover_docs, linkedin_reports=linkedin_reports,
@@ -3584,6 +3761,7 @@ def register_routes(app):
                                learn_roadmap=learn_roadmap,
                                quiz_attempts=quiz_attempts,
                                cert_plans=cert_plans, cert_names=cert_names,
+                               momentum_widget=momentum_widget,
                                star_competencies=dict((c[0], c[1]) for c in COMPETENCIES))
 
     # ---------- INDIA SALARY EXPLORER (Wave 1 #8) ----------
@@ -4469,6 +4647,17 @@ def register_routes(app):
             log.exception("Flashcard progress failed")
             db.session.rollback()
             return jsonify({'error': 'Could not save progress.'}), 500
+        # Wave 5 #27: a finished review session (5+ card reviews on the deck)
+        # earns XP. Idempotent per day, so marking more cards never double-pays.
+        try:
+            _progress = (fs.data or {}).get('progress') or {}
+            _total_reviews = sum(int((e or {}).get('reviews') or 0)
+                                 for e in _progress.values()
+                                 if isinstance(e, dict))
+            if _total_reviews >= 5:
+                _momentum_hook(current_user.id, 'flashcards_reviewed')
+        except Exception:
+            pass
         return jsonify({'success': True,
                         'stats': fc_mastery_stats(fs.data or {})})
 
@@ -4502,6 +4691,8 @@ def register_routes(app):
             log.exception("Paper quiz grading failed")
             db.session.rollback()
             return jsonify({'error': 'Could not grade the quiz.'}), 500
+        # Wave 5 #27: a completed paper quiz earns XP.
+        _momentum_hook(current_user.id, 'paper_quiz_completed')
         return jsonify({'success': True, 'score': attempt.score,
                         'total': attempt.total, 'details': result.get('details') or []})
 
@@ -4577,6 +4768,121 @@ def register_routes(app):
             log.exception("Cite guide failed")
             return jsonify({'error': 'Guide unavailable.'}), 500
         return jsonify(json_safe(guide))
+
+    # ================= Wave 5 #27: humane momentum system =================
+    @app.route('/momentum')
+    @login_required
+    def momentum_hub():
+        """Momentum hub: streak ring, level/XP, quests, league board,
+        weekly reflection, opt-out. Forgiveness-first: shields, graceful
+        resets, day-one win banner, rejoin CTA when opted out."""
+        try:
+            summary = momentum_mod.get_momentum_summary(current_user.id)
+        except Exception:
+            log.exception("Momentum hub failed")
+            summary = momentum_mod.empty_summary()
+        return render_template('momentum_hub.html', m=summary)
+
+    @app.route('/momentum/api/summary')
+    @login_required
+    def momentum_summary_api():
+        """JSON summary for the dashboard widget."""
+        try:
+            summary = momentum_mod.get_momentum_summary(current_user.id)
+        except Exception:
+            log.exception("Momentum summary API failed")
+            summary = momentum_mod.empty_summary()
+        return jsonify({'success': True, 'summary': summary})
+
+    @app.route('/momentum/api/quest/<quest_id>/claim', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def momentum_claim_quest(quest_id):
+        """Claim a completed weekly quest's 50 XP bonus (idempotent).
+
+        CSRF via X-CSRFToken header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        result = momentum_mod.claim_quest(current_user.id, quest_id)
+        if not result.get('ok'):
+            reason = result.get('reason') or 'claim failed'
+            if reason == 'not completed':
+                return jsonify({'error': 'Quest not completed yet.',
+                                'count': result.get('count'),
+                                'target': result.get('target')}), 400
+            if reason == 'unknown quest':
+                return jsonify({'error': 'Unknown quest.'}), 404
+            return jsonify({'error': 'Could not claim the quest.'}), 400
+        return jsonify({'success': True, 'xp': result.get('xp', 0),
+                        'duplicate': bool(result.get('duplicate')),
+                        'skipped': bool(result.get('skipped'))})
+
+    @app.route('/momentum/api/league/join', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def momentum_league_join():
+        """Opt into this ISO week's league cohort (idempotent).
+
+        CSRF via X-CSRFToken header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        result = momentum_mod.join_league(current_user.id)
+        if not result.get('ok'):
+            if result.get('reason') == 'opted out':
+                return jsonify({'error': 'Rejoin Momentum first to join a league.'}), 400
+            return jsonify({'error': 'Could not join the league.'}), 400
+        return jsonify({'success': True,
+                        'league_key': result.get('league_key'),
+                        'duplicate': bool(result.get('duplicate'))})
+
+    @app.route('/momentum/api/league/leave', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def momentum_league_leave():
+        """Opt out of the league board (history kept). CSRF via X-CSRFToken
+        header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        result = momentum_mod.leave_league(current_user.id)
+        if not result.get('ok'):
+            return jsonify({'error': 'Could not leave the league.'}), 400
+        return jsonify({'success': True})
+
+    @app.route('/momentum/api/reflect', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def momentum_reflect():
+        """Save this week's 2-minute reflection (upsert).
+
+        JSON body: {"wins": str, "focus_next": str}. CSRF via X-CSRFToken
+        header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        payload = request.get_json(silent=True) or {}
+        result = momentum_mod.save_reflection(
+            current_user.id, payload.get('wins'), payload.get('focus_next'))
+        if not result.get('ok'):
+            reason = result.get('reason') or 'save failed'
+            if reason == 'empty reflection':
+                return jsonify({'error': 'Write a line or two first.'}), 400
+            if reason == 'opted out':
+                return jsonify({'error': 'Rejoin Momentum to log reflections.'}), 400
+            return jsonify({'error': 'Could not save your reflection.'}), 400
+        return jsonify({'success': True,
+                        'week_start': result.get('week_start')})
+
+    @app.route('/momentum/api/opt-out', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def momentum_opt_out():
+        """Opt out of (or back into) Momentum. JSON body: {"opt_out": bool}.
+
+        When opted out, record_event() is a no-op and the hub shows a
+        rejoin CTA. CSRF via X-CSRFToken header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        payload = request.get_json(silent=True) or {}
+        result = momentum_mod.set_opt_out(current_user.id,
+                                          bool(payload.get('opt_out')))
+        if not result.get('ok'):
+            return jsonify({'error': 'Could not update your preference.'}), 400
+        return jsonify({'success': True,
+                        'opted_out': result.get('opted_out')})
 
     # ---------- API ENDPOINTS (Shared) ----------
     @app.route('/api/interview-questions/<company>')

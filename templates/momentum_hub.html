@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'dashboard' %}
+{% block title %}Momentum | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Humane momentum</span>
+            <h1>Small wins, <span class="b-grad">compounding</span>.</h1>
+            <p class="b-lede">XP for meaningful career actions — never screen time. Two streak shields a month forgive missed days, and a broken streak restarts at 1, never 0. Pause anytime; nothing here is designed to make you anxious.</p>
+        </div>
+    </div>
+</section>
+
+{% if m.opted_out %}
+{# ---------- Opted out: rejoin CTA only ---------- #}
+<section class="b-section" aria-label="Rejoin Momentum">
+    <div class="b-card b-card--form b-reveal">
+        <div class="b-sec-head" style="margin-top:0;">
+            <h2>Momentum is <span class="b-grad">paused</span></h2>
+            <p>No XP is being recorded, streaks are frozen, and leagues don't see you. Rejoin whenever you're ready — your history is kept.</p>
+        </div>
+        <div class="b-cta-row">
+            <button class="b-btn b-btn--primary" id="mm-rejoin" type="button">Rejoin Momentum</button>
+            <span class="b-pill" id="mm-status" style="display:none;"></span>
+        </div>
+        <p class="b-form-error" id="mm-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+{% else %}
+
+{# ---------- Streak + level ---------- #}
+<section class="b-section" aria-label="Your streak and level">
+    {% if not m.day_one.earned %}
+    <div class="b-card b-reveal" style="margin-bottom:var(--b-gap);border-color:var(--b-a1);">
+        <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+            <span class="b-tag">Day-one win waiting</span>
+            <p style="margin:0;flex:1;min-width:220px;">Complete any career action — a quiz, a DSA solve, a mock interview — and earn a one-time <strong>+{{ m.day_one.bonus }} XP</strong> welcome bonus on top.</p>
+        </div>
+    </div>
+    {% endif %}
+    <div class="b-bento">
+        <div class="b-card b-card--feature b-reveal">
+            <div style="display:flex;gap:1.2rem;align-items:center;">
+                <div class="b-score-ring" style="--b-score:{{ (m.streak.current / (m.streak.longest if m.streak.longest > 0 else 1) * 100) | round(0) }};" role="img" aria-label="{{ m.streak.current }} day streak, longest {{ m.streak.longest }}"><span>{{ m.streak.current }}</span></div>
+                <div>
+                    <h3 style="margin:0;">{{ m.streak.current }}-day streak</h3>
+                    <p style="color:var(--b-muted);font-size:.88rem;margin:.3rem 0 0;">Longest: {{ m.streak.longest }} days · {% if m.streak.last_active %}last active {{ m.streak.last_active }}{% else %}no activity yet{% endif %}</p>
+                    <p style="color:var(--b-muted);font-size:.85rem;margin:.3rem 0 0;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.12em;"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
+                        {{ m.streak.shields_left }} of {{ m.streak.shields_total }} streak shields left this month — a missed day is auto-repaired, no guilt.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="b-card b-card--feature b-reveal b-d1">
+            <span class="b-tag">Level {{ m.level }}</span>
+            <h3 style="margin:.5rem 0;">{{ m.total_xp }} XP</h3>
+            <div class="b-bar" role="progressbar" aria-valuenow="{{ m.level_pct }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progress to level {{ m.level + 1 }}"><i style="width:{{ m.level_pct }}%;"></i></div>
+            <p style="color:var(--b-muted);font-size:.85rem;margin:.5rem 0 0;">{{ m.xp_into_level }} / {{ m.xp_for_next_level }} XP to level {{ m.level + 1 }}</p>
+            {% if m.day_one.earned %}
+            <p style="font-size:.85rem;margin:.5rem 0 0;"><span class="b-tag">Day-one win earned · +{{ m.day_one.bonus }} XP</span></p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{# ---------- Weekly quests ---------- #}
+<section class="b-section" aria-label="Weekly quests">
+    <div class="b-sec-head"><h2>This week's <span class="b-grad">quests</span></h2><p>Consistency beats grinding — each quest rewards showing up across the week.</p></div>
+    <div class="b-bento">
+        {% for q in m.quests %}
+        <article class="b-card b-card--feature b-reveal" id="quest-{{ q.id }}">
+            <span class="b-tag">+{{ q.bonus }} XP</span>
+            <h3 style="margin:.5rem 0;">{{ q.title }}</h3>
+            <p style="color:var(--b-muted);font-size:.88rem;margin:0 0 .8rem;">{{ q.description }}</p>
+            <div class="b-bar" role="progressbar" aria-valuenow="{{ q.pct }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ q.title }} progress"><i style="width:{{ q.pct }}%;"></i></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.6rem;">
+                <span style="color:var(--b-muted);font-size:.85rem;">{{ q.count }} / {{ q.target }}</span>
+                {% if q.claimed %}
+                <span class="b-tag">Claimed</span>
+                {% elif q.completed %}
+                <button class="b-btn b-btn--primary b-btn--sm mm-claim" type="button" data-quest="{{ q.id }}">Claim +{{ q.bonus }} XP</button>
+                {% else %}
+                <span class="b-tag">In progress</span>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    <p class="b-form-error" id="mm-quest-error" style="display:none;" role="alert"></p>
+</section>
+
+{# ---------- League ---------- #}
+<section class="b-section" aria-label="Weekly league">
+    <div class="b-sec-head"><h2>Weekly <span class="b-grad">league</span></h2><p>Small opt-in cohorts. Ranked on consistency — active days and finished quests — not raw XP. Nothing here can be bought.</p></div>
+    <div class="b-card b-reveal">
+        {% if m.league.member %}
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem;">
+            <span class="b-tag">Cohort {{ m.league.league_key }}</span>
+            <button class="b-btn b-btn--ghost b-btn--sm" id="mm-league-leave" type="button">Leave league</button>
+        </div>
+        {% if m.league.board %}
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
+            <thead><tr style="text-align:left;color:var(--b-muted);">
+                <th style="padding:.4rem .6rem;">#</th><th style="padding:.4rem .6rem;">Member</th>
+                <th style="padding:.4rem .6rem;">Active days</th><th style="padding:.4rem .6rem;">Quests</th>
+                <th style="padding:.4rem .6rem;">XP</th><th style="padding:.4rem .6rem;">Score</th>
+            </tr></thead>
+            <tbody>
+            {% for e in m.league.board %}
+            <tr style="{% if e.is_you %}background:rgba(255,255,255,.05);{% endif %}border-top:1px solid rgba(255,255,255,.07);">
+                <td style="padding:.45rem .6rem;">{{ e.rank }}</td>
+                <td style="padding:.45rem .6rem;font-weight:{% if e.is_you %}700{% else %}400{% endif %};">{{ e.name }}{% if e.is_you %} <span class="b-tag">you</span>{% endif %}</td>
+                <td style="padding:.45rem .6rem;">{{ e.streak_days }}</td>
+                <td style="padding:.45rem .6rem;">{{ e.quests_completed }}</td>
+                <td style="padding:.45rem .6rem;">{{ e.xp }}</td>
+                <td style="padding:.45rem .6rem;">{{ e.score }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <p style="color:var(--b-muted);">No standings yet this week — be the first to log an action.</p>
+        {% endif %}
+        {% if m.league.last_week %}
+        <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.07);">
+            <p style="margin:0 0 .5rem;"><span class="b-tag">Last week · {{ m.league.last_week.week_start }}</span></p>
+            <p style="margin:0 0 .6rem;font-size:.95rem;"><strong>{{ m.league.last_week.winner }}</strong> won on consistency.</p>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                {% for e in m.league.last_week.entries %}
+                <span class="b-tag" title="{{ e.streak_days }} active days, {{ e.quests_completed }} quests, {{ e.xp }} XP">{% if e.won %}★ {% endif %}{{ e.name }} · {{ e.streak_days }}d</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <p style="color:var(--b-muted);margin:0 0 1rem;">You're not in a league. Join this week's cohort — small groups, friendly consistency race, leave anytime.</p>
+        <div class="b-cta-row">
+            <button class="b-btn b-btn--primary" id="mm-league-join" type="button">Join this week's league</button>
+            <span class="b-pill" id="mm-league-status" style="display:none;"></span>
+        </div>
+        {% endif %}
+        <p class="b-form-error" id="mm-league-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+
+{# ---------- Weekly reflection ---------- #}
+<section class="b-section" aria-label="Weekly reflection">
+    <div class="b-card b-card--form b-reveal">
+        <div class="b-sec-head" style="margin-top:0;">
+            <h2>Two-minute <span class="b-grad">reflection</span></h2>
+            <p>Wins and one focus for next week. Logging it counts toward your "Look back" quest.</p>
+        </div>
+        <div class="b-field">
+            <label class="b-label" for="mm-wins">This week's wins</label>
+            <textarea class="b-textarea" id="mm-wins" rows="3" maxlength="2000" placeholder="e.g. Solved 4 DSA problems, finished a mock interview…">{{ m.reflection.wins if m.reflection else '' }}</textarea>
+        </div>
+        <div class="b-field">
+            <label class="b-label" for="mm-focus">Focus for next week</label>
+            <textarea class="b-textarea" id="mm-focus" rows="3" maxlength="2000" placeholder="e.g. Two aptitude tests and one STAR story…">{{ m.reflection.focus_next if m.reflection else '' }}</textarea>
+        </div>
+        <div class="b-cta-row">
+            <button class="b-btn b-btn--primary" id="mm-reflect-save" type="button">Save reflection</button>
+            <span class="b-pill" id="mm-reflect-status" style="display:none;"></span>
+        </div>
+        <p class="b-form-error" id="mm-reflect-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+
+{# ---------- Opt out (kind, small) ---------- #}
+<section class="b-section" aria-label="Pause Momentum">
+    <div class="b-card b-reveal" style="text-align:center;">
+        <p style="color:var(--b-muted);font-size:.88rem;margin:0 0 .8rem;">Momentum should never feel like pressure. Pause it anytime — streaks freeze, no XP is recorded, and you can rejoin in one click.</p>
+        <button class="b-btn b-btn--ghost b-btn--sm" id="mm-optout" type="button">Pause Momentum</button>
+        <p class="b-form-error" id="mm-optout-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+{% endif %}
+
+<script src="{{ url_for('static', filename='js/momentum_hub.js') }}"></script>
+{% endblock %}
