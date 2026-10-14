@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Timed Aptitude Tests | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%2310b981' stroke-width='10'/><path d='M50 28v22l16 10' stroke='%2310b981' stroke-width='10' fill='none' stroke-linecap='round'/></svg>">
+    <style>
+        .ap-wrap { max-width: 860px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .ap-head h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+        .ap-head h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .ap-head p { color: var(--text-muted, #94a3b8); margin-bottom: 1.4rem; }
+        .ap-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 2rem; backdrop-filter: blur(12px); margin-bottom: 1.2rem; }
+        .ap-field { margin-bottom: 1rem; }
+        .ap-field label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; }
+        .ap-field select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; color: var(--text-main, #f8fafc); padding: 0.8rem 1rem; font-size: 0.95rem; }
+        .ap-field select option { background: #0b1220; }
+        .ap-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .ap-btn { display: inline-block; background: var(--gradient-primary); color: #04120c; font-weight: 700; border: none; border-radius: 12px; padding: 0.9rem 1.8rem; font-size: 1rem; cursor: pointer; }
+        .ap-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .ap-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main, #f8fafc); }
+        .ap-error { color: var(--accent-danger); font-size: 0.88rem; margin-top: 0.8rem; }
+        .ap-login-cta { text-align: center; padding: 2rem; }
+        .ap-login-cta a { color: var(--accent-primary); font-weight: 700; }
+        .ap-timerbar { position: sticky; top: 4.2rem; z-index: 30; background: rgba(6,12,20,0.92); border: 1px solid rgba(16,185,129,0.25); border-radius: 14px; padding: 0.7rem 1.1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; backdrop-filter: blur(10px); }
+        .ap-timer { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .ap-timer.urgent { color: var(--accent-danger); }
+        .ap-progress { height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; flex: 1; }
+        .ap-progress > div { height: 100%; background: var(--gradient-primary); border-radius: 999px; transition: width 0.3s ease; }
+        .ap-q { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.4rem; margin-bottom: 1rem; }
+        .ap-qmeta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.7rem; }
+        .ap-chip { font-size: 0.75rem; font-weight: 700; background: rgba(16,185,129,0.14); color: var(--accent-primary); border-radius: 999px; padding: 0.25rem 0.75rem; }
+        .ap-chip.diff-Hard { background: rgba(239,68,68,0.14); color: var(--accent-danger); }
+        .ap-chip.diff-Medium { background: rgba(245,158,11,0.14); color: #f59e0b; }
+        .ap-qtext { font-weight: 600; margin-bottom: 0.9rem; line-height: 1.55; white-space: pre-wrap; }
+        .ap-opt { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.65rem 0.8rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 0.5rem; cursor: pointer; transition: border-color 0.15s; }
+        .ap-opt:hover { border-color: rgba(16,185,129,0.5); }
+        .ap-opt input { margin-top: 0.25rem; accent-color: #10b981; }
+        .ap-opt.sel { border-color: #10b981; background: rgba(16,185,129,0.08); }
+        .ap-opt.correct { border-color: #10b981; background: rgba(16,185,129,0.12); }
+        .ap-opt.wrong { border-color: var(--accent-danger); background: rgba(239,68,68,0.1); }
+        .ap-expl { margin-top: 0.7rem; font-size: 0.88rem; color: #cbd5e1; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 0.7rem 0.9rem; }
+        .ap-expl strong { color: var(--accent-primary); }
+        .ap-score-ring { width: 130px; height: 130px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.9rem; font-weight: 800; margin: 0 auto 1rem; }
+        .ap-bar-row { display: grid; grid-template-columns: 130px 1fr 48px; gap: 0.7rem; align-items: center; margin-bottom: 0.55rem; font-size: 0.85rem; }
+        .ap-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+        .ap-bar > div { height: 100%; background: var(--gradient-primary); border-radius: 999px; }
+        .ap-weak { margin-top: 1rem; padding: 0.9rem 1.1rem; border-radius: 12px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.35); font-size: 0.9rem; }
+        .ap-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.2rem; }
+        @media (max-width: 700px) { .ap-wrap { padding-top: 5.5rem; } .ap-card, .ap-q { padding: 1.2rem; } .ap-grid2 { grid-template-columns: 1fr; } .ap-bar-row { grid-template-columns: 96px 1fr 44px; } }
+        @media (prefers-reduced-motion: reduce) { .ap-progress > div { transition: none; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
+            <span>ResumeAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/practice">Practice</a></li>
+            <li><a href="/aptitude" class="active">Aptitude</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            {% include "_auth_links.html" %}
+        </ul>
+    </nav>
+
+    <div class="ap-wrap">
+        <div class="ap-head">
+            <h1>Timed <span class="gradient-text">Aptitude Tests</span></h1>
+            <p>{{ total }} curated questions across quantitative aptitude, logical reasoning, and verbal ability. Beat the clock — timing is validated server-side.</p>
+        </div>
+
+        {% if not is_authed %}
+        <div class="ap-card ap-login-cta">
+            <p><a href="{{ url_for('login', next='/aptitude') }}">Log in</a> to take timed tests and save your attempts.</p>
+        </div>
+        {% endif %}
+
+        <div class="ap-card" id="setup-card" {% if not is_authed %}style="display:none"{% endif %}>
+            <div class="ap-field">
+                <label for="sel-category">Category</label>
+                <select id="sel-category">
+                    <option value="mixed">Mixed (all categories)</option>
+                    {% for cat, count in categories %}
+                    <option value="{{ cat }}">{{ cat|title }} ({{ count }} questions)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ap-grid2">
+                <div class="ap-field">
+                    <label for="sel-count">Questions</label>
+                    <select id="sel-count">
+                        <option value="10">10 questions</option>
+                        <option value="15">15 questions</option>
+                        <option value="20" selected>20 questions</option>
+                        <option value="25">25 questions</option>
+                        <option value="30">30 questions</option>
+                    </select>
+                </div>
+                <div class="ap-field">
+                    <label for="sel-time">Time limit</label>
+                    <select id="sel-time">
+                        <option value="300">5 minutes</option>
+                        <option value="600" selected>10 minutes</option>
+                        <option value="900">15 minutes</option>
+                        <option value="1200">20 minutes</option>
+                        <option value="1800">30 minutes</option>
+                    </select>
+                </div>
+            </div>
+            <button class="ap-btn" id="btn-start">Start Test</button>
+            <div class="ap-error" id="setup-error" role="alert" style="display:none"></div>
+        </div>
+
+        <div id="test-view" style="display:none">
+            <div class="ap-timerbar">
+                <div class="ap-progress"><div id="ap-prog" style="width:0%"></div></div>
+                <div class="ap-timer" id="ap-timer">--:--</div>
+            </div>
+            <div id="ap-questions"></div>
+            <div class="ap-actions">
+                <button class="ap-btn" id="btn-submit">Submit Answers</button>
+            </div>
+            <div class="ap-error" id="test-error" role="alert" style="display:none"></div>
+        </div>
+
+        <div id="result-view" style="display:none"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/aptitude.js') }}"></script>
+</body>
+</html>

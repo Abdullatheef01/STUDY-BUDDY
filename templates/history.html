@@ -251,6 +251,25 @@
 </div>
 
 <div class="section">
+    <h2>&#9201; Aptitude Tests</h2>
+    {% if aptitude_attempts %}
+    <div class="card-grid">
+        {% for a in aptitude_attempts %}
+        <a class="hist-card" href="{{ url_for('aptitude_report', attempt_id=a.id) }}">
+            <div class="fname">&#9201; {{ a.category|title }} &mdash; {{ '%.1f' % (a.summary_json.score_pct if a.summary_json and a.summary_json.score_pct is not none else 0) }}%</div>
+            <div class="meta">{{ a.num_questions }} questions &middot; {{ (a.summary_json.correct if a.summary_json else 0) }}/{{ a.num_questions }} correct{% if a.expired %} &middot; time expired{% endif %}</div>
+            <div class="meta">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        No aptitude attempts yet. <a href="{{ url_for('aptitude_home') }}">Take a timed test</a> and your scores will appear here.
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
     <h2>&#127919; Career Goals</h2>    <form class="goal-form" method="POST" action="{{ url_for('goal_add') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" name="title" placeholder="e.g. Crack SDE-1 interviews by March" maxlength="255" required>

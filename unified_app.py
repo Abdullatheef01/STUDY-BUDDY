@@ -14,6 +14,7 @@ import sys
 import time
 import uuid
 import json
+import random
 import hashlib
 import secrets
 import logging
@@ -244,6 +245,10 @@ from dsa_practice import (all_problems, get_problem, topics as dsa_topics,
                           filter_problems, public_problem, reveal_hint,
                           reveal_approach, validate_status_payload,
                           weak_topic_diagnosis, VALID_STATUSES)
+from aptitude_test import (categories as aptitude_categories,
+                           pick_questions as aptitude_pick,
+                           validate_test_setup, score_attempt,
+                           SUBMIT_GRACE_SEC, all_questions as aptitude_all)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -458,6 +463,46 @@ class DSAProgress(db.Model):
     __table_args__ = (db.UniqueConstraint("user_id", "problem_id", name="uq_dsa_user_problem"),)
 
     user = db.relationship("User", backref=db.backref("dsa_progress", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class AptitudeAttempt(db.Model):
+    """A timed aptitude test attempt belonging to a user (Wave 2 #16)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    category = db.Column(db.String(30), nullable=False)  # quantitative|logical|verbal|mixed
+    num_questions = db.Column(db.Integer, nullable=False)
+    time_limit_sec = db.Column(db.Integer, nullable=False)
+    question_ids = db.Column(db.JSON)   # ordered question ids (server-picked)
+    answers_json = db.Column(db.JSON)   # {qid: chosen_index}
+    results_json = db.Column(db.JSON)   # per-question review payload
+    summary_json = db.Column(db.JSON)   # score + analytics
+    expired = db.Column(db.Boolean, default=False, nullable=False)
+    started_at = db.Column(db.DateTime, nullable=False)  # server timestamp
+    submitted_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("aptitude_attempts", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class STARDraft(db.Model):
+    """A STAR answer draft belonging to a user (Wave 2 #17)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    competency = db.Column(db.String(50), nullable=False)
+    situation = db.Column(db.Text, default="")
+    task = db.Column(db.Text, default="")
+    action = db.Column(db.Text, default="")
+    result = db.Column(db.Text, default="")
+    scores_json = db.Column(db.JSON)       # per-section + overall scores
+    suggestions_json = db.Column(db.JSON)  # rewrite suggestions
+    ai_powered = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("star_drafts", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -2590,6 +2635,118 @@ def register_routes(app):
             return jsonify({'error': 'Could not save progress. Please try again.'}), 500
         return jsonify({'success': True, 'status': row.status})
 
+    # ---------- TIMED APTITUDE TESTS (Wave 2 #16) ----------
+    @app.route('/aptitude')
+    def aptitude_home():
+        """Aptitude test setup: category, question count, time limit."""
+        return render_template('aptitude.html',
+                               categories=aptitude_categories(),
+                               total=len(aptitude_all()),
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/aptitude/start', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def aptitude_start():
+        """Start a timed attempt. Login required. Server stamps the start
+        time; the client countdown is display-only.
+
+        CSRF token comes via the X-CSRFToken header, so this route is NOT
+        CSRF-exempt.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to take a test.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        cleaned, error = validate_test_setup(payload or {})
+        if error:
+            return jsonify({'error': error}), 400
+        seed = random.randint(0, 2 ** 31 - 1)
+        questions = aptitude_pick(cleaned["category"], n=cleaned["n"], seed=seed)
+        if not questions:
+            return jsonify({'error': 'No questions available for that selection.'}), 400
+        try:
+            row = AptitudeAttempt(
+                user_id=current_user.id,
+                category=cleaned["category"],
+                num_questions=len(questions),
+                time_limit_sec=cleaned["time_limit"],
+                question_ids=[q["id"] for q in questions],
+                started_at=datetime.now(timezone.utc),
+            )
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Aptitude attempt creation failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not start the test. Please try again.'}), 500
+        return jsonify({'success': True, 'attempt_id': row.id,
+                        'questions': json_safe(questions),
+                        'time_limit_sec': row.time_limit_sec})
+
+    @app.route('/aptitude/<int:attempt_id>/submit', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def aptitude_submit(attempt_id):
+        """Submit answers. Scoring is fully server-side: the question set
+        and correct answers come from the bank, never the client. The time
+        window is validated against the server start timestamp.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to submit.'}), 401
+        row = db.session.get(AptitudeAttempt, attempt_id)
+        if not row or row.user_id != current_user.id:
+            return jsonify({'error': 'Attempt not found.'}), 404
+        if row.submitted_at is not None:
+            return jsonify({'error': 'This attempt was already submitted.'}), 400
+        payload = request.get_json(silent=True) or {}
+        raw_answers = payload.get("answers") or {}
+        if not isinstance(raw_answers, dict):
+            return jsonify({'error': 'Invalid answers format.'}), 400
+        answers = {}
+        for qid in (row.question_ids or []):
+            if qid in raw_answers:
+                try:
+                    idx = int(raw_answers[qid])
+                except (TypeError, ValueError):
+                    continue
+                if 0 <= idx <= 3:
+                    answers[qid] = idx
+        now = datetime.now(timezone.utc)
+        started = row.started_at
+        if started.tzinfo is None:
+            started = started.replace(tzinfo=timezone.utc)
+        elapsed = (now - started).total_seconds()
+        expired = elapsed > (row.time_limit_sec + SUBMIT_GRACE_SEC)
+        results, summary = score_attempt(row.question_ids or [], answers)
+        summary["time_used_sec"] = int(min(elapsed, row.time_limit_sec + SUBMIT_GRACE_SEC))
+        summary["expired"] = expired
+        try:
+            row.answers_json = json_safe(answers)
+            row.results_json = json_safe(results)
+            row.summary_json = json_safe(summary)
+            row.expired = expired
+            row.submitted_at = now
+            db.session.commit()
+        except Exception:
+            log.exception("Aptitude submit persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your attempt. Please try again.'}), 500
+        return jsonify({'success': True, 'expired': expired,
+                        'summary': json_safe(summary),
+                        'results': json_safe(results)})
+
+    @app.route('/aptitude/<int:attempt_id>')
+    @login_required
+    def aptitude_report(attempt_id):
+        """Saved attempt report (owner only)."""
+        row = db.session.get(AptitudeAttempt, attempt_id)
+        if not row or row.user_id != current_user.id:
+            abort(404)
+        if row.submitted_at is None:
+            flash("This attempt has not been submitted yet.", "warning")
+            return redirect(url_for('aptitude_home'))
+        return render_template('aptitude_result.html', attempt=row,
+                               results=row.results_json or [],
+                               summary=row.summary_json or {})
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -2638,13 +2795,18 @@ def register_routes(app):
         coach_reports = (CommunicationAnalysis.query
                          .filter_by(user_id=current_user.id)
                          .order_by(CommunicationAnalysis.created_at.desc()).all())
+        aptitude_attempts = (AptitudeAttempt.query
+                             .filter(AptitudeAttempt.user_id == current_user.id,
+                                     AptitudeAttempt.submitted_at.isnot(None))
+                             .order_by(AptitudeAttempt.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
                                jd_matches=jd_matches, rewrites=rewrites,
                                cover_docs=cover_docs, linkedin_reports=linkedin_reports,
                                tracker_stats=tracker_stats, assessments=assessments,
-                               interviews=interviews, coach_reports=coach_reports)
+                               interviews=interviews, coach_reports=coach_reports,
+                               aptitude_attempts=aptitude_attempts)
 
     # ---------- INDIA SALARY EXPLORER (Wave 1 #8) ----------
     @app.route('/salary')
