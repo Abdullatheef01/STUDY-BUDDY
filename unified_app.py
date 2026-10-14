@@ -233,6 +233,8 @@ from career_assessment import (score_assessment, rule_based_why,
                                QUESTIONS, TOP_N_CLUSTERS)
 from salary_data import (get_options as salary_options, query as salary_query,
                           SalaryDataError)
+from opportunities import (list_opportunities, get_meta as opp_meta,
+                           opp_exists, TYPES as OPP_TYPES, OpportunityDataError)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -428,6 +430,21 @@ class Goal(db.Model):
 
     user = db.relationship("User", backref=db.backref("goals", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
+
+
+class OpportunityBookmark(db.Model):
+    """A user's bookmarked opportunity from the radar board (Wave 1 #9)."""
+    __tablename__ = "opportunity_bookmark"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    opp_id = db.Column(db.String(64), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "opp_id",
+                                         name="uq_bookmark_user_opp"),)
+
+    user = db.relationship("User", backref=db.backref("opportunity_bookmarks", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
 
 
 class AnonymousAnalysis(db.Model):
@@ -2183,6 +2200,77 @@ def register_routes(app):
             return jsonify({'success': False,
                             'error': 'Salary data is temporarily unavailable.'}), 503
         return jsonify({'success': True, 'entries': entries})
+
+    # ---------- OPPORTUNITY RADAR (Wave 1 #9) ----------
+    def _opp_labels(o):
+        """(deadline_label, countdown_label) for a board card."""
+        if not o["deadline"]:
+            return "", ""
+        y, m, d = (int(p) for p in o["deadline"].split("-"))
+        label = date(y, m, d).strftime("%d %b %Y")
+        n = o["days_left"]
+        countdown = "closes today" if n == 0 else ("1 day left" if n == 1 else f"{n} days left")
+        return label, countdown
+
+    @app.route('/opportunities')
+    def opportunity_board():
+        """Curated board of internships, scholarships and exams, sorted by deadline."""
+        opp_type = (request.args.get('type') or '').strip()
+        if opp_type not in OPP_TYPES:
+            opp_type = ""
+        try:
+            opps = list_opportunities(opp_type=opp_type or None)
+            meta = opp_meta()
+        except OpportunityDataError:
+            return render_template('error.html', message=(
+                "Opportunity data is temporarily unavailable. Please try again later.")), 503
+        bookmarked = set()
+        saved_only = False
+        if current_user.is_authenticated:
+            bookmarked = {b.opp_id for b in
+                          OpportunityBookmark.query.filter_by(user_id=current_user.id).all()}
+            saved_only = request.args.get('saved') == '1'
+            if saved_only:
+                opps = [o for o in opps if o["id"] in bookmarked]
+        for o in opps:
+            o["deadline_label"], o["countdown_label"] = _opp_labels(o)
+        return render_template('opportunities.html', opps=opps, meta=meta,
+                               types=OPP_TYPES, active_type=opp_type,
+                               saved_only=saved_only, bookmarked=bookmarked,
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/opportunities/bookmark', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def opportunity_bookmark_add():
+        """Bookmark an opportunity. CSRF via X-CSRFToken header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to save opportunities.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        opp_id = ((payload or {}).get('opp_id') or '').strip()
+        if not opp_id or not opp_exists(opp_id):
+            return jsonify({'error': 'Opportunity not found.'}), 404
+        existing = OpportunityBookmark.query.filter_by(
+            user_id=current_user.id, opp_id=opp_id).first()
+        if not existing:
+            db.session.add(OpportunityBookmark(user_id=current_user.id, opp_id=opp_id))
+            db.session.commit()
+        return jsonify({'success': True, 'opp_id': opp_id}), 201
+
+    @app.route('/opportunities/bookmark/remove', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def opportunity_bookmark_remove():
+        """Remove a bookmark. CSRF via X-CSRFToken header (not exempt)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        opp_id = ((payload or {}).get('opp_id') or '').strip()
+        row = OpportunityBookmark.query.filter_by(
+            user_id=current_user.id, opp_id=opp_id).first()
+        if not row:
+            return jsonify({'error': 'Bookmark not found.'}), 404
+        db.session.delete(row)
+        db.session.commit()
+        return jsonify({'success': True, 'opp_id': opp_id})
 
     # ---------- GOALS ----------
     @app.route('/goals/add', methods=['POST'])

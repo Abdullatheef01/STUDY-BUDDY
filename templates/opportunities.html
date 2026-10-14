@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Opportunity Radar | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2314b8a6'/><circle cx='50' cy='50' r='18' fill='none' stroke='white' stroke-width='8'/><path d='M50 32v-12M50 80v-12M32 50H20M80 50H68' stroke='white' stroke-width='8' stroke-linecap='round'/></svg>">
+    <style>
+        .opp-wrap { max-width: 1100px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .opp-head h1 { font-size: 1.9rem; }
+        .opp-head h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .opp-head p { color: var(--text-muted, #94a3b8); margin-top: 0.3rem; max-width: 640px; }
+        .opp-notice { margin: 1.2rem 0; background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.3); border-radius: 14px; padding: 0.9rem 1.2rem; font-size: 0.85rem; color: #bae6fd; }
+        .opp-filters { display: flex; gap: 0.7rem; align-items: end; flex-wrap: wrap; margin-bottom: 1.4rem; background: var(--bg-card); border: 1px solid rgba(16,185,129,0.22); border-radius: 16px; padding: 1rem 1.1rem; }
+        .opp-filters label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-muted, #94a3b8); }
+        .opp-filters select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; color: var(--text-main, #f8fafc); padding: 0.6rem 0.7rem; font-size: 0.9rem; min-width: 180px; }
+        .opp-filters select option { color: #0f172a; }
+        .opp-check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; padding-bottom: 0.6rem; }
+        .opp-btn { background: var(--gradient-primary); color: #fff; border: none; border-radius: 12px; padding: 0.65rem 1.3rem; font-weight: 700; cursor: pointer; font-size: 0.92rem; }
+        .opp-btn:hover { filter: brightness(1.1); }
+        .opp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+        .opp-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.55rem; }
+        .opp-card.soon { border-color: rgba(245,158,11,0.55); box-shadow: 0 0 0 1px rgba(245,158,11,0.25); }
+        .opp-top { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        .opp-badge { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border-radius: 999px; padding: 0.2rem 0.65rem; }
+        .opp-badge.internship { background: rgba(16,185,129,0.16); color: var(--accent-primary); }
+        .opp-badge.scholarship { background: rgba(56,189,248,0.14); color: var(--accent-info); }
+        .opp-badge.exam { background: rgba(245,158,11,0.14); color: var(--accent-warning); }
+        .opp-soon { font-size: 0.72rem; font-weight: 800; border-radius: 999px; padding: 0.2rem 0.65rem; background: rgba(245,158,11,0.18); color: var(--accent-warning); }
+        .opp-card h3 { font-size: 1.05rem; line-height: 1.35; }
+        .opp-org { font-size: 0.83rem; color: var(--text-muted, #94a3b8); }
+        .opp-deadline { font-size: 0.85rem; font-weight: 600; }
+        .opp-deadline .left { color: var(--accent-primary); }
+        .opp-deadline .left.urgent { color: var(--accent-warning); }
+        .opp-elig { font-size: 0.85rem; color: #cbd5e1; }
+        .opp-actions { display: flex; gap: 0.6rem; margin-top: auto; padding-top: 0.5rem; flex-wrap: wrap; }
+        .opp-link { display: inline-block; font-size: 0.85rem; font-weight: 700; color: var(--accent-primary); text-decoration: none; border: 1px solid rgba(16,185,129,0.4); border-radius: 10px; padding: 0.45rem 0.9rem; }
+        .opp-link:hover { background: rgba(16,185,129,0.12); }
+        .opp-bm { font-size: 0.85rem; font-weight: 600; background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text-main, #f8fafc); border-radius: 10px; padding: 0.45rem 0.9rem; cursor: pointer; }
+        .opp-bm.saved { border-color: var(--accent-tertiary); color: var(--accent-tertiary); }
+        .opp-bm:disabled { opacity: 0.6; cursor: wait; }
+        .opp-empty { text-align: center; color: var(--text-muted, #94a3b8); padding: 2.5rem 1rem; border: 1px dashed rgba(255,255,255,0.12); border-radius: 14px; }
+        .opp-login-cta { font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin-bottom: 1.2rem; }
+        .opp-login-cta a { color: var(--accent-primary); font-weight: 700; }
+        .opp-count { font-size: 0.82rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.8rem; }
+        .opp-schema { margin-top: 2rem; font-size: 0.8rem; color: var(--text-muted, #94a3b8); }
+        .opp-schema code { background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 6px; font-size: 0.78rem; }
+        @media (prefers-reduced-motion: reduce) { .opp-btn:hover, .opp-link:hover { filter: none; } }
+    </style>
+</head>
+<body>
+    <div class="opp-wrap">
+        <div class="opp-head">
+            <h1>Opportunity <span class="gradient-text">Radar</span></h1>
+            <p>Internships, scholarships and competitive exams with deadlines — sorted so the closest deadlines surface first.</p>
+        </div>
+
+        <div class="opp-notice">{{ meta.notice }} <strong>Last updated: {{ meta.last_updated }}.</strong></div>
+
+        <form class="opp-filters" method="get" action="{{ url_for('opportunity_board') }}">
+            <div>
+                <label for="fType">Type</label>
+                <select id="fType" name="type">
+                    <option value="">All types</option>
+                    {% for t in types %}
+                    <option value="{{ t }}" {% if active_type == t %}selected{% endif %}>{{ t|capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if is_authed %}
+            <label class="opp-check"><input type="checkbox" name="saved" value="1" {% if saved_only %}checked{% endif %}> Saved only</label>
+            {% endif %}
+            <button class="opp-btn" type="submit">Apply</button>
+        </form>
+
+        {% if not is_authed %}
+        <p class="opp-login-cta"><a href="{{ url_for('login', next='/opportunities') }}">Log in</a> to bookmark opportunities and build your shortlist.</p>
+        {% endif %}
+
+        <p class="opp-count">{{ opps|length }} opportunit{{ 'y' if opps|length == 1 else 'ies' }} · sorted by deadline</p>
+
+        <div class="opp-grid" id="oppGrid">
+            {% for o in opps %}
+            <article class="opp-card {% if o.closing_soon %}soon{% endif %}" data-opp-id="{{ o.id }}">
+                <div class="opp-top">
+                    <span class="opp-badge {{ o.type }}">{{ o.type }}</span>
+                    {% if o.closing_soon %}<span class="opp-soon">Closing soon</span>{% endif %}
+                </div>
+                <h3>{{ o.title }}</h3>
+                <div class="opp-org">{{ o.organization }}</div>
+                <div class="opp-deadline">
+                    {% if o.deadline %}
+                        Deadline: {{ o.deadline_label }} ·
+                        <span class="left {% if o.closing_soon %}urgent{% endif %}">{{ o.countdown_label }}</span>
+                    {% else %}
+                        <span class="left">Rolling — check the official site</span>
+                    {% endif %}
+                </div>
+                <p class="opp-elig">{{ o.eligibility }}</p>
+                <div class="opp-actions">
+                    <a class="opp-link" href="{{ o.link }}" target="_blank" rel="noopener">Official site ↗</a>
+                    {% if is_authed %}
+                    <button class="opp-bm {% if o.id in bookmarked %}saved{% endif %}" type="button" data-bookmarked="{{ '1' if o.id in bookmarked else '0' }}">{{ '★ Saved' if o.id in bookmarked else '☆ Save' }}</button>
+                    {% endif %}
+                </div>
+            </article>
+            {% else %}
+            <div class="opp-empty">No opportunities match these filters.</div>
+            {% endfor %}
+        </div>
+
+        <p class="opp-schema">Maintaining this board? Opportunities live in <code>data/opportunities.json</code> — the documented schema is in <code>opportunities.py</code> (<code>OPPORTUNITY JSON SCHEMA</code>).</p>
+    </div>
+    <script src="{{ url_for('static', filename='js/opportunities.js') }}"></script>
+</body>
+</html>
