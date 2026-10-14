@@ -1,0 +1,8965 @@
+[
+ {
+  "question": "Tell me about a time you took ownership of a project that was failing. What did you do?",
+  "companies": [
+   "Amazon",
+   "Microsoft",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Describe the failing state concretely (missed milestones, unhappy stakeholders)",
+   "List the specific actions YOU took: re-scoping, rallying the team, unblocking dependencies",
+   "Quantify the turnaround: shipped date, metrics recovered",
+   "Reflect: what early signal you now watch for"
+  ],
+  "time_minutes": 4,
+  "id": "beh-001"
+ },
+ {
+  "question": "Describe a situation where you went beyond your defined role to deliver a result.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "What was your official scope vs what you actually did",
+   "Why you chose to step up (customer impact, team need)",
+   "Outcome with numbers; credit collaborators honestly"
+  ],
+  "time_minutes": 3,
+  "id": "beh-002"
+ },
+ {
+  "question": "Tell me about a time you identified a problem nobody else had noticed.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "How you spotted it: data, logs, user feedback, code review",
+   "How you validated it was real before raising it",
+   "What you did to fix it and the measured impact"
+  ],
+  "time_minutes": 3,
+  "id": "beh-003"
+ },
+ {
+  "question": "Give an example of a time you delivered a difficult project with minimal guidance.",
+  "companies": [
+   "Meta",
+   "Amazon",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "How you decomposed the ambiguous goal into a plan",
+   "Where you sought input vs decided independently",
+   "Result and what the experience taught you about autonomy"
+  ],
+  "time_minutes": 4,
+  "id": "beh-004"
+ },
+ {
+  "question": "Tell me about a time you had to clean up someone else's mess under a deadline.",
+  "companies": [
+   "Amazon",
+   "Flipkart",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Stay factual and blameless about the predecessor's work",
+   "Your triage approach: what you fixed first and why",
+   "How you prevented recurrence (docs, tests, handover)"
+  ],
+  "time_minutes": 3,
+  "id": "beh-005"
+ },
+ {
+  "question": "Describe a time you pushed back on a request because it was the wrong thing to build.",
+  "companies": [
+   "Google",
+   "Netflix",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The request and why you believed it was wrong (data/user evidence)",
+   "How you communicated the pushback respectfully",
+   "The alternative you proposed and its outcome"
+  ],
+  "time_minutes": 4,
+  "id": "beh-006"
+ },
+ {
+  "question": "Tell me about the project you are most proud of and why.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Easy",
+  "key_points": [
+   "Pick a project with real complexity and real users",
+   "Your specific contribution vs the team's",
+   "Measurable impact and personal growth"
+  ],
+  "time_minutes": 3,
+  "id": "beh-007"
+ },
+ {
+  "question": "Describe a time you automated away a painful manual process.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The pain: time wasted, error rate",
+   "Your solution: tooling, scripts, or process change",
+   "Time saved per week/month, quantified"
+  ],
+  "time_minutes": 3,
+  "id": "beh-008"
+ },
+ {
+  "question": "Tell me about a time you took a calculated risk at work. What happened?",
+  "companies": [
+   "Netflix",
+   "Meta",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The risk, the upside you saw, and how you bounded the downside",
+   "Who you aligned with before acting",
+   "Outcome - honest about both wins and misses"
+  ],
+  "time_minutes": 4,
+  "id": "beh-009"
+ },
+ {
+  "question": "Give an example of when you improved something without being asked.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "What you noticed and why it mattered",
+   "What you changed (code, process, docs)",
+   "Evidence it helped: metrics or feedback"
+  ],
+  "time_minutes": 3,
+  "id": "beh-010"
+ },
+ {
+  "question": "Tell me about a time you owned an outage or production incident end to end.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Detection: how you found out and assessed blast radius",
+   "Mitigation steps in order; communication to stakeholders",
+   "Root cause, postmortem, and preventive action items"
+  ],
+  "time_minutes": 4,
+  "id": "beh-011"
+ },
+ {
+  "question": "Describe a situation where you had to learn a completely new technology quickly to deliver.",
+  "companies": [
+   "Microsoft",
+   "TCS",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Why the new tech was needed; your learning plan",
+   "How you validated your understanding (prototypes, reviews)",
+   "Delivery outcome"
+  ],
+  "time_minutes": 3,
+  "id": "beh-012"
+ },
+ {
+  "question": "Tell me about a time you said no to your manager. How did it go?",
+  "companies": [
+   "Netflix",
+   "Amazon",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The ask and your reasoned objection (data, trade-offs)",
+   "How you framed it constructively with alternatives",
+   "The decision and your commitment to it afterward"
+  ],
+  "time_minutes": 4,
+  "id": "beh-013"
+ },
+ {
+  "question": "Give an example of a time you turned vague requirements into a shipped product.",
+  "companies": [
+   "Meta",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "How you extracted clarity: questions, prototypes, spikes",
+   "Scope decisions you made and their rationale",
+   "Launch result and user reception"
+  ],
+  "time_minutes": 4,
+  "id": "beh-014"
+ },
+ {
+  "question": "Tell me about a time you mentored someone and it changed the outcome of a project.",
+  "companies": [
+   "Google",
+   "Microsoft",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Who you mentored and what they were stuck on",
+   "Your mentoring approach: pairing, feedback, stretch tasks",
+   "Their growth and the project result"
+  ],
+  "time_minutes": 3,
+  "id": "beh-015"
+ },
+ {
+  "question": "Tell me about your biggest professional failure. What did you learn?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Pick a REAL failure with real stakes, not a humblebrag",
+   "Your role in it - own it fully, no deflection",
+   "Specific lesson and how you changed behavior since, with an example"
+  ],
+  "time_minutes": 4,
+  "id": "beh-016"
+ },
+ {
+  "question": "Describe a time you missed a deadline. What happened and what did you do?",
+  "companies": [
+   "Amazon",
+   "TCS",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Why the deadline slipped: estimation error, scope creep, dependency",
+   "When and how you communicated the slip (early > late)",
+   "Recovery plan and the eventual delivery"
+  ],
+  "time_minutes": 3,
+  "id": "beh-017"
+ },
+ {
+  "question": "Tell me about a time your first solution to a problem was completely wrong.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "What the wrong approach was and why it seemed right initially",
+   "What evidence made you realize it was wrong",
+   "How you pivoted and what you check first now"
+  ],
+  "time_minutes": 3,
+  "id": "beh-018"
+ },
+ {
+  "question": "Give an example of a bug you shipped to production. How did you handle it?",
+  "companies": [
+   "Amazon",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The bug's impact, stated plainly",
+   "Detection, rollback/fix, and customer communication",
+   "Test/process changes so it cannot recur"
+  ],
+  "time_minutes": 3,
+  "id": "beh-019"
+ },
+ {
+  "question": "Tell me about a time you received harsh critical feedback. How did you respond?",
+  "companies": [
+   "Netflix",
+   "Amazon",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The feedback, without defensiveness",
+   "What you did with it: reflection, follow-up, behavior change",
+   "A later example showing the growth"
+  ],
+  "time_minutes": 4,
+  "id": "beh-020"
+ },
+ {
+  "question": "Describe a project that failed despite your best effort.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Why it failed: market, tech bet, execution - be analytical",
+   "What was in your control vs not",
+   "What you would do differently with the same constraints"
+  ],
+  "time_minutes": 4,
+  "id": "beh-021"
+ },
+ {
+  "question": "Tell me about a time you had to admit you didn't know something important.",
+  "companies": [
+   "Microsoft",
+   "TCS",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Easy",
+  "key_points": [
+   "The situation and why admitting it was the right call",
+   "How you closed the gap quickly",
+   "How it built trust"
+  ],
+  "time_minutes": 3,
+  "id": "beh-022"
+ },
+ {
+  "question": "Give an example of when you over-engineered a solution. What was the cost?",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "What you built vs what was actually needed",
+   "The cost: time, complexity, maintenance",
+   "Your simplicity heuristic now"
+  ],
+  "time_minutes": 3,
+  "id": "beh-023"
+ },
+ {
+  "question": "Tell me about a disagreement you lost. Were they right?",
+  "companies": [
+   "Netflix",
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The disagreement and both positions fairly stated",
+   "How you committed fully once decided (disagree-and-commit)",
+   "Honest verdict with hindsight"
+  ],
+  "time_minutes": 4,
+  "id": "beh-024"
+ },
+ {
+  "question": "Describe a time you had to unlearn something to make progress.",
+  "companies": [
+   "Microsoft",
+   "Meta",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The old belief/habit and where it came from",
+   "What forced the rethink",
+   "The new approach and its results"
+  ],
+  "time_minutes": 3,
+  "id": "beh-025"
+ },
+ {
+  "question": "Tell me about a time you underestimated the complexity of a task.",
+  "companies": [
+   "Amazon",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Initial estimate vs reality, and what you missed",
+   "How you re-planned and communicated",
+   "How you estimate differently now"
+  ],
+  "time_minutes": 3,
+  "id": "beh-026"
+ },
+ {
+  "question": "Give an example of a time you got something wrong about a user or customer.",
+  "companies": [
+   "Amazon",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Your assumption and the contradicting evidence",
+   "How you discovered the truth (research, data, feedback)",
+   "What changed in the product and your process"
+  ],
+  "time_minutes": 3,
+  "id": "beh-027"
+ },
+ {
+  "question": "Tell me about a conflict between speed and quality you faced. How did you resolve it?",
+  "companies": [
+   "Meta",
+   "Google",
+   "Netflix"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The trade-off and the stakes on each side",
+   "Your decision framework: what was reversible vs not",
+   "Outcome and whether you would decide the same again"
+  ],
+  "time_minutes": 4,
+  "id": "beh-028"
+ },
+ {
+  "question": "Describe your most difficult debugging experience.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The symptom and why it was hard (flaky, distributed, no repro)",
+   "Your systematic approach: hypotheses, instrumentation",
+   "Root cause and the fix"
+  ],
+  "time_minutes": 4,
+  "id": "beh-029"
+ },
+ {
+  "question": "Tell me about a time you had to deliver bad news to a stakeholder.",
+  "companies": [
+   "Amazon",
+   "TCS",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The bad news and why you owned the delivery",
+   "How you framed it: facts, impact, options, recommendation",
+   "The stakeholder's reaction and the resolution"
+  ],
+  "time_minutes": 3,
+  "id": "beh-030"
+ },
+ {
+  "question": "Tell me about a time you disagreed with a teammate on a technical approach.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Both approaches fairly described; focus on trade-offs not personalities",
+   "How you evaluated: prototype, data, precedent",
+   "Resolution and your genuine support for the chosen path"
+  ],
+  "time_minutes": 4,
+  "id": "beh-031"
+ },
+ {
+  "question": "Describe a conflict you had with a product manager or designer.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The conflicting goals: timeline vs quality vs scope",
+   "How you found the shared goal underneath",
+   "The compromise and its result"
+  ],
+  "time_minutes": 3,
+  "id": "beh-032"
+ },
+ {
+  "question": "Tell me about a time you had to work with a difficult colleague.",
+  "companies": [
+   "Amazon",
+   "TCS",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Describe behaviors, never label the person",
+   "What you tried: direct conversation, adapting, escalation",
+   "What worked and what the relationship looks like now"
+  ],
+  "time_minutes": 3,
+  "id": "beh-033"
+ },
+ {
+  "question": "Give an example of when you had to influence without authority.",
+  "companies": [
+   "Google",
+   "Microsoft",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The goal and why you had no formal power",
+   "Your influence tools: data, prototypes, allies, storytelling",
+   "The outcome and what you learned about persuasion"
+  ],
+  "time_minutes": 4,
+  "id": "beh-034"
+ },
+ {
+  "question": "Tell me about a time two teams you depended on disagreed, blocking you.",
+  "companies": [
+   "Amazon",
+   "Meta",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The deadlock and its impact on your deliverable",
+   "How you brokered alignment: joint doc, escalation path, decision owner",
+   "Unblocked result"
+  ],
+  "time_minutes": 4,
+  "id": "beh-035"
+ },
+ {
+  "question": "Describe a code-review disagreement that got heated. How did you handle it?",
+  "companies": [
+   "Google",
+   "Netflix",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The technical substance of the disagreement",
+   "How you de-escalated: took it offline, appealed to principles/data",
+   "The standard or precedent it set"
+  ],
+  "time_minutes": 3,
+  "id": "beh-036"
+ },
+ {
+  "question": "Tell me about a time you felt a decision was wrong but had to execute it anyway.",
+  "companies": [
+   "Amazon",
+   "Netflix",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Show you voiced concerns through proper channels first",
+   "How you committed fully: no foot-dragging, best effort",
+   "Result - honest about whether concerns proved valid"
+  ],
+  "time_minutes": 4,
+  "id": "beh-037"
+ },
+ {
+  "question": "Give an example of resolving a priority conflict between two managers.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The competing asks and their business weights",
+   "How you made the trade-off visible instead of silently dropping one",
+   "The negotiated outcome"
+  ],
+  "time_minutes": 3,
+  "id": "beh-038"
+ },
+ {
+  "question": "Tell me about a time you gave difficult feedback to a peer.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The situation requiring feedback; your relationship context",
+   "How you delivered it: specific, timely, private, actionable",
+   "Their response and the change you observed"
+  ],
+  "time_minutes": 3,
+  "id": "beh-039"
+ },
+ {
+  "question": "Describe a situation where you had to defend your team's work to leadership.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The challenge to your team's work and its context",
+   "How you prepared: data, demos, customer evidence",
+   "The leadership decision and team impact"
+  ],
+  "time_minutes": 4,
+  "id": "beh-040"
+ },
+ {
+  "question": "Tell me about a time a partner team missed their commitment to you.",
+  "companies": [
+   "Meta",
+   "Amazon",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Impact on your timeline; how early you detected the risk",
+   "Your contingency: re-scoping, parallel path, escalation",
+   "How you repaired the partnership afterward"
+  ],
+  "time_minutes": 3,
+  "id": "beh-041"
+ },
+ {
+  "question": "Give an example of when you changed someone's mind with data.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Netflix"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm",
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The entrenched opinion and why data could move it",
+   "The analysis: what you measured and how rigorously",
+   "The mind changed and the decision that followed"
+  ],
+  "time_minutes": 3,
+  "id": "beh-042"
+ },
+ {
+  "question": "Tell me about a time you mediated between design and engineering.",
+  "companies": [
+   "Apple",
+   "Meta",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "frontend",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Each side's legitimate constraints",
+   "The shared user outcome you anchored on",
+   "The shipped compromise"
+  ],
+  "time_minutes": 3,
+  "id": "beh-043"
+ },
+ {
+  "question": "Describe a disagreement about technical debt: pay it now or ship fast?",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Quantify the debt: velocity cost, incident risk",
+   "Your proposal balancing both: e.g. 20% capacity, debt budget",
+   "What was decided and the measured effect"
+  ],
+  "time_minutes": 4,
+  "id": "beh-044"
+ },
+ {
+  "question": "Tell me about a time you were wrong in a technical debate. How did you concede?",
+  "companies": [
+   "Netflix",
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Own the error quickly and publicly - no face-saving",
+   "What convinced you: their evidence or argument",
+   "How it improved the working relationship"
+  ],
+  "time_minutes": 3,
+  "id": "beh-045"
+ },
+ {
+  "question": "Tell me about the most ambiguous project you have worked on.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "What was unknown: goal, tech, timeline, users",
+   "Your system for creating clarity: spikes, prototypes, stakeholder loops",
+   "Where it landed"
+  ],
+  "time_minutes": 4,
+  "id": "beh-046"
+ },
+ {
+  "question": "Describe a time you made a decision with incomplete data.",
+  "companies": [
+   "Amazon",
+   "Netflix",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "What data you had vs what was missing; the cost of waiting",
+   "Your decision and the reversibility reasoning",
+   "Outcome and what the missing data would have changed"
+  ],
+  "time_minutes": 4,
+  "id": "beh-047"
+ },
+ {
+  "question": "Tell me about a time requirements changed mid-project. How did you adapt?",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The change and its blast radius on your plan",
+   "How you re-planned: what was kept, cut, renegotiated",
+   "Delivery against the new scope"
+  ],
+  "time_minutes": 3,
+  "id": "beh-048"
+ },
+ {
+  "question": "Give an example of a time you had to choose between two good options.",
+  "companies": [
+   "Google",
+   "Microsoft",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Both options' merits, honestly weighed",
+   "Your decision criteria and who you consulted",
+   "Result; would you choose the same again"
+  ],
+  "time_minutes": 3,
+  "id": "beh-049"
+ },
+ {
+  "question": "Tell me about a time you defined success metrics for a fuzzy goal.",
+  "companies": [
+   "Meta",
+   "Amazon",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm",
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The fuzzy goal and why it resisted measurement",
+   "The metrics you chose: leading vs lagging, guardrails",
+   "How the metrics changed decisions"
+  ],
+  "time_minutes": 4,
+  "id": "beh-050"
+ },
+ {
+  "question": "Describe a situation where you had to act before you felt ready.",
+  "companies": [
+   "Netflix",
+   "Swiggy",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The situation demanding action; what ready would have looked like",
+   "How you bounded the risk of acting early",
+   "What happened"
+  ],
+  "time_minutes": 3,
+  "id": "beh-051"
+ },
+ {
+  "question": "Tell me about a time you killed a project or feature you had invested in.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The investment and the evidence it was not working",
+   "How you made the call: data threshold decided in advance vs post-hoc",
+   "What the team did with the freed capacity"
+  ],
+  "time_minutes": 4,
+  "id": "beh-052"
+ },
+ {
+  "question": "Give an example of navigating conflicting data from two sources.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Flipkart"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist",
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The conflict and why each source could be wrong",
+   "How you reconciled: instrumentation, definitions, sampling",
+   "The trusted answer and the fix to prevent recurrence"
+  ],
+  "time_minutes": 3,
+  "id": "beh-053"
+ },
+ {
+  "question": "Tell me about a time you had to estimate something with almost no information.",
+  "companies": [
+   "TCS",
+   "Wipro",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Your estimation method: analogy, decomposition, ranges not points",
+   "How you communicated uncertainty",
+   "Actual vs estimate and calibration lesson"
+  ],
+  "time_minutes": 3,
+  "id": "beh-054"
+ },
+ {
+  "question": "Describe a time you pivoted strategy based on early user feedback.",
+  "companies": [
+   "Meta",
+   "Swiggy",
+   "Netflix"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The original plan and the feedback that challenged it",
+   "How you validated the signal was real, not noise",
+   "The pivot and its outcome"
+  ],
+  "time_minutes": 3,
+  "id": "beh-055"
+ },
+ {
+  "question": "Tell me about the hardest prioritization call you have made.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The competing items and their stakes",
+   "Your framework: impact/effort, reversibility, strategic fit",
+   "What got cut and how you communicated it"
+  ],
+  "time_minutes": 4,
+  "id": "beh-056"
+ },
+ {
+  "question": "Give an example of when you simplified an overcomplicated plan.",
+  "companies": [
+   "Google",
+   "Meta",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The original complexity and its costs",
+   "What you cut and the reasoning",
+   "The simpler plan's outcome"
+  ],
+  "time_minutes": 3,
+  "id": "beh-057"
+ },
+ {
+  "question": "Tell me about a time you had to make a call your team disagreed with.",
+  "companies": [
+   "Netflix",
+   "Amazon",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Why the decision was yours to make",
+   "How you heard dissent genuinely before deciding",
+   "How you carried the team through execution"
+  ],
+  "time_minutes": 4,
+  "id": "beh-058"
+ },
+ {
+  "question": "Describe a time you spotted a strategic risk others dismissed.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The risk and why others dismissed it",
+   "How you built the case: scenarios, pre-mortem, small bets",
+   "Whether it materialized and what changed"
+  ],
+  "time_minutes": 4,
+  "id": "beh-059"
+ },
+ {
+  "question": "Tell me about a time you had to balance short-term delivery with long-term health.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The tension: what shipping fast would cost later",
+   "Your explicit trade-off and who signed off",
+   "Both the delivery and the health outcome"
+  ],
+  "time_minutes": 4,
+  "id": "beh-060"
+ },
+ {
+  "question": "Tell me about the best team you have been part of. What made it work?",
+  "companies": [
+   "Google",
+   "Microsoft",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Easy",
+  "key_points": [
+   "Concrete team habits: rituals, review culture, psychological safety",
+   "Your role in creating that environment",
+   "What you replicate on every team since"
+  ],
+  "time_minutes": 3,
+  "id": "beh-061"
+ },
+ {
+  "question": "Describe a time you helped a struggling teammate get back on track.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "How you noticed without prying; private conversation first",
+   "Concrete help: pairing, re-scoping, unblocking",
+   "Their recovery - and what you learned about leading peers"
+  ],
+  "time_minutes": 3,
+  "id": "beh-062"
+ },
+ {
+  "question": "Tell me about a time you led a project without being the manager.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "How you earned the mandate: expertise, trust, volunteering",
+   "How you coordinated: planning, unblocking, decisions",
+   "Delivery and team feedback"
+  ],
+  "time_minutes": 3,
+  "id": "beh-063"
+ },
+ {
+  "question": "Give an example of building consensus in a divided team.",
+  "companies": [
+   "Microsoft",
+   "Amazon",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The divide and what each side feared losing",
+   "Your process: 1:1s, written proposals, decision records",
+   "The aligned outcome"
+  ],
+  "time_minutes": 4,
+  "id": "beh-064"
+ },
+ {
+  "question": "Tell me about a time you onboarded someone onto a complex codebase.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Your onboarding plan: docs, guided tours, starter tasks",
+   "How you balanced their speed vs your own delivery",
+   "Time-to-productivity result"
+  ],
+  "time_minutes": 3,
+  "id": "beh-065"
+ },
+ {
+  "question": "Describe a time you delivered feedback that changed someone's trajectory.",
+  "companies": [
+   "Netflix",
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The pattern you observed, with specific examples",
+   "The conversation: candor with care, actionable path",
+   "The long-term change"
+  ],
+  "time_minutes": 4,
+  "id": "beh-066"
+ },
+ {
+  "question": "Tell me about a cross-functional project you drove (eng + design + data).",
+  "companies": [
+   "Meta",
+   "Swiggy",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Each function's contribution and your coordination role",
+   "How you kept everyone aligned: shared docs, demos",
+   "Shipped outcome"
+  ],
+  "time_minutes": 3,
+  "id": "beh-067"
+ },
+ {
+  "question": "Give an example of when you improved your team's engineering practices.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The practice gap: flaky tests, slow reviews, no runbooks",
+   "What you introduced and how you got buy-in",
+   "Measured improvement"
+  ],
+  "time_minutes": 3,
+  "id": "beh-068"
+ },
+ {
+  "question": "Tell me about a time you handled an underperforming vendor or contractor.",
+  "companies": [
+   "Amazon",
+   "TCS",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Clear expectations set in writing first",
+   "The difficult conversation and the improvement plan",
+   "Outcome: recovered or replaced, and the lesson"
+  ],
+  "time_minutes": 3,
+  "id": "beh-069"
+ },
+ {
+  "question": "Describe a time you had to motivate a demoralized team.",
+  "companies": [
+   "Netflix",
+   "Amazon",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Why morale was low - name it honestly",
+   "What you did: transparency, quick wins, purpose",
+   "How you knew it worked"
+  ],
+  "time_minutes": 4,
+  "id": "beh-070"
+ },
+ {
+  "question": "Tell me about the toughest person you have managed or tech-led.",
+  "companies": [
+   "Google",
+   "Microsoft",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The challenge, described behaviorally not as a label",
+   "Your tailored approach",
+   "The outcome for them and the team"
+  ],
+  "time_minutes": 4,
+  "id": "beh-071"
+ },
+ {
+  "question": "Give an example of delegating something you could have done faster yourself.",
+  "companies": [
+   "Amazon",
+   "TCS",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Why you delegated: growth, bandwidth, leverage",
+   "How you set them up: context, guardrails, checkpoints",
+   "Their success and your time freed"
+  ],
+  "time_minutes": 3,
+  "id": "beh-072"
+ },
+ {
+  "question": "Tell me about a time you built something that made your whole team faster.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The friction you observed across the team",
+   "Your tool/process: what it automated or clarified",
+   "Adoption and time saved"
+  ],
+  "time_minutes": 3,
+  "id": "beh-073"
+ },
+ {
+  "question": "Describe a hiring decision you influenced. What did you look for?",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Netflix"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The role's real needs beyond the job description",
+   "Your interview approach and signal sought",
+   "The hire's eventual impact - calibration lesson"
+  ],
+  "time_minutes": 3,
+  "id": "beh-074"
+ },
+ {
+  "question": "Tell me about a time you inherited a struggling team and turned it around.",
+  "companies": [
+   "Microsoft",
+   "Amazon",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Diagnosis first: listening tour before changes",
+   "Your 30-60-90 moves",
+   "Metrics of the turnaround"
+  ],
+  "time_minutes": 4,
+  "id": "beh-075"
+ },
+ {
+  "question": "Tell me about a time you went above and beyond for a customer or user.",
+  "companies": [
+   "Amazon",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The customer's problem and its urgency",
+   "What beyond-the-call action you took",
+   "Their reaction and any systemic fix that followed"
+  ],
+  "time_minutes": 3,
+  "id": "beh-076"
+ },
+ {
+  "question": "Describe a time user feedback completely changed your plan.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The feedback and how you gathered it (not anecdote-only)",
+   "What you killed or changed",
+   "The improved metric"
+  ],
+  "time_minutes": 3,
+  "id": "beh-077"
+ },
+ {
+  "question": "Tell me about the most innovative thing you have built.",
+  "companies": [
+   "Google",
+   "Apple",
+   "Netflix"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "What was novel: approach, combination, or application",
+   "The problem it solved that existing solutions didn't",
+   "Adoption or recognition"
+  ],
+  "time_minutes": 3,
+  "id": "beh-078"
+ },
+ {
+  "question": "Give an example of a small detail you obsessed over that paid off.",
+  "companies": [
+   "Apple",
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The detail and why most would skip it",
+   "Your polish process",
+   "How users noticed"
+  ],
+  "time_minutes": 3,
+  "id": "beh-079"
+ },
+ {
+  "question": "Tell me about a time you said no to a feature users asked for.",
+  "companies": [
+   "Netflix",
+   "Meta",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "The request and its surface appeal",
+   "Your deeper analysis: jobs-to-be-done, costs, alternatives",
+   "What you built instead and user response"
+  ],
+  "time_minutes": 4,
+  "id": "beh-080"
+ },
+ {
+  "question": "Describe a time you used data to discover an unmet user need.",
+  "companies": [
+   "Amazon",
+   "Flipkart",
+   "Google"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist",
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The data anomaly or pattern you noticed",
+   "How you validated it was a real need",
+   "What you shipped for it"
+  ],
+  "time_minutes": 3,
+  "id": "beh-081"
+ },
+ {
+  "question": "Tell me about a time you simplified a product for users.",
+  "companies": [
+   "Apple",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The complexity users faced, with evidence",
+   "What you removed or streamlined",
+   "Usability/comprehension improvement"
+  ],
+  "time_minutes": 3,
+  "id": "beh-082"
+ },
+ {
+  "question": "Give an example of handling a furious customer or stakeholder.",
+  "companies": [
+   "Amazon",
+   "TCS",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "Listen first: acknowledge the impact genuinely",
+   "Root cause fix, not just apology",
+   "How you followed up and what changed systemically"
+  ],
+  "time_minutes": 3,
+  "id": "beh-083"
+ },
+ {
+  "question": "Tell me about a time you anticipated a user need before they asked.",
+  "companies": [
+   "Apple",
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The insight source: usage patterns, support tickets, foresight",
+   "What you built proactively",
+   "Reception when users discovered it"
+  ],
+  "time_minutes": 3,
+  "id": "beh-084"
+ },
+ {
+  "question": "Describe your proudest moment helping a user succeed.",
+  "companies": [
+   "Swiggy",
+   "Flipkart",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Easy",
+  "key_points": [
+   "The user's goal and obstacle",
+   "Your specific help",
+   "Their success, in their words if possible"
+  ],
+  "time_minutes": 3,
+  "id": "beh-085"
+ },
+ {
+  "question": "Tell me about a time you had to balance two user segments with opposite needs.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Both segments' needs, fairly stated",
+   "Your segmentation or configurability solution",
+   "Satisfaction on both sides"
+  ],
+  "time_minutes": 4,
+  "id": "beh-086"
+ },
+ {
+  "question": "Give an example of a time you killed a beloved feature for the greater good.",
+  "companies": [
+   "Netflix",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+   "Why it had to go: maintenance, confusion, strategy",
+   "How you handled the backlash: communication, migration path",
+   "The net benefit"
+  ],
+  "time_minutes": 4,
+  "id": "beh-087"
+ },
+ {
+  "question": "Tell me about a time you turned a complaint into a product improvement.",
+  "companies": [
+   "Amazon",
+   "Swiggy",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The complaint pattern you detected",
+   "The fix: quick win vs systemic",
+   "Complaint-rate delta"
+  ],
+  "time_minutes": 3,
+  "id": "beh-088"
+ },
+ {
+  "question": "Describe a time you designed for users very different from yourself.",
+  "companies": [
+   "Google",
+   "Microsoft",
+   "TCS"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "How you built empathy: research, immersion, proxies",
+   "Design decisions that differed from your instincts",
+   "Validation with real users"
+  ],
+  "time_minutes": 3,
+  "id": "beh-089"
+ },
+ {
+  "question": "Tell me about the fastest you have ever gone from idea to shipped product.",
+  "companies": [
+   "Swiggy",
+   "Flipkart",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+   "The idea and why speed mattered",
+   "What you cut vs kept to hit the timeline",
+   "Launch result and follow-ups"
+  ],
+  "time_minutes": 3,
+  "id": "beh-090"
+ },
+ {
+  "question": "Tell me about yourself.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "2-minute arc: present role, 2-3 proof points, why this role now",
+   "Quantify: scale, impact, recognition",
+   "End with forward-looking enthusiasm for THIS role"
+  ],
+  "time_minutes": 2,
+  "id": "hr-001"
+ },
+ {
+  "question": "Why do you want to work at our company?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Specific: product, mission, tech, culture - never generic",
+   "Connect your background to their actual problems",
+   "Show you did homework: recent launches, engineering blog"
+  ],
+  "time_minutes": 2,
+  "id": "hr-002"
+ },
+ {
+  "question": "Why are you leaving your current job?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Forward-looking: seeking growth, scope, mission - never trash current employer",
+   "What you learned where you are",
+   "Why THIS move is the logical next step"
+  ],
+  "time_minutes": 2,
+  "id": "hr-003"
+ },
+ {
+  "question": "What are your greatest strengths?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "2-3 strengths relevant to the role, each with a proof story",
+   "Mix technical and collaborative strengths",
+   "Keep each to one crisp example"
+  ],
+  "time_minutes": 2,
+  "id": "hr-004"
+ },
+ {
+  "question": "What is your biggest weakness?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "A real weakness, not a disguised strength",
+   "What you are actively doing about it",
+   "Evidence of progress"
+  ],
+  "time_minutes": 2,
+  "id": "hr-005"
+ },
+ {
+  "question": "Where do you see yourself in 5 years?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Ambitious but realistic trajectory in this domain",
+   "Skills you want to build, impact you want to have",
+   "Align with growth paths at THIS company"
+  ],
+  "time_minutes": 2,
+  "id": "hr-006"
+ },
+ {
+  "question": "Why should we hire you over other candidates?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "Your differentiated mix: skills + domain + drive",
+   "2-3 concrete proof points tied to their needs",
+   "Confident, not arrogant; acknowledge strong competition"
+  ],
+  "time_minutes": 2,
+  "id": "hr-007"
+ },
+ {
+  "question": "Tell me about a time you worked under pressure.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Swiggy",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "The pressure: deadline, outage, launch",
+   "How you stayed effective: prioritization, communication",
+   "Outcome"
+  ],
+  "time_minutes": 2,
+  "id": "hr-008"
+ },
+ {
+  "question": "Are you comfortable relocating?",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Amazon",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Be honest about constraints upfront",
+   "If yes: enthusiasm; if conditional: state conditions clearly",
+   "Ask about relocation support specifics"
+  ],
+  "time_minutes": 2,
+  "id": "hr-009"
+ },
+ {
+  "question": "What are your salary expectations?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "Research the band first (levels.fyi, peers)",
+   "Give a researched range, not a single number",
+   "Anchor on total comp; express flexibility for the right role"
+  ],
+  "time_minutes": 2,
+  "id": "hr-010"
+ },
+ {
+  "question": "How do you handle disagreements with your manager?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "Private, data-backed discussion first",
+   "Commit fully once decided",
+   "An example showing maturity"
+  ],
+  "time_minutes": 2,
+  "id": "hr-011"
+ },
+ {
+  "question": "Describe your ideal work environment.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Honest preferences: autonomy, feedback cadence, collaboration style",
+   "Connect to what you know about THEIR culture",
+   "Show self-awareness about where you thrive"
+  ],
+  "time_minutes": 2,
+  "id": "hr-012"
+ },
+ {
+  "question": "What motivates you at work?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Intrinsic drivers: mastery, impact, learning - with examples",
+   "Avoid pure compensation answers",
+   "Tie to the role's actual work"
+  ],
+  "time_minutes": 2,
+  "id": "hr-013"
+ },
+ {
+  "question": "How do you keep your skills up to date?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Concrete habits: building, reading, courses, communities",
+   "A recent example of something you learned and applied",
+   "Curiosity as a system, not a claim"
+  ],
+  "time_minutes": 2,
+  "id": "hr-014"
+ },
+ {
+  "question": "Tell me about a gap in your resume.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "Address it directly and briefly",
+   "What you did during the gap: learning, freelance, family",
+   "Why you are ready and excited now"
+  ],
+  "time_minutes": 2,
+  "id": "hr-015"
+ },
+ {
+  "question": "Have you ever been laid off? What happened?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "Factual and brief: restructuring, not performance",
+   "No bitterness; what you did next",
+   "Forward focus"
+  ],
+  "time_minutes": 2,
+  "id": "hr-016"
+ },
+ {
+  "question": "How do you handle feedback and criticism?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "You actively seek it: examples of asking",
+   "A time feedback changed your approach",
+   "Growth mindset with evidence"
+  ],
+  "time_minutes": 2,
+  "id": "hr-017"
+ },
+ {
+  "question": "Describe a difficult decision you had to make at work.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "The stakes and the options",
+   "Your decision process",
+   "Ownership of the outcome"
+  ],
+  "time_minutes": 2,
+  "id": "hr-018"
+ },
+ {
+  "question": "What do you know about our company culture?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Cite specifics: leadership principles, engineering blog, values page",
+   "Connect 1-2 values to your own stories",
+   "Ask a sharp culture question back"
+  ],
+  "time_minutes": 2,
+  "id": "hr-019"
+ },
+ {
+  "question": "How would your colleagues describe you?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "3 adjectives, each with a micro-story",
+   "Include one about collaboration, not just skill",
+   "Honest, not inflated"
+  ],
+  "time_minutes": 2,
+  "id": "hr-020"
+ },
+ {
+  "question": "What has been your biggest achievement so far?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Pick the one with clearest impact and your clearest ownership",
+   "Quantify relentlessly",
+   "Why it mattered beyond the numbers"
+  ],
+  "time_minutes": 2,
+  "id": "hr-021"
+ },
+ {
+  "question": "How do you prioritize when everything is urgent?",
+  "companies": [
+   "Amazon",
+   "Swiggy",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "Your framework: impact, urgency, reversibility",
+   "How you communicate trade-offs upward",
+   "An example"
+  ],
+  "time_minutes": 2,
+  "id": "hr-022"
+ },
+ {
+  "question": "Are you interviewing elsewhere?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Honest but discreet: 'exploring a few opportunities' is fine",
+   "Reaffirm genuine interest in THIS role",
+   "Never use as crude leverage"
+  ],
+  "time_minutes": 2,
+  "id": "hr-023"
+ },
+ {
+  "question": "What questions do you have for me?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Always have 3-4: role scope, team challenges, success metrics, growth",
+   "Ask about the interviewer's own experience",
+   "Never say 'no questions'"
+  ],
+  "time_minutes": 2,
+  "id": "hr-024"
+ },
+ {
+  "question": "How do you deal with tight deadlines you didn't set?",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Assess feasibility honestly first",
+   "Negotiate scope, not just complain about time",
+   "Communicate progress early and often"
+  ],
+  "time_minutes": 2,
+  "id": "hr-025"
+ },
+ {
+  "question": "What would you do in your first 90 days here?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Medium",
+  "key_points": [
+   "Learn: codebase, customers, team norms (30 days)",
+   "Contribute: ship something real (60 days)",
+   "Own: propose an improvement (90 days)"
+  ],
+  "time_minutes": 2,
+  "id": "hr-026"
+ },
+ {
+  "question": "How do you handle working with people from different backgrounds?",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Genuine examples of cross-cultural collaboration",
+   "What you learned about communication styles",
+   "Respect as default, curiosity as habit"
+  ],
+  "time_minutes": 2,
+  "id": "hr-027"
+ },
+ {
+  "question": "What does work-life balance mean to you?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Honest and sustainable: intensity in sprints, recovery after",
+   "How you protect focus and health",
+   "Align with the team's actual rhythm"
+  ],
+  "time_minutes": 2,
+  "id": "hr-028"
+ },
+ {
+  "question": "If we don't hire you, what will you do?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Hard",
+  "key_points": [
+   "Graceful: keep building, keep applying, no desperation",
+   "Reaffirm why you want THIS role specifically",
+   "Ask for feedback regardless"
+  ],
+  "time_minutes": 2,
+  "id": "hr-029"
+ },
+ {
+  "question": "What kind of manager brings out your best work?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "hr",
+  "difficulty": "Easy",
+  "key_points": [
+   "Honest style match: autonomy vs guidance, feedback frequency",
+   "An example of thriving under such management",
+   "What you do when the style differs"
+  ],
+  "time_minutes": 2,
+  "id": "hr-030"
+ },
+ {
+  "question": "You have 8 balls, one is heavier. Find it with a balance scale in 2 weighings.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Divide into 3 groups (3,3,2) - ternary search thinking",
+   "First weighing of 3 vs 3 identifies the heavy group or the pair",
+   "Second weighing pinpoints the ball; information bound: 3^2=9 >= 8"
+  ],
+  "time_minutes": 5,
+  "id": "puz-001"
+ },
+ {
+  "question": "100 prisoners, 100 boxes with their names, each may open 50 boxes. Devise a strategy so all survive with good probability.",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "Key insight: boxes form permutation cycles; follow the cycle starting from your own number",
+   "Cycle-following keeps everyone within their cycle length",
+   "Success probability = P(no cycle longer than 50) ~ 31%; explain why random fails"
+  ],
+  "time_minutes": 8,
+  "id": "puz-002"
+ },
+ {
+  "question": "How would you find the heavy ball among 12 with 3 weighings, and tell whether it is heavy or light?",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "12 balls, 3 outcomes per weighing: 3^3=27 >= 24 possibilities (12 balls x heavy/light)",
+   "First weighing 4v4; branch on balance/tilt",
+   "Track the full decision tree; the classic solution labels and rotates balls"
+  ],
+  "time_minutes": 8,
+  "id": "puz-003"
+ },
+ {
+  "question": "Two ropes burn unevenly for exactly 60 minutes each. Measure exactly 45 minutes.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Light rope A at both ends and rope B at one end simultaneously",
+   "A burns out in 30 min; at that moment light B's other end",
+   "B's remaining 30-min worth burns in 15 min: total 45"
+  ],
+  "time_minutes": 4,
+  "id": "puz-004"
+ },
+ {
+  "question": "5 pirates split 100 gold coins, voting in seniority order. What does the most senior propose?",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "Backward induction from the 2-pirate base case",
+   "Senior needs 3 votes including own: buy the cheapest pirates (those who would get 0 next round)",
+   "Answer: 98/0/1/0/1 style split - explain each pirate's reasoning"
+  ],
+  "time_minutes": 8,
+  "id": "puz-005"
+ },
+ {
+  "question": "Bridge at night: 4 people cross in 1,2,7,10 min; max 2 at a time, one flashlight. Minimum total time?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Naive fastest-shuttles: 10+1+7+1+2 = 21",
+   "Better: pair the two slowest together (7,10 cross together): 2+1+10+2+2 = 17",
+   "Generalize: compare 2*b1+a1+an vs b1+2*a1+an strategies"
+  ],
+  "time_minutes": 5,
+  "id": "puz-006"
+ },
+ {
+  "question": "1000 wine bottles, one poisoned, kills in 24h. 10 prisoners, one round of testing. Find the bottle.",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "Binary encoding: 2^10 = 1024 >= 1000",
+   "Prisoner i drinks from bottles with bit i set",
+   "Death pattern reads the bottle number in binary"
+  ],
+  "time_minutes": 6,
+  "id": "puz-007"
+ },
+ {
+  "question": "Estimate the number of tennis balls that fit in a school bus.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "State assumptions: bus volume minus seats; ball volume with packing factor",
+   "Fermi math with clear decomposition",
+   "Show structured thinking, not the exact number"
+  ],
+  "time_minutes": 4,
+  "id": "puz-008"
+ },
+ {
+  "question": "How many golf balls fit in a 747?",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Cabin volume estimate minus cockpit, seats, aisles",
+   "Packing factor ~0.65 for spheres",
+   "Order of magnitude matters, not precision"
+  ],
+  "time_minutes": 4,
+  "id": "puz-009"
+ },
+ {
+  "question": "A man pushes his car up to a hotel and shouts 'I'm bankrupt!' Why?",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Lateral thinking: it is Monopoly - landing on a hotel",
+   "Ask clarifying questions before jumping to conclusions",
+   "Demonstrate structured elimination of hypotheses"
+  ],
+  "time_minutes": 3,
+  "id": "puz-010"
+ },
+ {
+  "question": "You have a 3-gallon and 5-gallon jug. Measure exactly 4 gallons.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Fill 5, pour into 3 (2 left in 5); empty 3; pour the 2 into 3",
+   "Fill 5 again, top up the 3 (1 gallon) leaving exactly 4 in the 5-gallon jug",
+   "Generalize: it is the GCD / extended-Euclidean idea"
+  ],
+  "time_minutes": 4,
+  "id": "puz-011"
+ },
+ {
+  "question": "3 light switches outside a closed room, one bulb inside. One visit. Which switch controls the bulb?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Use a second sense: heat. Switch 1 on 5 min then off; switch 2 on; enter",
+   "Lit = switch 2; warm-but-off = switch 1; cold = switch 3",
+   "Lesson: expand the state space beyond the obvious"
+  ],
+  "time_minutes": 4,
+  "id": "puz-012"
+ },
+ {
+  "question": "How many times do a clock's hands overlap in 24 hours?",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Not 24: overlaps every 12/11 hours (~65.45 min)",
+   "22 times in 24h (11 per 12h)",
+   "Derive via relative speed: 11/12 rev per hour"
+  ],
+  "time_minutes": 4,
+  "id": "puz-013"
+ },
+ {
+  "question": "Ants on a 1m stick walk and turn on collision. Which ant falls off last?",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Collisions are equivalent to ants passing through each other",
+   "So just compute each ant's solo fall time",
+   "The max solo time is the answer - identity does not matter"
+  ],
+  "time_minutes": 5,
+  "id": "puz-014"
+ },
+ {
+  "question": "You flip a coin until HHT appears. Expected flips? What about HHH?",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_scientist"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "HHT: 8 flips - the pattern has little self-overlap",
+   "HHH: 14 flips - self-overlap wastes progress",
+   "Set up pattern-matching equations; explain autocorrelation"
+  ],
+  "time_minutes": 8,
+  "id": "puz-015"
+ },
+ {
+  "question": "25 horses, race 5 at a time. Minimum races to find the top 3?",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "5 heats + winners' race = 6; then reason about who can still be top-3",
+   "Only horses beaten by at most 2 others in the final matter",
+   "One race among the candidates: total 7"
+  ],
+  "time_minutes": 6,
+  "id": "puz-016"
+ },
+ {
+  "question": "100 doors toggled on pass i (multiples of i). Which doors end open?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Door n is toggled once per divisor; open iff odd number of divisors",
+   "Only perfect squares have an odd divisor count",
+   "Doors 1,4,9,...,100: 10 doors"
+  ],
+  "time_minutes": 4,
+  "id": "puz-017"
+ },
+ {
+  "question": "A bat and ball cost $1.10; the bat costs $1 more than the ball. What does the ball cost?",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "$0.05, not $0.10 - the intuitive answer is wrong",
+   "Set up: x + (x+1) = 1.10",
+   "Lesson: slow down on 'obvious' arithmetic"
+  ],
+  "time_minutes": 3,
+  "id": "puz-018"
+ },
+ {
+  "question": "Lily pads double daily and cover the lake in 30 days. When was it half covered?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Day 29 - exponential intuition check",
+   "Explain doubling backwards",
+   "Connect to growth estimation in systems"
+  ],
+  "time_minutes": 3,
+  "id": "puz-019"
+ },
+ {
+  "question": "5 machines make 5 widgets in 5 minutes. How long for 100 machines to make 100 widgets?",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "5 minutes - the rate is per machine",
+   "Resist scaling everything",
+   "State the unit-rate reasoning"
+  ],
+  "time_minutes": 3,
+  "id": "puz-020"
+ },
+ {
+  "question": "You have 2 eggs and a 100-floor building. Minimize worst-case drops to find the critical floor.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "Linear = 100 worst; binary search wastes the first egg on early breaks",
+   "Decreasing-step strategy: 14,27,39,... - worst case 14 drops",
+   "Derive x(x+1)/2 >= 100 -> x=14; generalize to n eggs"
+  ],
+  "time_minutes": 8,
+  "id": "puz-021"
+ },
+ {
+  "question": "How would you weigh an elephant without a scale?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Boat displacement: mark the waterline with the elephant, replace with known weights",
+   "Archimedes in action; discuss precision limits",
+   "Creativity + physics over brute force"
+  ],
+  "time_minutes": 4,
+  "id": "puz-022"
+ },
+ {
+  "question": "3 boxes labeled Apples, Oranges, Mixed - all mislabeled. One fruit pull to fix all labels?",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Pull from the box labeled 'Mixed' - it must be pure (all labels are wrong)",
+   "That fruit identifies the box; the remaining two follow by elimination",
+   "One draw suffices"
+  ],
+  "time_minutes": 4,
+  "id": "puz-023"
+ },
+ {
+  "question": "Why are manhole covers round?",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "A round cover cannot fall through its hole; it also rolls for transport",
+   "Mention stress distribution as a bonus",
+   "Show practical + geometric reasoning"
+  ],
+  "time_minutes": 3,
+  "id": "puz-024"
+ },
+ {
+  "question": "How many piano tuners are there in Chicago?",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Population -> households -> pianos -> tunings per year -> tuner capacity",
+   "Chain of Fermi estimates with stated assumptions",
+   "Sanity-check the final number"
+  ],
+  "time_minutes": 4,
+  "id": "puz-025"
+ },
+ {
+  "question": "In a 3x3 magic square using 1-9, what must the center be?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Center must be 5: total 45, each line sums to 15, center counted 4 times",
+   "Derive via line-sum algebra",
+   "Generalize the reasoning"
+  ],
+  "time_minutes": 4,
+  "id": "puz-026"
+ },
+ {
+  "question": "4 cards show A, D, 4, 7. Rule: vowel on one side -> even number on the other. Minimum flips to verify?",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Flip A (vowel, must check) and 7 (odd, contrapositive)",
+   "Not D or 4 - the classic Wason selection task",
+   "Explain modus tollens intuitively"
+  ],
+  "time_minutes": 4,
+  "id": "puz-027"
+ },
+ {
+  "question": "Monty Hall: you pick a door, the host opens another with a goat. Switch or stay? Prove it.",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Switch: 2/3 vs 1/3 - enumerate all 3 car positions",
+   "Intuition: the host's action concentrates probability",
+   "Extend with the 100-doors variant"
+  ],
+  "time_minutes": 4,
+  "id": "puz-028"
+ },
+ {
+  "question": "How would you test a toaster?",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Functional: browning levels, timer, safety shutoff",
+   "Edge cases: bagels, frozen bread, crumbs, voltage swings",
+   "Non-functional: durability, UX, accessibility"
+  ],
+  "time_minutes": 5,
+  "id": "puz-029"
+ },
+ {
+  "question": "Estimate the total bandwidth of a highway full of trucks carrying hard drives.",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Never underestimate sneakernet: TB per truck times trucks per hour",
+   "Compare with fiber: latency vs throughput trade-off",
+   "Real world: AWS Snowmobile exists for exactly this"
+  ],
+  "time_minutes": 5,
+  "id": "puz-030"
+ },
+ {
+  "question": "Two trains 60km apart approach at 30km/h each; a fly shuttles between them at 60km/h. How far does the fly travel?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Do not sum the infinite series: time to collision = 1h, so the fly travels 60km",
+   "Elegant reframing beats brute force",
+   "Mention the von Neumann anecdote"
+  ],
+  "time_minutes": 4,
+  "id": "puz-031"
+ },
+ {
+  "question": "Describe your approach to the 8-queens problem.",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Backtracking with pruning: one queen per row",
+   "Constraint propagation on columns and diagonals",
+   "92 solutions; discuss optimizations"
+  ],
+  "time_minutes": 5,
+  "id": "puz-032"
+ },
+ {
+  "question": "You have a biased coin with unknown bias. Simulate a fair coin.",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "Von Neumann: flip twice; HT->heads, TH->tails, else retry",
+   "P(HT)=P(TH)=p(1-p), so conditioned outcomes are fair",
+   "Efficiency: expected 1/(p(1-p)) flips per fair bit"
+  ],
+  "time_minutes": 6,
+  "id": "puz-033"
+ },
+ {
+  "question": "How would you find the median of a stream of numbers?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Two heaps: max-heap for lower half, min-heap for upper half",
+   "Balance invariant keeps the median at the tops; O(log n) insert",
+   "Discuss extensions: sliding window, distributed"
+  ],
+  "time_minutes": 6,
+  "id": "puz-034"
+ },
+ {
+  "question": "Sum the numbers 1 to 100 without a loop - and generalize.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Pair 1+100, 2+99, ... = 50 pairs x 101 = 5050",
+   "Generalize to n(n+1)/2; prove by pairing or induction",
+   "Mention the young Gauss story briefly"
+  ],
+  "time_minutes": 3,
+  "id": "puz-035"
+ },
+ {
+  "question": "A frog climbs a 30m well, up 3m by day, slips 2m by night. When does it escape?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops",
+   "data_analyst",
+   "data_scientist",
+   "pm"
+  ],
+  "category": "puzzles",
+  "difficulty": "Easy",
+  "key_points": [
+   "Net 1m/day but the last climb has no slip: reaches top on day 28",
+   "Off-by-one trap: (30-3)/1 + 1 = 28",
+   "Generalize the formula"
+  ],
+  "time_minutes": 3,
+  "id": "puz-036"
+ },
+ {
+  "question": "You have 9 coins, one lighter, 2 weighings. Then: 27 coins, 3 weighings. Pattern?",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Ternary search: 3^n coins need n weighings",
+   "Each weighing has 3 outcomes, dividing into thirds",
+   "Information-theoretic lower bound"
+  ],
+  "time_minutes": 5,
+  "id": "puz-037"
+ },
+ {
+  "question": "How many times does the digit 1 appear from 1 to 1000?",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Medium",
+  "key_points": [
+   "Count per digit position: hundreds/tens/units separately",
+   "Answer: 301 (include 1000's... actually 1 appears 301 times 1-1000)",
+   "Show the positional counting method"
+  ],
+  "time_minutes": 5,
+  "id": "puz-038"
+ },
+ {
+  "question": "Two people take turns picking coins from a row, optimal play. Who wins and by how much?",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "puzzles",
+  "difficulty": "Hard",
+  "key_points": [
+   "Minimax DP: dp[i][j] = max(coins[i]-dp[i+1][j], coins[j]-dp[i][j-1])",
+   "Even/odd positional strategy for the simple case",
+   "Complexity O(n^2) time, O(n) space optimized"
+  ],
+  "time_minutes": 7,
+  "id": "puz-039"
+ },
+ {
+  "question": "Design a URL shortener like bit.ly.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Meta",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Requirements: 100M URLs/day, redirect <50ms, 5-year retention",
+   "Hash (MD5+base62, 7 chars) vs counter+base62; collision handling",
+   "Cache hot URLs in Redis; DB sharding by hash; analytics pipeline"
+  ],
+  "time_minutes": 20,
+  "id": "sd-001"
+ },
+ {
+  "question": "Design an autocomplete/typeahead service like Google Search suggestions.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Trie of top queries in memory, sharded by prefix; update via streaming pipeline",
+   "Ranking: frequency + personalization + trends; debounce client requests",
+   "Scale: 10B queries/day; cache top prefixes at edge"
+  ],
+  "time_minutes": 25,
+  "id": "sd-002"
+ },
+ {
+  "question": "Design a WhatsApp-like messaging system.",
+  "companies": [
+   "Meta",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "WebSocket gateway per connection; stateless app servers behind LB",
+   "Message store: per-conversation tables, media in object storage",
+   "Presence, read receipts via pub/sub; E2E encryption implications"
+  ],
+  "time_minutes": 30,
+  "id": "sd-003"
+ },
+ {
+  "question": "Design Instagram's feed and stories.",
+  "companies": [
+   "Meta",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Fan-out on write vs read: celebrity problem; hybrid approach",
+   "Media pipeline: upload, transcode, CDN; story TTL with Redis expiry",
+   "Ranking service separate from retrieval"
+  ],
+  "time_minutes": 30,
+  "id": "sd-004"
+ },
+ {
+  "question": "Design a rate limiter for a public API.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Stripe",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Algorithms: token bucket vs sliding-window counter; compare precision/cost",
+   "Distributed: Redis + Lua atomicity; sticky vs centralized",
+   "Headers: X-RateLimit-Remaining; fail-open vs fail-closed on Redis outage"
+  ],
+  "time_minutes": 20,
+  "id": "sd-005"
+ },
+ {
+  "question": "Design a notification system (push, email, SMS).",
+  "companies": [
+   "Amazon",
+   "Meta",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Queue per channel with priorities; template service; provider abstraction",
+   "Dedup, rate limits per user, quiet hours, preference center",
+   "Retry with backoff + DLQ; idempotency keys"
+  ],
+  "time_minutes": 20,
+  "id": "sd-006"
+ },
+ {
+  "question": "Design YouTube's video upload and playback pipeline.",
+  "companies": [
+   "Google",
+   "Netflix",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Upload -> transcode DAG (multiple resolutions) -> object storage + CDN",
+   "Adaptive bitrate (HLS/DASH); thumbnail generation",
+   "Metadata DB sharded by video id; view counting via stream processing"
+  ],
+  "time_minutes": 30,
+  "id": "sd-007"
+ },
+ {
+  "question": "Design Uber's ride-matching system.",
+  "companies": [
+   "Uber",
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Geospatial index: geohash/quadtrees for driver search",
+   "Matching: dispatch radius expansion; ETA via routing service",
+   "Surge pricing as a separate stream; trip state machine"
+  ],
+  "time_minutes": 30,
+  "id": "sd-008"
+ },
+ {
+  "question": "Design a distributed job queue like Celery/Cloud Tasks.",
+  "companies": [
+   "Amazon",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Broker: Redis/RabbitMQ; at-least-once + idempotent workers",
+   "Delayed/periodic jobs: scheduler + sorted sets",
+   "Poison-pill handling, DLQ, visibility timeout"
+  ],
+  "time_minutes": 20,
+  "id": "sd-009"
+ },
+ {
+  "question": "Design a web crawler at Google scale.",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Frontier: URL queue with politeness per host; dedup via Bloom filter + exact store",
+   "Fetch workers, DNS caching, robots.txt",
+   "Near-duplicate detection: simhash; incremental recrawl scheduling"
+  ],
+  "time_minutes": 30,
+  "id": "sd-010"
+ },
+ {
+  "question": "Design a key-value store like Redis (single node, then distributed).",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Single node: hash table, event loop, persistence (RDB+AOF)",
+   "Distributed: consistent hashing, replication, gossip failure detection",
+   "CAP trade-offs: CP (etcd) vs AP (Dynamo-style) configurations"
+  ],
+  "time_minutes": 25,
+  "id": "sd-011"
+ },
+ {
+  "question": "Design a load balancer (L4 and L7).",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "L4: ECMP/Direct Server Return; L7: reverse proxy with routing rules",
+   "Health checks: active/passive; least-connections vs round-robin",
+   "Sticky sessions, TLS termination, graceful draining"
+  ],
+  "time_minutes": 20,
+  "id": "sd-012"
+ },
+ {
+  "question": "Design a distributed cache (e.g., Memcached cluster).",
+  "companies": [
+   "Meta",
+   "Amazon",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Consistent hashing for node mapping; virtual nodes for balance",
+   "Cache-aside vs read/write-through; TTL and stampede protection (request coalescing)",
+   "Eviction: LRU approximations; hot-key mitigation"
+  ],
+  "time_minutes": 20,
+  "id": "sd-013"
+ },
+ {
+  "question": "Design a metrics and monitoring system (like Prometheus).",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Uber"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Pull vs push ingestion; time-series storage with downsampling",
+   "Alerting: rule evaluation, silencing, on-call routing",
+   "Cardinality explosion: label discipline and limits"
+  ],
+  "time_minutes": 25,
+  "id": "sd-014"
+ },
+ {
+  "question": "Design a logging pipeline for 1TB/day.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Agents -> Kafka -> stream processing -> hot (Elasticsearch) + cold (S3) storage",
+   "Sampling and log levels to control cost",
+   "Schema: structured JSON; PII redaction"
+  ],
+  "time_minutes": 20,
+  "id": "sd-015"
+ },
+ {
+  "question": "Design a search engine for an e-commerce site.",
+  "companies": [
+   "Amazon",
+   "Flipkart",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Inverted index with sharding; tokenizer + stemming for the catalog language",
+   "Ranking: text relevance + business signals (sales, margin)",
+   "Facets, spell correction, query understanding"
+  ],
+  "time_minutes": 25,
+  "id": "sd-016"
+ },
+ {
+  "question": "Design a news feed ranking system.",
+  "companies": [
+   "Meta",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Candidate generation (embedding retrieval) -> ranking model -> re-ranking/diversity",
+   "Feature store for online features; training/serving skew guards",
+   "Exploration, freshness, and integrity filters"
+  ],
+  "time_minutes": 25,
+  "id": "sd-017"
+ },
+ {
+  "question": "Design a payment processing system.",
+  "companies": [
+   "Stripe",
+   "Amazon",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Idempotency keys everywhere; double-entry ledger as source of truth",
+   "State machine per payment; reconciliation jobs",
+   "PCI scope minimization via tokenization; exactly-once semantics"
+  ],
+  "time_minutes": 30,
+  "id": "sd-018"
+ },
+ {
+  "question": "Design a ride-sharing ETA system.",
+  "companies": [
+   "Uber",
+   "Swiggy",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Road graph with live speeds; routing (Contraction Hierarchies)",
+   "ML ETA model on segments; map-matching GPS traces",
+   "Precomputation vs online trade-offs"
+  ],
+  "time_minutes": 25,
+  "id": "sd-019"
+ },
+ {
+  "question": "Design a chat application with group chats and online presence.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Connection service with consistent hashing by user id",
+   "Group fan-out: per-member queues; read receipts aggregated",
+   "Presence via heartbeats + last-seen; message history pagination"
+  ],
+  "time_minutes": 20,
+  "id": "sd-020"
+ },
+ {
+  "question": "Design a file-sharing service like Dropbox.",
+  "companies": [
+   "Dropbox",
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Chunking + content-defined hashing for dedup; delta sync",
+   "Metadata service separate from block storage",
+   "Conflict resolution: last-writer-wins with version vectors"
+  ],
+  "time_minutes": 25,
+  "id": "sd-021"
+ },
+ {
+  "question": "Design a distributed lock service.",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Single node: SET NX PX (Redlock debates); fencing tokens for correctness",
+   "Consensus-based: etcd/ZooKeeper leases and sessions",
+   "When NOT to use distributed locks: idempotency first"
+  ],
+  "time_minutes": 25,
+  "id": "sd-022"
+ },
+ {
+  "question": "Design an ad-serving system (real-time bidding).",
+  "companies": [
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "<100ms auction: candidate retrieval, bid shading, pacing",
+   "Frequency capping and budget pacing via control loops",
+   "Logging for billing: exactly-once impression counting"
+  ],
+  "time_minutes": 30,
+  "id": "sd-023"
+ },
+ {
+  "question": "Design a recommendation system for video content.",
+  "companies": [
+   "Netflix",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Two-tower retrieval + ranking; implicit feedback signals",
+   "Cold start: popularity + content-based fallback",
+   "Online learning and position bias correction"
+  ],
+  "time_minutes": 25,
+  "id": "sd-024"
+ },
+ {
+  "question": "Design a URL/blocklist service for phishing detection.",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Bloom filter on client, exact check on server for positives",
+   "Update pipeline: crawlers + ML classifiers + analyst review",
+   "Privacy: hashed prefixes (Safe Browsing API model)"
+  ],
+  "time_minutes": 20,
+  "id": "sd-025"
+ },
+ {
+  "question": "Design a ticket-booking system (concerts, high contention).",
+  "companies": [
+   "Swiggy",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Seat inventory: avoid oversell - serializable holds with TTL",
+   "Queue-it style virtual waiting room for flash sales",
+   "Payment timeout releases holds; idempotent booking API"
+  ],
+  "time_minutes": 25,
+  "id": "sd-026"
+ },
+ {
+  "question": "Design a leaderboard for a mobile game (millions of players).",
+  "companies": [
+   "Google",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Redis sorted sets sharded by region/season",
+   "Approximate ranks for the long tail; exact for top-K",
+   "Anti-cheat: server-authoritative scores, anomaly detection"
+  ],
+  "time_minutes": 20,
+  "id": "sd-027"
+ },
+ {
+  "question": "Design an email service like Gmail (storage + search).",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Per-user sharded storage; inverted index for search",
+   "Attachments deduped in object storage",
+   "Push via long-poll/WebSocket; offline sync protocol"
+  ],
+  "time_minutes": 25,
+  "id": "sd-028"
+ },
+ {
+  "question": "Design a CI/CD pipeline system.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Pipeline DAG executor with caching and parallelism",
+   "Artifact registry; hermetic builds for reproducibility",
+   "Progressive delivery: canary, blue-green, feature flags"
+  ],
+  "time_minutes": 20,
+  "id": "sd-029"
+ },
+ {
+  "question": "Design a feature-flag and experimentation platform.",
+  "companies": [
+   "Netflix",
+   "Meta",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Flag evaluation at edge with consistent bucketing",
+   "Experiment assignment: deterministic hashing; guardrail metrics",
+   "Kill switches with sub-second propagation"
+  ],
+  "time_minutes": 20,
+  "id": "sd-030"
+ },
+ {
+  "question": "Design a data warehouse ingestion pipeline (batch + streaming).",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist",
+   "data_analyst"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Batch: Airflow/Dagster orchestration, idempotent loads, partitioning",
+   "Streaming: Kafka -> Flink/Spark -> upserts with exactly-once",
+   "Schema evolution: registry, backward compatibility, data contracts"
+  ],
+  "time_minutes": 20,
+  "id": "sd-031"
+ },
+ {
+  "question": "Design a fraud-detection system for transactions.",
+  "companies": [
+   "Stripe",
+   "Amazon",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist",
+   "data_analyst"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Real-time scoring <200ms: feature store + lightweight model",
+   "Rules engine + ML ensemble; feedback loop from chargebacks",
+   "Precision/recall trade-off; human review queue for gray zone"
+  ],
+  "time_minutes": 25,
+  "id": "sd-032"
+ },
+ {
+  "question": "Design a food-delivery dispatch system (rider assignment).",
+  "companies": [
+   "Swiggy",
+   "Uber"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Batch matching every few seconds: assignment as optimization problem",
+   "Geospatial indexing; batching multiple orders per rider",
+   "Reassignment on delays; ETA communication"
+  ],
+  "time_minutes": 25,
+  "id": "sd-033"
+ },
+ {
+  "question": "Design a live-streaming platform (like IPL streaming to millions).",
+  "companies": [
+   "Netflix",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Ingest: RTMP -> transcode ladder -> CDN with edge PoPs",
+   "Low-latency: CMAF chunks, tuned GOP; scale origin shields",
+   "Chat/interactivity on separate websocket tier"
+  ],
+  "time_minutes": 30,
+  "id": "sd-034"
+ },
+ {
+  "question": "Design a distributed file system (GFS/HDFS style).",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Master/chunkserver split; chunk size trade-offs (64MB)",
+   "Replication + heartbeat-based re-replication",
+   "Single-master limits; modern evolution (Colossus)"
+  ],
+  "time_minutes": 25,
+  "id": "sd-035"
+ },
+ {
+  "question": "Design a consensus-free replicated counter (CRDTs).",
+  "companies": [
+   "Amazon",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "G-counter/PN-counter: merge = max per replica",
+   "Use cases: likes, inventory approximations",
+   "When CRDTs are NOT enough: money needs consensus"
+  ],
+  "time_minutes": 25,
+  "id": "sd-036"
+ },
+ {
+  "question": "Design a secrets-management service.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Envelope encryption with KMS; rotation without restarts",
+   "Short-lived dynamic credentials; audit logging every access",
+   "Break-glass procedures and blast-radius limits"
+  ],
+  "time_minutes": 20,
+  "id": "sd-037"
+ },
+ {
+  "question": "Design an API gateway.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Routing, authn/authz, rate limiting, request shaping in one tier",
+   "Plugin architecture: WASM/Lua filters",
+   "Observability: per-route metrics, distributed tracing"
+  ],
+  "time_minutes": 20,
+  "id": "sd-038"
+ },
+ {
+  "question": "Design a multi-tenant SaaS data isolation model.",
+  "companies": [
+   "Microsoft",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Silo vs pool vs bridge models; noisy-neighbor controls",
+   "Tenant id in every query; row-level security",
+   "Tenant-aware rate limiting and billing"
+  ],
+  "time_minutes": 20,
+  "id": "sd-039"
+ },
+ {
+  "question": "Design a GDPR-compliant data deletion system.",
+  "companies": [
+   "Meta",
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Data inventory: lineage tracking from collection to warehouse",
+   "Tombstones + crypto-shredding for backups",
+   "Verification: deletion certificates, audit trail"
+  ],
+  "time_minutes": 25,
+  "id": "sd-040"
+ },
+ {
+  "question": "Design a real-time analytics dashboard (sub-second queries on billions of rows).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist",
+   "data_analyst"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Pre-aggregation: materialized rollups, streaming cubes (Druid/Pinot)",
+   "Approximate queries: HyperLogLog, t-digest",
+   "Query governor: kill runaway queries, result caching"
+  ],
+  "time_minutes": 25,
+  "id": "sd-041"
+ },
+ {
+  "question": "Design a CDN from scratch.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Netflix"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Anycast DNS + edge PoPs; tiered caching (edge -> regional -> origin)",
+   "Cache invalidation: TTL, versioned URLs, purge API",
+   "TLS at edge; origin shielding; request collapsing"
+  ],
+  "time_minutes": 25,
+  "id": "sd-042"
+ },
+ {
+  "question": "Design a distributed tracing system.",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Uber"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Trace/span model; context propagation via headers",
+   "Sampling: head vs tail-based; collector pipeline",
+   "Storage: columnar for spans; retention tiers"
+  ],
+  "time_minutes": 20,
+  "id": "sd-043"
+ },
+ {
+  "question": "Design a cron-as-a-service platform.",
+  "companies": [
+   "Amazon",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Distributed scheduler: leader election, sharded job ownership",
+   "At-least-once execution + idempotent jobs",
+   "Missed-fire policies, timezone handling, backfill"
+  ],
+  "time_minutes": 20,
+  "id": "sd-044"
+ },
+ {
+  "question": "Design a URL preview / link-unfurl service.",
+  "companies": [
+   "Meta",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Async fetch workers; oEmbed/OpenGraph parsing",
+   "SSRF protection: no internal IPs, timeouts, size caps",
+   "Cache previews; refresh on demand"
+  ],
+  "time_minutes": 15,
+  "id": "sd-045"
+ },
+ {
+  "question": "Design a two-factor authentication system.",
+  "companies": [
+   "Google",
+   "Microsoft",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "TOTP (RFC 6238) vs WebAuthn/passkeys; backup codes",
+   "Rate-limit verification attempts; account recovery flows",
+   "Risk-based step-up: device + behavior signals"
+  ],
+  "time_minutes": 20,
+  "id": "sd-046"
+ },
+ {
+  "question": "Design a collaborative document editor (Google Docs).",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "OT vs CRDT for conflict resolution",
+   "Presence: cursor positions via websocket",
+   "Persistence: operation log + snapshots"
+  ],
+  "time_minutes": 30,
+  "id": "sd-047"
+ },
+ {
+  "question": "Design a stock-trading order-matching engine.",
+  "companies": [
+   "Zerodha",
+   "Google"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Price-time priority matching; lock-free data structures",
+   "Deterministic replay for audit; low-latency networking",
+   "Risk checks pre-trade; circuit breakers"
+  ],
+  "time_minutes": 30,
+  "id": "sd-048"
+ },
+ {
+  "question": "Design a ride-hailing surge-pricing engine.",
+  "companies": [
+   "Uber",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist",
+   "data_analyst"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Supply/demand per hex cell computed on streaming data",
+   "Smoothing to avoid oscillation; caps and transparency",
+   "A/B testing pricing with guardrail metrics"
+  ],
+  "time_minutes": 25,
+  "id": "sd-049"
+ },
+ {
+  "question": "Design an e-commerce flash-sale system (Big Billion Day).",
+  "companies": [
+   "Flipkart",
+   "Amazon",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Pre-warm: capacity planning, load shedding, static fallbacks",
+   "Inventory: decrement with reservation TTLs",
+   "Queue-based checkout; bot mitigation"
+  ],
+  "time_minutes": 25,
+  "id": "sd-050"
+ },
+ {
+  "question": "Design a UPI-like instant payment network.",
+  "companies": [
+   "Google",
+   "Amazon"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Idempotent transaction API; two-phase commit across banks",
+   "Reconciliation and settlement batches",
+   "Fraud velocity checks; 99.99% availability targets"
+  ],
+  "time_minutes": 30,
+  "id": "sd-051"
+ },
+ {
+  "question": "Design a distributed session store for a global app.",
+  "companies": [
+   "Amazon",
+   "Google",
+   "Meta"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Sticky vs centralized sessions; JWT trade-offs",
+   "Redis cluster with replication; session fixation defenses",
+   "Geo-routing: write-local, read-global patterns"
+  ],
+  "time_minutes": 20,
+  "id": "sd-052"
+ },
+ {
+  "question": "Design a push-notification service for 100M devices.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "FCM/APNs integration; token registry with invalidation",
+   "Batching and collapsing; priority lanes",
+   "Delivery analytics and feedback loops"
+  ],
+  "time_minutes": 25,
+  "id": "sd-053"
+ },
+ {
+  "question": "Design a code-search engine (like Sourcegraph).",
+  "companies": [
+   "Google",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Trigram index over code; incremental reindexing",
+   "Ranking: repo importance, symbol matches",
+   "Scale: sharded index, streaming results"
+  ],
+  "time_minutes": 25,
+  "id": "sd-054"
+ },
+ {
+  "question": "Design an ML feature store.",
+  "companies": [
+   "Uber",
+   "Google",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist",
+   "data_analyst"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Online (low-latency) + offline (training) stores with consistency",
+   "Point-in-time correctness for training data",
+   "Feature monitoring: drift, staleness alerts"
+  ],
+  "time_minutes": 25,
+  "id": "sd-055"
+ },
+ {
+  "question": "Design a model-serving platform (real-time inference).",
+  "companies": [
+   "Google",
+   "Amazon",
+   "Netflix"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist",
+   "data_analyst"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Model registry + versioned deployments; canary by traffic split",
+   "Batching, GPU sharing, autoscaling on queue depth",
+   "Shadow mode for new models; rollback in seconds"
+  ],
+  "time_minutes": 25,
+  "id": "sd-056"
+ },
+ {
+  "question": "Design a data lake with ACID guarantees (Delta Lake style).",
+  "companies": [
+   "Amazon",
+   "Microsoft",
+   "Flipkart"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops",
+   "data_scientist",
+   "data_analyst"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Transaction log over object storage; optimistic concurrency",
+   "Time travel and schema enforcement",
+   "Compaction (Z-order) for read performance"
+  ],
+  "time_minutes": 25,
+  "id": "sd-057"
+ },
+ {
+  "question": "Design a hospital appointment system at national scale.",
+  "companies": [
+   "TCS",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Slot inventory per doctor; double-booking prevention",
+   "Reminders via SMS/WhatsApp; no-show prediction",
+   "Priority queues for emergencies"
+  ],
+  "time_minutes": 20,
+  "id": "sd-058"
+ },
+ {
+  "question": "Design an exam/assessment platform (like HackerRank).",
+  "companies": [
+   "TCS",
+   "Infosys"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Medium",
+  "key_points": [
+   "Sandboxed code execution at scale; cheating detection signals",
+   "Question bank with difficulty calibration",
+   "Proctoring: browser lockdown + anomaly flags"
+  ],
+  "time_minutes": 20,
+  "id": "sd-059"
+ },
+ {
+  "question": "Design a railway reservation system (IRCTC scale).",
+  "companies": [
+   "TCS",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "devops"
+  ],
+  "category": "system_design",
+  "difficulty": "Hard",
+  "key_points": [
+   "Tatkal contention: queue + lottery vs first-come",
+   "Seat map as inventory with holds",
+   "Payment timeout handling; waitlist prediction"
+  ],
+  "time_minutes": 25,
+  "id": "sd-060"
+ },
+ {
+  "question": "Two Sum: given an array and a target, return indices of two numbers that add up to the target.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Brute force O(n^2) first, then optimize",
+   "Hash map: one pass, store value->index; check complement",
+   "Edge: duplicates; follow-up: sorted array -> two pointers"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-001"
+ },
+ {
+  "question": "Best Time to Buy and Sell Stock: max profit from one transaction.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Track min price so far; profit = price - min_price",
+   "One pass O(n), O(1) space",
+   "Follow-ups: multiple transactions, cooldown, fee"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-002"
+ },
+ {
+  "question": "Contains Duplicate: determine if any value appears at least twice.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Amazon",
+   "Microsoft"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Hash set single pass; early exit",
+   "Sorting alternative O(n log n)",
+   "Follow-up: find the duplicate with O(1) space (Floyd)"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-003"
+ },
+ {
+  "question": "Maximum Subarray (Kadane's): largest sum of a contiguous subarray.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Kadane: extend or restart at each element",
+   "Track global max; handle all-negative arrays",
+   "Follow-up: return the subarray indices; circular variant"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-004"
+ },
+ {
+  "question": "Product of Array Except Self: without division, O(n).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Prefix products then suffix products in one output array",
+   "O(n) time, O(1) extra space (output doesn't count)",
+   "Follow-up: with division allowed? zeros handling"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-005"
+ },
+ {
+  "question": "3Sum: all unique triplets summing to zero.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Sort + fix one + two pointers; skip duplicates carefully",
+   "O(n^2) time; dedup via sorted skip logic",
+   "Follow-ups: 3Sum Closest, 4Sum"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-006"
+ },
+ {
+  "question": "Container With Most Water: max area between lines.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Two pointers from ends; move the shorter side",
+   "Proof sketch: the shorter side can't form a better pair",
+   "O(n) time, O(1) space"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-007"
+ },
+ {
+  "question": "Trapping Rain Water: compute trapped water given elevation map.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Two pointers with left_max/right_max; or monotonic stack",
+   "DP with precomputed max arrays as the clear first solution",
+   "Follow-up: 2D trapping rain water"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-008"
+ },
+ {
+  "question": "Valid Anagram: check if two strings are anagrams.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Frequency count (26 letters) or sorted compare",
+   "Unicode follow-up: hash map instead of array",
+   "Early exit on length mismatch"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-009"
+ },
+ {
+  "question": "Group Anagrams: group strings that are anagrams.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Key = sorted string or 26-count tuple; hash map",
+   "O(n * k log k) vs O(n * k) trade-off",
+   "Follow-up: streaming/grouping large datasets"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-010"
+ },
+ {
+  "question": "Longest Substring Without Repeating Characters.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Sliding window + last-seen index map",
+   "Move left bound to max(left, last_seen[char]+1)",
+   "O(n) time; follow-up: at most K distinct"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-011"
+ },
+ {
+  "question": "Longest Palindromic Substring.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Expand around centers (2n-1 centers), O(n^2)",
+   "Manacher's O(n) as follow-up discussion",
+   "DP alternative O(n^2) space"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-012"
+ },
+ {
+  "question": "Valid Parentheses: check balanced brackets.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Stack: push opens, match closes; check empty at end",
+   "Handle all three bracket types",
+   "Follow-up: minimum removals to balance; longest valid"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-013"
+ },
+ {
+  "question": "Minimum Window Substring: smallest substring containing all chars of t.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Sliding window with need/have counts",
+   "Shrink while valid; track best window",
+   "O(n+m); follow-up: at most K distinct variant"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-014"
+ },
+ {
+  "question": "Merge Intervals: merge overlapping intervals.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Sort by start; sweep merging into current",
+   "O(n log n); careful with touching intervals [1,4],[4,5]",
+   "Follow-ups: insert interval, meeting rooms"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-015"
+ },
+ {
+  "question": "Rotate Array by k steps, in place.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Three reversals: reverse all, first k, rest",
+   "k %= n; O(1) space",
+   "Follow-up: rotate matrix 90 degrees"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-016"
+ },
+ {
+  "question": "Find the Duplicate Number: n+1 ints in [1,n], one duplicate, O(1) space.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Floyd's cycle detection: array as linked list via indices",
+   "Phase 1: find meeting; Phase 2: find entrance",
+   "Why sorting/counting violate constraints"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-017"
+ },
+ {
+  "question": "First Missing Positive: smallest missing positive in unsorted array, O(n)/O(1).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Cyclic placement: put i at index i-1",
+   "Then scan for first misplaced",
+   "Handle negatives/duplicates gracefully"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-018"
+ },
+ {
+  "question": "Spiral Matrix: return elements in spiral order.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Boundary pointers shrinking: top/bottom/left/right",
+   "Careful with single row/column remainders",
+   "Follow-up: generate spiral matrix"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-019"
+ },
+ {
+  "question": "Set Matrix Zeroes: zero rows/cols containing a zero, O(1) space.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Use first row/col as markers + two flags",
+   "Two passes; order matters to not clobber markers",
+   "Follow-up: O(m+n) version first for clarity"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-020"
+ },
+ {
+  "question": "Reverse a Linked List, iteratively and recursively.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Iterative: prev/curr/next pointer dance, O(1) space",
+   "Recursive: trust the subproblem; base case null/single",
+   "Follow-up: reverse in k-groups"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-021"
+ },
+ {
+  "question": "Detect a cycle in a linked list (and find its start).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Floyd: slow/fast pointers; meeting implies cycle",
+   "Entrance: reset one to head, advance both at same speed - prove it",
+   "Hash-set alternative and its cost"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-022"
+ },
+ {
+  "question": "Merge Two Sorted Lists.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Dummy head; advance the smaller",
+   "Recursive one-liner as follow-up",
+   "Extend: merge k sorted lists with a heap"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-023"
+ },
+ {
+  "question": "Remove Nth Node From End of List, one pass.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Fast pointer n ahead; then move both",
+   "Dummy head handles removing the head",
+   "Edge: n equals list length"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-024"
+ },
+ {
+  "question": "Reorder List: L0->Ln->L1->Ln-1...",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Find middle, reverse second half, merge alternately",
+   "Three subproblems composed; O(1) space",
+   "Verify on even/odd lengths"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-025"
+ },
+ {
+  "question": "LRU Cache: O(1) get and put.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Hash map + doubly linked list; dummy head/tail",
+   "Move-to-front on access; evict from tail",
+   "Follow-up: LFU cache; thread safety discussion"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-026"
+ },
+ {
+  "question": "Add Two Numbers represented as reverse-order linked lists.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Digit-by-digit with carry; dummy head",
+   "Different lengths and final carry edge cases",
+   "Follow-up: forward order (stacks or reverse)"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-027"
+ },
+ {
+  "question": "Copy List with Random Pointer.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Interleave copies (A->A'->B->B'), wire random, then split: O(1) space",
+   "Hash-map version first for clarity",
+   "Explain why the interleave trick works"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-028"
+ },
+ {
+  "question": "Valid Parentheses already covered; now: Daily Temperatures (next warmer day).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Monotonic decreasing stack of indices",
+   "Pop while current > stack top; answer = distance",
+   "Pattern: next-greater-element family"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-029"
+ },
+ {
+  "question": "Largest Rectangle in Histogram.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Monotonic increasing stack; compute area on pop",
+   "Sentinel bar to flush the stack",
+   "Related: maximal rectangle in binary matrix"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-030"
+ },
+ {
+  "question": "Evaluate Reverse Polish Notation.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Stack of operands; apply operators popping two",
+   "Integer division truncation toward zero",
+   "Follow-up: infix with precedence (two stacks)"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-031"
+ },
+ {
+  "question": "Min Stack: push/pop/top/getMin all O(1).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Auxiliary min-stack, or store (value, current_min) pairs",
+   "Handle duplicate minimums correctly",
+   "Follow-up: max stack; queue with stacks"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-032"
+ },
+ {
+  "question": "Maximum Depth of Binary Tree.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Recursive: 1 + max(depths); iterative BFS level count",
+   "Base case null -> 0",
+   "Follow-up: diameter; balanced check in one pass"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-033"
+ },
+ {
+  "question": "Invert Binary Tree.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Swap children recursively or BFS iteratively",
+   "Famous tweet question - stay calm",
+   "Follow-up: invert n-ary tree"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-034"
+ },
+ {
+  "question": "Validate Binary Search Tree.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Pass (low, high) bounds down; strict inequality",
+   "Inorder-must-be-sorted alternative",
+   "Edge: duplicate values; integer overflow bounds"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-035"
+ },
+ {
+  "question": "Lowest Common Ancestor of a BST (then of a binary tree).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "BST: walk down using value comparisons, O(h)",
+   "Binary tree: recursive - return non-null sides",
+   "Follow-up: LCA with parent pointers"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-036"
+ },
+ {
+  "question": "Binary Tree Level Order Traversal.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "BFS with level-size loop; queue",
+   "Zigzag variant with direction flag",
+   "Follow-up: right-side view = last of each level"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-037"
+ },
+ {
+  "question": "Serialize and Deserialize a Binary Tree.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Preorder with null markers; rebuild with index pointer",
+   "BFS alternative; compactness discussion",
+   "Follow-up: serialize BST more compactly (no nulls)"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-038"
+ },
+ {
+  "question": "Kth Smallest Element in a BST.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Inorder traversal counting; iterative with stack",
+   "Augmented subtree sizes for O(h)",
+   "Follow-up: kth largest; median of BST"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-039"
+ },
+ {
+  "question": "Construct Binary Tree from Preorder and Inorder.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Root = preorder[0]; split inorder at root via map",
+   "Recursion with index ranges; O(n) with hash map",
+   "Follow-up: from inorder+postorder"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-040"
+ },
+ {
+  "question": "Number of Islands: count islands in a binary grid.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "DFS/BFS flood fill, mark visited in place",
+   "Count launches = islands; O(mn) time",
+   "Follow-ups: max area; distinct island shapes"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-041"
+ },
+ {
+  "question": "Clone Graph (deep copy of undirected graph).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "DFS/BFS with old->new node map",
+   "Handle cycles via the map check",
+   "Follow-up: copy random-pointer list (same idea)"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-042"
+ },
+ {
+  "question": "Course Schedule: can you finish all courses given prerequisites?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Cycle detection in directed graph: Kahn's BFS or DFS colors",
+   "Build adjacency + indegree; process zero-indegree queue",
+   "Follow-up: return an ordering (Course Schedule II)"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-043"
+ },
+ {
+  "question": "Word Ladder: shortest transformation from beginWord to endWord.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "BFS over word graph; pattern buckets (*ot) for neighbors",
+   "Bidirectional BFS optimization",
+   "Follow-up: return all shortest paths (Word Ladder II)"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-044"
+ },
+ {
+  "question": "Rotting Oranges: minutes until all fresh oranges rot (multi-source BFS).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Queue all initially rotten; level-order BFS = minutes",
+   "Count fresh; if any remain -> -1",
+   "Pattern: multi-source BFS (walls and gates, 01-matrix)"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-045"
+ },
+ {
+  "question": "Pacific Atlantic Water Flow: cells flowing to both oceans.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Reverse thinking: BFS from ocean borders inward/uphill",
+   "Two visited sets; intersect",
+   "Why forward simulation from each cell is too slow"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-046"
+ },
+ {
+  "question": "Graph Valid Tree: n nodes, edges list - is it a valid tree?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Conditions: edges == n-1 AND connected (or no cycle + connected)",
+   "Union-Find or DFS; watch self-loops",
+   "Follow-up: count connected components"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-047"
+ },
+ {
+  "question": "Alien Dictionary: derive character order from sorted words.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Build graph from first differing chars of adjacent words",
+   "Topological sort; detect invalid prefix case",
+   "Cycle -> empty result"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-048"
+ },
+ {
+  "question": "Top K Frequent Elements.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Count with map; bucket sort by frequency O(n)",
+   "Heap alternative O(n log k); compare trade-offs",
+   "Follow-up: streaming top-k (heavy hitters)"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-049"
+ },
+ {
+  "question": "Kth Largest Element in an Array (no full sort).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Min-heap of size k: O(n log k)",
+   "Quickselect average O(n); worst-case discussion",
+   "Follow-up: kth largest in a stream"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-050"
+ },
+ {
+  "question": "Find Median from Data Stream.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Two heaps: max-heap low half, min-heap high half",
+   "Balance sizes; median from tops",
+   "Follow-up: sliding-window median"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-051"
+ },
+ {
+  "question": "Merge K Sorted Lists.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Min-heap of list heads; pop/advance/push",
+   "O(N log k); divide-and-conquer alternative",
+   "Follow-up: merge k sorted arrays"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-052"
+ },
+ {
+  "question": "Task Scheduler: min intervals with cooldown n.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Count max frequency; formula: (max-1)*(n+1) + maxCount",
+   "Greedy simulation with heap as the intuitive first pass",
+   "Explain idle slots via the most frequent task"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-053"
+ },
+ {
+  "question": "Climbing Stairs: distinct ways to reach step n (1 or 2 steps).",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Fibonacci DP: dp[i] = dp[i-1] + dp[i-2]; O(1) space",
+   "Recognize the recurrence first",
+   "Follow-ups: 1..k steps; min cost climbing"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-054"
+ },
+ {
+  "question": "House Robber: max loot without robbing adjacent houses.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "dp[i] = max(dp[i-1], dp[i-2] + nums[i]); two variables suffice",
+   "Circular variant: run twice (include/exclude first)",
+   "Follow-up: House Robber III on trees"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-055"
+ },
+ {
+  "question": "Coin Change: fewest coins for amount; -1 if impossible.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "dp[amount] = 1 + min(dp[amount-c]); initialize INF",
+   "Order of loops: combinations vs permutations (Coin Change II)",
+   "Greedy fails: counterexample [1,3,4] amount 6"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-056"
+ },
+ {
+  "question": "Longest Increasing Subsequence.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "O(n^2) DP first; then patience sorting O(n log n)",
+   "Binary search on tails array; reconstruct the sequence as follow-up",
+   "Related: Russian doll envelopes"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-057"
+ },
+ {
+  "question": "Word Break: can s be segmented into dictionary words?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "dp[i]: prefix s[:i] segmentable; check all j < i",
+   "BFS/DFS+memo alternative; Trie optimization",
+   "Follow-up: return all segmentations (Word Break II)"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-058"
+ },
+ {
+  "question": "Partition Equal Subset Sum: can array split into equal sums?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Subset-sum DP: total even and reachable total/2",
+   "1D boolean DP iterating backwards",
+   "Related: target sum, last stone weight II"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-059"
+ },
+ {
+  "question": "Unique Paths in a grid (with obstacles).",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "dp[i][j] = dp[i-1][j] + dp[i][j-1]; obstacles zero out cells",
+   "Combinatorial formula C(m+n-2, m-1) without obstacles",
+   "Space optimize to 1D"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-060"
+ },
+ {
+  "question": "Edit Distance: min operations (insert/delete/replace) to convert word1 to word2.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "dp[i][j] on prefixes; recurrence with match/mismatch",
+   "Base cases: empty prefixes; O(mn) time/space",
+   "Space optimize to 2 rows; follow-up: print the edits"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-061"
+ },
+ {
+  "question": "Longest Common Subsequence.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Classic 2D DP; match -> diagonal+1 else max(top,left)",
+   "Reconstruct the subsequence by backtracking",
+   "Follow-up: shortest common supersequence"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-062"
+ },
+ {
+  "question": "Decode Ways: number of ways to decode a digit string (1-26 -> A-Z).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "dp[i] = dp[i-1] (single digit valid) + dp[i-2] (two digits 10-26)",
+   "Handle '0' carefully: '0' alone invalid, '10'/'20' only as pair",
+   "Follow-up: with '*' wildcard (Decode Ways II)"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-063"
+ },
+ {
+  "question": "Maximum Product Subarray.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Track both max and min ending here (negatives flip)",
+   "Swap on negative; reset logic",
+   "Why Kadane alone fails: sign flips"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-064"
+ },
+ {
+  "question": "Jump Game: can you reach the last index?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Greedy: track farthest reachable; O(n)",
+   "DP backwards as the slower first attempt",
+   "Follow-up: Jump Game II minimum jumps"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-065"
+ },
+ {
+  "question": "Combination Sum: all combos summing to target (reuse allowed).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Backtracking with start index to avoid permutations",
+   "Sort + prune when remainder < 0",
+   "Variants: no reuse (II), k numbers 1-9 (III)"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-066"
+ },
+ {
+  "question": "Permutations of an array (with and without duplicates).",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Backtrack with used[] array; duplicates: sort + skip used[i-1]",
+   "Swap-in-place alternative",
+   "Count check: n! sanity"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-067"
+ },
+ {
+  "question": "Subsets (power set), with duplicates variant.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Backtrack include/exclude; or iterative doubling",
+   "Duplicates: sort and skip same-level repeats",
+   "Bitmask enumeration O(n*2^n)"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-068"
+ },
+ {
+  "question": "N-Queens: place n queens so none attack.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Backtrack row by row; sets for cols/diagonals",
+   "Count vs enumerate variants",
+   "Bitmask optimization discussion"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-069"
+ },
+ {
+  "question": "Sudoku Solver.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Backtrack with row/col/box constraint sets",
+   "MRV heuristic: try emptiest-constrained cell first",
+   "Validate the board first"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-070"
+ },
+ {
+  "question": "Binary Search in Rotated Sorted Array.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "One half is always sorted; check which, then decide",
+   "Handle the sorted-half identification carefully",
+   "Follow-ups: with duplicates; find minimum"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-071"
+ },
+ {
+  "question": "Search a 2D Matrix (rows and cols sorted).",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Treat as 1D binary search (flatten index) O(log mn)",
+   "Staircase O(m+n) from top-right as alternative",
+   "Compare approaches"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-072"
+ },
+ {
+  "question": "Koko Eating Bananas: min eating speed to finish in h hours.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Binary search on answer: speed 1..max(piles)",
+   "Feasibility check: sum of ceil(pile/speed) <= h",
+   "Pattern: search the answer space"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-073"
+ },
+ {
+  "question": "Find Peak Element in O(log n).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Binary search: if mid < mid+1, peak is right",
+   "Invariant: a peak always exists in the chosen half",
+   "2D peak finding as follow-up"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-074"
+ },
+ {
+  "question": "Median of Two Sorted Arrays in O(log(m+n)).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Binary search the partition: i + j = (m+n+1)/2",
+   "Check maxLeft <= minRight conditions",
+   "Edge cases: empty array, odd/even totals"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-075"
+ },
+ {
+  "question": "Implement Trie (prefix tree) with insert/search/startsWith.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Node: children map + is_end flag",
+   "Use cases: autocomplete, spell check",
+   "Follow-up: word search II on a board"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-076"
+ },
+ {
+  "question": "Design Add and Search Words (with '.' wildcard).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Trie + DFS on '.' branching to all children",
+   "Complexity: bounded by alphabet^dots",
+   "Alternative: brute force per query comparison"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-077"
+ },
+ {
+  "question": "Word Search: find a word in a 2D board (adjacent cells).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "DFS with backtracking; mark visited in place",
+   "Prune: frequency check of board vs word first",
+   "Follow-up: multiple words -> Trie (Word Search II)"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-078"
+ },
+ {
+  "question": "Course Schedule already covered; now: Network Delay Time (Dijkstra).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Dijkstra with heap from source; answer = max distance",
+   "Unreachable -> -1; why no negative weights",
+   "Follow-up: Bellman-Ford for negatives"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-079"
+ },
+ {
+  "question": "Cheapest Flights Within K Stops.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Bellman-Ford limited to k+1 relaxations, or BFS-level Dijkstra variant",
+   "Why plain Dijkstra fails with the stops constraint",
+   "DP formulation alternative"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-080"
+ },
+ {
+  "question": "Debounce vs throttle: implement both and explain when to use each.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Debounce: reset timer on each call; throttle: allow once per window",
+   "Leading vs trailing edge options",
+   "Use cases: search input vs scroll handlers"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-081"
+ },
+ {
+  "question": "Implement a simple Promise.all from scratch.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Counter of resolved; results array indexed; reject fast",
+   "Handle non-promise values via Promise.resolve",
+   "Follow-up: Promise.allSettled, race"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-082"
+ },
+ {
+  "question": "Deep flatten a nested array (any depth), iteratively.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend",
+   "sde"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Stack-based iteration to avoid recursion limits",
+   "Preserve order; handle non-array items",
+   "Follow-up: flatten nested objects with paths"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-083"
+ },
+ {
+  "question": "Implement a tiny event emitter (on/emit/off/once).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Map event -> Set of listeners; once wraps and removes",
+   "Memory-leak guard: max listeners warning",
+   "Follow-up: wildcard events"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-084"
+ },
+ {
+  "question": "Virtualize a long list: render only visible rows (windowing).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Absolute positioning with top offset = startIndex * rowHeight",
+   "Scroll handler -> compute visible range (+ overscan)",
+   "Dynamic row heights: measure and cache"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-085"
+ },
+ {
+  "question": "Deep clone an object handling circular references.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend",
+   "sde"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "WeakMap/Map for visited; clone by type (Array, Date, Map...)",
+   "Functions/symbols: copy by reference decision",
+   "structuredClone as the platform answer"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-086"
+ },
+ {
+  "question": "Implement JSON.stringify for a subset (no functions/cycles).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Recursive serialization per type; escape strings",
+   "Arrays vs objects; null/undefined handling",
+   "Replacer and indentation as follow-ups"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-087"
+ },
+ {
+  "question": "Build a simple state store (Redux-like): createStore, dispatch, subscribe.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "frontend"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Reducer purity; subscribers notified on dispatch",
+   "Middleware as follow-up (compose chain)",
+   "Time-travel via action log"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-088"
+ },
+ {
+  "question": "Given page-view events, compute daily active users and 7-day retention.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "DAU: count distinct users per day",
+   "Retention: cohort users active on day 0 AND day 7",
+   "SQL: self-join on user_id with date diff; sketch the query"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-089"
+ },
+ {
+  "question": "Find the second-highest salary per department (SQL).",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "DENSE_RANK() OVER (PARTITION BY dept ORDER BY salary DESC) = 2",
+   "Correlated subquery alternative",
+   "Handle ties explicitly"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-090"
+ },
+ {
+  "question": "Detect outliers in a numeric column. Describe 2 methods.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "IQR rule: outside [Q1-1.5 IQR, Q3+1.5 IQR]",
+   "Z-score with robust variants (median/MAD)",
+   "Discuss when each breaks: skewed distributions"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-091"
+ },
+ {
+  "question": "Explain p-value to a non-technical stakeholder.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Probability of seeing this result if nothing were happening",
+   "Not the probability the hypothesis is true",
+   "Pair with effect size and confidence intervals"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-092"
+ },
+ {
+  "question": "A/B test: conversion 5.0% vs 5.4% with 10k users each. Significant?",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Two-proportion z-test; compute SE and z",
+   "Check power/sample size planning, not just p-values",
+   "Peeking problem: sequential testing corrections"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-093"
+ },
+ {
+  "question": "Handle class imbalance in a fraud dataset (1% positive).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Resampling: SMOTE/undersample; class weights",
+   "Right metrics: PR-AUC over accuracy",
+   "Threshold tuning to business cost"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-094"
+ },
+ {
+  "question": "Explain overfitting and three ways to combat it.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "data_analyst",
+   "data_scientist"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "Model memorizes noise: train/val gap",
+   "Regularization, cross-validation, more/better data",
+   "Early stopping as the practical fourth"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-095"
+ },
+ {
+  "question": "Design a CI pipeline for a monorepo with 50 services.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Change detection: build only affected (dependency graph)",
+   "Remote caching (Bazel-style) for speed",
+   "Trunk-based flow with feature flags"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-096"
+ },
+ {
+  "question": "Debug high CPU on a production Linux box, step by step.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "devops",
+   "sde",
+   "backend"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "top/htop -> pid; perf top / flame graphs",
+   "Check GC, thread dumps, recent deploys",
+   "Reproduce in staging; fix + monitor"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-097"
+ },
+ {
+  "question": "Design log rotation and retention for 100 servers.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+   "logrotate: size/time triggers, compression, retention count",
+   "Centralize: ship to ELK/S3; local buffer on outage",
+   "PII redaction before shipping"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-098"
+ },
+ {
+  "question": "Explain what happens when you type a URL and press enter (devops-flavored).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy",
+   "TCS",
+   "Infosys",
+   "Wipro"
+  ],
+  "roles": [
+   "devops",
+   "sde",
+   "backend"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "DNS -> TCP/TLS handshake -> HTTP request through LB/CDN",
+   "Server: routing, app logic, DB; response rendering",
+   "Name one failure mode per layer"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-099"
+ },
+ {
+  "question": "You have 3 environments and a secret leaked in git history. Remediate.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Rotate the secret everywhere FIRST, then purge history (filter-repo)",
+   "Audit access logs for misuse window",
+   "Prevent: pre-commit hooks, secret scanning, short-lived creds"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-100"
+ },
+ {
+  "question": "Sliding Window Maximum: max of each window size k.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Monotonic decreasing deque of indices; evict out-of-window",
+   "O(n); each element pushed/popped once",
+   "Naive heap O(n log k) as first attempt"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-101"
+ },
+ {
+  "question": "Subarray Sum Equals K (count subarrays).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Prefix sums + hash map of frequencies",
+   "count += map[prefix - k]; handle k=0 and negatives",
+   "Follow-up: longest subarray with sum K"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-102"
+ },
+ {
+  "question": "Next Permutation: rearrange to the lexicographically next greater permutation.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Find pivot (first descent from right), swap with smallest larger, reverse suffix",
+   "All-descending -> reverse whole array",
+   "Follow-up: kth permutation"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-103"
+ },
+ {
+  "question": "Sort Colors (Dutch national flag): sort 0s,1s,2s in one pass.",
+  "companies": [
+   "TCS",
+   "Infosys",
+   "Wipro",
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Three pointers: low/mid/high; swap and advance",
+   "Invariant: [0,low)=0s, [low,mid)=1s, (high,end]=2s",
+   "Generalize to k colors (counting sort)"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-104"
+ },
+ {
+  "question": "Wiggle Sort II: reorder so nums[0]<nums[1]>nums[2]<...",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Median via quickselect; 3-way partition with virtual indexing",
+   "Simpler O(n log n) version first",
+   "Strict inequality edge cases"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-105"
+ },
+ {
+  "question": "Largest Number: arrange numbers to form the largest concatenated number.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Custom comparator: x+y vs y+x as strings",
+   "All-zeros edge -> return '0'",
+   "Proof sketch of comparator validity"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-106"
+ },
+ {
+  "question": "Insert Delete GetRandom O(1) (with duplicates variant).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Array + value->indices map; swap-with-last on remove",
+   "Duplicates: map value -> set of indices",
+   "Random: uniform index choice"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-107"
+ },
+ {
+  "question": "Design a Hit Counter (last 5 minutes).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Queue of timestamps; evict older than 300s",
+   "Bucketed array (300 slots) for O(1) memory",
+   "Follow-up: distributed hit counter"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-108"
+ },
+ {
+  "question": "Snapshot Array: set/snap/get with snap ids.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Per-index list of (snap_id, value); binary search on get",
+   "Lazy: only record on set",
+   "Memory vs time trade-offs"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-109"
+ },
+ {
+  "question": "Time-Based Key-Value Store.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Map key -> sorted list of (timestamp, value); binary search",
+   "Strictly increasing timestamps simplify",
+   "Follow-up: out-of-order timestamps"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-110"
+ },
+ {
+  "question": "Autocomplete System with hot-degree ranking.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Trie nodes store top-3 hot sentences (update on insert)",
+   "DFS collect + sort alternative; compare costs",
+   "'#' commits the typed sentence"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-111"
+ },
+ {
+  "question": "Shortest Path in Binary Matrix (8-directional BFS).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "BFS from (0,0); blocked start/end -> -1",
+   "8 directions; distance = levels",
+   "A* with heuristic as follow-up"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-112"
+ },
+ {
+  "question": "01 Matrix: distance to nearest 0 for each cell.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Multi-source BFS from all zeros simultaneously",
+   "DP two-pass alternative",
+   "Why single-source per cell is too slow"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-113"
+ },
+ {
+  "question": "Surrounded Regions: flip captured 'O's to 'X'.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Mark border-connected 'O's via DFS/BFS, then flip the rest",
+   "In-place with temporary marker",
+   "Union-Find alternative"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-114"
+ },
+ {
+  "question": "Accounts Merge: merge accounts sharing emails (Union-Find).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Union emails of the same account; group by root",
+   "Sort emails in output; keep the name",
+   "DFS graph alternative"
+  ],
+  "time_minutes": 25,
+  "id": "dsa-115"
+ },
+ {
+  "question": "Redundant Connection: find the extra edge forming a cycle.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "Union-Find: first edge connecting already-connected nodes",
+   "Return the LAST such edge per spec",
+   "Follow-up: directed variant (II)"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-116"
+ },
+ {
+  "question": "Critical Connections (bridges) in a network (Tarjan).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "DFS discovery times + low-link values",
+   "Bridge iff low[v] > disc[u]",
+   "Explain the invariant carefully"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-117"
+ },
+ {
+  "question": "Reconstruct Itinerary: Eulerian path with lexical order.",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Hierholzer's algorithm with min-heap adjacency",
+   "Post-order append + reverse",
+   "Why greedy smallest-first fails"
+  ],
+  "time_minutes": 30,
+  "id": "dsa-118"
+ },
+ {
+  "question": "Burst Balloons: max coins from bursting (interval DP).",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "Think reverse: which balloon bursts LAST in (l,r)",
+   "dp[l][r] = max over k of dp[l][k]+dp[k][r]+nums[l]*nums[k]*nums[r]",
+   "O(n^3); padding with 1s"
+  ],
+  "time_minutes": 35,
+  "id": "dsa-119"
+ },
+ {
+  "question": "Regular Expression Matching ('.' and '*').",
+  "companies": [
+   "Google",
+   "Meta",
+   "Amazon",
+   "Microsoft",
+   "Apple",
+   "Netflix",
+   "Flipkart",
+   "Swiggy"
+  ],
+  "roles": [
+   "sde",
+   "backend",
+   "frontend",
+   "devops"
+  ],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+   "DP on (i,j): match char or '.'; '*' = zero (skip) or one+ (consume)",
+   "Base: empty pattern vs empty string",
+   "Memoized recursion is clearest"
+  ],
+  "time_minutes": 35,
+  "id": "dsa-120"
+ }
+]

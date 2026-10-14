@@ -1,0 +1,971 @@
+[
+ {
+  "word": "um",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Pure filler; pause silently instead."
+ },
+ {
+  "word": "uh",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Pure filler; pause silently instead."
+ },
+ {
+  "word": "er",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Pure filler; pause silently instead."
+ },
+ {
+  "word": "ah",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Pure filler; pause silently instead."
+ },
+ {
+  "word": "like",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "As a filler ('I was, like, debugging') it weakens every sentence."
+ },
+ {
+  "word": "you know",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Assumes agreement; adds nothing."
+ },
+ {
+  "word": "i mean",
+  "category": "filler",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Restarts that signal uncertainty; say the point directly."
+ },
+ {
+  "word": "well",
+  "category": "throat_clearer",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "OK occasionally at a start; habitual use stalls momentum."
+ },
+ {
+  "word": "so",
+  "category": "throat_clearer",
+  "severity": 1,
+  "alternatives": [
+   ""
+  ],
+  "note": "Fine as a connector; weak as a sentence starter every time."
+ },
+ {
+  "word": "actually",
+  "category": "filler",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "in fact"
+  ],
+  "note": "Often contradicts unnecessarily; cut unless correcting."
+ },
+ {
+  "word": "basically",
+  "category": "filler",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "in essence"
+  ],
+  "note": "Implies you're dumbing it down; just say it."
+ },
+ {
+  "word": "literally",
+  "category": "weak_intensifier",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Almost always misused; delete."
+ },
+ {
+  "word": "honestly",
+  "category": "filler",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Implies the rest was dishonest; cut."
+ },
+ {
+  "word": "seriously",
+  "category": "filler",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Filler emphasis; let the content carry weight."
+ },
+ {
+  "word": "right?",
+  "category": "filler",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Tag question seeking validation; state it plainly."
+ },
+ {
+  "word": "okay?",
+  "category": "filler",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Same as 'right?' - drop the tag."
+ },
+ {
+  "word": "stuff",
+  "category": "vague",
+  "severity": 3,
+  "alternatives": [
+   "the migration",
+   "the components"
+  ],
+  "note": "Name the thing."
+ },
+ {
+  "word": "things",
+  "category": "vague",
+  "severity": 3,
+  "alternatives": [
+   "the services",
+   "the results"
+  ],
+  "note": "Name the thing."
+ },
+ {
+  "word": "whatever",
+  "category": "vague",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Signals you don't care; never in interviews."
+ },
+ {
+  "word": "something like that",
+  "category": "vague",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "specifically"
+  ],
+  "note": "Hedges the whole sentence."
+ },
+ {
+  "word": "and so on",
+  "category": "vague",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "for example"
+  ],
+  "note": "Hand-waves the list; give one concrete item."
+ },
+ {
+  "word": "etc",
+  "category": "vague",
+  "severity": 1,
+  "alternatives": [
+   "",
+   "for example"
+  ],
+  "note": "Weak ending; name the last item instead."
+ },
+ {
+  "word": "maybe",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "I recommend"
+  ],
+  "note": "Hedges a recommendation; take a stance."
+ },
+ {
+  "word": "perhaps",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "I recommend"
+  ],
+  "note": "Formal hedge; take a stance."
+ },
+ {
+  "word": "probably",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "I expect"
+  ],
+  "note": "Fine for estimates; weak for opinions."
+ },
+ {
+  "word": "i think",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "The data shows"
+  ],
+  "note": "OK for opinions; replace with evidence when you have it."
+ },
+ {
+  "word": "i guess",
+  "category": "hedge",
+  "severity": 3,
+  "alternatives": [
+   "",
+   "My assessment is"
+  ],
+  "note": "Sounds unsure of your own analysis."
+ },
+ {
+  "word": "i feel like",
+  "category": "hedge",
+  "severity": 3,
+  "alternatives": [
+   "",
+   "The evidence suggests"
+  ],
+  "note": "Feelings don't debug systems."
+ },
+ {
+  "word": "kind of",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "partially"
+  ],
+  "note": "Waters down the claim."
+ },
+ {
+  "word": "sort of",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "partially"
+  ],
+  "note": "Waters down the claim."
+ },
+ {
+  "word": "a bit",
+  "category": "hedge",
+  "severity": 1,
+  "alternatives": [
+   "",
+   "slightly"
+  ],
+  "note": "Mild hedge; fine sparingly."
+ },
+ {
+  "word": "might be",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "is",
+   "appears to be"
+  ],
+  "note": "Hedged assertion; commit or cite uncertainty explicitly."
+ },
+ {
+  "word": "could be",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "is",
+   "may indicate"
+  ],
+  "note": "Hedged assertion."
+ },
+ {
+  "word": "seems like",
+  "category": "hedge",
+  "severity": 1,
+  "alternatives": [
+   "indicates",
+   "shows"
+  ],
+  "note": "OK for hypotheses; weak for conclusions."
+ },
+ {
+  "word": "just",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Minimizer ('I just built...') - own your work."
+ },
+ {
+  "word": "only",
+  "category": "hedge",
+  "severity": 1,
+  "alternatives": [
+   ""
+  ],
+  "note": "Minimizer in self-description; cut."
+ },
+ {
+  "word": "try to",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "will",
+   "did"
+  ],
+  "note": "'Try to' promises effort without outcome."
+ },
+ {
+  "word": "i'll try",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "I will"
+  ],
+  "note": "Commit or explain the blocker."
+ },
+ {
+  "word": "very",
+  "category": "weak_intensifier",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "significantly"
+  ],
+  "note": "Weakest intensifier; use a stronger adjective."
+ },
+ {
+  "word": "really",
+  "category": "weak_intensifier",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "substantially"
+  ],
+  "note": "Conversational filler; cut in formal answers."
+ },
+ {
+  "word": "extremely",
+  "category": "weak_intensifier",
+  "severity": 1,
+  "alternatives": [
+   "",
+   "critically"
+  ],
+  "note": "OK rarely; usually exaggeration."
+ },
+ {
+  "word": "totally",
+  "category": "weak_intensifier",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Slang intensifier; cut."
+ },
+ {
+  "word": "super",
+  "category": "weak_intensifier",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "highly"
+  ],
+  "note": "Slang; cut in interviews."
+ },
+ {
+  "word": "quite",
+  "category": "weak_intensifier",
+  "severity": 1,
+  "alternatives": [
+   "",
+   "fairly"
+  ],
+  "note": "Mild; fine sparingly."
+ },
+ {
+  "word": "pretty much",
+  "category": "hedge",
+  "severity": 2,
+  "alternatives": [
+   "",
+   "largely"
+  ],
+  "note": "Hedge phrase; tighten."
+ },
+ {
+  "word": "in order to",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "to"
+  ],
+  "note": "Two wasted words."
+ },
+ {
+  "word": "due to the fact that",
+  "category": "wordy",
+  "severity": 3,
+  "alternatives": [
+   "because"
+  ],
+  "note": "Five words for one."
+ },
+ {
+  "word": "at the end of the day",
+  "category": "wordy",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Cliche; delete."
+ },
+ {
+  "word": "needless to say",
+  "category": "wordy",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Then don't say it."
+ },
+ {
+  "word": "it goes without saying",
+  "category": "wordy",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Then don't say it."
+ },
+ {
+  "word": "as a matter of fact",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Filler phrase."
+ },
+ {
+  "word": "for all intents and purposes",
+  "category": "wordy",
+  "severity": 3,
+  "alternatives": [
+   "effectively"
+  ],
+  "note": "Six words, one meaning."
+ },
+ {
+  "word": "in my opinion",
+  "category": "wordy",
+  "severity": 1,
+  "alternatives": [
+   ""
+  ],
+  "note": "Obvious in an interview; cut."
+ },
+ {
+  "word": "to be honest",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "See 'honestly'."
+ },
+ {
+  "word": "first and foremost",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "first"
+  ],
+  "note": "Doubled opener."
+ },
+ {
+  "word": "each and every",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "each"
+  ],
+  "note": "Doubled determiner."
+ },
+ {
+  "word": "null and void",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "void"
+  ],
+  "note": "Legal doublet; one word suffices."
+ },
+ {
+  "word": "cease and desist",
+  "category": "wordy",
+  "severity": 1,
+  "alternatives": [
+   "stop"
+  ],
+  "note": "Legal doublet."
+ },
+ {
+  "word": "basic fundamentals",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "fundamentals"
+  ],
+  "note": "Redundant pair."
+ },
+ {
+  "word": "end result",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "result"
+  ],
+  "note": "Redundant pair."
+ },
+ {
+  "word": "final outcome",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "outcome"
+  ],
+  "note": "Redundant pair."
+ },
+ {
+  "word": "past history",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "history"
+  ],
+  "note": "Redundant pair."
+ },
+ {
+  "word": "future plans",
+  "category": "wordy",
+  "severity": 1,
+  "alternatives": [
+   "plans"
+  ],
+  "note": "Plans are always future."
+ },
+ {
+  "word": "free gift",
+  "category": "wordy",
+  "severity": 2,
+  "alternatives": [
+   "gift"
+  ],
+  "note": "Gifts are free."
+ },
+ {
+  "word": "advance planning",
+  "category": "wordy",
+  "severity": 1,
+  "alternatives": [
+   "planning"
+  ],
+  "note": "Planning is advance."
+ },
+ {
+  "word": "completely finished",
+  "category": "wordy",
+  "severity": 1,
+  "alternatives": [
+   "finished"
+  ],
+  "note": "Finished is complete."
+ },
+ {
+  "word": "absolutely essential",
+  "category": "wordy",
+  "severity": 1,
+  "alternatives": [
+   "essential"
+  ],
+  "note": "Essential is absolute."
+ },
+ {
+  "word": "so basically",
+  "category": "throat_clearer",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Double filler opener; start with the point."
+ },
+ {
+  "word": "well basically",
+  "category": "throat_clearer",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Double filler opener."
+ },
+ {
+  "word": "okay so",
+  "category": "throat_clearer",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Filler launch; start clean."
+ },
+ {
+  "word": "right so",
+  "category": "throat_clearer",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Filler launch."
+ },
+ {
+  "word": "yeah so",
+  "category": "throat_clearer",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Filler launch."
+ },
+ {
+  "word": "like i said",
+  "category": "throat_clearer",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Defensive; just restate briefly if needed."
+ },
+ {
+  "word": "as i mentioned",
+  "category": "throat_clearer",
+  "severity": 1,
+  "alternatives": [
+   ""
+  ],
+  "note": "Mild; fine once, annoying repeated."
+ },
+ {
+  "word": "long story short",
+  "category": "throat_clearer",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "Then tell the short story."
+ },
+ {
+  "word": "to make a long story short",
+  "category": "throat_clearer",
+  "severity": 2,
+  "alternatives": [
+   ""
+  ],
+  "note": "See above."
+ },
+ {
+  "word": "synergy",
+  "category": "jargon",
+  "severity": 3,
+  "alternatives": [
+   "combined effect",
+   "collaboration"
+  ],
+  "note": "Empty in interviews; say what actually happened."
+ },
+ {
+  "word": "leverage",
+  "category": "jargon",
+  "severity": 2,
+  "alternatives": [
+   "use"
+  ],
+  "note": "Verbified noun; 'use' is stronger."
+ },
+ {
+  "word": "bandwidth",
+  "category": "jargon",
+  "severity": 2,
+  "alternatives": [
+   "capacity",
+   "time"
+  ],
+  "note": "Dehumanizing for people; name the constraint."
+ },
+ {
+  "word": "deep dive",
+  "category": "jargon",
+  "severity": 1,
+  "alternatives": [
+   "detailed analysis"
+  ],
+  "note": "Cliche; fine once."
+ },
+ {
+  "word": "move the needle",
+  "category": "jargon",
+  "severity": 2,
+  "alternatives": [
+   "improved",
+   "changed"
+  ],
+  "note": "Cliche; quantify instead."
+ },
+ {
+  "word": "low-hanging fruit",
+  "category": "jargon",
+  "severity": 2,
+  "alternatives": [
+   "quick wins"
+  ],
+  "note": "Cliche."
+ },
+ {
+  "word": "boil the ocean",
+  "category": "jargon",
+  "severity": 1,
+  "alternatives": [
+   "over-scope"
+  ],
+  "note": "Cliche but vivid; use once max."
+ },
+ {
+  "word": "circle back",
+  "category": "jargon",
+  "severity": 1,
+  "alternatives": [
+   "follow up"
+  ],
+  "note": "Cliche."
+ },
+ {
+  "word": "touch base",
+  "category": "jargon",
+  "severity": 1,
+  "alternatives": [
+   "meet",
+   "sync"
+  ],
+  "note": "Cliche."
+ },
+ {
+  "word": "take this offline",
+  "category": "jargon",
+  "severity": 1,
+  "alternatives": [
+   "discuss separately"
+  ],
+  "note": "Cliche."
+ },
+ {
+  "word": "best practices",
+  "category": "jargon",
+  "severity": 1,
+  "alternatives": [
+   "proven approaches"
+  ],
+  "note": "Vague; name the practice."
+ },
+ {
+  "word": "thought leader",
+  "category": "jargon",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Self-applied title; let others say it."
+ },
+ {
+  "word": "guru",
+  "category": "jargon",
+  "severity": 3,
+  "alternatives": [
+   "specialist"
+  ],
+  "note": "Inflated; use 'specialist'."
+ },
+ {
+  "word": "ninja",
+  "category": "jargon",
+  "severity": 3,
+  "alternatives": [
+   "engineer"
+  ],
+  "note": "Inflated; use the real title."
+ },
+ {
+  "word": "rockstar",
+  "category": "jargon",
+  "severity": 3,
+  "alternatives": [
+   "strong contributor"
+  ],
+  "note": "Inflated."
+ },
+ {
+  "word": "disrupt",
+  "category": "jargon",
+  "severity": 1,
+  "alternatives": [
+   "improve",
+   "replace"
+  ],
+  "note": "Overused; be specific."
+ },
+ {
+  "word": "ideate",
+  "category": "jargon",
+  "severity": 2,
+  "alternatives": [
+   "brainstorm"
+  ],
+  "note": "Jargon verb."
+ },
+ {
+  "word": "operationalize",
+  "category": "jargon",
+  "severity": 2,
+  "alternatives": [
+   "put into practice"
+  ],
+  "note": "Jargon verb."
+ },
+ {
+  "word": "utilize",
+  "category": "jargon",
+  "severity": 2,
+  "alternatives": [
+   "use"
+  ],
+  "note": "'Use' is always better."
+ },
+ {
+  "word": "hmm",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Thinking noise; pause silently instead."
+ },
+ {
+  "word": "uhh",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Pure filler; pause silently instead."
+ },
+ {
+  "word": "y'know",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   ""
+  ],
+  "note": "Slurred 'you know'; cut."
+ },
+ {
+  "word": "kinda",
+  "category": "hedge",
+  "severity": 3,
+  "alternatives": [
+   "somewhat"
+  ],
+  "note": "Slang hedge; use 'somewhat'."
+ },
+ {
+  "word": "sorta",
+  "category": "hedge",
+  "severity": 3,
+  "alternatives": [
+   "somewhat"
+  ],
+  "note": "Slang hedge; use 'somewhat'."
+ },
+ {
+  "word": "wanna",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   "want to"
+  ],
+  "note": "Slang; use full form in interviews."
+ },
+ {
+  "word": "gonna",
+  "category": "filler",
+  "severity": 3,
+  "alternatives": [
+   "going to"
+  ],
+  "note": "Slang; use full form in interviews."
+ },
+ {
+  "word": "a lot",
+  "category": "vague",
+  "severity": 1,
+  "alternatives": [
+   "",
+   "significantly"
+  ],
+  "note": "Vague quantity; quantify when you can."
+ },
+ {
+  "word": "a little",
+  "category": "hedge",
+  "severity": 1,
+  "alternatives": [
+   "",
+   "slightly"
+  ],
+  "note": "Mild hedge; fine sparingly."
+ }
+]

@@ -1,0 +1,2681 @@
+[
+ {
+  "id": "dsa-arrays-01",
+  "title": "Two Sum",
+  "statement": "Given an array of integers nums and an integer target, return indices of the two numbers that add up to target. Each input has exactly one solution.",
+  "difficulty": "Easy",
+  "topics": [
+   "arrays",
+   "hashmap"
+  ],
+  "hints": [
+   "A brute-force double loop works but is O(n^2) - can you do better?",
+   "As you scan, what would you need to remember to check each number instantly?",
+   "Store each value's index in a hash map; for x, look up (target - x)."
+  ],
+  "approach": "One pass: for each x, check if complement exists in the map; else store x. Guaranteed one solution.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Returning values instead of indices",
+   "Using the same element twice"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/two-sum/"
+ },
+ {
+  "id": "dsa-arrays-02",
+  "title": "Best Time to Buy and Sell Stock",
+  "statement": "Given prices where prices[i] is the day-i price, pick one day to buy and a later day to sell for maximum profit. Return 0 if no profit possible.",
+  "difficulty": "Easy",
+  "topics": [
+   "arrays",
+   "greedy"
+  ],
+  "hints": [
+   "Track the lowest price seen so far as you go.",
+   "At each day, the best profit ending today = price - min_price_so_far.",
+   "Keep a running maximum of that value."
+  ],
+  "approach": "Single left-to-right scan maintaining min_price and max_profit.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Allowing sell before buy (wrong order)",
+   "Forgetting the no-profit -> 0 case"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"
+ },
+ {
+  "id": "dsa-arrays-03",
+  "title": "Maximum Subarray",
+  "statement": "Find the contiguous subarray with the largest sum and return that sum.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "dp"
+  ],
+  "hints": [
+   "Decide at each element: extend the previous subarray or start fresh here.",
+   "Keep two numbers: best sum ending at i, and best sum seen anywhere.",
+   "This is Kadane's algorithm."
+  ],
+  "approach": "Iterate once; cur = max(x, cur + x); best = max(best, cur).",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Resetting cur to 0 breaks all-negative arrays",
+   "Confusing 'ending here' with 'anywhere'"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/maximum-subarray/"
+ },
+ {
+  "id": "dsa-arrays-04",
+  "title": "Product of Array Except Self",
+  "statement": "Given nums, return an array where answer[i] is the product of all elements except nums[i]. No division; O(n) time.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "prefix-suffix"
+  ],
+  "hints": [
+   "The answer for i = (product of left part) x (product of right part).",
+   "Compute left products in a forward pass into the output array.",
+   "Then sweep backward multiplying in the right products - O(1) extra space."
+  ],
+  "approach": "Two passes: prefix products into output, then suffix product accumulated backward.",
+  "complexity": "Time O(n), Space O(1) excluding output",
+  "pitfalls": [
+   "Using division (fails on zeros)",
+   "Extra arrays when O(1) space is required"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/product-of-array-except-self/"
+ },
+ {
+  "id": "dsa-arrays-05",
+  "title": "3Sum",
+  "statement": "Find all unique triplets [a,b,c] in nums with a+b+c = 0.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "two-pointers",
+   "sorting"
+  ],
+  "hints": [
+   "Sorting first makes duplicates manageable - why?",
+   "Fix one element, then use two pointers on the rest like Two Sum II.",
+   "Skip equal neighbors after sorting to avoid duplicate triplets."
+  ],
+  "approach": "Sort; for each i, two-pointer scan of (i+1..end); skip duplicates at all three positions.",
+  "complexity": "Time O(n^2), Space O(1) excluding output",
+  "pitfalls": [
+   "Duplicate triplets from not skipping",
+   "O(n^3) brute force timing out"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/3sum/"
+ },
+ {
+  "id": "dsa-arrays-06",
+  "title": "Container With Most Water",
+  "statement": "Given heights, find two lines forming the container holding the most water.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "two-pointers",
+   "greedy"
+  ],
+  "hints": [
+   "Start with the widest container (both ends) and narrow it.",
+   "Which pointer should move - and why is it safe to move it?",
+   "Move the shorter side: it can never form a better pair at this width."
+  ],
+  "approach": "Two pointers inward; area = min(h[l],h[r]) * (r-l); move the smaller height.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Moving the taller pointer (loses the proof)",
+   "Forgetting width shrinks each step"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/container-with-most-water/"
+ },
+ {
+  "id": "dsa-arrays-07",
+  "title": "Trapping Rain Water",
+  "statement": "Given an elevation map, compute how much water it traps after raining.",
+  "difficulty": "Hard",
+  "topics": [
+   "arrays",
+   "two-pointers",
+   "stack"
+  ],
+  "hints": [
+   "Water at i = min(tallest left, tallest right) - height[i].",
+   "Precompute left-max and right-max arrays for an O(n) space solution.",
+   "Two pointers can do it in O(1) space: always advance the lower side."
+  ],
+  "approach": "Two pointers with left_max/right_max; add water on the lower side each step.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Adding negative water (clamp at 0)",
+   "Wrong pointer-move condition"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/trapping-rain-water/"
+ },
+ {
+  "id": "dsa-arrays-08",
+  "title": "Find the Duplicate Number",
+  "statement": "Array of n+1 integers in [1, n] with one duplicate. Find it without modifying the array, O(1) space.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "two-pointers",
+   "cycles"
+  ],
+  "hints": [
+   "Treat values as next-pointers: index i -> nums[i] forms a linked list with a cycle.",
+   "The duplicate is the cycle entrance (two numbers point to it).",
+   "Apply Floyd's tortoise and hare, then find the entrance."
+  ],
+  "approach": "Phase 1: find meeting point. Phase 2: one pointer to start, move both - they meet at the duplicate.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Sorting the array (modifies it)",
+   "Binary-search-on-count is O(n log n) - acceptable but not the intended trick"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/find-the-duplicate-number/"
+ },
+ {
+  "id": "dsa-arrays-09",
+  "title": "First Missing Positive",
+  "statement": "Find the smallest missing positive integer in an unsorted array. O(n) time, O(1) space.",
+  "difficulty": "Hard",
+  "topics": [
+   "arrays",
+   "cyclic-sort"
+  ],
+  "hints": [
+   "The answer is in [1, n+1] - so ignore everything else.",
+   "Place each x in [1,n] at index x-1 by swapping (cyclic sort).",
+   "Then the first index i with nums[i] != i+1 gives the answer."
+  ],
+  "approach": "Cyclic placement pass, then a linear scan for the first misplaced value.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Infinite swap loops (skip when already correct)",
+   "Forgetting numbers outside [1,n]"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/first-missing-positive/"
+ },
+ {
+  "id": "dsa-arrays-10",
+  "title": "Merge Intervals",
+  "statement": "Merge all overlapping intervals.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "sorting",
+   "greedy"
+  ],
+  "hints": [
+   "What order makes overlaps easy to detect? Sort by start.",
+   "Keep a 'current' interval; extend its end or start a new one.",
+   "Touching intervals like [1,4],[4,5]: decide merge per the problem's definition."
+  ],
+  "approach": "Sort by start; sweep, merging into the current interval when overlapping.",
+  "complexity": "Time O(n log n), Space O(1) excluding output",
+  "pitfalls": [
+   "Not sorting first",
+   "Wrong overlap condition (use start <= cur_end)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/merge-intervals/"
+ },
+ {
+  "id": "dsa-arrays-11",
+  "title": "Rotate Array",
+  "statement": "Rotate the array right by k steps, in place.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "reversal"
+  ],
+  "hints": [
+   "Reversing is its own inverse - how can three reverses rotate?",
+   "Reverse all, then reverse the first k, then the rest.",
+   "Remember k %= n first."
+  ],
+  "approach": "k %= n; reverse(0,n); reverse(0,k); reverse(k,n).",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Forgetting k %= n (k can exceed n)",
+   "Extra array when in-place required"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/rotate-array/"
+ },
+ {
+  "id": "dsa-arrays-12",
+  "title": "Subarray Sum Equals K",
+  "statement": "Count the number of contiguous subarrays summing to k.",
+  "difficulty": "Medium",
+  "topics": [
+   "arrays",
+   "hashmap",
+   "prefix-sums"
+  ],
+  "hints": [
+   "If you knew all prefix sums, when does a subarray sum to k?",
+   "prefix[j] - prefix[i] = k  =>  look up (prefix[j] - k) seen before.",
+   "Seed the map with {0: 1} for subarrays starting at index 0."
+  ],
+  "approach": "Running prefix sum; add map.get(prefix - k, 0) to the count; then record prefix.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Sliding window (fails with negatives)",
+   "Forgetting the {0:1} seed"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/subarray-sum-equals-k/"
+ },
+ {
+  "id": "dsa-strings-01",
+  "title": "Valid Anagram",
+  "statement": "Determine if string t is an anagram of string s.",
+  "difficulty": "Easy",
+  "topics": [
+   "strings",
+   "hashmap"
+  ],
+  "hints": [
+   "Anagrams have identical character frequencies.",
+   "Count with a 26-array (lowercase) or a hash map for Unicode.",
+   "Early exit when lengths differ."
+  ],
+  "approach": "Build frequency counts for s, decrement for t; all zeros (or use Counter).",
+  "complexity": "Time O(n), Space O(1) for fixed alphabet",
+  "pitfalls": [
+   "Sorting is O(n log n) - fine but slower",
+   "Case sensitivity assumptions"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/valid-anagram/"
+ },
+ {
+  "id": "dsa-strings-02",
+  "title": "Group Anagrams",
+  "statement": "Group an array of strings into anagram groups.",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "hashmap"
+  ],
+  "hints": [
+   "Anagrams share a canonical key - what could it be?",
+   "Sorted string, or a 26-count tuple (avoids O(k log k) sort).",
+   "Map key -> list; return the values."
+  ],
+  "approach": "Hash map keyed by character-count tuple; append each string to its group.",
+  "complexity": "Time O(n*k), Space O(n*k)",
+  "pitfalls": [
+   "Using the sorted string when k is huge",
+   "Mutating the key"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/group-anagrams/"
+ },
+ {
+  "id": "dsa-strings-03",
+  "title": "Longest Substring Without Repeating Characters",
+  "statement": "Length of the longest substring with all distinct characters.",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "sliding-window",
+   "hashmap"
+  ],
+  "hints": [
+   "Grow the right edge; when a duplicate appears, jump the left edge past its last occurrence.",
+   "A last-seen index map makes the jump O(1).",
+   "left = max(left, last_seen[ch] + 1) - never move left backward."
+  ],
+  "approach": "Sliding window with a last-occurrence map; track max window size.",
+  "complexity": "Time O(n), Space O(min(n, alphabet))",
+  "pitfalls": [
+   "Moving left to last_seen+1 without max() (moves backward)",
+   "O(n^2) re-scanning"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
+ },
+ {
+  "id": "dsa-strings-04",
+  "title": "Longest Palindromic Substring",
+  "statement": "Return the longest palindromic substring of s.",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "two-pointers",
+   "dp"
+  ],
+  "hints": [
+   "Every palindrome has a center - expand around each of the 2n-1 centers.",
+   "Even and odd lengths need separate centers.",
+   "Manacher's O(n) exists; expand-around-center O(n^2) is the expected answer."
+  ],
+  "approach": "For each center, expand while s[l]==s[r]; keep the longest.",
+  "complexity": "Time O(n^2), Space O(1)",
+  "pitfalls": [
+   "Only checking odd-length centers",
+   "O(n^3) checking every substring"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/longest-palindromic-substring/"
+ },
+ {
+  "id": "dsa-strings-05",
+  "title": "Minimum Window Substring",
+  "statement": "Smallest substring of s containing all characters of t (with frequencies).",
+  "difficulty": "Hard",
+  "topics": [
+   "strings",
+   "sliding-window",
+   "hashmap"
+  ],
+  "hints": [
+   "Expand right until the window is valid; then shrink left while it stays valid.",
+   "Track 'formed' = how many distinct chars meet their required count.",
+   "Record the best window during shrinking."
+  ],
+  "approach": "Sliding window with need-counts and a formed counter; shrink greedily.",
+  "complexity": "Time O(n + m), Space O(m)",
+  "pitfalls": [
+   "Shrinking before the window is valid",
+   "Not handling duplicate chars in t"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/minimum-window-substring/"
+ },
+ {
+  "id": "dsa-strings-06",
+  "title": "Valid Parentheses",
+  "statement": "Determine if a bracket string is valid (properly closed and nested).",
+  "difficulty": "Easy",
+  "topics": [
+   "strings",
+   "stack"
+  ],
+  "hints": [
+   "Open brackets go on a stack; closers must match the top.",
+   "A closer with an empty stack, or leftover opens at the end, means invalid.",
+   "Map closer -> opener for clean matching."
+  ],
+  "approach": "Stack scan; push opens, pop-and-check on closers; valid iff stack empty at end.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Only counting brackets (nesting matters)",
+   "Forgetting the final empty check"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/valid-parentheses/"
+ },
+ {
+  "id": "dsa-strings-07",
+  "title": "Longest Repeating Character Replacement",
+  "statement": "Longest substring with same letter after at most k replacements.",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "sliding-window"
+  ],
+  "hints": [
+   "In a window, replacements needed = window_size - max_frequency.",
+   "Keep the window valid (replacements <= k); max_freq never decreases - why is that OK?",
+   "Because we only care about the maximum window seen."
+  ],
+  "approach": "Sliding window tracking max char frequency; shrink when window - maxfreq > k.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Recomputing max frequency on shrink (unnecessary)",
+   "Confusing with 'at most k distinct'"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/longest-repeating-character-replacement/"
+ },
+ {
+  "id": "dsa-strings-08",
+  "title": "Encode and Decode Strings",
+  "statement": "Design an encoding of a string list to a single string and back (strings may contain any chars).",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "design"
+  ],
+  "hints": [
+   "Delimiters can appear in the data - so prefix each string with its length.",
+   "Format: '<len>#<string>' repeated; decode by reading the length first.",
+   "Why does this handle every edge case?"
+  ],
+  "approach": "Length-prefix encoding; decode by parsing '<digits>#', then slicing exactly len chars.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Using a separator character (breaks on data containing it)",
+   "Off-by-one in slicing"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/encode-and-decode-strings/"
+ },
+ {
+  "id": "dsa-ll-01",
+  "title": "Reverse Linked List",
+  "statement": "Reverse a singly linked list iteratively and recursively.",
+  "difficulty": "Easy",
+  "topics": [
+   "linked-lists",
+   "pointers"
+  ],
+  "hints": [
+   "You need three pointers: prev, curr, and a temp for next.",
+   "At each step: save next, flip curr.next to prev, advance.",
+   "Recursive: reverse the rest, then fix the two links at the front."
+  ],
+  "approach": "Iterative three-pointer loop; recursive trust-the-subproblem.",
+  "complexity": "Time O(n), Space O(1) iterative / O(n) recursive",
+  "pitfalls": [
+   "Losing the next pointer before flipping",
+   "Wrong base case in recursion"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/reverse-linked-list/"
+ },
+ {
+  "id": "dsa-ll-02",
+  "title": "Linked List Cycle II (find cycle start)",
+  "statement": "Detect whether a linked list has a cycle; if so return the node where it begins.",
+  "difficulty": "Medium",
+  "topics": [
+   "linked-lists",
+   "two-pointers"
+  ],
+  "hints": [
+   "Floyd: slow (+1) and fast (+2); meeting means a cycle.",
+   "Why does resetting one pointer to head and advancing both find the entrance?",
+   "Distance math: they meet k steps before the entrance along the cycle."
+  ],
+  "approach": "Phase 1 meet; phase 2 reset slow to head, advance both one step - meeting node is the entrance.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Returning the meeting point as the answer (wrong)",
+   "Hash set works but uses O(n) space"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/linked-list-cycle-ii/"
+ },
+ {
+  "id": "dsa-ll-03",
+  "title": "Merge Two Sorted Lists",
+  "statement": "Merge two sorted linked lists into one sorted list.",
+  "difficulty": "Easy",
+  "topics": [
+   "linked-lists",
+   "recursion"
+  ],
+  "hints": [
+   "A dummy head removes the special case for the first node.",
+   "Always attach the smaller head and advance it.",
+   "Recursive version is a clean 5-liner."
+  ],
+  "approach": "Dummy head; iterative attach-smaller; or recursion.",
+  "complexity": "Time O(n+m), Space O(1) iterative",
+  "pitfalls": [
+   "Losing the head (no dummy)",
+   "Not handling exhausted lists"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/merge-two-sorted-lists/"
+ },
+ {
+  "id": "dsa-ll-04",
+  "title": "Remove Nth Node From End",
+  "statement": "Remove the nth node from the end in one pass.",
+  "difficulty": "Medium",
+  "topics": [
+   "linked-lists",
+   "two-pointers"
+  ],
+  "hints": [
+   "Two pointers n apart: when the front hits the end, the back is at the target's predecessor.",
+   "A dummy head handles n == length (removing the head).",
+   "Count the gap carefully: front starts n steps ahead."
+  ],
+  "approach": "Dummy head; advance fast n+1 steps; move both; delete slow.next.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Off-by-one in the gap",
+   "Crash when removing the head without dummy"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/"
+ },
+ {
+  "id": "dsa-ll-05",
+  "title": "Reorder List",
+  "statement": "Reorder L0->L1->...->Ln into L0->Ln->L1->Ln-1->...",
+  "difficulty": "Medium",
+  "topics": [
+   "linked-lists",
+   "two-pointers"
+  ],
+  "hints": [
+   "Split the list in half (slow/fast).",
+   "Reverse the second half.",
+   "Merge the two halves alternately."
+  ],
+  "approach": "Three composed subproblems; all O(1) space.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Wrong split point on odd lengths",
+   "Creating a cycle when merging"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/reorder-list/"
+ },
+ {
+  "id": "dsa-ll-06",
+  "title": "Add Two Numbers",
+  "statement": "Two numbers as reverse-order linked lists; return their sum as a list.",
+  "difficulty": "Medium",
+  "topics": [
+   "linked-lists",
+   "math"
+  ],
+  "hints": [
+   "Add digit by digit with a carry, like grade-school addition.",
+   "Lists may differ in length; a final carry may add a node.",
+   "Dummy head again simplifies everything."
+  ],
+  "approach": "Walk both lists with carry; append (total % 10); carry = total // 10.",
+  "complexity": "Time O(max(n,m)), Space O(max(n,m)) for output",
+  "pitfalls": [
+   "Dropping the final carry",
+   "Assuming equal lengths"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/add-two-numbers/"
+ },
+ {
+  "id": "dsa-ll-07",
+  "title": "Copy List with Random Pointer",
+  "statement": "Deep-copy a list where each node has next and random pointers.",
+  "difficulty": "Medium",
+  "topics": [
+   "linked-lists",
+   "hashmap"
+  ],
+  "hints": [
+   "A map from old node to new node solves it in two passes.",
+   "Can you do O(1) space? Interleave copies: A->A'->B->B'.",
+   "Then wire A'.random = A.random.next, and finally split the lists."
+  ],
+  "approach": "Hash-map version for clarity; interleave trick for O(1) space.",
+  "complexity": "Time O(n), Space O(n) map / O(1) interleave",
+  "pitfalls": [
+   "Shallow-copying random targets",
+   "Breaking the original list during split"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/copy-list-with-random-pointer/"
+ },
+ {
+  "id": "dsa-ll-08",
+  "title": "Reverse Nodes in k-Group",
+  "statement": "Reverse the list k nodes at a time; leave the remainder as-is.",
+  "difficulty": "Hard",
+  "topics": [
+   "linked-lists",
+   "recursion"
+  ],
+  "hints": [
+   "Process group by group: reverse k, connect to the next group's result.",
+   "First check that k nodes remain; if not, leave them.",
+   "Recursion handles 'the rest' elegantly."
+  ],
+  "approach": "Count k nodes; reverse the group; recurse on the remainder; stitch.",
+  "complexity": "Time O(n), Space O(n/k) recursion",
+  "pitfalls": [
+   "Reversing a short final group",
+   "Losing the connection between groups"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/reverse-nodes-in-k-group/"
+ },
+ {
+  "id": "dsa-ll-09",
+  "title": "Palindrome Linked List",
+  "statement": "Determine if a singly linked list is a palindrome, O(1) space.",
+  "difficulty": "Easy",
+  "topics": [
+   "linked-lists",
+   "two-pointers"
+  ],
+  "hints": [
+   "Find the middle, reverse the second half, compare.",
+   "O(n) space via array copy is the easy version - then optimize.",
+   "Optionally restore the list afterward."
+  ],
+  "approach": "Middle via slow/fast; reverse second half; pairwise compare.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Modifying input without noting it",
+   "Odd-length middle element handling"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/palindrome-linked-list/"
+ },
+ {
+  "id": "dsa-ll-10",
+  "title": "Merge K Sorted Lists",
+  "statement": "Merge k sorted linked lists into one sorted list.",
+  "difficulty": "Hard",
+  "topics": [
+   "linked-lists",
+   "heap"
+  ],
+  "hints": [
+   "Merging pairwise is O(kN); a heap of k heads is better.",
+   "Push all heads; repeatedly pop min, push its next.",
+   "Divide-and-conquer merging is an O(N log k) alternative."
+  ],
+  "approach": "Min-heap over current heads; pop/push until empty.",
+  "complexity": "Time O(N log k), Space O(k)",
+  "pitfalls": [
+   "Pairwise merging (TLE)",
+   "Forgetting to push next after pop"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/merge-k-sorted-lists/"
+ },
+ {
+  "id": "dsa-stk-01",
+  "title": "Min Stack",
+  "statement": "Stack supporting push, pop, top, and getMin in O(1).",
+  "difficulty": "Medium",
+  "topics": [
+   "stacks",
+   "design"
+  ],
+  "hints": [
+   "Each stack entry can remember the minimum below it.",
+   "Store pairs (value, min_so_far), or keep a parallel min-stack.",
+   "Duplicate minimums must be handled - think about pop logic."
+  ],
+  "approach": "Auxiliary min tracking per element; getMin reads the top's stored min.",
+  "complexity": "Time O(1) all ops, Space O(n)",
+  "pitfalls": [
+   "Popping the min tracking on duplicate mins",
+   "Recomputing min on pop (O(n))"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/min-stack/"
+ },
+ {
+  "id": "dsa-stk-02",
+  "title": "Evaluate Reverse Polish Notation",
+  "statement": "Evaluate an arithmetic expression in Reverse Polish Notation.",
+  "difficulty": "Medium",
+  "topics": [
+   "stacks"
+  ],
+  "hints": [
+   "Numbers go on the stack; operators pop two operands.",
+   "Order matters for - and /: second-popped is the left operand.",
+   "Integer division truncates toward zero."
+  ],
+  "approach": "Stack scan; apply operators to the top two values.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Operand order swapped",
+   "Using float division"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/evaluate-reverse-polish-notation/"
+ },
+ {
+  "id": "dsa-stk-03",
+  "title": "Daily Temperatures",
+  "statement": "For each day, how many days until a warmer temperature (0 if none).",
+  "difficulty": "Medium",
+  "topics": [
+   "stacks",
+   "monotonic-stack"
+  ],
+  "hints": [
+   "A decreasing stack of indices holds days awaiting a warmer day.",
+   "When today is warmer than the stack top, resolve those days: answer = i - idx.",
+   "Each index is pushed and popped once."
+  ],
+  "approach": "Monotonic decreasing stack; resolve on warmer days.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "O(n^2) rescanning",
+   "Using temperatures instead of indices (need distances)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/daily-temperatures/"
+ },
+ {
+  "id": "dsa-stk-04",
+  "title": "Largest Rectangle in Histogram",
+  "statement": "Largest rectangle area in a histogram.",
+  "difficulty": "Hard",
+  "topics": [
+   "stacks",
+   "monotonic-stack"
+  ],
+  "hints": [
+   "A bar's max rectangle extends until a smaller bar on each side.",
+   "Increasing stack: when a smaller bar arrives, pop and compute areas.",
+   "A sentinel zero bar flushes the stack at the end."
+  ],
+  "approach": "Monotonic increasing stack with sentinel; area = height * width on pop.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Width miscalculation (use current index - stack top - 1)",
+   "Forgetting the sentinel"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/largest-rectangle-in-histogram/"
+ },
+ {
+  "id": "dsa-stk-05",
+  "title": "Valid Parentheses (extended: minimum removals)",
+  "statement": "Given a bracket string, remove the minimum brackets to make it valid.",
+  "difficulty": "Medium",
+  "topics": [
+   "stacks",
+   "strings"
+  ],
+  "hints": [
+   "First pass: mark indices of unmatched closers and leftover opens.",
+   "A stack of indices (not chars) makes marking easy.",
+   "Rebuild the string skipping marked indices."
+  ],
+  "approach": "Index stack to find unmatched positions; filter them out.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Removing valid pairs",
+   "Not handling all bracket types"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/"
+ },
+ {
+  "id": "dsa-stk-06",
+  "title": "Implement Queue using Stacks",
+  "statement": "Implement a FIFO queue with two LIFO stacks.",
+  "difficulty": "Easy",
+  "topics": [
+   "stacks",
+   "queues",
+   "design"
+  ],
+  "hints": [
+   "One stack for input, one for output; transfer lazily.",
+   "Only move elements when the output stack is empty - why?",
+   "Amortized O(1): each element moves at most twice."
+  ],
+  "approach": "Push to in-stack; pop/peek transfer to out-stack when empty.",
+  "complexity": "Time O(1) amortized, Space O(n)",
+  "pitfalls": [
+   "Transferring on every pop (O(n) each)",
+   "Forgetting peek shares pop's logic"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/implement-queue-using-stacks/"
+ },
+ {
+  "id": "dsa-stk-07",
+  "title": "Next Greater Element I",
+  "statement": "For each element in nums1, find its next greater element in nums2 (nums1 subset of nums2).",
+  "difficulty": "Easy",
+  "topics": [
+   "stacks",
+   "monotonic-stack",
+   "hashmap"
+  ],
+  "hints": [
+   "Process nums2 once with a decreasing stack, recording next-greater in a map.",
+   "Then answer each nums1 query by lookup.",
+   "Remaining stack elements map to -1."
+  ],
+  "approach": "Monotonic stack over nums2 -> map; O(1) per query.",
+  "complexity": "Time O(n+m), Space O(n)",
+  "pitfalls": [
+   "Brute force per query O(n*m)",
+   "Forgetting the -1 default"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/next-greater-element-i/"
+ },
+ {
+  "id": "dsa-stk-08",
+  "title": "Asteroid Collision",
+  "statement": "Asteroids move left/right; simulate collisions (larger survives; equal both explode).",
+  "difficulty": "Medium",
+  "topics": [
+   "stacks",
+   "simulation"
+  ],
+  "hints": [
+   "Only right-moving asteroids on the stack can collide with an incoming left-mover.",
+   "While loop: resolve repeated collisions against the stack top.",
+   "Left-movers never collide with each other."
+  ],
+  "approach": "Stack of right-movers; resolve each left-mover against the stack.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Single if instead of while (chain collisions)",
+   "Wrong survivor on equal sizes"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/asteroid-collision/"
+ },
+ {
+  "id": "dsa-stk-09",
+  "title": "Simplify Path (Unix)",
+  "statement": "Canonicalize an absolute Unix path.",
+  "difficulty": "Medium",
+  "topics": [
+   "stacks",
+   "strings"
+  ],
+  "hints": [
+   "Split on '/'; push normal names, pop on '..', ignore '.' and empties.",
+   "Join the stack with '/' and prefix '/'.",
+   "Multiple slashes collapse naturally via the split."
+  ],
+  "approach": "Stack of path components; handle '..', '.', and empty tokens.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Popping on '..' past root",
+   "Keeping trailing slash"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/simplify-path/"
+ },
+ {
+  "id": "dsa-stk-10",
+  "title": "Decode String (k[encoded])",
+  "statement": "Decode strings like '3[a2[c]]' -> 'accaccacc'.",
+  "difficulty": "Medium",
+  "topics": [
+   "stacks",
+   "recursion"
+  ],
+  "hints": [
+   "Two stacks: counts and current strings; '[' pushes, ']' resolves.",
+   "Multi-digit counts need accumulation before '['.",
+   "Recursive descent is equally clean."
+  ],
+  "approach": "Stack-based parse; on ']' pop count and string, repeat and append.",
+  "complexity": "Time O(n * output), Space O(n)",
+  "pitfalls": [
+   "Single-digit count assumption",
+   "Losing outer context on nesting"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/decode-string/"
+ },
+ {
+  "id": "dsa-trees-01",
+  "title": "Maximum Depth of Binary Tree",
+  "statement": "Find the maximum depth (longest root-to-leaf path) of a binary tree.",
+  "difficulty": "Easy",
+  "topics": [
+   "trees",
+   "recursion",
+   "bfs"
+  ],
+  "hints": [
+   "Depth = 1 + max(depth of children).",
+   "Base case: null node has depth 0.",
+   "BFS level-counting works too."
+  ],
+  "approach": "Recursive: 1 + max(left, right); or iterative BFS counting levels.",
+  "complexity": "Time O(n), Space O(h) recursion",
+  "pitfalls": [
+   "Counting nodes vs edges inconsistently",
+   "Forgetting the null base case"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/maximum-depth-of-binary-tree/"
+ },
+ {
+  "id": "dsa-trees-02",
+  "title": "Invert Binary Tree",
+  "statement": "Invert a binary tree (mirror it).",
+  "difficulty": "Easy",
+  "topics": [
+   "trees",
+   "recursion"
+  ],
+  "hints": [
+   "At each node, swap left and right children.",
+   "Then recurse into both (now-swapped) children.",
+   "BFS version: swap as you visit each node."
+  ],
+  "approach": "Post-order swap at every node, recursively or iteratively.",
+  "complexity": "Time O(n), Space O(h)",
+  "pitfalls": [
+   "Swapping after recursing into the wrong child",
+   "Null checks"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/invert-binary-tree/"
+ },
+ {
+  "id": "dsa-trees-03",
+  "title": "Diameter of Binary Tree",
+  "statement": "Length (edges) of the longest path between any two nodes.",
+  "difficulty": "Easy",
+  "topics": [
+   "trees",
+   "recursion"
+  ],
+  "hints": [
+   "The longest path through a node = left depth + right depth.",
+   "Compute depths bottom-up, tracking the max path seen.",
+   "Similar to max-depth, with one extra global."
+  ],
+  "approach": "Post-order: return depth, update global max of left+right.",
+  "complexity": "Time O(n), Space O(h)",
+  "pitfalls": [
+   "Returning the path instead of its length",
+   "Counting nodes instead of edges"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/diameter-of-binary-tree/"
+ },
+ {
+  "id": "dsa-trees-04",
+  "title": "Balanced Binary Tree",
+  "statement": "Determine if a binary tree is height-balanced (children's heights differ by at most 1 everywhere).",
+  "difficulty": "Easy",
+  "topics": [
+   "trees",
+   "recursion"
+  ],
+  "hints": [
+   "Naive: check balance at each node with depth calls - O(n^2).",
+   "Better: return -1 for unbalanced subtrees in one pass.",
+   "Combine depth computation with the balance check."
+  ],
+  "approach": "Post-order returning height or -1 (unbalanced sentinel).",
+  "complexity": "Time O(n), Space O(h)",
+  "pitfalls": [
+   "O(n^2) repeated depth computation",
+   "Only checking the root"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/balanced-binary-tree/"
+ },
+ {
+  "id": "dsa-trees-05",
+  "title": "Validate Binary Search Tree",
+  "statement": "Determine if a binary tree is a valid BST.",
+  "difficulty": "Medium",
+  "topics": [
+   "trees",
+   "bst",
+   "recursion"
+  ],
+  "hints": [
+   "Each node must lie within (low, high) bounds passed down.",
+   "Inorder traversal of a BST is sorted - alternative check.",
+   "Duplicates: decide strict vs non-strict per the problem."
+  ],
+  "approach": "DFS with bounds; or inorder with prev-value tracking.",
+  "complexity": "Time O(n), Space O(h)",
+  "pitfalls": [
+   "Only comparing with parent (grandparent violations missed)",
+   "Integer overflow with INT_MIN bounds"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/validate-binary-search-tree/"
+ },
+ {
+  "id": "dsa-trees-06",
+  "title": "Kth Smallest Element in a BST",
+  "statement": "Find the kth smallest value in a BST.",
+  "difficulty": "Medium",
+  "topics": [
+   "trees",
+   "bst"
+  ],
+  "hints": [
+   "Inorder traversal visits nodes in sorted order - stop at k.",
+   "Iterative with an explicit stack avoids recursion depth issues.",
+   "Augmented subtree sizes give O(h) per query."
+  ],
+  "approach": "Inorder counting to k; or order-statistic tree augmentation.",
+  "complexity": "Time O(h + k), Space O(h)",
+  "pitfalls": [
+   "Full traversal when early stop suffices",
+   "Off-by-one on k (1-indexed)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/"
+ },
+ {
+  "id": "dsa-trees-07",
+  "title": "Lowest Common Ancestor (Binary Tree)",
+  "statement": "Find the lowest common ancestor of two nodes in a binary tree.",
+  "difficulty": "Medium",
+  "topics": [
+   "trees",
+   "recursion"
+  ],
+  "hints": [
+   "If a subtree contains both/neither/one, what should it return?",
+   "Return p or q when found; the first node receiving both is the LCA.",
+   "BST version is simpler: walk down by comparisons."
+  ],
+  "approach": "Recursive: combine left/right results; LCA is where both sides are non-null.",
+  "complexity": "Time O(n), Space O(h)",
+  "pitfalls": [
+   "Assuming BST properties in a general tree",
+   "Not handling p == q"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/"
+ },
+ {
+  "id": "dsa-trees-08",
+  "title": "Binary Tree Level Order Traversal",
+  "statement": "Return node values grouped by depth level.",
+  "difficulty": "Medium",
+  "topics": [
+   "trees",
+   "bfs"
+  ],
+  "hints": [
+   "BFS; capture queue size at each level to group nodes.",
+   "DFS with a depth parameter also works (append to level list).",
+   "Zigzag: alternate the append direction per level."
+  ],
+  "approach": "Queue-based BFS with per-level snapshots.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Mixing levels (not snapshotting queue size)",
+   "Recursion depth on skewed trees"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/binary-tree-level-order-traversal/"
+ },
+ {
+  "id": "dsa-trees-09",
+  "title": "Serialize and Deserialize Binary Tree",
+  "statement": "Design an algorithm to serialize a binary tree to a string and back.",
+  "difficulty": "Hard",
+  "topics": [
+   "trees",
+   "design",
+   "dfs"
+  ],
+  "hints": [
+   "Preorder with '#' markers for nulls captures the full structure.",
+   "Deserialize by consuming tokens with an index pointer.",
+   "Level-order also works; compare compactness."
+  ],
+  "approach": "Preorder encode with null markers; recursive decode consuming tokens.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Ambiguous encoding without null markers",
+   "Shared mutable index bugs"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/"
+ },
+ {
+  "id": "dsa-trees-10",
+  "title": "Binary Tree Maximum Path Sum",
+  "statement": "Maximum sum over all paths (any start/end) in a binary tree.",
+  "difficulty": "Hard",
+  "topics": [
+   "trees",
+   "recursion",
+   "dp"
+  ],
+  "hints": [
+   "For each node: best downward path = val + max(0, left, right).",
+   "A path THROUGH the node can use both children: candidate = val + left + right.",
+   "Return downward-best upward; track the global through-max."
+  ],
+  "approach": "Post-order returning max downward path; global max over through-paths.",
+  "complexity": "Time O(n), Space O(h)",
+  "pitfalls": [
+   "Allowing negative contributions downward (clamp at 0)",
+   "Confusing return value with global answer"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/binary-tree-maximum-path-sum/"
+ },
+ {
+  "id": "dsa-trees-11",
+  "title": "Count Good Nodes in Binary Tree",
+  "statement": "Count nodes where the path from root contains no greater value.",
+  "difficulty": "Medium",
+  "topics": [
+   "trees",
+   "dfs"
+  ],
+  "hints": [
+   "Pass the maximum seen so far down the recursion.",
+   "A node is good iff node.val >= max_so_far.",
+   "Update max_so_far for children."
+  ],
+  "approach": "DFS carrying path maximum; count when node.val >= max.",
+  "complexity": "Time O(n), Space O(h)",
+  "pitfalls": [
+   "Using global max instead of path max",
+   "Strict vs non-strict comparison"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/count-good-nodes-in-binary-tree/"
+ },
+ {
+  "id": "dsa-trees-12",
+  "title": "Construct Tree from Preorder and Inorder",
+  "statement": "Rebuild a binary tree from its preorder and inorder traversals.",
+  "difficulty": "Medium",
+  "topics": [
+   "trees",
+   "recursion",
+   "hashmap"
+  ],
+  "hints": [
+   "preorder[0] is the root; find it in inorder to split left/right subtrees.",
+   "A value->index map makes the split O(1).",
+   "Recurse with index ranges, not slices (avoid O(n^2) copying)."
+  ],
+  "approach": "Recursive build with (pre_idx, in_left, in_right) ranges and an index map.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Slicing arrays each call (O(n^2))",
+   "Linear search for root in inorder"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/"
+ },
+ {
+  "id": "dsa-heaps-01",
+  "title": "Kth Largest Element in an Array",
+  "statement": "Find the kth largest element without fully sorting.",
+  "difficulty": "Medium",
+  "topics": [
+   "heaps",
+   "quickselect"
+  ],
+  "hints": [
+   "A min-heap of size k keeps the k largest; the top is the answer.",
+   "Quickselect partitions like quicksort: average O(n).",
+   "Compare: heap is simpler, quickselect is faster on average."
+  ],
+  "approach": "Min-heap of size k; or quickselect for average O(n).",
+  "complexity": "Time O(n log k) heap / O(n) avg quickselect, Space O(k)",
+  "pitfalls": [
+   "Max-heap of everything (O(n log n))",
+   "Quickselect worst-case O(n^2) unmentioned"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+ },
+ {
+  "id": "dsa-heaps-02",
+  "title": "Top K Frequent Elements",
+  "statement": "Return the k most frequent elements.",
+  "difficulty": "Medium",
+  "topics": [
+   "heaps",
+   "hashmap",
+   "bucket-sort"
+  ],
+  "hints": [
+   "Count frequencies, then either heap (O(n log k)) or bucket by count (O(n)).",
+   "Bucket index = frequency; scan buckets from high to low.",
+   "Which is better depends on constraints - discuss."
+  ],
+  "approach": "Frequency map + bucket sort by count; or min-heap of size k.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Sorting all frequencies O(n log n)",
+   "Forgetting ties can exceed k (fine - return any k)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/top-k-frequent-elements/"
+ },
+ {
+  "id": "dsa-heaps-03",
+  "title": "Find Median from Data Stream",
+  "statement": "Support addNum and findMedian on a stream.",
+  "difficulty": "Hard",
+  "topics": [
+   "heaps",
+   "design"
+  ],
+  "hints": [
+   "Two heaps: max-heap for the lower half, min-heap for the upper half.",
+   "Keep sizes balanced (differ by at most 1); median from the tops.",
+   "Every addNum: push, then rebalance."
+  ],
+  "approach": "Dual-heap with size invariant; median is top(s).",
+  "complexity": "Time O(log n) add, O(1) median; Space O(n)",
+  "pitfalls": [
+   "Broken size invariant after inserts",
+   "Python heapq is min-heap: negate for max-heap"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/find-median-from-data-stream/"
+ },
+ {
+  "id": "dsa-heaps-04",
+  "title": "Task Scheduler",
+  "statement": "Minimum intervals to run tasks with cooldown n between same tasks.",
+  "difficulty": "Medium",
+  "topics": [
+   "heaps",
+   "greedy",
+   "math"
+  ],
+  "hints": [
+   "The most frequent task dictates the skeleton: (maxFreq-1) * (n+1) slots.",
+   "Add the count of tasks tied for max frequency.",
+   "Take max with total tasks (no idle needed if dense)."
+  ],
+  "approach": "Frequency formula; or greedy simulation with max-heap + cooldown queue.",
+  "complexity": "Time O(n), Space O(1) formula",
+  "pitfalls": [
+   "Forgetting the +count of max-frequency ties",
+   "Missing the max(total) case"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/task-scheduler/"
+ },
+ {
+  "id": "dsa-heaps-05",
+  "title": "K Closest Points to Origin",
+  "statement": "Return the k closest points to (0,0).",
+  "difficulty": "Medium",
+  "topics": [
+   "heaps",
+   "quickselect"
+  ],
+  "hints": [
+   "Compare squared distances (skip sqrt).",
+   "Max-heap of size k, or quickselect on distance.",
+   "Sorting all is O(n log n) - beatable."
+  ],
+  "approach": "Max-heap of size k by squared distance; or quickselect.",
+  "complexity": "Time O(n log k), Space O(k)",
+  "pitfalls": [
+   "Computing sqrt unnecessarily",
+   "Min-heap of all points"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/k-closest-points-to-origin/"
+ },
+ {
+  "id": "dsa-heaps-06",
+  "title": "IPO (maximize capital with k projects)",
+  "statement": "Pick up to k projects to maximize final capital; each needs min capital and yields profit.",
+  "difficulty": "Hard",
+  "topics": [
+   "heaps",
+   "greedy"
+  ],
+  "hints": [
+   "Sort projects by required capital; use a max-heap for affordable profits.",
+   "Each round: move newly-affordable projects into the heap, take the best.",
+   "Greedy works because profits only increase affordability."
+  ],
+  "approach": "Sort by capital + max-heap of profits; k rounds.",
+  "complexity": "Time O(n log n), Space O(n)",
+  "pitfalls": [
+   "Re-scanning affordable projects each round O(kn)",
+   "Taking projects in requirement order only"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/ipo/"
+ },
+ {
+  "id": "dsa-heaps-07",
+  "title": "Sliding Window Maximum",
+  "statement": "Maximum of each sliding window of size k.",
+  "difficulty": "Hard",
+  "topics": [
+   "heaps",
+   "deque",
+   "sliding-window"
+  ],
+  "hints": [
+   "A decreasing deque of indices gives O(n): front is always the max.",
+   "Evict indices outside the window from the front.",
+   "Heap with lazy deletion is O(n log k) - acceptable alternative."
+  ],
+  "approach": "Monotonic deque; maintain decreasing values, drop out-of-window.",
+  "complexity": "Time O(n), Space O(k)",
+  "pitfalls": [
+   "Heap without lazy deletion of stale entries",
+   "Storing values instead of indices"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/sliding-window-maximum/"
+ },
+ {
+  "id": "dsa-heaps-08",
+  "title": "Meeting Rooms II (min conference rooms)",
+  "statement": "Minimum rooms so all meetings fit.",
+  "difficulty": "Medium",
+  "topics": [
+   "heaps",
+   "sorting",
+   "greedy",
+   "intervals"
+  ],
+  "hints": [
+   "Sort by start; a min-heap of end times tracks busy rooms.",
+   "If the earliest-ending room frees before this starts, reuse it.",
+   "Heap size at the end = answer."
+  ],
+  "approach": "Sweep line with min-heap of end times.",
+  "complexity": "Time O(n log n), Space O(n)",
+  "pitfalls": [
+   "Counting overlaps pairwise O(n^2)",
+   "Not sorting by start first"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/meeting-rooms-ii/"
+ },
+ {
+  "id": "dsa-graphs-01",
+  "title": "Number of Islands",
+  "statement": "Count the islands (connected '1's, 4-directional) in a binary grid.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "dfs",
+   "bfs",
+   "matrix"
+  ],
+  "hints": [
+   "Each unvisited '1' starts a new island - flood-fill it.",
+   "Mark visited by flipping to '0' (in-place) or a visited set.",
+   "DFS recursive or BFS iterative both work."
+  ],
+  "approach": "Scan grid; on unvisited '1', increment count and flood-fill its region.",
+  "complexity": "Time O(mn), Space O(mn) worst-case recursion",
+  "pitfalls": [
+   "8-directional by mistake",
+   "Not marking visited (infinite loop)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/number-of-islands/"
+ },
+ {
+  "id": "dsa-graphs-02",
+  "title": "Clone Graph",
+  "statement": "Deep-copy a connected undirected graph given a reference node.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "dfs",
+   "hashmap"
+  ],
+  "hints": [
+   "A map from original node to clone handles cycles.",
+   "DFS: clone node, then recursively clone neighbors.",
+   "BFS version is equally valid."
+  ],
+  "approach": "DFS/BFS with old->new map; wire neighbors to clones.",
+  "complexity": "Time O(n+e), Space O(n)",
+  "pitfalls": [
+   "Infinite recursion on cycles (no map check)",
+   "Shallow copy of neighbor lists"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/clone-graph/"
+ },
+ {
+  "id": "dsa-graphs-03",
+  "title": "Course Schedule",
+  "statement": "Can you finish n courses given [course, prerequisite] pairs?",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "topological-sort",
+   "bfs"
+  ],
+  "hints": [
+   "Model as a directed graph; the question is cycle detection.",
+   "Kahn's algorithm: repeatedly remove zero-indegree nodes.",
+   "If all nodes are removed, no cycle exists."
+  ],
+  "approach": "Build adjacency + indegree; BFS from zero-indegree nodes; check count.",
+  "complexity": "Time O(n+e), Space O(n+e)",
+  "pitfalls": [
+   "Edge direction flipped",
+   "DFS color method: forgetting the 'visiting' state"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/course-schedule/"
+ },
+ {
+  "id": "dsa-graphs-04",
+  "title": "Course Schedule II (return ordering)",
+  "statement": "Return a valid course order, or empty array if impossible.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "topological-sort"
+  ],
+  "hints": [
+   "Same as Course Schedule, but record the removal order.",
+   "That order IS a valid topological ordering.",
+   "Any valid order is accepted."
+  ],
+  "approach": "Kahn's algorithm recording the dequeue order.",
+  "complexity": "Time O(n+e), Space O(n+e)",
+  "pitfalls": [
+   "Returning partial order on cycle (must return [])",
+   "See previous pitfalls"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/course-schedule-ii/"
+ },
+ {
+  "id": "dsa-graphs-05",
+  "title": "Rotting Oranges",
+  "statement": "Minutes until no fresh orange remains (4-directional spread per minute); -1 if impossible.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "bfs",
+   "matrix"
+  ],
+  "hints": [
+   "Multi-source BFS: enqueue ALL rotten oranges at time 0.",
+   "Level-order traversal counts minutes.",
+   "Count fresh oranges; leftovers mean -1."
+  ],
+  "approach": "BFS from all rotten sources simultaneously; levels = minutes.",
+  "complexity": "Time O(mn), Space O(mn)",
+  "pitfalls": [
+   "BFS from each rotten separately (wrong timing)",
+   "Forgetting the impossible case"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/rotting-oranges/"
+ },
+ {
+  "id": "dsa-graphs-06",
+  "title": "Pacific Atlantic Water Flow",
+  "statement": "Cells with heights; find cells from which water flows to both oceans (borders).",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "dfs",
+   "bfs",
+   "matrix"
+  ],
+  "hints": [
+   "Forward simulation from every cell is O((mn)^2) - reverse it.",
+   "Start BFS/DFS from each ocean's border, moving to equal-or-higher cells.",
+   "Intersect the two reachable sets."
+  ],
+  "approach": "Two reverse flood-fills from ocean borders; intersect reachable cells.",
+  "complexity": "Time O(mn), Space O(mn)",
+  "pitfalls": [
+   "Wrong flow direction (must go uphill in reverse)",
+   "Exponential per-cell DFS"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/pacific-atlantic-water-flow/"
+ },
+ {
+  "id": "dsa-graphs-07",
+  "title": "Graph Valid Tree",
+  "statement": "Given n nodes and edges, determine if they form a valid tree.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "union-find",
+   "dfs"
+  ],
+  "hints": [
+   "A tree: exactly n-1 edges AND connected (either implies the other given no self-loops... check both).",
+   "Union-Find: any union of already-connected nodes means a cycle.",
+   "Or DFS: no cycles and visit count == n."
+  ],
+  "approach": "Check edge count, then Union-Find for cycles / connectivity.",
+  "complexity": "Time O(n \u03b1(n)), Space O(n)",
+  "pitfalls": [
+   "Only checking edge count",
+   "Self-loops not treated as cycles"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/graph-valid-tree/"
+ },
+ {
+  "id": "dsa-graphs-08",
+  "title": "Number of Connected Components",
+  "statement": "Count connected components in an undirected graph.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "union-find",
+   "dfs"
+  ],
+  "hints": [
+   "Union all edges; count distinct roots.",
+   "Or DFS/BFS from each unvisited node, counting launches.",
+   "Isolated nodes count as their own component."
+  ],
+  "approach": "Union-Find over edges; count unique parents.",
+  "complexity": "Time O(n \u03b1(n)), Space O(n)",
+  "pitfalls": [
+   "Forgetting isolated nodes",
+   "Not path-compressing (still correct, slower)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/"
+ },
+ {
+  "id": "dsa-graphs-09",
+  "title": "Word Ladder",
+  "statement": "Shortest transformation sequence length from beginWord to endWord, changing one letter at a time through valid words.",
+  "difficulty": "Hard",
+  "topics": [
+   "graphs",
+   "bfs"
+  ],
+  "hints": [
+   "Model words as a graph; BFS gives the shortest path.",
+   "Neighbors via wildcard patterns (*ot -> hot, dot) precomputed in a map.",
+   "Bidirectional BFS halves the search."
+  ],
+  "approach": "BFS with pattern-bucket adjacency; bidirectional for speed.",
+  "complexity": "Time O(n * L^2), Space O(n * L)",
+  "pitfalls": [
+   "DFS (finds A path, not shortest)",
+   "Rebuilding neighbors by scanning all words each time"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/word-ladder/"
+ },
+ {
+  "id": "dsa-graphs-10",
+  "title": "Network Delay Time (Dijkstra)",
+  "statement": "Time for a signal from node k to reach all nodes (directed weighted edges); -1 if unreachable.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "dijkstra",
+   "heap"
+  ],
+  "hints": [
+   "Classic single-source shortest path with non-negative weights: Dijkstra.",
+   "Heap of (dist, node); relax edges; skip stale entries.",
+   "Answer = max distance; unreachable nodes -> -1."
+  ],
+  "approach": "Dijkstra from k; max of distances or -1.",
+  "complexity": "Time O(e log n), Space O(n+e)",
+  "pitfalls": [
+   "Dijkstra with negative weights",
+   "Not skipping stale heap entries"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/network-delay-time/"
+ },
+ {
+  "id": "dsa-graphs-11",
+  "title": "Alien Dictionary",
+  "statement": "Derive the character order from a list of words sorted in an alien language.",
+  "difficulty": "Hard",
+  "topics": [
+   "graphs",
+   "topological-sort"
+  ],
+  "hints": [
+   "Compare adjacent words; first differing chars give an ordering edge.",
+   "Watch the invalid case: 'abc' before 'ab' is impossible.",
+   "Topological sort; a cycle means no valid order."
+  ],
+  "approach": "Build graph from adjacent pairs; Kahn's sort; validate prefix case.",
+  "complexity": "Time O(C), Space O(1) (fixed alphabet)",
+  "pitfalls": [
+   "Missing the prefix-invalid case",
+   "Using only first/last words"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/alien-dictionary/"
+ },
+ {
+  "id": "dsa-graphs-12",
+  "title": "Redundant Connection",
+  "statement": "A tree plus one extra edge; return the edge that can be removed to restore the tree.",
+  "difficulty": "Medium",
+  "topics": [
+   "graphs",
+   "union-find"
+  ],
+  "hints": [
+   "Process edges in order; the first edge joining two connected nodes is redundant.",
+   "Return the LAST such edge per the problem statement (with plain union-find it's the first found - re-read the spec).",
+   "Actually: return the edge that appears last in input among cycle-forming edges."
+  ],
+  "approach": "Union-Find in input order; track the last cycle-forming edge.",
+  "complexity": "Time O(n \u03b1(n)), Space O(n)",
+  "pitfalls": [
+   "Returning the first cycle edge instead of the last",
+   "DFS cycle detection is O(n^2)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/redundant-connection/"
+ },
+ {
+  "id": "dsa-dp-01",
+  "title": "Climbing Stairs",
+  "statement": "Distinct ways to climb n stairs taking 1 or 2 steps.",
+  "difficulty": "Easy",
+  "topics": [
+   "dp",
+   "math"
+  ],
+  "hints": [
+   "Ways(n) = ways(n-1) + ways(n-2): the last step is 1 or 2.",
+   "It's Fibonacci; two variables suffice.",
+   "Base: ways(1)=1, ways(2)=2."
+  ],
+  "approach": "Iterative Fibonacci with O(1) space.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Exponential recursion without memo",
+   "Off-by-one base cases"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/climbing-stairs/"
+ },
+ {
+  "id": "dsa-dp-02",
+  "title": "House Robber",
+  "statement": "Max money robbing houses with no two adjacent.",
+  "difficulty": "Medium",
+  "topics": [
+   "dp"
+  ],
+  "hints": [
+   "At each house: rob it (plus dp[i-2]) or skip it (dp[i-1]).",
+   "Two variables rolling forward.",
+   "Circular street: run twice, excluding first or last."
+  ],
+  "approach": "dp[i] = max(dp[i-1], dp[i-2] + nums[i]).",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Greedy by value (fails)",
+   "Forgetting the circular variant constraint"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/house-robber/"
+ },
+ {
+  "id": "dsa-dp-03",
+  "title": "Coin Change",
+  "statement": "Fewest coins to make amount; -1 if impossible.",
+  "difficulty": "Medium",
+  "topics": [
+   "dp"
+  ],
+  "hints": [
+   "dp[x] = 1 + min(dp[x - coin]) over coins; INF if unreachable.",
+   "Iterate amounts outer, coins inner (for min-coins formulation).",
+   "Greedy fails: coins [1,3,4], amount 6 -> greedy gives 4+1+1, optimal 3+3."
+  ],
+  "approach": "Bottom-up DP over amounts with INF sentinel.",
+  "complexity": "Time O(amount * coins), Space O(amount)",
+  "pitfalls": [
+   "Greedy coin choice",
+   "Wrong loop order confusion with counting variant"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/coin-change/"
+ },
+ {
+  "id": "dsa-dp-04",
+  "title": "Longest Increasing Subsequence",
+  "statement": "Length of the longest strictly increasing subsequence.",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "binary-search"
+  ],
+  "hints": [
+   "O(n^2): dp[i] = 1 + max(dp[j]) for j < i with nums[j] < nums[i].",
+   "O(n log n): maintain tails[]; binary-search each number's position.",
+   "Tails isn't the subsequence - only its length is correct."
+  ],
+  "approach": "Patience sorting with binary search on tails array.",
+  "complexity": "Time O(n log n), Space O(n)",
+  "pitfalls": [
+   "Claiming tails IS the LIS",
+   "Non-strict comparison for strictly increasing"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/longest-increasing-subsequence/"
+ },
+ {
+  "id": "dsa-dp-05",
+  "title": "Word Break",
+  "statement": "Can s be segmented into dictionary words?",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "strings"
+  ],
+  "hints": [
+   "dp[i]: prefix of length i is segmentable.",
+   "For each i, try every j < i where dp[j] and s[j:i] in dict.",
+   "BFS/DFS with memo is equivalent."
+  ],
+  "approach": "DP over prefix lengths with dictionary lookup.",
+  "complexity": "Time O(n^2), Space O(n)",
+  "pitfalls": [
+   "Greedy longest-match (fails)",
+   "Not memoizing the recursion (exponential)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/word-break/"
+ },
+ {
+  "id": "dsa-dp-06",
+  "title": "Partition Equal Subset Sum",
+  "statement": "Can the array be split into two equal-sum subsets?",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "knapsack"
+  ],
+  "hints": [
+   "Total must be even; then it's subset-sum to total/2.",
+   "1D boolean DP iterating sums BACKWARD (avoid reuse).",
+   "Classic 0/1 knapsack."
+  ],
+  "approach": "Backward-iterating boolean DP for subset sum.",
+  "complexity": "Time O(n * sum), Space O(sum)",
+  "pitfalls": [
+   "Forward iteration (unbounded reuse bug)",
+   "Skipping the even-total check"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/partition-equal-subset-sum/"
+ },
+ {
+  "id": "dsa-dp-07",
+  "title": "Decode Ways",
+  "statement": "Number of ways to decode a digit string (1->A ... 26->Z).",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "strings"
+  ],
+  "hints": [
+   "dp[i] += dp[i-1] if s[i-1] != '0'; dp[i] += dp[i-2] if 10 <= two-digit <= 26.",
+   "'0' is the trap: valid only inside 10 or 20.",
+   "Leading zeros make the answer 0 immediately."
+  ],
+  "approach": "Linear DP with careful zero handling.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Treating '0' as standalone valid",
+   "Missing the '10'/'20' pair case"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/decode-ways/"
+ },
+ {
+  "id": "dsa-dp-08",
+  "title": "Unique Paths with Obstacles",
+  "statement": "Count paths from top-left to bottom-right moving only down/right, avoiding obstacles.",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "matrix"
+  ],
+  "hints": [
+   "dp[i][j] = dp[i-1][j] + dp[i][j-1]; obstacles force 0.",
+   "First row/col: 1s until the first obstacle.",
+   "In-place on the grid is fine."
+  ],
+  "approach": "Grid DP with obstacle zeroing.",
+  "complexity": "Time O(mn), Space O(1) in-place",
+  "pitfalls": [
+   "Not zeroing obstacle cells",
+   "Forgetting blocked start/end"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/unique-paths-ii/"
+ },
+ {
+  "id": "dsa-dp-09",
+  "title": "Edit Distance",
+  "statement": "Minimum operations (insert, delete, replace) to convert word1 to word2.",
+  "difficulty": "Hard",
+  "topics": [
+   "dp",
+   "strings"
+  ],
+  "hints": [
+   "Define dp[i][j] on prefixes; consider the last characters.",
+   "If equal: dp[i-1][j-1]; else 1 + min(delete, insert, replace).",
+   "Base: converting to/from empty string costs the length."
+  ],
+  "approach": "2D DP over prefix pairs with the three-operation recurrence.",
+  "complexity": "Time O(mn), Space O(mn) (O(n) optimized)",
+  "pitfalls": [
+   "Wrong base cases",
+   "Forgetting replace as a distinct op"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/edit-distance/"
+ },
+ {
+  "id": "dsa-dp-10",
+  "title": "Longest Common Subsequence",
+  "statement": "Length of the longest common subsequence of two strings.",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "strings"
+  ],
+  "hints": [
+   "Match -> 1 + dp[i-1][j-1]; else max of skipping one char from either.",
+   "Backtrack through the table to reconstruct it.",
+   "Subsequence, not substring: gaps allowed."
+  ],
+  "approach": "Classic 2D DP; optional reconstruction pass.",
+  "complexity": "Time O(mn), Space O(mn)",
+  "pitfalls": [
+   "Confusing subsequence with substring",
+   "Off-by-one in table indexing"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/longest-common-subsequence/"
+ },
+ {
+  "id": "dsa-dp-11",
+  "title": "Maximum Product Subarray",
+  "statement": "Maximum product of a contiguous subarray.",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "arrays"
+  ],
+  "hints": [
+   "Negatives flip: track BOTH max and min ending at each position.",
+   "On a negative, swap max and min before multiplying.",
+   "Kadane alone fails - why?"
+  ],
+  "approach": "Rolling max_ending/min_ending with swap on negatives.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Only tracking max (sign flips break it)",
+   "Zero-reset mistakes"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/maximum-product-subarray/"
+ },
+ {
+  "id": "dsa-dp-12",
+  "title": "Jump Game II (min jumps)",
+  "statement": "Minimum jumps to reach the end (each element = max jump length).",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "greedy",
+   "arrays"
+  ],
+  "hints": [
+   "Greedy layers: current jump's reach vs the farthest reachable.",
+   "When you exhaust the current range, jump and extend.",
+   "BFS-level thinking on an implicit graph."
+  ],
+  "approach": "Greedy range expansion counting jumps.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "DP O(n^2) when greedy suffices",
+   "Counting the final jump wrong"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/jump-game-ii/"
+ },
+ {
+  "id": "dsa-dp-13",
+  "title": "Combination Sum",
+  "statement": "All unique combinations summing to target; candidates reusable.",
+  "difficulty": "Medium",
+  "topics": [
+   "dp",
+   "backtracking"
+  ],
+  "hints": [
+   "Backtrack with a start index to avoid duplicate permutations.",
+   "Sort first so you can prune when the remainder goes negative.",
+   "Variants change the reuse/duplicate rules."
+  ],
+  "approach": "DFS with start-index and pruning.",
+  "complexity": "Time O(2^n) worst, Space O(target)",
+  "pitfalls": [
+   "Permutations instead of combinations (no start index)",
+   "Missing the sort-prune"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/combination-sum/"
+ },
+ {
+  "id": "dsa-dp-14",
+  "title": "N-Queens II (count)",
+  "statement": "Count distinct solutions to the n-queens puzzle.",
+  "difficulty": "Hard",
+  "topics": [
+   "dp",
+   "backtracking"
+  ],
+  "hints": [
+   "Place row by row; track attacked columns and diagonals in sets.",
+   "Diagonal ids: r+c and r-c are constant per diagonal.",
+   "Bitmask version is the optimized classic."
+  ],
+  "approach": "Backtracking with column/diagonal sets.",
+  "complexity": "Time O(n!), Space O(n)",
+  "pitfalls": [
+   "Diagonal collision detection wrong",
+   "Counting symmetric duplicates separately is fine"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/n-queens-ii/"
+ },
+ {
+  "id": "dsa-dp-15",
+  "title": "Regular Expression Matching",
+  "statement": "Match string against pattern with '.' and '*' (zero or more of preceding).",
+  "difficulty": "Hard",
+  "topics": [
+   "dp",
+   "strings",
+   "recursion"
+  ],
+  "hints": [
+   "dp(i,j): does s[i:] match p[j:]? Handle '*' by zero-match (skip) or consume-one.",
+   "Memoize the recursion; base cases on empty pattern/string.",
+   "Draw the decision tree for 'a*' carefully."
+  ],
+  "approach": "Memoized recursion on (i, j) with the star-branching rule.",
+  "complexity": "Time O(mn), Space O(mn)",
+  "pitfalls": [
+   "Greedy '*' matching (fails)",
+   "Exponential naive recursion"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/regular-expression-matching/"
+ },
+ {
+  "id": "dsa-dp-16",
+  "title": "Burst Balloons",
+  "statement": "Max coins bursting balloons; bursting i yields nums[l]*nums[i]*nums[r].",
+  "difficulty": "Hard",
+  "topics": [
+   "dp",
+   "interval-dp"
+  ],
+  "hints": [
+   "Think REVERSE: which balloon bursts LAST in interval (l, r)?",
+   "dp[l][r] = max over k of dp[l][k] + dp[k][r] + nums[l]*nums[k]*nums[r].",
+   "Pad with 1s at both ends."
+  ],
+  "approach": "Interval DP over last-burst choice.",
+  "complexity": "Time O(n^3), Space O(n^2)",
+  "pitfalls": [
+   "Forward thinking (order dependence)",
+   "Forgetting the padding"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/burst-balloons/"
+ },
+ {
+  "id": "dsa-search-01",
+  "title": "Binary Search (classic)",
+  "statement": "Search a sorted array for target; return index or -1.",
+  "difficulty": "Easy",
+  "topics": [
+   "binary-search"
+  ],
+  "hints": [
+   "Maintain [lo, hi]; mid = lo + (hi-lo)//2 avoids overflow.",
+   "Shrink the half that cannot contain the target.",
+   "Loop invariant: target in [lo, hi] if present."
+  ],
+  "approach": "Iterative halving with overflow-safe midpoint.",
+  "complexity": "Time O(log n), Space O(1)",
+  "pitfalls": [
+   "(lo+hi)//2 overflow in fixed-width languages",
+   "Infinite loop from wrong bound updates"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/binary-search/"
+ },
+ {
+  "id": "dsa-search-02",
+  "title": "Search in Rotated Sorted Array",
+  "statement": "Search target in a rotated sorted array.",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "arrays"
+  ],
+  "hints": [
+   "One half is always sorted - determine which via nums[lo] <= nums[mid].",
+   "Check if the target lies in the sorted half; else go to the other.",
+   "Duplicates break the worst case to O(n)."
+  ],
+  "approach": "Modified binary search using the sorted-half property.",
+  "complexity": "Time O(log n), Space O(1)",
+  "pitfalls": [
+   "Wrong half identification",
+   "Duplicates causing O(n) unhandled"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/search-in-rotated-sorted-array/"
+ },
+ {
+  "id": "dsa-search-03",
+  "title": "Find Minimum in Rotated Sorted Array",
+  "statement": "Find the minimum element in a rotated sorted array.",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "arrays"
+  ],
+  "hints": [
+   "Compare nums[mid] with nums[hi] to decide the side.",
+   "The minimum is the only element smaller than its predecessor.",
+   "Duplicates: hi -= 1 fallback."
+  ],
+  "approach": "Binary search toward the rotation pivot.",
+  "complexity": "Time O(log n), Space O(1)",
+  "pitfalls": [
+   "Comparing with nums[lo] instead (ambiguous)",
+   "Missing the duplicate case"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"
+ },
+ {
+  "id": "dsa-search-04",
+  "title": "Koko Eating Bananas",
+  "statement": "Minimum integer eating speed k to finish all piles within h hours.",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "math"
+  ],
+  "hints": [
+   "Binary search the ANSWER: speed in [1, max(piles)].",
+   "Feasibility: sum(ceil(pile / k)) <= h.",
+   "Monotonic: faster speeds only help."
+  ],
+  "approach": "Binary search on speed with a feasibility check.",
+  "complexity": "Time O(n log max), Space O(1)",
+  "pitfalls": [
+   "Floating-point ceil errors (use integer math)",
+   "Wrong search bounds"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/koko-eating-bananas/"
+ },
+ {
+  "id": "dsa-search-05",
+  "title": "Median of Two Sorted Arrays",
+  "statement": "Median of two sorted arrays in O(log(m+n)).",
+  "difficulty": "Hard",
+  "topics": [
+   "binary-search",
+   "arrays"
+  ],
+  "hints": [
+   "Binary search the partition: i + j = (m+n+1)//2 on the smaller array.",
+   "Valid when maxLeft1 <= minRight2 and maxLeft2 <= minRight1.",
+   "Handle empty partitions with infinities."
+  ],
+  "approach": "Partition binary search; median from border values.",
+  "complexity": "Time O(log(min(m,n))), Space O(1)",
+  "pitfalls": [
+   "Merging (O(m+n) - too slow per spec)",
+   "Odd/even total confusion"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/median-of-two-sorted-arrays/"
+ },
+ {
+  "id": "dsa-search-06",
+  "title": "Search a 2D Matrix",
+  "statement": "Matrix with rows sorted and first-of-row > last-of-previous; search target.",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "matrix"
+  ],
+  "hints": [
+   "Flatten conceptually: index i -> (i//n, i%n); binary search once.",
+   "Or staircase from top-right in O(m+n).",
+   "Compare the two approaches."
+  ],
+  "approach": "Binary search on the virtual flat array.",
+  "complexity": "Time O(log(mn)), Space O(1)",
+  "pitfalls": [
+   "Row-by-row binary search (works, less elegant)",
+   "Index mapping errors"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/search-a-2d-matrix/"
+ },
+ {
+  "id": "dsa-search-07",
+  "title": "Find Peak Element",
+  "statement": "Find any peak (greater than neighbors) in O(log n).",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "arrays"
+  ],
+  "hints": [
+   "If nums[mid] < nums[mid+1], a peak must exist to the right.",
+   "The array edges act as -infinity.",
+   "Invariant: the chosen half always contains a peak."
+  ],
+  "approach": "Binary search toward the rising slope.",
+  "complexity": "Time O(log n), Space O(1)",
+  "pitfalls": [
+   "Linear scan (misses the point)",
+   "Boundary handling for mid+1"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/find-peak-element/"
+ },
+ {
+  "id": "dsa-search-08",
+  "title": "Time Based Key-Value Store",
+  "statement": "set(key, value, timestamp); get(key, timestamp) returns the latest value at or before timestamp.",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "hashmap",
+   "design"
+  ],
+  "hints": [
+   "Per key, keep a list of (timestamp, value) in increasing order.",
+   "Binary search for the rightmost timestamp <= target.",
+   "Strictly increasing timestamps simplify appends."
+  ],
+  "approach": "Hash map of sorted timestamp lists + binary search.",
+  "complexity": "Time O(log n) get, Space O(n)",
+  "pitfalls": [
+   "Linear scan per get",
+   "Leftmost vs rightmost binary search confusion"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/time-based-key-value-store/"
+ },
+ {
+  "id": "dsa-search-09",
+  "title": "Sqrt(x) without built-ins",
+  "statement": "Integer square root of x.",
+  "difficulty": "Easy",
+  "topics": [
+   "binary-search",
+   "math"
+  ],
+  "hints": [
+   "Binary search answer in [0, x]; compare mid*mid with x.",
+   "Newton's method converges faster - mention it.",
+   "Avoid overflow: compare mid <= x // mid."
+  ],
+  "approach": "Binary search on the answer range.",
+  "complexity": "Time O(log x), Space O(1)",
+  "pitfalls": [
+   "mid*mid overflow",
+   "Float precision issues"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/sqrtx/"
+ },
+ {
+  "id": "dsa-search-10",
+  "title": "Capacity To Ship Packages Within D Days",
+  "statement": "Minimum ship capacity to ship all weights within D days (order preserved).",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "greedy"
+  ],
+  "hints": [
+   "Binary search capacity in [max(weights), sum(weights)].",
+   "Feasibility: greedy day-packing count <= D.",
+   "Same answer-space pattern as Koko."
+  ],
+  "approach": "Binary search on capacity with greedy feasibility.",
+  "complexity": "Time O(n log sum), Space O(1)",
+  "pitfalls": [
+   "Lower bound below max single weight",
+   "Not preserving order in feasibility"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/"
+ },
+ {
+  "id": "dsa-search-11",
+  "title": "Find First and Last Position in Sorted Array",
+  "statement": "Find the start/end indices of target in sorted array; [-1,-1] if absent.",
+  "difficulty": "Medium",
+  "topics": [
+   "binary-search",
+   "arrays"
+  ],
+  "hints": [
+   "Two binary searches: lower bound and upper bound.",
+   "Or one search then expand - but that's O(n) worst case.",
+   "bisect_left / bisect_right model."
+  ],
+  "approach": "Lower-bound and upper-bound binary searches.",
+  "complexity": "Time O(log n), Space O(1)",
+  "pitfalls": [
+   "Linear expansion after find (O(n) worst)",
+   "Off-by-one in bound variants"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
+ },
+ {
+  "id": "dsa-search-12",
+  "title": "Split Array Largest Sum",
+  "statement": "Split into k subarrays minimizing the largest subarray sum.",
+  "difficulty": "Hard",
+  "topics": [
+   "binary-search",
+   "dp",
+   "greedy"
+  ],
+  "hints": [
+   "Binary search the answer: largest-sum in [max(nums), sum(nums)].",
+   "Feasibility: greedy counting of subarrays needed.",
+   "DP O(n^2 k) exists but binary search wins."
+  ],
+  "approach": "Binary search on the minimized maximum with greedy check.",
+  "complexity": "Time O(n log sum), Space O(1)",
+  "pitfalls": [
+   "DP when constraints allow binary search",
+   "Feasibility counting errors"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/split-array-largest-sum/"
+ },
+ {
+  "id": "dsa-hash-01",
+  "title": "Two Sum (hashmap drill)",
+  "statement": "Revisit Two Sum focusing on the hashmap pattern's generalizations.",
+  "difficulty": "Easy",
+  "topics": [
+   "hashmap",
+   "arrays"
+  ],
+  "hints": [
+   "Complement lookup is the core pattern.",
+   "Same pattern: pair sums, difference k, subarray sums.",
+   "One pass vs two pass trade-offs."
+  ],
+  "approach": "Single-pass complement map.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "See dsa-arrays-01 pitfalls",
+   "Not recognizing the pattern family"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/two-sum/"
+ },
+ {
+  "id": "dsa-hash-02",
+  "title": "Group Anagrams (hashmap drill)",
+  "statement": "Group strings by anagram equivalence using hashing.",
+  "difficulty": "Medium",
+  "topics": [
+   "hashmap",
+   "strings"
+  ],
+  "hints": [
+   "Canonical key per string: count-tuple is O(k).",
+   "Map key -> list; deterministic and fast.",
+   "Prime-product hashing is a fun alternative (overflow caveats)."
+  ],
+  "approach": "Count-tuple keys in a hash map.",
+  "complexity": "Time O(n*k), Space O(n*k)",
+  "pitfalls": [
+   "Sorted-key O(k log k) overhead",
+   "Mutable keys"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/group-anagrams/"
+ },
+ {
+  "id": "dsa-hash-03",
+  "title": "Longest Consecutive Sequence",
+  "statement": "Longest run of consecutive integers, O(n).",
+  "difficulty": "Medium",
+  "topics": [
+   "hashmap",
+   "arrays",
+   "union-find"
+  ],
+  "hints": [
+   "Only start counting from sequence beginnings (x-1 not in set).",
+   "Each number is then visited at most twice overall.",
+   "Sorting is O(n log n) - beat it with a set."
+  ],
+  "approach": "Hash set; expand only from sequence starts.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Expanding from every element (O(n^2))",
+   "Sorting first"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/longest-consecutive-sequence/"
+ },
+ {
+  "id": "dsa-hash-04",
+  "title": "Subarray Sum Equals K (hashmap drill)",
+  "statement": "Count subarrays summing to k via prefix sums.",
+  "difficulty": "Medium",
+  "topics": [
+   "hashmap",
+   "prefix-sums",
+   "arrays"
+  ],
+  "hints": [
+   "prefix[j] - prefix[i] = k -> need count of (prefix - k).",
+   "Seed {0: 1}; update after querying (order matters).",
+   "Works with negatives where sliding window fails."
+  ],
+  "approach": "Running prefix with frequency map.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Query-after-update order swapped",
+   "Sliding window on negatives"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/subarray-sum-equals-k/"
+ },
+ {
+  "id": "dsa-hash-05",
+  "title": "LRU Cache (hashmap + list drill)",
+  "statement": "O(1) get/put cache with eviction.",
+  "difficulty": "Medium",
+  "topics": [
+   "hashmap",
+   "linked-lists",
+   "design"
+  ],
+  "hints": [
+   "Map key -> node; doubly-linked list for recency order.",
+   "Dummy head/tail simplify edge cases.",
+   "OrderedDict is the library shortcut - implement manually first."
+  ],
+  "approach": "Hash map + doubly linked list with dummies.",
+  "complexity": "Time O(1), Space O(capacity)",
+  "pitfalls": [
+   "Singly linked list (can't evict in O(1))",
+   "Forgetting to update map on eviction"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/lru-cache/"
+ },
+ {
+  "id": "dsa-hash-06",
+  "title": "Insert Delete GetRandom O(1)",
+  "statement": "Set with O(1) insert, delete, and uniform random retrieval.",
+  "difficulty": "Medium",
+  "topics": [
+   "hashmap",
+   "arrays",
+   "design"
+  ],
+  "hints": [
+   "Array for random access + map value -> index.",
+   "Delete by swapping with the last element.",
+   "Duplicates need index sets."
+  ],
+  "approach": "Array + index map with swap-remove.",
+  "complexity": "Time O(1) avg, Space O(n)",
+  "pitfalls": [
+   "Linear delete scan",
+   "Stale indices after swap"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/insert-delete-getrandom-o1/"
+ },
+ {
+  "id": "dsa-hash-07",
+  "title": "Design HashMap (from scratch)",
+  "statement": "Implement a hash map with put/get/remove.",
+  "difficulty": "Easy",
+  "topics": [
+   "hashmap",
+   "design"
+  ],
+  "hints": [
+   "Buckets array; chaining for collisions.",
+   "Hash function: built-in hash % capacity; handle negatives.",
+   "Resize when load factor exceeds ~0.75."
+  ],
+  "approach": "Separate chaining with dynamic resize.",
+  "complexity": "Time O(1) avg, Space O(n)",
+  "pitfalls": [
+   "No collision handling",
+   "Never resizing (degrades to O(n))"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/design-hashmap/"
+ },
+ {
+  "id": "dsa-hash-08",
+  "title": "Word Pattern (bijection check)",
+  "statement": "Check if a pattern string bijectively maps to words.",
+  "difficulty": "Easy",
+  "topics": [
+   "hashmap",
+   "strings"
+  ],
+  "hints": [
+   "Bijection needs BOTH directions checked.",
+   "Two maps, or one map + one set of used words.",
+   "Isomorphic Strings is the twin problem."
+  ],
+  "approach": "Dual-direction mapping validation.",
+  "complexity": "Time O(n), Space O(n)",
+  "pitfalls": [
+   "Checking only one direction",
+   "Length mismatch ignored"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/word-pattern/"
+ },
+ {
+  "id": "dsa-misc-01",
+  "title": "Reverse Integer (32-bit clamp)",
+  "statement": "Reverse digits of a 32-bit signed integer; return 0 on overflow.",
+  "difficulty": "Medium",
+  "topics": [
+   "math"
+  ],
+  "hints": [
+   "Build the reversed number digit by digit.",
+   "Check overflow BEFORE multiplying: rev > INT_MAX//10 etc.",
+   "Python ints don't overflow - simulate the check anyway."
+  ],
+  "approach": "Digit extraction loop with pre-overflow checks.",
+  "complexity": "Time O(log x), Space O(1)",
+  "pitfalls": [
+   "Checking overflow after it happens",
+   "String reverse without overflow handling"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/reverse-integer/"
+ },
+ {
+  "id": "dsa-misc-02",
+  "title": "Pow(x, n) (fast exponentiation)",
+  "statement": "Compute x^n in O(log n).",
+  "difficulty": "Medium",
+  "topics": [
+   "math",
+   "recursion",
+   "binary-exponentiation"
+  ],
+  "hints": [
+   "x^n = (x^2)^(n/2); handle odd n with an extra multiply.",
+   "Negative n: invert x first.",
+   "Iterative bit-loop version too."
+  ],
+  "approach": "Binary exponentiation, recursive or iterative.",
+  "complexity": "Time O(log n), Space O(log n) / O(1)",
+  "pitfalls": [
+   "O(n) repeated multiplication",
+   "n = -2^31 edge in fixed-width langs"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/powx-n/"
+ },
+ {
+  "id": "dsa-misc-03",
+  "title": "Spiral Matrix",
+  "statement": "Return matrix elements in spiral order.",
+  "difficulty": "Medium",
+  "topics": [
+   "matrix",
+   "simulation"
+  ],
+  "hints": [
+   "Shrink boundaries: top, bottom, left, right.",
+   "After each wall, check the loop condition again (single row/col left).",
+   "Direction arrays are an alternative."
+  ],
+  "approach": "Boundary-shrinking traversal.",
+  "complexity": "Time O(mn), Space O(1) excluding output",
+  "pitfalls": [
+   "Double-visiting the last row/column",
+   "Off-by-one on boundaries"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/spiral-matrix/"
+ },
+ {
+  "id": "dsa-misc-04",
+  "title": "Rotate Image (90 degrees in place)",
+  "statement": "Rotate an n x n matrix 90 degrees clockwise, in place.",
+  "difficulty": "Medium",
+  "topics": [
+   "matrix",
+   "arrays"
+  ],
+  "hints": [
+   "Transpose then reverse each row - two clean steps.",
+   "Or rotate 4-cycles layer by layer.",
+   "Verify on 3x3 by hand."
+  ],
+  "approach": "Transpose + row reversal.",
+  "complexity": "Time O(n^2), Space O(1)",
+  "pitfalls": [
+   "Extra matrix (violates in-place)",
+   "Counterclockwise by mistake"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/rotate-image/"
+ },
+ {
+  "id": "dsa-misc-05",
+  "title": "Set Matrix Zeroes (O(1) space)",
+  "statement": "Zero out rows/columns containing a zero, constant space.",
+  "difficulty": "Medium",
+  "topics": [
+   "matrix",
+   "arrays"
+  ],
+  "hints": [
+   "Use the first row and column as marker storage.",
+   "Two flags remember whether the first row/col themselves need zeroing.",
+   "Mark first, then zero in a second pass."
+  ],
+  "approach": "First-row/col markers + flags.",
+  "complexity": "Time O(mn), Space O(1)",
+  "pitfalls": [
+   "Zeroing markers prematurely",
+   "Forgetting the two flags"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/set-matrix-zeroes/"
+ },
+ {
+  "id": "dsa-misc-06",
+  "title": "Game of Life (in-place)",
+  "statement": "Next state of Conway's Game of Life, in place.",
+  "difficulty": "Medium",
+  "topics": [
+   "matrix",
+   "simulation"
+  ],
+  "hints": [
+   "Encode transitions in extra bits: 2 = dead->alive, 3 = alive->dead.",
+   "Count live neighbors using val % 2 (original state).",
+   "Second pass: shift right to finalize."
+  ],
+  "approach": "In-place state encoding with bit tricks.",
+  "complexity": "Time O(mn), Space O(1)",
+  "pitfalls": [
+   "Extra board (violates in-place)",
+   "Counting transitional states as live/dead wrong"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/game-of-life/"
+ },
+ {
+  "id": "dsa-misc-07",
+  "title": "String to Integer (atoi)",
+  "statement": "Parse a string to a 32-bit signed integer with clamping.",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "math",
+   "simulation"
+  ],
+  "hints": [
+   "Skip whitespace, read optional sign, then digits.",
+   "Clamp on overflow DURING parsing (pre-check).",
+   "Stop at the first non-digit."
+  ],
+  "approach": "State-machine parse with overflow pre-checks.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Overflow after the fact",
+   "Sign applied wrong",
+   "Trailing chars mishandled"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/string-to-integer-atoi/"
+ },
+ {
+  "id": "dsa-misc-08",
+  "title": "Integer to Roman / Roman to Integer",
+  "statement": "Convert between integers and Roman numerals.",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "math",
+   "greedy"
+  ],
+  "hints": [
+   "Greedy subtraction with value-symbol pairs including 4/9 forms (IV, IX...).",
+   "Reverse: add, but subtract when a smaller precedes a larger.",
+   "Table-driven is cleanest."
+  ],
+  "approach": "Greedy table mapping both directions.",
+  "complexity": "Time O(n), Space O(1)",
+  "pitfalls": [
+   "Missing subtractive forms",
+   "Wrong direction in reverse parse"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/integer-to-roman/"
+ },
+ {
+  "id": "dsa-misc-09",
+  "title": "Multiply Strings (big integers as strings)",
+  "statement": "Multiply two non-negative integer strings without big-int libs.",
+  "difficulty": "Medium",
+  "topics": [
+   "strings",
+   "math"
+  ],
+  "hints": [
+   "Grade-school multiplication: result[i+j] += d1*d2, then carry.",
+   "Result has at most m+n digits.",
+   "Strip leading zeros."
+  ],
+  "approach": "Positional accumulation + carry pass.",
+  "complexity": "Time O(mn), Space O(mn)",
+  "pitfalls": [
+   "Converting to int (defeats the purpose)",
+   "Carry propagation errors"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/multiply-strings/"
+ },
+ {
+  "id": "dsa-misc-10",
+  "title": "Plus One (digit array)",
+  "statement": "Increment a large integer represented as a digit array.",
+  "difficulty": "Easy",
+  "topics": [
+   "arrays",
+   "math"
+  ],
+  "hints": [
+   "Add from the right with carry; early exit when no carry.",
+   "All 9s -> need a new leading 1.",
+   "The easy version of big-integer handling."
+  ],
+  "approach": "Right-to-left increment with carry.",
+  "complexity": "Time O(n), Space O(1) amortized",
+  "pitfalls": [
+   "Forgetting the all-9s expansion",
+   "Converting to int (overflows)"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/plus-one/"
+ },
+ {
+  "id": "dsa-misc-11",
+  "title": "Happy Number (cycle detection)",
+  "statement": "Determine if repeated digit-square-summing reaches 1.",
+  "difficulty": "Easy",
+  "topics": [
+   "math",
+   "two-pointers",
+   "hashmap"
+  ],
+  "hints": [
+   "The sequence either reaches 1 or cycles - detect the cycle.",
+   "Floyd or a seen-set both work.",
+   "Why must it cycle? Values stay bounded."
+  ],
+  "approach": "Cycle detection on the digit-square iteration.",
+  "complexity": "Time O(log n) per step, Space O(1) Floyd",
+  "pitfalls": [
+   "Infinite loop without cycle detection",
+   "Digit extraction bugs"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/happy-number/"
+ },
+ {
+  "id": "dsa-misc-12",
+  "title": "Excel Sheet Column Title/Number",
+  "statement": "Convert between 1-indexed column numbers and titles (A..Z, AA...).",
+  "difficulty": "Easy",
+  "topics": [
+   "math",
+   "strings"
+  ],
+  "hints": [
+   "It's base-26 but 1-indexed: no zero digit.",
+   "Number->title: (n-1) % 26 + 'A', then (n-1)//26.",
+   "Title->number: standard base-26 accumulation."
+  ],
+  "approach": "Adjusted base-26 conversion both ways.",
+  "complexity": "Time O(log n), Space O(1)",
+  "pitfalls": [
+   "Plain base-26 (off by one on Z->AA)",
+   "Direction confusion"
+  ],
+  "leetcode_url": "https://leetcode.com/problems/excel-sheet-column-title/"
+ }
+]

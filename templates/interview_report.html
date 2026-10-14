@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Report | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <style>
+        .rp-wrap { max-width: 820px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .rp-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 2rem; backdrop-filter: blur(12px); margin-bottom: 1.2rem; }
+        .rp-meta { color: var(--text-muted, #94a3b8); font-size: 0.88rem; margin-bottom: 0.6rem; }
+        .rp-score-ring { width: 110px; height: 110px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.7rem; font-weight: 800; }
+        .rp-bar-row { display: grid; grid-template-columns: 150px 1fr 44px; gap: 0.7rem; align-items: center; margin-bottom: 0.55rem; font-size: 0.85rem; }
+        .rp-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+        .rp-bar > div { height: 100%; background: var(--gradient-primary); border-radius: 999px; }
+        .rp-answer { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; font-size: 0.9rem; color: #cbd5e1; white-space: pre-wrap; margin: 0.8rem 0; }
+        .rp-fb h4 { font-size: 0.95rem; margin: 0.9rem 0 0.4rem; color: var(--accent-primary); }
+        .rp-fb h4.fix { color: #f59e0b; }
+        .rp-fb ul { margin-left: 1.2rem; color: #cbd5e1; font-size: 0.9rem; }
+        .rp-fb li { margin-bottom: 0.35rem; }
+        .rp-q { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .rp-back { display: inline-block; margin-bottom: 1.4rem; color: var(--accent-secondary); font-weight: 600; text-decoration: none; }
+        @media (max-width: 700px) { .rp-wrap { padding-top: 5.5rem; } .rp-card { padding: 1.4rem; } .rp-bar-row { grid-template-columns: 110px 1fr 40px; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg></div>
+            <span>ResumeAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/interview" class="active">Interviews</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            {% include "_auth_links.html" %}
+        </ul>
+    </nav>
+
+    <div class="rp-wrap">
+        <a class="rp-back" href="{{ url_for('interview_home') }}">&larr; All mock interviews</a>
+        <div class="rp-card" style="text-align:center">
+            {% set total = session.total_score or 0 %}
+            {% set color = '#10b981' if total >= 70 else ('#f59e0b' if total >= 45 else '#ef4444') %}
+            <div class="rp-score-ring" style="border: 4px solid {{ color }}; color: {{ color }};">{{ total }}</div>
+            <h2 style="margin-top:0.8rem;">{{ session.company }} &middot; {{ session.role.replace('_', ' ').title() }}</h2>
+            <div class="rp-meta">{{ session.category.replace('_', ' ').title() }} &middot; {{ session.created_at.strftime('%d %b %Y, %I:%M %p') }}{% if session.ai_powered %} &middot; AI-polished feedback{% endif %}</div>
+        </div>
+
+        {% for a in answers %}
+        {% set q = (questions | selectattr('id', 'equalto', a.question_id) | list | first) %}
+        <div class="rp-card">
+            <div class="rp-q">Q{{ loop.index }}: {{ (q.question if q else '') }}</div>
+            <div class="rp-meta">Score {{ a.total }}/100 &middot; {{ a.word_count }} words</div>
+            {% set labels = {'correctness': ('Correctness / approach', 40), 'communication': ('Communication', 25), 'depth': ('Depth', 20), 'edge_cases': ('Edge cases', 15)} %}
+            {% for key, (label, maxv) in labels.items() %}
+            <div class="rp-bar-row">
+                <span>{{ label }}</span>
+                <div class="rp-bar"><div style="width: {{ (a.scores[key] / maxv * 100) | round(1) }}%"></div></div>
+                <span>{{ a.scores[key] }}</span>
+            </div>
+            {% endfor %}
+            {% if a.answer_text %}
+            <div class="rp-answer">{{ a.answer_text }}</div>
+            {% endif %}
+            {% set fb = a.feedback or {} %}
+            <div class="rp-fb">
+                {% if fb.strengths %}
+                <h4>Strengths</h4>
+                <ul>{% for s in fb.strengths %}<li>{{ s }}</li>{% endfor %}</ul>
+                {% endif %}
+                {% if fb.improvements %}
+                <h4 class="fix">What to improve</h4>
+                <ul>{% for s in fb.improvements %}<li>{{ s }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

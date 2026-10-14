@@ -236,6 +236,8 @@ from salary_data import (get_options as salary_options, query as salary_query,
 from opportunities import (list_opportunities, get_meta as opp_meta,
                            opp_exists, TYPES as OPP_TYPES, OpportunityDataError)
 from portfolio import validate_portfolio_payload, unique_slug
+from mock_interview import (interview_options, pick_questions, score_answer,
+                            generate_rule_based_feedback, validate_interview_setup)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -403,6 +405,23 @@ class CareerAssessment(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("career_assessments", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class InterviewSession(db.Model):
+    """A company-specific mock interview session belonging to a user (Wave 2 #13)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    company = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    questions_json = db.Column(db.JSON)  # selected question dicts
+    answers_json = db.Column(db.JSON)    # [{question_id, answer, scoring, feedback}]
+    total_score = db.Column(db.Float)
+    ai_powered = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("interview_sessions", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -902,6 +921,57 @@ def _linkedin_suggestions(report, fields):
             log.warning("LinkedIn suggestions: model returned no usable items")
         except (ValueError, json.JSONDecodeError):
             log.warning("LinkedIn suggestions: non-JSON model output, retrying")
+    return fallback, False
+
+
+def _interview_feedback(scored_answers, questions):
+    """Polish per-answer strengths/improvements via Gemini, rule-based fallback.
+
+    Returns (feedback_list, ai_powered). Numeric scores never depend on the
+    LLM; a Gemini outage degrades the wording only.
+    """
+    fallback = [generate_rule_based_feedback(s, q)
+                for s, q in zip(scored_answers, questions)]
+    compact = []
+    for s, q in zip(scored_answers, questions):
+        compact.append({
+            "q": (q.get("question") or "")[:300],
+            "key_points": (q.get("key_points") or [])[:4],
+            "scores": s["scores"],
+            "answer": (s.get("answer_text") or "")[:1200],
+        })
+    prompt = (
+        "You are an expert interview coach. Below are a candidate's answers "
+        "with rubric scores (correctness/40, communication/25, depth/20, "
+        "edge_cases/15). For EACH answer return one strengths item and up to "
+        "3 improvements, referencing the actual answer text - no generic advice.\n"
+        'Return ONLY JSON like {"feedback": [{"strengths": ["..."], '
+        '"improvements": ["..."]}]} with one entry per answer, in order.\n'
+        "ANSWERS:\n" + json.dumps(compact)[:12000]
+    )
+    for _attempt in range(2):
+        try:
+            raw = call_gemini_ai(prompt)
+        except GeminiError as e:
+            log.warning("Interview feedback: Gemini unavailable: %s", e)
+            return fallback, False
+        try:
+            parsed = _parse_json_safely(raw)
+            items = parsed.get("feedback") if isinstance(parsed, dict) else None
+            if isinstance(items, list) and len(items) == len(compact):
+                cleaned = []
+                for it in items:
+                    if not isinstance(it, dict):
+                        cleaned.append({"strengths": [], "improvements": []})
+                        continue
+                    cleaned.append({
+                        "strengths": [str(x)[:400] for x in (it.get("strengths") or [])[:3]],
+                        "improvements": [str(x)[:400] for x in (it.get("improvements") or [])[:4]],
+                    })
+                return cleaned, True
+            log.warning("Interview feedback: model returned unusable shape")
+        except (ValueError, json.JSONDecodeError):
+            log.warning("Interview feedback: non-JSON model output, retrying")
     return fallback, False
 
 
@@ -2151,6 +2221,114 @@ def register_routes(app):
                                clusters=row.top_clusters,
                                assessment_id=row.id, created_at=row.created_at)
 
+    # ---------- COMPANY-SPECIFIC MOCK INTERVIEWS (Wave 2 #13) ----------
+    @app.route('/interview')
+    def interview_home():
+        """Mock interview setup: pick company, role, category."""
+        from mock_interview import _load_bank
+        return render_template('interview.html', options=interview_options(),
+                               total_questions=len(_load_bank()),
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/interview/start', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def interview_start():
+        """Start a mock interview session. Login required (sessions are per-user).
+
+        Accepts JSON or form data: company, role, category, num_questions.
+        CSRF token comes via the X-CSRFToken header, so this route is NOT
+        CSRF-exempt.
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to start a mock interview.'}), 401
+        payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+        cleaned, error = validate_interview_setup(payload or {})
+        if error:
+            return jsonify({'error': error}), 400
+        questions = pick_questions(cleaned["company"], cleaned["role"],
+                                   cleaned["category"], n=cleaned["n"])
+        if not questions:
+            return jsonify({'error': 'No questions available for that selection.'}), 400
+        try:
+            row = InterviewSession(
+                user_id=current_user.id,
+                company=cleaned["company"], role=cleaned["role"],
+                category=cleaned["category"],
+                questions_json=json_safe(questions),
+                answers_json=[],
+            )
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Interview session creation failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not start the interview. Please try again.'}), 500
+        return jsonify({'success': True, 'session_id': row.id,
+                        'questions': json_safe(questions)})
+
+    @app.route('/interview/<int:session_id>/submit', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def interview_submit(session_id):
+        """Score all answers for a session against the rubric.
+
+        Body: {"answers": [{"question_id": "...", "answer": "..."}]}.
+        Scoring is deterministic and server-side; Gemini only polishes the
+        feedback wording (rule-based fallback always works).
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to submit answers.'}), 401
+        row = InterviewSession.query.filter_by(id=session_id,
+                                               user_id=current_user.id).first()
+        if not row:
+            return jsonify({'error': 'Interview session not found.'}), 404
+        payload = request.get_json(silent=True) or {}
+        raw_answers = payload.get("answers")
+        if not isinstance(raw_answers, list) or not raw_answers:
+            return jsonify({'error': 'Provide a non-empty answers list.'}), 400
+        questions = row.questions_json or []
+        qmap = {q.get("id"): q for q in questions}
+        scored = []
+        for item in raw_answers[:10]:
+            if not isinstance(item, dict):
+                continue
+            qid = str(item.get("question_id") or "")
+            question = qmap.get(qid)
+            if not question:
+                continue
+            answer = str(item.get("answer") or "")[:8000]
+            s = score_answer(question, answer)
+            s["answer_text"] = answer
+            scored.append(s)
+        if not scored:
+            return jsonify({'error': 'No answers matched this session\u2019s questions.'}), 400
+        feedback, ai_powered = _interview_feedback(scored, [qmap[s["question_id"]] for s in scored])
+        for s, fb in zip(scored, feedback):
+            s["feedback"] = fb
+        total = round(sum(s["total"] for s in scored) / len(scored), 1)
+        try:
+            row.answers_json = json_safe(scored)
+            row.total_score = total
+            row.ai_powered = ai_powered
+            db.session.commit()
+        except Exception:
+            log.exception("Interview result persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save your results. Please try again.'}), 500
+        return jsonify({'success': True, 'total_score': total,
+                        'ai_powered': ai_powered,
+                        'results': json_safe(scored),
+                        'report_url': url_for('view_interview', session_id=row.id)})
+
+    @app.route('/interview/<int:session_id>')
+    @login_required
+    def view_interview(session_id):
+        """Render a saved interview report (owner only)."""
+        row = InterviewSession.query.filter_by(id=session_id,
+                                               user_id=current_user.id).first_or_404()
+        return render_template('interview_report.html', session=row,
+                               questions=row.questions_json or [],
+                               answers=row.answers_json or [])
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -2193,12 +2371,16 @@ def register_routes(app):
         assessments = (CareerAssessment.query
                        .filter_by(user_id=current_user.id)
                        .order_by(CareerAssessment.created_at.desc()).all())
+        interviews = (InterviewSession.query
+                      .filter_by(user_id=current_user.id)
+                      .order_by(InterviewSession.created_at.desc()).all())
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
                                jd_matches=jd_matches, rewrites=rewrites,
                                cover_docs=cover_docs, linkedin_reports=linkedin_reports,
-                               tracker_stats=tracker_stats, assessments=assessments)
+                               tracker_stats=tracker_stats, assessments=assessments,
+                               interviews=interviews)
 
     # ---------- INDIA SALARY EXPLORER (Wave 1 #8) ----------
     @app.route('/salary')
