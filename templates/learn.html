@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block theme %}resume{% endblock %}
+{% block title %}Learn | AI Career & Research Assistant{% endblock %}
+{% block nav_learn %}b-active{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Wave 3 &mdash; Learning</span>
+            <h1>Learn with a <span class="b-grad">plan</span>, not by accident.</h1>
+            <p class="b-lede">Structured roadmaps for every skill, quizzes that diagnose your weak spots, and certification guidance with honest ROI — all mapped to the roles you're targeting.</p>
+            <div class="b-sec-head" style="margin:1.6rem 0 0;">
+                <div class="b-bento" style="margin-top:1.2rem;">
+                    <div class="b-card b-card--stat"><div class="b-stat-num" data-count="{{ num_skills }}">{{ num_skills }}</div><div class="b-stat-label">Skills with full roadmaps</div></div>
+                    <div class="b-card b-card--stat"><div class="b-stat-num" data-count="{{ num_quiz_questions }}">{{ num_quiz_questions }}</div><div class="b-stat-label">Quiz questions</div></div>
+                    <div class="b-card b-card--stat"><div class="b-stat-num" data-count="{{ num_certs }}">{{ num_certs }}</div><div class="b-stat-label">Certifications tracked</div></div>
+                    <div class="b-card b-card--stat"><div class="b-stat-num" data-count="{{ num_roles }}">{{ num_roles }}</div><div class="b-stat-label">Target roles mapped</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Learning tracks">
+    <div class="b-sec-head">
+        <h2>Three ways to <span class="b-grad">level up</span></h2>
+        <p>Pick a track — they connect with each other.</p>
+    </div>
+    <div class="b-bento">
+        <a class="b-card b-card--feature b-reveal" href="{{ url_for('roadmaps_home') }}" aria-label="Skill roadmaps">
+            <span class="b-tag">Roadmaps</span>
+            <h3 style="margin:0;">Skill-gap roadmaps</h3>
+            <p style="color:var(--b-muted);margin:0;">Tell us your target role and current skills — get a ranked gap report and a week-by-week learning plan built from free resources. Track your stage-by-stage progress.</p>
+            <span class="b-btn b-btn--ghost b-btn--sm" style="margin-top:auto;align-self:flex-start;">Explore roadmaps</span>
+        </a>
+        <a class="b-card b-card--feature b-reveal b-d1" href="{{ url_for('quizzes_home') }}" aria-label="Skill quizzes">
+            <span class="b-tag">Quizzes</span>
+            <h3 style="margin:0;">Skill quizzes</h3>
+            <p style="color:var(--b-muted);margin:0;">Timed or untimed quizzes across {{ num_quiz_skills }} skills with instant explanations, topic-wise breakdowns, and weak-topic diagnosis that points back to your roadmap.</p>
+            <span class="b-btn b-btn--ghost b-btn--sm" style="margin-top:auto;align-self:flex-start;">Start a quiz</span>
+        </a>
+        <a class="b-card b-card--feature b-reveal b-d2" href="{{ url_for('certs_home') }}" aria-label="Certification guidance">
+            <span class="b-tag">Certifications</span>
+            <h3 style="margin:0;">Certification guidance</h3>
+            <p style="color:var(--b-muted);margin:0;">Which cert is actually worth your money? Get ranked recommendations by role, skills, and budget — with approximate INR costs and week-by-week study plans.</p>
+            <span class="b-btn b-btn--ghost b-btn--sm" style="margin-top:auto;align-self:flex-start;">Find your cert</span>
+        </a>
+        {% if is_authed %}
+        <a class="b-card b-card--feature b-reveal b-d3" href="{{ url_for('roadmaps_dashboard') }}" aria-label="My learning dashboard">
+            <span class="b-tag">Progress</span>
+            <h3 style="margin:0;">My learning dashboard</h3>
+            <p style="color:var(--b-muted);margin:0;">Your roadmap stages, quiz best scores, and saved certification study plans — all in one place.</p>
+            <span class="b-btn b-btn--ghost b-btn--sm" style="margin-top:auto;align-self:flex-start;">View dashboard</span>
+        </a>
+        {% else %}
+        <div class="b-card b-card--feature b-reveal b-d3">
+            <span class="b-tag">Progress</span>
+            <h3 style="margin:0;">Track your progress</h3>
+            <p style="color:var(--b-muted);margin:0;">Sign in to save roadmap progress, quiz history, and certification study plans across sessions.</p>
+            <a class="b-btn b-btn--primary b-btn--sm" style="margin-top:auto;align-self:flex-start;" href="{{ url_for('login') }}">Sign in</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="b-section" aria-label="How the tracks connect">
+    <div class="b-card b-reveal">
+        <div class="b-sec-head" style="margin-top:0;">
+            <h2>How it <span class="b-grad">fits together</span></h2>
+        </div>
+        <div class="b-kv">
+            <div class="b-kv-row"><span class="b-kv-label"><strong>1. Diagnose</strong> — run the skill-gap analyzer for your target role</span><span class="b-kv-val"><a href="{{ url_for('roadmaps_home') }}">Roadmaps</a></span></div>
+            <div class="b-kv-row"><span class="b-kv-label"><strong>2. Learn</strong> — follow the staged plan with free resources and checkpoints</span><span class="b-kv-val"><a href="{{ url_for('roadmaps_home') }}">Roadmaps</a></span></div>
+            <div class="b-kv-row"><span class="b-kv-label"><strong>3. Test</strong> — quiz yourself; weak topics link straight back to roadmap stages</span><span class="b-kv-val"><a href="{{ url_for('quizzes_home') }}">Quizzes</a></span></div>
+            <div class="b-kv-row"><span class="b-kv-label"><strong>4. Certify</strong> — when you're ready, pick the certification with the best ROI</span><span class="b-kv-val"><a href="{{ url_for('certs_home') }}">Certs</a></span></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

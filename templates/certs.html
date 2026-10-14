@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block theme %}resume{% endblock %}
+{% block title %}Certification Guidance | AI Career & Research Assistant{% endblock %}
+{% block nav_learn %}b-active{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+
+{% block content %}
+<section style="padding-top:2.6rem;">
+    <div class="b-sec-head b-reveal">
+        <span class="b-pill"><span class="b-pulse"></span>Feature 20 &mdash; Certifications</span>
+        <h1>Certification <span class="b-grad">guidance</span></h1>
+        <p class="b-lede">Which certification is actually worth your time and money? Get ranked recommendations with honest ROI reasoning — costs shown in approximate INR.</p>
+    </div>
+    {% if is_authed %}
+    <div><a class="b-btn b-btn--ghost b-btn--sm" href="{{ url_for('certs_plans') }}">My saved study plans</a></div>
+    {% endif %}
+</section>
+
+<section class="b-section" aria-label="Certification recommender" style="padding-top:0;">
+    <div class="b-card b-reveal">
+        <h2 style="margin-top:0;">Find your certification</h2>
+        <div class="b-bento" style="grid-template-columns:repeat(3,1fr);">
+            <div class="b-field">
+                <label class="b-label" for="rec-role">Target role</label>
+                <select class="b-select" id="rec-role">
+                    <option value="">Any role</option>
+                    {% for r in roles %}
+                    <option value="{{ r.id }}">{{ r.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="b-field">
+                <label class="b-label" for="rec-budget">Max budget (INR, optional)</label>
+                <input class="b-input" id="rec-budget" type="number" min="0" step="500" placeholder="e.g. 25000">
+            </div>
+            <div class="b-field">
+                <label class="b-label" for="rec-n">How many suggestions</label>
+                <select class="b-select" id="rec-n">
+                    <option value="5">5</option><option value="8" selected>8</option><option value="12">12</option>
+                </select>
+            </div>
+        </div>
+        <div class="b-field">
+            <label class="b-label" for="rec-skills">Your skills <span style="color:var(--b-muted);font-weight:400;">(comma-separated, e.g. python, sql, linux)</span></label>
+            <input class="b-input" id="rec-skills" type="text" placeholder="python, sql, linux">
+        </div>
+        <button class="b-btn b-btn--primary b-magnet" id="rec-run">Recommend certifications</button>
+        <span id="rec-status" role="status" style="margin-left:1rem;color:var(--b-muted);"></span>
+        <div id="rec-result" class="b-bento" style="margin-top:1.6rem;"></div>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Browse by domain">
+    <div class="b-sec-head">
+        <h2>Browse by <span class="b-grad">domain</span></h2>
+        <p>Pick a domain to see every tracked certification with costs, validity, and exam format.</p>
+    </div>
+    <div class="b-bento" id="cert-domains">
+        {% for domain, count in domains %}
+        <button class="b-card b-card--lite b-reveal cert-domain" data-domain="{{ domain }}" style="text-align:left;cursor:pointer;font:inherit;color:inherit;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;">
+                <h3 style="margin:0;">{{ domain }}</h3>
+                <span class="b-tag">{{ count }}</span>
+            </div>
+            <div style="color:var(--b-muted);font-size:.85rem;margin-top:.4rem;">certifications</div>
+        </button>
+        {% endfor %}
+    </div>
+    <div id="cert-list" style="margin-top:1.4rem;"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/learn_certs.js') }}"></script>
+{% endblock %}

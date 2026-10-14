@@ -41,6 +41,7 @@
                     <li><a href="{{ url_for('index') }}">Hub</a></li>
                     <li><a href="{{ url_for('resume_home') }}">Resume</a></li>
                     <li><a href="{{ url_for('practice') }}">Practice</a></li>
+                    <li><a href="{{ url_for('learn_hub') }}" class="{% block nav_learn %}{% endblock %}">Learn</a></li>
                     <li><a href="{{ url_for('research_home') }}">Research</a></li>
                     {% include "_auth_links.html" %}
                 </ul>

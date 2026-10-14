@@ -264,6 +264,10 @@ from skill_quizzes import (quiz_skills, skill_topics, public_question,
                            build_quiz, check_answer, grade_quiz,
                            validate_start_payload, best_scores as quiz_best_scores,
                            get_question as get_quiz_question)
+from cert_guide import (all_certs, get_cert, domains as cert_domains,
+                        filter_certs, recommend as recommend_certs,
+                        build_study_plan, validate_recommend_payload,
+                        validate_plan_payload)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -558,6 +562,19 @@ class QuizAttempt(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("quiz_attempts", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class CertPlan(db.Model):
+    """A saved certification study plan belonging to a user (Wave 3 #20)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    cert_id = db.Column(db.String(50), nullable=False, index=True)
+    weeks = db.Column(db.Integer, nullable=False)
+    plan_json = db.Column(db.JSON)  # week-by-week plan
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("cert_plans", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -2954,6 +2971,18 @@ def register_routes(app):
             return jsonify({'error': 'Could not delete the draft.'}), 500
         return jsonify({'success': True})
 
+    # ---------- LEARNING HUB (Wave 3) ----------
+    @app.route('/learn')
+    def learn_hub():
+        """Learning hub: roadmaps, skill quizzes, certification guidance."""
+        return render_template('learn.html',
+                               num_skills=len(roadmap_skills()),
+                               num_quiz_questions=sum(n for _, n in quiz_skills()),
+                               num_quiz_skills=len(quiz_skills()),
+                               num_certs=len(all_certs()),
+                               num_roles=len(roadmap_roles()),
+                               is_authed=current_user.is_authenticated)
+
     def _learn_ai_tip(prompt, fallback):
         """Optional Gemini polish for learning tips. Returns (tip, ai_powered).
 
@@ -3243,6 +3272,105 @@ def register_routes(app):
         return render_template('quiz_history.html', attempts=attempts,
                                best=quiz_best_scores(attempts))
 
+    # ----- Feature #20: certification guidance -----
+    @app.route('/learn/certs')
+    def certs_home():
+        """Browse certifications + run the recommender."""
+        return render_template('certs.html',
+                               domains=cert_domains(),
+                               roles=roadmap_roles(),
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/learn/certs/browse')
+    @limiter.limit("60 per hour")
+    def certs_browse():
+        """JSON list of certifications, filterable by domain/difficulty/cost."""
+        try:
+            max_cost = request.args.get('max_cost')
+            max_cost = float(max_cost) if max_cost not in (None, "") else None
+        except (TypeError, ValueError):
+            return jsonify({'error': 'max_cost must be a number.'}), 400
+        certs = filter_certs(domain=request.args.get('domain') or None,
+                             max_cost_inr=max_cost,
+                             difficulty=request.args.get('difficulty') or None)
+        summaries = [{
+            "id": c["id"], "name": c["name"], "provider": c["provider"],
+            "domain": c.get("domain"), "cost_inr": c.get("cost_inr"),
+            "cost_note": c.get("cost_note"), "validity_years": c.get("validity_years"),
+            "difficulty": c.get("difficulty"),
+            "url": url_for('cert_detail', cert_id=c["id"]),
+        } for c in certs]
+        return jsonify({'success': True, 'certifications': summaries})
+
+    @app.route('/learn/certs/<cert_id>')
+    def cert_detail(cert_id):
+        """Certification detail + study-plan generator."""
+        cert = get_cert(cert_id)
+        if not cert:
+            abort(404)
+        return render_template('cert_detail.html', cert=cert,
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/learn/certs/recommend', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def certs_recommend():
+        """Rank certifications by role match, skill overlap, budget, difficulty.
+
+        JSON body: {"skills": [...], "target_role": "...",
+                    "budget_inr": 20000, "top_n": 8}.
+        CSRF token via X-CSRFToken header (not exempt). Anonymous allowed.
+        """
+        payload = request.get_json(silent=True) or {}
+        cleaned, error = validate_recommend_payload(payload)
+        if error:
+            return jsonify({'error': error}), 400
+        ranked = recommend_certs(skills=cleaned["skills"],
+                                 target_role=cleaned["target_role"],
+                                 budget_inr=cleaned["budget_inr"],
+                                 top_n=cleaned["top_n"])
+        return jsonify({'success': True,
+                        'recommendations': json_safe(ranked)})
+
+    @app.route('/learn/certs/plan', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def certs_plan():
+        """Generate (and save) a week-by-week study plan. Login required.
+
+        JSON body: {"cert_id": "...", "weeks": 8}.
+        CSRF token via X-CSRFToken header (not exempt).
+        """
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to save a study plan.'}), 401
+        payload = request.get_json(silent=True) or {}
+        cleaned, error = validate_plan_payload(payload)
+        if error:
+            return jsonify({'error': error}), 400
+        plan, perr = build_study_plan(cleaned["cert_id"], cleaned["weeks"])
+        if perr:
+            return jsonify({'error': perr}), 400
+        try:
+            row = CertPlan(user_id=current_user.id, cert_id=cleaned["cert_id"],
+                           weeks=cleaned["weeks"], plan_json=json_safe(plan))
+            db.session.add(row)
+            db.session.commit()
+        except Exception:
+            log.exception("Cert plan save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save the study plan. Please try again.'}), 500
+        return jsonify({'success': True, 'plan_id': row.id,
+                        'plan': json_safe(plan)})
+
+    @app.route('/learn/certs/plans')
+    @login_required
+    def certs_plans():
+        """The user's saved certification study plans."""
+        plans = (CertPlan.query
+                 .filter_by(user_id=current_user.id)
+                 .order_by(CertPlan.created_at.desc()).all())
+        cert_names = {c["id"]: c["name"] for c in all_certs()}
+        return render_template('cert_plans.html', plans=plans,
+                               cert_names=cert_names)
+
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):
         """Render a single analysis result (anonymous DB row or saved DB row)."""
@@ -3299,6 +3427,18 @@ def register_routes(app):
                        .filter_by(user_id=current_user.id)
                        .order_by(STARDraft.updated_at.desc())
                        .limit(12).all())
+        learn_roadmap = roadmap_progress_summary(
+            RoadmapProgress.query.filter_by(user_id=current_user.id).all())
+        quiz_attempts = (QuizAttempt.query
+                         .filter(QuizAttempt.user_id == current_user.id,
+                                 QuizAttempt.submitted_at.isnot(None))
+                         .order_by(QuizAttempt.submitted_at.desc())
+                         .limit(8).all())
+        cert_plans = (CertPlan.query
+                      .filter_by(user_id=current_user.id)
+                      .order_by(CertPlan.created_at.desc())
+                      .limit(6).all())
+        cert_names = {c["id"]: c["name"] for c in all_certs()}
         goals = (Goal.query.filter_by(user_id=current_user.id)
                  .order_by(Goal.status.asc(), Goal.created_at.desc()).all())
         return render_template('history.html', analyses=analyses, goals=goals,
@@ -3308,6 +3448,9 @@ def register_routes(app):
                                interviews=interviews, coach_reports=coach_reports,
                                aptitude_attempts=aptitude_attempts,
                                star_drafts=star_drafts,
+                               learn_roadmap=learn_roadmap,
+                               quiz_attempts=quiz_attempts,
+                               cert_plans=cert_plans, cert_names=cert_names,
                                star_competencies=dict((c[0], c[1]) for c in COMPETENCIES))
 
     # ---------- INDIA SALARY EXPLORER (Wave 1 #8) ----------

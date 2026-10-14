@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block theme %}resume{% endblock %}
+{% block title %}{{ cert.name }} | AI Career & Research Assistant{% endblock %}
+{% block nav_learn %}b-active{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+
+{% block content %}
+<section style="padding-top:2.6rem;">
+    <div class="b-reveal">
+        <a href="{{ url_for('certs_home') }}" style="font-size:.9rem;">&larr; All certifications</a>
+        <div class="b-sec-head">
+            <span class="b-pill">{{ cert.domain }} &middot; {{ cert.difficulty }}</span>
+            <h1>{{ cert.name }}</h1>
+            <p class="b-lede">by {{ cert.provider }}</p>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" style="padding-top:0;" aria-label="Certification facts">
+    <div class="b-bento">
+        <div class="b-card b-span-2 b-reveal">
+            <div class="b-kv">
+                <div class="b-kv-row"><span class="b-kv-label">Exam cost</span><span class="b-kv-val">&#8377;{{ "{:,}".format(cert.cost_inr) }}</span></div>
+                <div class="b-kv-row"><span class="b-kv-label"></span><span class="b-kv-label" style="font-size:.8rem;">{{ cert.cost_note }}</span></div>
+                <div class="b-kv-row"><span class="b-kv-label">Valid for</span><span class="b-kv-val">{% if cert.validity_years %}{{ cert.validity_years }} years{% else %}Lifetime{% endif %}</span></div>
+                <div class="b-kv-row"><span class="b-kv-label">Difficulty</span><span class="b-kv-val">{{ cert.difficulty }}</span></div>
+                <div class="b-kv-row"><span class="b-kv-label">Prerequisites</span><span class="b-kv-label">{{ cert.prerequisites }}</span></div>
+                <div class="b-kv-row"><span class="b-kv-label">Exam format</span><span class="b-kv-label">{{ cert.exam_format }}</span></div>
+            </div>
+            <div style="margin-top:1.2rem;">
+                <a class="b-btn b-btn--ghost b-btn--sm" href="{{ cert.official_url }}" target="_blank" rel="noopener noreferrer">Official exam page</a>
+            </div>
+        </div>
+        <div class="b-card b-span-2 b-reveal b-d1">
+            <h3 style="margin-top:0;">Career value</h3>
+            <p style="color:var(--b-muted);">{{ cert.career_value }}</p>
+            <h3>Recommended for</h3>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                {% for r in cert.roles %}<span class="b-tag">{{ r|replace('-',' ')|title }}</span>{% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" style="padding-top:0;" aria-label="Preparation resources">
+    <div class="b-card b-reveal">
+        <h2 style="margin-top:0;">Prep <span class="b-grad">resources</span></h2>
+        <div class="b-bento" style="grid-template-columns:repeat(2,1fr);">
+            {% for r in cert.prep_resources %}
+            <a class="b-card b-card--lite" href="{{ r.url }}" target="_blank" rel="noopener noreferrer" style="padding:1rem 1.2rem;">
+                <div style="display:flex;justify-content:space-between;gap:.6rem;align-items:baseline;">
+                    <strong style="font-size:.92rem;">{{ r.title }}</strong>
+                    <span class="b-tag" style="{% if r.kind == 'free' %}color:var(--b-ok);border-color:rgba(52,211,153,.4);{% endif %}">{{ r.kind }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="b-section" style="padding-top:0;" aria-label="Study plan generator">
+    <div class="b-card b-reveal">
+        <h2 style="margin-top:0;">Generate a <span class="b-grad">study plan</span></h2>
+        {% if is_authed %}
+        <div class="b-bento" style="grid-template-columns:repeat(2,1fr);">
+            <div class="b-field">
+                <label class="b-label" for="plan-weeks">Weeks to prepare</label>
+                <select class="b-select" id="plan-weeks">
+                    {% for w in [4,6,8,10,12,16] %}
+                    <option value="{{ w }}" {% if w == 8 %}selected{% endif %}>{{ w }} weeks</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="b-field" style="align-self:end;">
+                <button class="b-btn b-btn--primary b-magnet" id="plan-generate" data-cert="{{ cert.id }}">Generate &amp; save plan</button>
+            </div>
+        </div>
+        <span id="plan-status" role="status" style="color:var(--b-muted);"></span>
+        <div id="plan-result" style="margin-top:1.4rem;"></div>
+        {% else %}
+        <p class="b-lede"><a href="{{ url_for('login') }}">Sign in</a> to generate and save a week-by-week study plan for this certification.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/learn_certs.js') }}"></script>
+{% endblock %}
