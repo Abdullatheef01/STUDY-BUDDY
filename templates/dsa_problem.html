@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ problem.title }} | DSA Practice</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <style>
+        .dp-wrap { max-width: 960px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .dp-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 1.8rem; backdrop-filter: blur(12px); margin-bottom: 1.2rem; }
+        .dp-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.7rem 0 1rem; align-items: center; }
+        .dp-chip { font-size: 0.75rem; font-weight: 700; border-radius: 999px; padding: 0.25rem 0.75rem; }
+        .diff-Easy { background: rgba(16,185,129,0.15); color: #10b981; }
+        .diff-Medium { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .diff-Hard { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .dp-topic { font-size: 0.75rem; background: rgba(255,255,255,0.07); border-radius: 999px; padding: 0.25rem 0.75rem; color: var(--text-muted, #94a3b8); }
+        .dp-stmt { font-size: 0.95rem; line-height: 1.75; color: #e2e8f0; white-space: pre-wrap; }
+        .dp-h3 { font-size: 1.05rem; margin: 0 0 0.7rem; color: var(--accent-primary); }
+        .dp-hint { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 0.7rem; font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; }
+        .dp-hint .n { font-weight: 800; color: #f59e0b; margin-right: 0.4rem; }
+        .dp-approach { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 1rem 1.2rem; font-size: 0.9rem; line-height: 1.7; color: #e2e8f0; white-space: pre-wrap; }
+        .dp-pit { margin: 0.5rem 0 0 1.2rem; color: #cbd5e1; font-size: 0.88rem; }
+        .dp-pit li { margin-bottom: 0.35rem; }
+        .dp-code { width: 100%; min-height: 260px; background: #0b1220; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; color: #e2e8f0; padding: 1rem; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88rem; resize: vertical; line-height: 1.6; }
+        .dp-btn { display: inline-block; background: var(--gradient-primary); color: #04120c; font-weight: 700; border: none; border-radius: 12px; padding: 0.75rem 1.4rem; font-size: 0.92rem; cursor: pointer; margin-right: 0.6rem; margin-top: 0.8rem; }
+        .dp-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .dp-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main, #f8fafc); }
+        .dp-btn-warn { background: transparent; border: 1px solid rgba(239,68,68,0.5); color: #f87171; }
+        .dp-msg { font-size: 0.88rem; margin-top: 0.8rem; }
+        .dp-msg.ok { color: #10b981; } .dp-msg.err { color: var(--accent-danger); }
+        .dp-back { display: inline-block; margin-bottom: 1rem; color: var(--accent-primary); font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+        @media (max-width: 700px) { .dp-wrap { padding-top: 5.5rem; } .dp-card { padding: 1.3rem; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/resume" class="logo">Resume<span>AI</span></a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/dsa" class="active">DSA</a></li>
+            <li><a href="/dsa/diagnosis">Diagnosis</a></li>
+        </ul>
+    </nav>
+
+    <div class="dp-wrap">
+        <a class="dp-back" href="{{ url_for('dsa_home') }}">&larr; All problems</a>
+
+        <div class="dp-card">
+            <h1 style="font-size:1.5rem;">{{ problem.title }}</h1>
+            <div class="dp-meta">
+                <span class="dp-chip diff-{{ problem.difficulty }}">{{ problem.difficulty }}</span>
+                {% for t in problem.topics %}<span class="dp-topic">{{ t }}</span>{% endfor %}
+                {% if problem.leetcode_url %}<a href="{{ problem.leetcode_url }}" target="_blank" rel="noopener" style="font-size:0.82rem;color:var(--accent-primary);">LeetCode &nearr;</a>{% endif %}
+            </div>
+            <div class="dp-stmt">{{ problem.statement }}</div>
+        </div>
+
+        <div class="dp-card">
+            <h3 class="dp-h3">Hints <span style="font-size:0.8rem;color:var(--text-muted,#94a3b8);">({{ problem.hints_revealed }}/{{ problem.total_hints }} revealed)</span></h3>
+            <div id="hint-list">
+                {% for h in problem.hints %}
+                <div class="dp-hint"><span class="n">Hint {{ loop.index }}</span>{{ h }}</div>
+                {% endfor %}
+            </div>
+            {% if is_authed %}
+            <button class="dp-btn dp-btn-ghost" id="hint-btn" data-pid="{{ problem.id }}" {% if problem.hints_revealed >= problem.total_hints %}disabled{% endif %}>
+                {% if problem.hints_revealed >= problem.total_hints %}All hints revealed{% else %}Reveal next hint{% endif %}
+            </button>
+            <button class="dp-btn dp-btn-ghost" id="approach-btn" data-pid="{{ problem.id }}">Show approach outline</button>
+            <div id="approach-box"></div>
+            {% else %}
+            <p style="font-size:0.88rem;color:var(--text-muted,#94a3b8);"><a href="{{ url_for('login') }}" style="color:var(--accent-primary);font-weight:700;">Log in</a> to reveal hints progressively.</p>
+            {% endif %}
+        </div>
+
+        {% if problem.complexity %}
+        <div class="dp-card">
+            <h3 class="dp-h3">Complexity</h3>
+            <p style="font-size:0.9rem;color:#cbd5e1;">{{ problem.complexity }}</p>
+        </div>
+        {% endif %}
+
+        {% if problem.pitfalls %}
+        <div class="dp-card">
+            <h3 class="dp-h3">Common pitfalls</h3>
+            <ul class="dp-pit">
+                {% for pit in problem.pitfalls %}<li>{{ pit }}</li>{% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="dp-card">
+            <h3 class="dp-h3">Your solution</h3>
+            {% if is_authed %}
+            <textarea id="dsa-code" class="dp-code" placeholder="// Write your solution in any language...">{{ saved_code }}</textarea>
+            <div>
+                <button class="dp-btn" id="solved-btn" data-pid="{{ problem.id }}">Mark Solved</button>
+                <button class="dp-btn dp-btn-warn" id="stuck-btn" data-pid="{{ problem.id }}">Mark Stuck</button>
+                <button class="dp-btn dp-btn-ghost" id="save-btn" data-pid="{{ problem.id }}">Save Code</button>
+            </div>
+            <div class="dp-msg" id="dsa-msg" role="status"></div>
+            {% if my_status %}<p style="font-size:0.85rem;color:var(--text-muted,#94a3b8);margin-top:0.6rem;">Current status: <strong>{{ my_status }}</strong></p>{% endif %}
+            {% else %}
+            <p style="font-size:0.88rem;color:var(--text-muted,#94a3b8);"><a href="{{ url_for('login') }}" style="color:var(--accent-primary);font-weight:700;">Log in</a> to save your code and track progress.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dsa_problem.js') }}"></script>
+</body>
+</html>

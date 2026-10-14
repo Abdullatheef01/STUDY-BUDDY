@@ -239,6 +239,11 @@ from portfolio import validate_portfolio_payload, unique_slug
 from mock_interview import (interview_options, pick_questions, score_answer,
                             generate_rule_based_feedback, validate_interview_setup)
 from communication_coach import analyze_transcript, validate_coach_inputs
+from dsa_practice import (all_problems, get_problem, topics as dsa_topics,
+                          difficulties as dsa_difficulties,
+                          filter_problems, public_problem, reveal_hint,
+                          reveal_approach, validate_status_payload,
+                          weak_topic_diagnosis, VALID_STATUSES)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -435,6 +440,24 @@ class CommunicationAnalysis(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     user = db.relationship("User", backref=db.backref("communication_analyses", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
+
+
+class DSAProgress(db.Model):
+    """Per-user DSA practice progress (Wave 2 #15). One row per user+problem."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    problem_id = db.Column(db.String(50), nullable=False, index=True)
+    status = db.Column(db.String(20), default="attempted", nullable=False)  # attempted|solved|stuck
+    hints_used = db.Column(db.Integer, default=0, nullable=False)
+    code = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "problem_id", name="uq_dsa_user_problem"),)
+
+    user = db.relationship("User", backref=db.backref("dsa_progress", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
 
 
@@ -2440,6 +2463,132 @@ def register_routes(app):
                                                    user_id=current_user.id).first_or_404()
         return render_template('coach_report.html', report=row.analysis_json,
                                analysis_id=row.id, created_at=row.created_at)
+
+    # ---------- DSA PRACTICE (Wave 2 #15) ----------
+    @app.route('/dsa')
+    def dsa_home():
+        """DSA practice: filter problems by topic/difficulty."""
+        return render_template('dsa.html', topics=dsa_topics(),
+                               difficulties=dsa_difficulties(),
+                               total=len(all_problems()),
+                               is_authed=current_user.is_authenticated)
+
+    @app.route('/api/dsa/problems')
+    def dsa_problem_list():
+        """JSON problem list with optional topic/difficulty filters."""
+        topic = (request.args.get('topic') or '').strip()[:60]
+        difficulty = (request.args.get('difficulty') or '').strip()[:10]
+        problems = filter_problems(topic or None, difficulty or None)
+        out = []
+        if current_user.is_authenticated:
+            progress = {r.problem_id: r.status for r in
+                        DSAProgress.query.filter_by(user_id=current_user.id).all()}
+            for p in problems:
+                p = dict(p)
+                p['my_status'] = progress.get(p['id'])
+                out.append(p)
+        else:
+            out = problems
+        return jsonify({'problems': out, 'count': len(out)})
+
+    @app.route('/dsa/diagnosis')
+    @login_required
+    def dsa_diagnosis():
+        """Weak-topic diagnosis dashboard (owner only)."""
+        rows = DSAProgress.query.filter_by(user_id=current_user.id).all()
+        progress = [{"problem_id": r.problem_id, "status": r.status,
+                     "hints_used": r.hints_used} for r in rows]
+        report = weak_topic_diagnosis(progress)
+        return render_template('dsa_diagnosis.html', report=report)
+
+    @app.route('/dsa/<problem_id>')
+    def dsa_problem_page(problem_id):
+        """Problem workspace: statement, progressive hints, code area."""
+        problem_id = (problem_id or '').strip()[:50]
+        p = get_problem(problem_id)
+        if not p:
+            abort(404)
+        hints_revealed = 0
+        my_status = None
+        saved_code = ""
+        if current_user.is_authenticated:
+            row = DSAProgress.query.filter_by(user_id=current_user.id,
+                                              problem_id=problem_id).first()
+            if row:
+                hints_revealed = row.hints_used
+                my_status = row.status
+                saved_code = row.code or ""
+        payload = public_problem(problem_id, hints_revealed)
+        return render_template('dsa_problem.html', problem=payload,
+                               my_status=my_status, saved_code=saved_code,
+                               is_authed=current_user.is_authenticated)
+
+    def _dsa_progress_row(problem_id):
+        row = DSAProgress.query.filter_by(user_id=current_user.id,
+                                          problem_id=problem_id).first()
+        if not row:
+            row = DSAProgress(user_id=current_user.id, problem_id=problem_id)
+            db.session.add(row)
+        return row
+
+    @app.route('/dsa/<problem_id>/hint', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def dsa_hint(problem_id):
+        """Reveal the next progressive hint. Login required; persisted."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to use hints.'}), 401
+        problem_id = (problem_id or '').strip()[:50]
+        if not get_problem(problem_id):
+            return jsonify({'error': 'Unknown problem.'}), 404
+        try:
+            row = _dsa_progress_row(problem_id)
+            hint, new_count = reveal_hint(problem_id, row.hints_used or 0)
+            row.hints_used = new_count
+            if row.status == 'attempted':
+                pass
+            db.session.commit()
+        except Exception:
+            log.exception("DSA hint persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not reveal hint. Please try again.'}), 500
+        return jsonify({'success': True, 'hint': hint, 'hints_used': new_count,
+                        'exhausted': hint is None})
+
+    @app.route('/dsa/<problem_id>/approach', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def dsa_approach(problem_id):
+        """Reveal the approach outline — only on explicit request."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to view the approach.'}), 401
+        problem_id = (problem_id or '').strip()[:50]
+        approach = reveal_approach(problem_id)
+        if approach is None:
+            return jsonify({'error': 'Unknown problem.'}), 404
+        return jsonify({'success': True, 'approach': approach})
+
+    @app.route('/dsa/<problem_id>/status', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def dsa_status(problem_id):
+        """Save code + mark solved/stuck/attempted. Login required."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to save progress.'}), 401
+        problem_id = (problem_id or '').strip()[:50]
+        if not get_problem(problem_id):
+            return jsonify({'error': 'Unknown problem.'}), 404
+        payload = request.get_json(silent=True) or {}
+        data, error = validate_status_payload(payload)
+        if error:
+            return jsonify({'error': error}), 400
+        try:
+            row = _dsa_progress_row(problem_id)
+            row.status = data['status']
+            row.code = data['code']
+            db.session.commit()
+        except Exception:
+            log.exception("DSA status persistence failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save progress. Please try again.'}), 500
+        return jsonify({'success': True, 'status': row.status})
 
     @app.route('/results/<analysis_id>')
     def view_result(analysis_id):

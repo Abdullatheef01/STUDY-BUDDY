@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="resume">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weak-Topic Diagnosis | DSA Practice</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310b981'/><path d='M30 52l12 12 28-30' stroke='white' stroke-width='10' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <style>
+        .dg-wrap { max-width: 960px; margin: 0 auto; padding: 6.5rem 1.2rem 4rem; }
+        .dg-card { background: var(--bg-card); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 1.8rem; backdrop-filter: blur(12px); margin-bottom: 1.2rem; }
+        .dg-h3 { font-size: 1.1rem; margin: 0 0 1rem; color: var(--accent-primary); }
+        .dg-overall { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .dg-stat { text-align: center; }
+        .dg-stat .v { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); }
+        .dg-stat .l { font-size: 0.78rem; color: var(--text-muted, #94a3b8); }
+        .dg-row { display: grid; grid-template-columns: 1fr 2fr 130px; gap: 0.8rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.88rem; }
+        .dg-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; position: relative; }
+        .dg-bar .solved { height: 100%; background: #10b981; border-radius: 999px; }
+        .dg-bar .stuck { height: 100%; background: #ef4444; border-radius: 999px; position: absolute; top: 0; }
+        .dg-rec { display: block; padding: 0.9rem 1.1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 0.6rem; text-decoration: none; color: inherit; }
+        .dg-rec:hover { border-color: rgba(16,185,129,0.4); }
+        .dg-rec .t { font-weight: 600; font-size: 0.93rem; }
+        .dg-rec .r { font-size: 0.82rem; color: var(--text-muted, #94a3b8); margin-top: 0.25rem; }
+        .dg-empty { text-align: center; color: var(--text-muted, #94a3b8); padding: 2rem; }
+        .dg-empty a { color: var(--accent-primary); font-weight: 700; }
+        .diff-Easy { background: rgba(16,185,129,0.15); color: #10b981; }
+        .diff-Medium { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .diff-Hard { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .dg-chip { font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 0.2rem 0.6rem; }
+        @media (max-width: 700px) { .dg-wrap { padding-top: 5.5rem; } .dg-card { padding: 1.3rem; } .dg-row { grid-template-columns: 1fr; gap: 0.3rem; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="career-grid" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar">
+        <a href="/resume" class="logo">Resume<span>AI</span></a>
+        <ul class="nav-links">
+            <li><a href="/">Hub</a></li>
+            <li><a href="/resume">Home</a></li>
+            <li><a href="/dsa">DSA</a></li>
+            <li><a href="/dsa/diagnosis" class="active">Diagnosis</a></li>
+        </ul>
+    </nav>
+
+    <div class="dg-wrap">
+        <div class="dg-card">
+            <h1 style="font-size:1.6rem;margin-bottom:0.4rem;">Weak-Topic <span style="background:var(--gradient-primary);-webkit-background-clip:text;background-clip:text;color:transparent;">Diagnosis</span></h1>
+            <p style="color:var(--text-muted,#94a3b8);font-size:0.9rem;">Based on the problems you've attempted, solved, and marked stuck.</p>
+        </div>
+
+        {% if report.overall.attempted == 0 %}
+        <div class="dg-card dg-empty">
+            <p>No practice data yet. <a href="{{ url_for('dsa_home') }}">Solve your first problem</a> and your diagnosis will appear here.</p>
+        </div>
+        {% else %}
+        <div class="dg-card">
+            <h3 class="dg-h3">Overall</h3>
+            <div class="dg-overall">
+                <div class="dg-stat"><div class="v">{{ report.overall.attempted }}</div><div class="l">Attempted</div></div>
+                <div class="dg-stat"><div class="v">{{ report.overall.solved }}</div><div class="l">Solved</div></div>
+                <div class="dg-stat"><div class="v">{{ report.overall.stuck }}</div><div class="l">Stuck</div></div>
+                <div class="dg-stat"><div class="v">{{ report.overall.solve_rate }}%</div><div class="l">Solve rate</div></div>
+            </div>
+        </div>
+
+        <div class="dg-card">
+            <h3 class="dg-h3">Per-topic performance</h3>
+            {% for t in report.topics %}
+            <div class="dg-row">
+                <div><strong>{{ t.topic }}</strong> <span style="color:var(--text-muted,#94a3b8);font-size:0.78rem;">({{ t.attempted }})</span></div>
+                <div class="dg-bar" title="Solved {{ t.solved }}, stuck {{ t.stuck }}">
+                    <div class="solved" style="width:{{ t.solve_rate }}%"></div>
+                    <div class="stuck" style="left:{{ t.solve_rate }}%;width:{{ t.stuck_rate }}%"></div>
+                </div>
+                <div style="font-size:0.78rem;color:var(--text-muted,#94a3b8);">{{ t.solve_rate }}% solved &middot; {{ t.stuck }} stuck</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if report.recommendations %}
+        <div class="dg-card">
+            <h3 class="dg-h3">Recommended next</h3>
+            {% for rec in report.recommendations %}
+            <a class="dg-rec" href="{{ url_for('dsa_problem_page', problem_id=rec.problem_id) }}">
+                <div class="t">{{ rec.title }} <span class="dg-chip diff-{{ rec.difficulty }}">{{ rec.difficulty }}</span></div>
+                <div class="r">{{ rec.reason }}</div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
