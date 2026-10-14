@@ -273,6 +273,9 @@ from pdf_qa import (validate_upload as pdfqa_validate_upload,
                     chunk_pages as pdfqa_chunk_pages,
                     retrieve as pdfqa_retrieve,
                     answer_question as pdfqa_answer)
+from arxiv_import import (validate_arxiv_id, validate_doi,
+                          fetch_arxiv, fetch_doi, normalize_metadata,
+                          fetch_citation_graph, download_pdf as arxiv_download_pdf)
 from recommendation.job_recommender import get_recommendations
 from recommendation.skill_gap_analysis import analyze_skill_gaps
 from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
@@ -615,6 +618,28 @@ class StudyQuestion(db.Model):
                                                       cascade="all, delete-orphan"))
     doc = db.relationship("StudyDoc", backref=db.backref("questions", lazy="dynamic",
                                                           cascade="all, delete-orphan"))
+
+
+class PaperImport(db.Model):
+    """An arXiv/DOI-imported paper (Wave 4 #25) with provenance."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    title = db.Column(db.String(512), nullable=False)
+    authors = db.Column(db.JSON)  # ["First Last", ...]
+    abstract = db.Column(db.Text)
+    year = db.Column(db.Integer)
+    venue = db.Column(db.String(255))
+    doi = db.Column(db.String(255))
+    arxiv_id = db.Column(db.String(64), index=True)
+    pdf_url = db.Column(db.String(512))
+    openalex_id = db.Column(db.String(64))
+    source = db.Column(db.String(20))  # arxiv | openalex
+    fetched_at = db.Column(db.String(32))  # UTC ISO provenance timestamp
+    data = db.Column(db.JSON)  # {"graph": {...}} cached citation graph
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User", backref=db.backref("paper_imports", lazy="dynamic",
+                                                      cascade="all, delete-orphan"))
 
 
 class ResearchSession(db.Model):
@@ -3942,6 +3967,149 @@ def register_routes(app):
             db.session.rollback()
             return jsonify({'error': 'Could not delete this document.'}), 500
         return jsonify({'success': True})
+
+    # Feature #25: arXiv/DOI import + citation graph
+    @app.route('/research/import')
+    @login_required
+    def study_import_page():
+        """Paper import page (arXiv / DOI)."""
+        papers = PaperImport.query.filter_by(user_id=current_user.id).order_by(
+            PaperImport.created_at.desc()).limit(50).all()
+        return render_template('study_import.html', papers=[{
+            'id': p.id, 'title': p.title, 'authors': p.authors or [],
+            'year': p.year, 'venue': p.venue, 'doi': p.doi,
+            'arxiv_id': p.arxiv_id, 'openalex_id': p.openalex_id,
+            'source': p.source} for p in papers])
+
+    def _store_paper_import(meta):
+        paper = PaperImport(
+            user_id=current_user.id, title=(meta.get('title') or 'Untitled')[:512],
+            authors=meta.get('authors') or [], abstract=meta.get('abstract'),
+            year=meta.get('year'), venue=meta.get('venue'), doi=meta.get('doi'),
+            arxiv_id=meta.get('arxiv_id'), pdf_url=meta.get('pdf_url'),
+            openalex_id=meta.get('openalex_id'), source=meta.get('source'),
+            fetched_at=meta.get('fetched_at'))
+        db.session.add(paper)
+        db.session.commit()
+        return paper
+
+    @app.route('/api/study/import/arxiv', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def study_import_arxiv():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Import a paper by arXiv ID. JSON body: {"arxiv_id": "..."}."""
+        payload = request.get_json(silent=True) or {}
+        arxiv_id = validate_arxiv_id(payload.get('arxiv_id') or '')
+        if not arxiv_id:
+            return jsonify({'error': 'Invalid arXiv ID. Use formats like 1706.03762.'}), 400
+        meta = normalize_metadata(fetch_arxiv(arxiv_id))
+        if meta.get('error'):
+            return jsonify({'error': meta['error']}), 502
+        try:
+            paper = _store_paper_import(meta)
+        except Exception:
+            log.exception("arXiv import store failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save this paper.'}), 500
+        meta['import_id'] = paper.id
+        return jsonify(json_safe(meta))
+
+    @app.route('/api/study/import/doi', methods=['POST'])
+    @limiter.limit("30 per hour")
+    def study_import_doi():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Import a paper by DOI. JSON body: {"doi": "..."}."""
+        payload = request.get_json(silent=True) or {}
+        doi = validate_doi(payload.get('doi') or '')
+        if not doi:
+            return jsonify({'error': 'Invalid DOI. Use formats like 10.1038/nature12373.'}), 400
+        meta = normalize_metadata(fetch_doi(doi))
+        if meta.get('error'):
+            return jsonify({'error': meta['error']}), 502
+        try:
+            paper = _store_paper_import(meta)
+        except Exception:
+            log.exception("DOI import store failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save this paper.'}), 500
+        meta['import_id'] = paper.id
+        return jsonify(json_safe(meta))
+
+    @app.route('/api/study/import/<path:openalex_id>/graph')
+    @limiter.limit("30 per hour")
+    def study_import_graph(openalex_id):
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Citation graph around an imported paper (cached 24h)."""
+        from urllib.parse import unquote
+        graph = fetch_citation_graph(unquote(openalex_id), max_nodes=25)
+        if graph.get('error'):
+            return jsonify({'error': graph['error']}), 502
+        return jsonify(json_safe(graph))
+
+    @app.route('/api/study/import/pdf', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def study_import_pdf():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Fetch an imported paper's PDF into the study library (#25 -> #21).
+
+        JSON body: {"pdf_url": ..., "title": ..., "arxiv_id"/"doi": ...}.
+        """
+        payload = request.get_json(silent=True) or {}
+        pdf_url = (payload.get('pdf_url') or '').strip()
+        if not pdf_url.lower().startswith(('http://', 'https://')):
+            return jsonify({'error': 'Invalid PDF URL.'}), 400
+        arxiv_id = (payload.get('arxiv_id') or '').strip()
+        doi = (payload.get('doi') or '').strip()
+        filename = "{}.pdf".format(uuid.uuid4().hex)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        try:
+            downloaded = arxiv_download_pdf(pdf_url, filepath)
+            if not downloaded and arxiv_id:
+                # OpenAlex sometimes points at mirrors that block direct
+                # download; arXiv's own PDF URL is deterministic — try it.
+                downloaded = arxiv_download_pdf(
+                    "https://arxiv.org/pdf/{}".format(arxiv_id), filepath)
+            if not downloaded:
+                return jsonify({'error': 'Could not download the PDF.'}), 502
+            pages = pdfqa_parse_pages(filepath)
+            if not any((p or '').strip() for p in pages):
+                raise ValueError("no-text")
+            chunks = pdfqa_chunk_pages(pages)
+            doc = StudyDoc(
+                user_id=current_user.id,
+                title=(payload.get('title') or 'Imported paper').strip()[:255],
+                stored_filename=filename,
+                source='arxiv' if arxiv_id else 'doi',
+                source_ref=arxiv_id or doi,
+                num_pages=len(pages), num_chunks=len(chunks),
+                char_count=sum(len(c.get('text', '')) for c in chunks),
+                data={'chunks': [dict(c) for c in chunks],
+                      'truncated': bool(getattr(chunks, 'truncated', False))})
+            db.session.add(doc)
+            db.session.commit()
+        except ValueError as e:
+            if str(e) == "no-text":
+                try:
+                    os.remove(filepath)
+                except OSError:
+                    pass
+                return jsonify({'error': 'No extractable text found in this PDF.'}), 400
+            raise
+        except Exception:
+            log.exception("Study import-PDF failed")
+            db.session.rollback()
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
+            return jsonify({'error': 'Could not import this PDF into your library.'}), 500
+        return jsonify({'success': True, 'doc': {
+            'id': doc.id, 'title': doc.title, 'pages': doc.num_pages,
+            'chunks': doc.num_chunks}})
 
     # ---------- API ENDPOINTS (Shared) ----------
     @app.route('/api/interview-questions/<company>')
