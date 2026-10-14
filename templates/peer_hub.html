@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'practice' %}
+{% block title %}Peer mock interviews | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Peer practice</span>
+            <h1>Interview <span class="b-grad">each other</span>, get sharper together.</h1>
+            <p class="b-lede">Create a room, share the link with a peer, and take turns interviewing. The platform draws questions from the shared 339-question interview bank, runs per-question timers, and structures reciprocal rubric feedback — finishing a session earns <strong>+40 XP</strong> for both of you.</p>
+        </div>
+    </div>
+</section>
+
+{# ---------- Create a room ---------- #}
+<section class="b-section" aria-label="Create a peer room">
+    <div class="b-sec-head"><h2>Start a <span class="b-grad">room</span></h2><p>Pick a role and category — you'll get a shareable link for your peer.</p></div>
+    <div class="b-card b-card--form b-reveal">
+        <form id="peer-create" onsubmit="return false;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+                <div>
+                    <label for="peer-role" class="b-label">Role</label>
+                    <select id="peer-role" class="b-input" style="width:100%;">
+                        {% for r in roles %}
+                        <option value="{{ r }}">{{ r|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="peer-category" class="b-label">Category</label>
+                    <select id="peer-category" class="b-input" style="width:100%;">
+                        {% for c in categories %}
+                        <option value="{{ c }}">{{ c|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="peer-when" class="b-label">Optional start time</label>
+                    <input id="peer-when" type="datetime-local" class="b-input" style="width:100%;">
+                </div>
+            </div>
+            <div style="margin-top:1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+                <input id="peer-invite-only" type="checkbox" style="width:1.05rem;height:1.05rem;">
+                <label for="peer-invite-only" style="font-size:.92rem;">Invite-only <span style="color:var(--b-muted);">(hidden from the open board — only people with the link can join)</span></label>
+            </div>
+            <div class="b-cta-row" style="margin-top:1.2rem;">
+                <button class="b-btn b-btn--primary" id="peer-create-btn" type="submit">Create room &amp; get link</button>
+                <span class="b-pill" id="peer-create-status" style="display:none;"></span>
+            </div>
+            <p class="b-form-error" id="peer-create-error" style="display:none;" role="alert"></p>
+        </form>
+    </div>
+</section>
+
+{# ---------- Open rooms board ---------- #}
+<section class="b-section" aria-label="Open rooms">
+    <div class="b-sec-head"><h2>Open <span class="b-grad">rooms</span></h2><p>Peers looking for a practice partner right now. Invite-only rooms never appear here.</p></div>
+    {% if open_rooms %}
+    <div class="b-bento">
+        {% for room in open_rooms %}
+        <article class="b-card b-card--feature b-reveal">
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem;">
+                <span class="b-tag">{{ room.role|capitalize }}</span>
+                <span class="b-tag">{{ room.category|capitalize }}</span>
+                {% if room.scheduled_at %}<span class="b-tag">{{ room.scheduled_at.strftime('%b %d, %H:%M') }}</span>{% endif %}
+            </div>
+            <h3 style="margin:.2rem 0;">{{ room.host.name }}'s room</h3>
+            <p style="color:var(--b-muted);font-size:.88rem;margin:.3rem 0 0;">
+                {{ (room.question_ids or [])|length }} questions drawn · created {{ room.created_at.strftime('%b %d, %H:%M') }}
+            </p>
+            <div class="b-cta-row" style="margin-top:1rem;">
+                <a class="b-btn b-btn--primary b-btn--sm" href="{{ url_for('peer_room', token=room.token) }}">View &amp; join</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">No open rooms right now — create one above and share your link.</p></div>
+    {% endif %}
+</section>
+
+{# ---------- My rooms ---------- #}
+<section class="b-section" aria-label="My rooms">
+    <div class="b-sec-head"><h2>My <span class="b-grad">rooms</span></h2><p>Rooms you host or joined.</p></div>
+    {% if my_rooms %}
+    <div class="b-bento">
+        {% for room in my_rooms %}
+        <article class="b-card b-card--feature b-reveal">
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem;">
+                <span class="b-tag">{{ room.role|capitalize }}</span>
+                <span class="b-tag">{{ room.category|capitalize }}</span>
+                <span class="b-tag" data-peer-status="{{ room.status }}">{{ room.status|replace('_',' ')|capitalize }}</span>
+                {% if room.invite_only %}<span class="b-tag">Invite-only</span>{% endif %}
+            </div>
+            <h3 style="margin:.2rem 0;">{% if room.host_id == current_user.id %}Your room{% else %}{{ room.host.name }}'s room{% endif %}</h3>
+            <p style="color:var(--b-muted);font-size:.88rem;margin:.3rem 0 0;">
+                Round {{ room.round_no + 1 }} · {{ room.created_at.strftime('%b %d, %H:%M') }}
+                {% if room.guest %}· with {{ room.guest.name }}{% endif %}
+            </p>
+            <div class="b-cta-row" style="margin-top:1rem;">
+                <a class="b-btn b-btn--sm" href="{{ url_for('peer_room', token=room.token) }}">Open room</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">You haven't created or joined any rooms yet.</p></div>
+    {% endif %}
+</section>
+
+<script>
+(function () {
+    'use strict';
+    function csrfHeaders(extra) {
+        var headers = extra || {};
+        var m = document.querySelector('meta[name="csrf-token"]');
+        if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+        return headers;
+    }
+    function showErr(msg) {
+        var el = document.getElementById('peer-create-error');
+        el.textContent = msg; el.style.display = 'block';
+    }
+    function showStatus(msg) {
+        var el = document.getElementById('peer-create-status');
+        el.textContent = msg; el.style.display = 'inline-block';
+    }
+    var btn = document.getElementById('peer-create-btn');
+    btn.addEventListener('click', function () {
+        document.getElementById('peer-create-error').style.display = 'none';
+        var when = document.getElementById('peer-when').value;
+        var body = {
+            role: document.getElementById('peer-role').value,
+            category: document.getElementById('peer-category').value,
+            invite_only: document.getElementById('peer-invite-only').checked
+        };
+        if (when) body.scheduled_at = when.replace('T', ' ').slice(0, 16);
+        btn.disabled = true;
+        showStatus('Creating…');
+        fetch('/peer/api/rooms', {
+            method: 'POST',
+            headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(body)
+        }).then(function (r) {
+            return r.json().catch(function () { return { error: 'Bad response' }; });
+        }).then(function (data) {
+            if (data.error) {
+                btn.disabled = false; showStatus('');
+                document.getElementById('peer-create-status').style.display = 'none';
+                showErr(data.error); return;
+            }
+            window.location.href = data.url;
+        }).catch(function () {
+            btn.disabled = false; showStatus('');
+            document.getElementById('peer-create-status').style.display = 'none';
+            showErr('Network error — please try again.');
+        });
+    });
+})();
+</script>
+{% endblock %}

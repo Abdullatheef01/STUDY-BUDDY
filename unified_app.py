@@ -837,6 +837,117 @@ class Portfolio(db.Model):
                                                       cascade="all, delete-orphan"))
 
 
+class PeerRoom(db.Model):
+    """A peer mock-interview room (Wave 5 #28).
+
+    Two students take turns interviewing each other. The host creates the
+    room (role + category + optional scheduling), a peer joins via the
+    12-char share token, and the platform structures question cards,
+    timing, role swaps and reciprocal rubric feedback. question_ids holds
+    the current round's interview-bank question ids (in display order);
+    drawn_ids accumulates every id drawn so role swaps draw fresh cards.
+    """
+    __tablename__ = "peer_room"
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(12), unique=True, nullable=False, index=True)
+    host_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                       index=True)
+    role = db.Column(db.String(30), nullable=False, default="general")
+    category = db.Column(db.String(30), nullable=False, default="behavioral")
+    status = db.Column(db.String(20), nullable=False, default="open", index=True)
+    scheduled_at = db.Column(db.DateTime, nullable=True)
+    guest_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True,
+                        index=True)
+    invite_only = db.Column(db.Boolean, nullable=False, default=False)
+    interviewer_id = db.Column(db.Integer, db.ForeignKey("user.id"),
+                              nullable=True)
+    question_ids = db.Column(db.JSON)
+    drawn_ids = db.Column(db.JSON)
+    round_no = db.Column(db.Integer, nullable=False, default=0)
+    proposed_slots = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    host = db.relationship("User", foreign_keys=[host_id])
+    guest = db.relationship("User", foreign_keys=[guest_id])
+    interviewer = db.relationship("User", foreign_keys=[interviewer_id])
+
+
+class PeerAnswer(db.Model):
+    """A typed text answer by the current interviewee in a peer room."""
+    __tablename__ = "peer_answer"
+
+    __table_args__ = (db.UniqueConstraint("room_id", "user_id", "question_id",
+                                         name="uq_peer_answer"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey("peer_room.id"),
+                       nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                       index=True)
+    question_id = db.Column(db.String(20), nullable=False)
+    question_text = db.Column(db.Text)
+    answer_text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    room = db.relationship("PeerRoom", backref=db.backref(
+        "answers", lazy="dynamic", cascade="all, delete-orphan"))
+
+
+class PeerFeedback(db.Model):
+    """Reciprocal rubric feedback: each participant reviews the other.
+
+    Five 1-5 rubric dimensions plus free-text comments. One row per
+    (room, reviewer, reviewee) — resubmission updates the existing row.
+    """
+    __tablename__ = "peer_feedback"
+
+    __table_args__ = (db.UniqueConstraint("room_id", "reviewer_id", "reviewee_id",
+                                         name="uq_peer_feedback_pair"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey("peer_room.id"),
+                       nullable=False, index=True)
+    reviewer_id = db.Column(db.Integer, db.ForeignKey("user.id"),
+                           nullable=False, index=True)
+    reviewee_id = db.Column(db.Integer, db.ForeignKey("user.id"),
+                           nullable=False, index=True)
+    clarity = db.Column(db.Integer, nullable=False)
+    structure = db.Column(db.Integer, nullable=False)
+    depth = db.Column(db.Integer, nullable=False)
+    relevance = db.Column(db.Integer, nullable=False)
+    confidence = db.Column(db.Integer, nullable=False)
+    comments = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+    room = db.relationship("PeerRoom", backref=db.backref(
+        "feedbacks", lazy="dynamic", cascade="all, delete-orphan"))
+
+
+class PeerBlock(db.Model):
+    """Safety: a user reporting + blocking another user.
+
+    Blocked users can neither join each other's rooms nor see each other's
+    rooms on the open board (both directions).
+    """
+    __tablename__ = "peer_block"
+
+    __table_args__ = (db.UniqueConstraint("blocker_id", "blocked_id",
+                                         name="uq_peer_block"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    blocker_id = db.Column(db.Integer, db.ForeignKey("user.id"),
+                          nullable=False, index=True)
+    blocked_id = db.Column(db.Integer, db.ForeignKey("user.id"),
+                          nullable=False, index=True)
+    reason = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           nullable=False)
+
+
 class AnonymousAnalysis(db.Model):
     """A resume analysis for an anonymous visitor.
 
@@ -1055,6 +1166,7 @@ def json_safe(obj):
     return json.loads(json.dumps(obj, default=str))
 
 
+# ========================================================
 # --- Wave 5 #29: rejection retrospectives (pure helpers) ---
 # ========================================================
 # Pure functions over lists of JobApplication/Retrospective rows — no Flask
@@ -1343,6 +1455,168 @@ def _momentum_hook(user_id, event_type):
     except Exception:
         log.exception("Momentum hook failed for event %s (non-fatal)",
                       event_type)
+
+
+# ---------------------------------------------------------------------------
+# Peer mock interviews (Wave 5 #28): shared constants and helpers
+# ---------------------------------------------------------------------------
+
+#: Roles a peer room can target. 'data' covers data_analyst + data_scientist
+#: in the interview question bank; 'general' draws category-only.
+PEER_ROLES = ("frontend", "backend", "data", "general")
+
+#: Room categories. The interview bank has no literal 'technical' category,
+#: so it maps onto the bank's technical categories (dsa/system_design/puzzles).
+PEER_CATEGORIES = ("behavioral", "technical")
+PEER_CATEGORY_MAP = {
+    "behavioral": ("behavioral", "hr"),
+    "technical": ("dsa", "system_design", "puzzles"),
+}
+PEER_ROLE_MAP = {
+    "frontend": ("frontend",),
+    "backend": ("backend",),
+    "data": ("data_analyst", "data_scientist"),
+    "general": (),
+}
+
+PEER_STATUSES = ("open", "waiting", "in_progress", "done", "cancelled")
+N_PEER_QUESTIONS = 6
+PEER_ANSWER_MAX_CHARS = 10000
+PEER_COMMENT_MAX_CHARS = 5000
+PEER_RUBRIC_DIMS = ("clarity", "structure", "depth", "relevance",
+                    "confidence")
+
+
+def _peer_bank():
+    """The shared 339-question interview bank (mock_interview.py)."""
+    from mock_interview import _load_bank
+    return _load_bank()
+
+
+def _peer_questions(role, category, n=N_PEER_QUESTIONS, exclude=None):
+    """Draw n bank questions for a peer room.
+
+    Filters by role + mapped category with graceful fallbacks
+    (role+category -> category-only). Never raises: returns [] when the
+    bank cannot satisfy the request.
+    """
+    try:
+        bank = _peer_bank() or []
+    except Exception:
+        log.exception("Peer question draw failed: bank unreadable")
+        return []
+    cats = PEER_CATEGORY_MAP.get(category) or PEER_CATEGORY_MAP["behavioral"]
+    roles = PEER_ROLE_MAP.get(role, ())
+    excluded = set(exclude or [])
+
+    def _pool(with_role):
+        return [q for q in bank
+                if q.get("category") in cats
+                and q.get("id") not in excluded
+                and (not with_role or not roles
+                     or any(r in (q.get("roles") or []) for r in roles))]
+
+    pool = _pool(with_role=True)
+    if not pool:
+        pool = _pool(with_role=False)
+    rng = random.Random()
+    rng.shuffle(pool)
+    return pool[:max(0, n)]
+
+
+def _peer_token():
+    """Mint a unique 12-char room token (never raises)."""
+    for _ in range(25):
+        token = secrets.token_hex(6)
+        try:
+            if not PeerRoom.query.filter_by(token=token).first():
+                return token
+        except Exception:
+            log.exception("Peer token uniqueness check failed")
+            break
+    return secrets.token_hex(6) + uuid.uuid4().hex[:4]
+
+
+def _peer_room_or_none(token):
+    """Fetch a room by token; None for missing/blank tokens (never raises)."""
+    token = (token or "").strip()
+    if not token:
+        return None
+    try:
+        return PeerRoom.query.filter_by(token=token).first()
+    except Exception:
+        log.exception("Peer room lookup failed")
+        return None
+
+
+def _peer_is_participant(room, user_id):
+    return (room is not None and user_id is not None
+            and (user_id == room.host_id or user_id == room.guest_id))
+
+
+def _peer_partner_id(room, user_id):
+    """The other participant's id, or None when there is no partner yet."""
+    if room is None or user_id is None:
+        return None
+    if user_id == room.host_id:
+        return room.guest_id
+    if user_id == room.guest_id:
+        return room.host_id
+    return None
+
+
+def _peer_blocked(a_id, b_id):
+    """True when either user has blocked the other (never raises)."""
+    if not a_id or not b_id or a_id == b_id:
+        return False
+    try:
+        return (db.session.query(PeerBlock.id).filter(
+            ((PeerBlock.blocker_id == a_id) & (PeerBlock.blocked_id == b_id))
+            | ((PeerBlock.blocker_id == b_id) & (PeerBlock.blocked_id == a_id))
+        ).first() is not None)
+    except Exception:
+        log.exception("Peer block check failed")
+        return True  # fail closed: treat as blocked on DB errors
+
+
+def _peer_blocked_ids(user_id):
+    """Ids of users blocked by / blocking this user (never raises)."""
+    ids = set()
+    if not user_id:
+        return ids
+    try:
+        rows = PeerBlock.query.filter(
+            (PeerBlock.blocker_id == user_id)
+            | (PeerBlock.blocked_id == user_id)).all()
+        for r in rows:
+            ids.add(r.blocker_id)
+            ids.add(r.blocked_id)
+    except Exception:
+        log.exception("Peer blocked-ids lookup failed")
+    ids.discard(user_id)
+    return ids
+
+
+def _peer_parse_slot(value):
+    """Parse a slot string ('YYYY-MM-DD HH:MM' or ISO '...T...'); None if bad."""
+    value = (value or "").strip()
+    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S"):
+        try:
+            return datetime.strptime(value, fmt)
+        except (ValueError, TypeError):
+            continue
+    return None
+
+
+def _peer_question_by_id(question_id):
+    """Bank entry for a question id, or None (never raises)."""
+    try:
+        for q in (_peer_bank() or []):
+            if q.get("id") == question_id:
+                return q
+    except Exception:
+        log.exception("Peer bank lookup failed")
+    return None
 
 
 def get_db_url():
@@ -5541,6 +5815,544 @@ def register_routes(app):
             log.exception("Experiment list failed")
             items = []
         return jsonify({'success': True, 'experiments': items})
+
+    # ---------- PEER MOCK INTERVIEWS (Wave 5 #28) ----------
+    # Structured practice: share-token rooms, question cards from the shared
+    # 339-question interview bank, per-question timers, typed answers, role
+    # swaps, lightweight scheduling, reciprocal rubric feedback, XP on finish,
+    # and report/block safety. All POSTs rate-limited; CSRF via the
+    # X-CSRFToken header (not exempt).
+
+    def _peer_api_error(message, code):
+        return jsonify({'error': message}), code
+
+    @app.route('/peer')
+    @login_required
+    def peer_hub():
+        """Hub: create-room form, open-rooms board, and my rooms."""
+        me = current_user.id
+        blocked_ids = _peer_blocked_ids(me)
+        try:
+            open_q = (PeerRoom.query
+                      .filter(PeerRoom.status == 'open',
+                              PeerRoom.invite_only.is_(False),
+                              PeerRoom.host_id != me)
+                      .order_by(PeerRoom.created_at.desc())
+                      .limit(60))
+            open_rooms = [r for r in open_q.all()
+                          if r.host_id not in blocked_ids]
+            my_rooms = (PeerRoom.query
+                        .filter((PeerRoom.host_id == me)
+                                | (PeerRoom.guest_id == me))
+                        .order_by(PeerRoom.created_at.desc())
+                        .limit(40).all())
+        except Exception:
+            log.exception("Peer hub query failed")
+            open_rooms, my_rooms = [], []
+        return render_template('peer_hub.html', open_rooms=open_rooms,
+                               my_rooms=my_rooms, roles=PEER_ROLES,
+                               categories=PEER_CATEGORIES,
+                               nav_active='practice')
+
+    @app.route('/peer/api/rooms', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def peer_create_room():
+        """Create a room: JSON {role, category, invite_only?, scheduled_at?}.
+
+        Returns the share token + room URL. Draws the first question round
+        from the shared interview bank immediately.
+        """
+        payload = request.get_json(silent=True) or {}
+        role = (payload.get('role') or 'general').strip().lower()
+        category = (payload.get('category') or 'behavioral').strip().lower()
+        if role not in PEER_ROLES:
+            return _peer_api_error('Unknown role. Pick one of: %s.'
+                                   % ', '.join(PEER_ROLES), 400)
+        if category not in PEER_CATEGORIES:
+            return _peer_api_error('Unknown category. Pick one of: %s.'
+                                   % ', '.join(PEER_CATEGORIES), 400)
+        invite_only = bool(payload.get('invite_only'))
+        scheduled_at = None
+        if payload.get('scheduled_at'):
+            scheduled_at = _peer_parse_slot(payload.get('scheduled_at'))
+            if scheduled_at is None:
+                return _peer_api_error(
+                    'scheduled_at must look like "YYYY-MM-DD HH:MM".', 400)
+        try:
+            token = _peer_token()
+            questions = _peer_questions(role, category)
+            qids = [q['id'] for q in questions]
+            room = PeerRoom(token=token, host_id=current_user.id, role=role,
+                            category=category, status='open',
+                            scheduled_at=scheduled_at,
+                            invite_only=invite_only,
+                            interviewer_id=current_user.id,
+                            question_ids=qids, drawn_ids=list(qids),
+                            round_no=0)
+            db.session.add(room)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer room creation failed")
+            return _peer_api_error('Could not create the room. '
+                                   'Please try again.', 500)
+        return jsonify({'success': True, 'token': token,
+                        'url': url_for('peer_room', token=token),
+                        'questions': len(qids)})
+
+    @app.route('/peer/room/<token>')
+    @login_required
+    def peer_room(token):
+        """Session room: question cards, timers, answers, swap/finish,
+        scheduling, and (after finish) reciprocal feedback + summary."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            abort(404)
+        me = current_user.id
+        is_participant = _peer_is_participant(room, me)
+        can_join = (not is_participant and room.guest_id is None
+                    and room.status in ('open', 'waiting')
+                    and not _peer_blocked(me, room.host_id))
+        questions = []
+        for qid in (room.question_ids or []):
+            q = _peer_question_by_id(qid)
+            if q:
+                questions.append({
+                    'id': q['id'], 'question': q.get('question'),
+                    'category': q.get('category'),
+                    'difficulty': q.get('difficulty'),
+                    'time_minutes': q.get('time_minutes') or 5,
+                    'key_points': q.get('key_points') or [],
+                })
+        answers = {}
+        if is_participant:
+            try:
+                for a in PeerAnswer.query.filter_by(room_id=room.id).all():
+                    answers.setdefault(a.question_id, {})[a.user_id] = \
+                        a.answer_text
+            except Exception:
+                log.exception("Peer answers lookup failed")
+        feedbacks = []
+        try:
+            for f in (PeerFeedback.query.filter_by(room_id=room.id)
+                      .order_by(PeerFeedback.created_at.asc()).all()):
+                feedbacks.append({
+                    'reviewer_id': f.reviewer_id,
+                    'reviewee_id': f.reviewee_id,
+                    'scores': {d: getattr(f, d) for d in PEER_RUBRIC_DIMS},
+                    'comments': f.comments,
+                })
+        except Exception:
+            log.exception("Peer feedback lookup failed")
+        partner_id = _peer_partner_id(room, me)
+        partner = None
+        if partner_id:
+            try:
+                partner = User.query.get(partner_id)
+            except Exception:
+                partner = None
+        i_am_interviewer = (room.interviewer_id == me)
+        my_feedback_done = any(f['reviewer_id'] == me for f in feedbacks)
+        return render_template('peer_room.html', room=room, questions=questions,
+                               answers=answers, feedbacks=feedbacks,
+                               is_participant=is_participant, can_join=can_join,
+                               partner=partner, partner_id=partner_id,
+                               i_am_interviewer=i_am_interviewer,
+                               my_feedback_done=my_feedback_done,
+                               rubric_dims=PEER_RUBRIC_DIMS,
+                               nav_active='practice')
+
+    @app.route('/peer/api/room/<token>/join', methods=['POST'])
+    @login_required
+    @limiter.limit("30 per hour")
+    def peer_join_room(token):
+        """Guest joins an open room. Hosts can't join their own room;
+        blocked users can't join each other."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        me = current_user.id
+        if me == room.host_id:
+            return _peer_api_error("You can't join your own room — share the "
+                                   'link with a peer instead.', 403)
+        if room.status in ('done', 'cancelled'):
+            return _peer_api_error('This session is already %s.'
+                                   % room.status, 400)
+        if room.guest_id is not None:
+            return _peer_api_error('This room already has a partner.', 400)
+        if room.status == 'in_progress':
+            return _peer_api_error('This session already started.', 400)
+        if _peer_blocked(me, room.host_id):
+            return _peer_api_error('You cannot join this room.', 403)
+        try:
+            room.guest_id = me
+            now_naive = datetime.now(timezone.utc).replace(tzinfo=None)
+            if room.scheduled_at and room.scheduled_at > now_naive:
+                room.status = 'waiting'
+            else:
+                room.status = 'in_progress'
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer join failed")
+            return _peer_api_error('Could not join the room. '
+                                   'Please try again.', 500)
+        return jsonify({'success': True, 'status': room.status,
+                        'scheduled_at': (room.scheduled_at.isoformat()
+                                         if room.scheduled_at else None)})
+
+    @app.route('/peer/api/room/<token>/start', methods=['POST'])
+    @login_required
+    @limiter.limit("30 per hour")
+    def peer_start_room(token):
+        """Move a scheduled ('waiting') room into 'in_progress'."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        if not _peer_is_participant(room, current_user.id):
+            return _peer_api_error('Only room participants can start the '
+                                   'session.', 403)
+        if room.status == 'in_progress':
+            return jsonify({'success': True, 'status': 'in_progress'})
+        if room.status != 'waiting':
+            return _peer_api_error('Only scheduled rooms can be started '
+                                   '(current: %s).' % room.status, 400)
+        if room.guest_id is None:
+            return _peer_api_error('Waiting for a peer to join first.', 400)
+        try:
+            room.status = 'in_progress'
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer start failed")
+            return _peer_api_error('Could not start the session.', 500)
+        return jsonify({'success': True, 'status': 'in_progress'})
+
+    @app.route('/peer/api/room/<token>/answer', methods=['POST'])
+    @login_required
+    @limiter.limit("60 per hour")
+    def peer_save_answer(token):
+        """Save the current interviewee's typed answer to a question card."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        me = current_user.id
+        if not _peer_is_participant(room, me):
+            return _peer_api_error('Only room participants can answer.', 403)
+        if room.status == 'done':
+            return _peer_api_error('This session is finished — answers are '
+                                   'locked.', 400)
+        if room.status == 'cancelled':
+            return _peer_api_error('This session was cancelled.', 400)
+        if room.guest_id is None:
+            return _peer_api_error('Waiting for a peer to join first.', 400)
+        if me == room.interviewer_id:
+            return _peer_api_error('Only the interviewee answers — ask the '
+                                   'questions, or swap roles to answer.', 403)
+        payload = request.get_json(silent=True) or {}
+        qid = (payload.get('question_id') or '').strip()
+        answer_text = (payload.get('answer_text') or '').strip()
+        if qid not in (room.question_ids or []):
+            return _peer_api_error('Unknown question for this round.', 404)
+        if not answer_text:
+            return _peer_api_error('Write your answer first.', 400)
+        if len(answer_text) > PEER_ANSWER_MAX_CHARS:
+            return _peer_api_error('Answer is too long (max %d characters).'
+                                   % PEER_ANSWER_MAX_CHARS, 400)
+        try:
+            q = _peer_question_by_id(qid) or {}
+            existing = (PeerAnswer.query
+                        .filter_by(room_id=room.id, user_id=me,
+                                   question_id=qid).first())
+            if existing:
+                existing.answer_text = answer_text
+            else:
+                db.session.add(PeerAnswer(room_id=room.id, user_id=me,
+                                         question_id=qid,
+                                         question_text=q.get('question'),
+                                         answer_text=answer_text))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer answer save failed")
+            return _peer_api_error('Could not save your answer.', 500)
+        return jsonify({'success': True})
+
+    @app.route('/peer/api/room/<token>/swap', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def peer_swap_roles(token):
+        """Flip interviewer/interviewee and draw a fresh question round."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        me = current_user.id
+        if not _peer_is_participant(room, me):
+            return _peer_api_error('Only room participants can swap roles.',
+                                   403)
+        if room.status != 'in_progress':
+            return _peer_api_error('Role swaps are only available while the '
+                                   'session is in progress.', 400)
+        if room.guest_id is None:
+            return _peer_api_error('Waiting for a peer to join first.', 400)
+        partner_id = _peer_partner_id(room, me)
+        try:
+            drawn = list(room.drawn_ids or []) + list(room.question_ids or [])
+            questions = _peer_questions(room.role, room.category,
+                                        exclude=drawn)
+            qids = [q['id'] for q in questions]
+            room.interviewer_id = partner_id
+            room.question_ids = qids
+            room.drawn_ids = drawn + qids
+            room.round_no = (room.round_no or 0) + 1
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer role swap failed")
+            return _peer_api_error('Could not swap roles.', 500)
+        return jsonify({'success': True, 'round_no': room.round_no,
+                        'interviewer_id': room.interviewer_id,
+                        'questions': len(qids)})
+
+    @app.route('/peer/api/room/<token>/finish', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def peer_finish_room(token):
+        """Either participant ends the session: marks done + awards
+        momentum XP ('peer_session_completed') to both participants."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        if not _peer_is_participant(room, current_user.id):
+            return _peer_api_error('Only room participants can finish the '
+                                   'session.', 403)
+        if room.status == 'done':
+            return jsonify({'success': True, 'already': True})
+        if room.status == 'cancelled':
+            return _peer_api_error('This session was cancelled.', 400)
+        participants = [uid for uid in (room.host_id, room.guest_id)
+                        if uid]
+        try:
+            room.status = 'done'
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer finish failed")
+            return _peer_api_error('Could not finish the session.', 500)
+        for uid in participants:
+            _momentum_hook(uid, 'peer_session_completed')
+        return jsonify({'success': True, 'participants': participants})
+
+    @app.route('/peer/api/room/<token>/cancel', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def peer_cancel_room(token):
+        """Host cancels a room before it is done."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        if current_user.id != room.host_id:
+            return _peer_api_error('Only the host can cancel the room.', 403)
+        if room.status in ('done', 'cancelled'):
+            return _peer_api_error('This session is already %s.'
+                                   % room.status, 400)
+        try:
+            room.status = 'cancelled'
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer cancel failed")
+            return _peer_api_error('Could not cancel the room.', 500)
+        return jsonify({'success': True})
+
+    @app.route('/peer/api/room/<token>/feedback', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def peer_submit_feedback(token):
+        """Submit rubric feedback for the partner (both directions allowed).
+
+        JSON: {reviewee_id, clarity, structure, depth, relevance,
+        confidence, comments?}. Only after the session is done.
+        """
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        me = current_user.id
+        if not _peer_is_participant(room, me):
+            return _peer_api_error('Only room participants can give '
+                                   'feedback.', 403)
+        if room.status != 'done':
+            return _peer_api_error('Feedback opens after the session is '
+                                   'finished.', 400)
+        payload = request.get_json(silent=True) or {}
+        try:
+            reviewee_id = int(payload.get('reviewee_id'))
+        except (TypeError, ValueError):
+            return _peer_api_error('reviewee_id must be a participant id.',
+                                   400)
+        if reviewee_id == me:
+            return _peer_api_error("You can't review yourself — review your "
+                                   'peer.', 400)
+        if reviewee_id != _peer_partner_id(room, me):
+            return _peer_api_error('You can only review your session '
+                                   'partner.', 403)
+        scores = {}
+        for dim in PEER_RUBRIC_DIMS:
+            try:
+                val = int(payload.get(dim))
+            except (TypeError, ValueError):
+                return _peer_api_error('%s must be an integer 1-5.' % dim,
+                                       400)
+            if not 1 <= val <= 5:
+                return _peer_api_error('%s must be between 1 and 5.' % dim,
+                                       400)
+            scores[dim] = val
+        comments = (payload.get('comments') or '').strip() or None
+        if comments and len(comments) > PEER_COMMENT_MAX_CHARS:
+            return _peer_api_error('Comments are too long (max %d '
+                                   'characters).' % PEER_COMMENT_MAX_CHARS,
+                                   400)
+        try:
+            existing = (PeerFeedback.query
+                        .filter_by(room_id=room.id, reviewer_id=me,
+                                   reviewee_id=reviewee_id).first())
+            if existing:
+                for dim, val in scores.items():
+                    setattr(existing, dim, val)
+                existing.comments = comments
+            else:
+                db.session.add(PeerFeedback(room_id=room.id, reviewer_id=me,
+                                           reviewee_id=reviewee_id,
+                                           comments=comments, **scores))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer feedback save failed")
+            return _peer_api_error('Could not save your feedback.', 500)
+        return jsonify({'success': True})
+
+    @app.route('/peer/api/rooms/<int:room_id>/slots', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def peer_propose_slots(room_id):
+        """Host proposes time slots (comma-separated 'YYYY-MM-DD HH:MM')."""
+        try:
+            room = PeerRoom.query.get(room_id)
+        except Exception:
+            log.exception("Peer room lookup failed")
+            return _peer_api_error('Room not found.', 404)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        if current_user.id != room.host_id:
+            return _peer_api_error('Only the host can propose time slots.',
+                                   403)
+        if room.status in ('done', 'cancelled'):
+            return _peer_api_error('This session is already %s.'
+                                   % room.status, 400)
+        payload = request.get_json(silent=True) or {}
+        raw = payload.get('slots') or ''
+        if isinstance(raw, list):
+            parts = [str(s) for s in raw]
+        else:
+            parts = [p.strip() for p in str(raw).split(',')]
+        parts = [p for p in parts if p]
+        if not parts:
+            return _peer_api_error('Propose at least one time slot.', 400)
+        if len(parts) > 10:
+            return _peer_api_error('Keep it to 10 slots or fewer.', 400)
+        parsed = []
+        for part in parts:
+            dt = _peer_parse_slot(part)
+            if dt is None:
+                return _peer_api_error('Slot "%s" is not a valid '
+                                       '"YYYY-MM-DD HH:MM".' % part, 400)
+            parsed.append(dt.strftime('%Y-%m-%d %H:%M'))
+        try:
+            room.proposed_slots = parsed
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer slot proposal failed")
+            return _peer_api_error('Could not save the slots.', 500)
+        return jsonify({'success': True, 'slots': parsed})
+
+    @app.route('/peer/api/room/<token>/slot/accept', methods=['POST'])
+    @login_required
+    @limiter.limit("20 per hour")
+    def peer_accept_slot(token):
+        """Guest accepts one proposed slot; the room becomes scheduled."""
+        room = _peer_room_or_none(token)
+        if room is None:
+            return _peer_api_error('Room not found.', 404)
+        me = current_user.id
+        if not _peer_is_participant(room, me):
+            return _peer_api_error('Only room participants can accept a '
+                                   'slot.', 403)
+        if me == room.host_id:
+            return _peer_api_error('The host proposes slots; the guest '
+                                   'accepts one.', 403)
+        if room.status in ('done', 'cancelled'):
+            return _peer_api_error('This session is already %s.'
+                                   % room.status, 400)
+        payload = request.get_json(silent=True) or {}
+        slot = _peer_parse_slot(payload.get('slot'))
+        if slot is None:
+            return _peer_api_error('slot must look like "YYYY-MM-DD HH:MM".',
+                                   400)
+        slot_str = slot.strftime('%Y-%m-%d %H:%M')
+        if slot_str not in (room.proposed_slots or []):
+            return _peer_api_error('That slot was not proposed by the host.',
+                                   400)
+        try:
+            room.scheduled_at = slot
+            if slot > datetime.now(timezone.utc).replace(tzinfo=None):
+                room.status = 'waiting'
+            else:
+                room.status = 'in_progress'
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer slot accept failed")
+            return _peer_api_error('Could not accept the slot.', 500)
+        return jsonify({'success': True, 'status': room.status,
+                        'scheduled_at': slot_str})
+
+    @app.route('/peer/api/report', methods=['POST'])
+    @login_required
+    @limiter.limit("10 per hour")
+    def peer_report_user():
+        """Report + block another user (safety). JSON: {user_id, reason?}."""
+        payload = request.get_json(silent=True) or {}
+        try:
+            target_id = int(payload.get('user_id'))
+        except (TypeError, ValueError):
+            return _peer_api_error('user_id must be a user id.', 400)
+        if target_id == current_user.id:
+            return _peer_api_error("You can't report yourself.", 400)
+        try:
+            target = User.query.get(target_id)
+        except Exception:
+            log.exception("Peer report target lookup failed")
+            return _peer_api_error('User not found.', 404)
+        if target is None:
+            return _peer_api_error('User not found.', 404)
+        reason = (payload.get('reason') or '').strip() or None
+        if reason and len(reason) > 2000:
+            return _peer_api_error('Reason is too long.', 400)
+        try:
+            existing = (PeerBlock.query
+                        .filter_by(blocker_id=current_user.id,
+                                   blocked_id=target_id).first())
+            if not existing:
+                db.session.add(PeerBlock(blocker_id=current_user.id,
+                                        blocked_id=target_id, reason=reason))
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+            log.exception("Peer report failed")
+            return _peer_api_error('Could not record the report.', 500)
+        return jsonify({'success': True})
 
     # ---------- API ENDPOINTS (Shared) ----------
     @app.route('/api/interview-questions/<company>')

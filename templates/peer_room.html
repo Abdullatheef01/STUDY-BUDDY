@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% block theme %}hub{% endblock %}
+{% set nav_active = 'practice' %}
+{% block title %}Peer room {{ room.token }} | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Peer mock interview</span>
+            <h1>{{ room.role|capitalize }} · <span class="b-grad">{{ room.category|capitalize }}</span></h1>
+            <p class="b-lede">
+                Host: <strong>{{ room.host.name }}</strong>
+                {% if partner %} · Partner: <strong>{{ partner.name }}</strong>{% endif %}
+                · Round {{ room.round_no + 1 }}
+            </p>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;">
+                <span class="b-tag" data-peer-status="{{ room.status }}">{{ room.status|replace('_',' ')|capitalize }}</span>
+                {% if room.invite_only %}<span class="b-tag">Invite-only</span>{% endif %}
+                {% if room.scheduled_at %}<span class="b-tag">Scheduled: {{ room.scheduled_at.strftime('%b %d, %H:%M') }}</span>{% endif %}
+                {% if is_participant %}
+                    {% if i_am_interviewer %}<span class="b-tag">You are interviewing</span>
+                    {% else %}<span class="b-tag">You are answering</span>{% endif %}
+                {% endif %}
+            </div>
+            <div class="b-cta-row" style="margin-top:1.2rem;">
+                {% if can_join %}
+                    <button class="b-btn b-btn--primary" id="peer-join" type="button">Join this session</button>
+                {% endif %}
+                {% if is_participant and room.status == 'waiting' %}
+                    <button class="b-btn b-btn--primary" id="peer-start" type="button">Start session now</button>
+                {% endif %}
+                {% if is_participant and room.status == 'in_progress' and partner_id %}
+                    <button class="b-btn" id="peer-swap" type="button">Swap roles</button>
+                    <button class="b-btn b-btn--ghost" id="peer-finish" type="button">Finish session</button>
+                {% endif %}
+                {% if is_participant and room.host_id == current_user.id and room.status not in ('done','cancelled') %}
+                    <button class="b-btn b-btn--ghost" id="peer-cancel" type="button">Cancel room</button>
+                {% endif %}
+            </div>
+            <p class="b-form-error" id="peer-room-error" style="display:none;" role="alert"></p>
+            {% if is_participant %}
+            <div style="margin-top:1rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+                <label class="b-label" for="peer-share-link" style="margin:0;">Share link</label>
+                <input id="peer-share-link" class="b-input" style="flex:1;min-width:220px;" readonly
+                       value="{{ url_for('peer_room', token=room.token, _external=True) }}">
+                <button class="b-btn b-btn--sm" id="peer-copy" type="button">Copy</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{# ---------- Scheduling ---------- #}
+{% if is_participant and room.status not in ('done','cancelled') %}
+<section class="b-section" aria-label="Scheduling">
+    <div class="b-sec-head"><h2>Schedule <span class="b-grad">time</span></h2><p>Propose slots, accept one — lightweight propose/accept, no calendar needed.</p></div>
+    <div class="b-card b-card--form b-reveal">
+        {% if room.host_id == current_user.id %}
+        <label class="b-label" for="peer-slots">Propose slots <span style="color:var(--b-muted);">(comma-separated, "YYYY-MM-DD HH:MM")</span></label>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+            <input id="peer-slots" class="b-input" style="flex:1;min-width:240px;" placeholder="2026-10-20 18:00, 2026-10-21 18:00"
+                   value="{{ (room.proposed_slots or [])|join(', ') }}">
+            <button class="b-btn b-btn--primary b-btn--sm" id="peer-propose" type="button">Propose</button>
+        </div>
+        {% endif %}
+        {% if room.proposed_slots %}
+        <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+            {% for slot in room.proposed_slots %}
+            <span class="b-tag" style="display:inline-flex;gap:.5rem;align-items:center;">
+                {{ slot }}
+                {% if partner_id and current_user.id != room.host_id and room.status in ('waiting','in_progress','open') %}
+                <button class="b-btn b-btn--sm peer-accept-slot" type="button" data-slot="{{ slot }}" style="padding:.15rem .6rem;">Accept</button>
+                {% endif %}
+            </span>
+            {% endfor %}
+        </div>
+        {% elif room.host_id != current_user.id %}
+        <p style="color:var(--b-muted);margin:0;">The host hasn't proposed any time slots yet.</p>
+        {% endif %}
+        <p class="b-form-error" id="peer-slot-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+{% endif %}
+
+{# ---------- Question cards ---------- #}
+<section class="b-section" aria-label="Question cards">
+    <div class="b-sec-head"><h2>Question <span class="b-grad">cards</span></h2>
+        <p>{% if i_am_interviewer %}You ask — read the card, use the key points as follow-up guidance, and run the timer.{% else %}Type your answer under each card. Your peer sees what you write.{% endif %}</p>
+    </div>
+    {% if questions %}
+    <div class="b-bento">
+        {% for q in questions %}
+        <article class="b-card b-card--feature b-reveal" data-qid="{{ q.id }}">
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem;align-items:center;">
+                <span class="b-tag">Q{{ loop.index }}</span>
+                <span class="b-tag">{{ q.difficulty }}</span>
+                <span class="b-tag">{{ q.time_minutes }} min</span>
+                <span class="b-pill peer-timer" data-minutes="{{ q.time_minutes }}" style="margin-left:auto;">Timer ready</span>
+            </div>
+            <h3 style="margin:.2rem 0 0.6rem;font-size:1.02rem;line-height:1.45;">{{ q.question }}</h3>
+            {% if i_am_interviewer and q.key_points %}
+            <details style="margin-bottom:.8rem;">
+                <summary style="cursor:pointer;color:var(--b-muted);font-size:.88rem;">Interviewer guidance ({{ q.key_points|length }} key points)</summary>
+                <ul style="color:var(--b-muted);font-size:.88rem;margin:.5rem 0 0;padding-left:1.2rem;">
+                    {% for kp in q.key_points %}<li>{{ kp }}</li>{% endfor %}
+                </ul>
+            </details>
+            {% endif %}
+            <div style="display:flex;gap:.5rem;margin-bottom:.6rem;">
+                <button class="b-btn b-btn--sm peer-timer-start" type="button">Start {{ q.time_minutes }}-min timer</button>
+            </div>
+            {% if is_participant and not i_am_interviewer and room.status == 'in_progress' %}
+            <label class="b-label" for="peer-ans-{{ q.id }}">Your answer</label>
+            <textarea id="peer-ans-{{ q.id }}" class="b-textarea peer-answer" data-qid="{{ q.id }}" rows="4"
+                      style="width:100%;" placeholder="Type your answer here…">{{ (answers.get(q.id, {}) or {}).get(current_user.id, '') }}</textarea>
+            <div class="b-cta-row" style="margin-top:.6rem;">
+                <button class="b-btn b-btn--primary b-btn--sm peer-save-answer" type="button" data-qid="{{ q.id }}">Save answer</button>
+                <span class="b-pill peer-answer-status" style="display:none;"></span>
+            </div>
+            {% elif is_participant and answers.get(q.id) %}
+            <div style="margin-top:.6rem;">
+                {% for uid, text in answers.get(q.id).items() %}
+                <p style="font-size:.9rem;background:var(--b-surface-2,#1a1d24);border-radius:.6rem;padding:.7rem .9rem;">
+                    <strong>{% if uid == room.host_id %}{{ room.host.name }}{% elif room.guest and uid == room.guest.id %}{{ room.guest.name }}{% else %}Peer{% endif %}:</strong>
+                    {{ text }}
+                </p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">No questions drawn for this round.</p></div>
+    {% endif %}
+</section>
+
+{# ---------- Feedback ---------- #}
+{% if is_participant and room.status == 'done' and partner_id %}
+<section class="b-section" aria-label="Feedback">
+    <div class="b-sec-head"><h2>Reciprocal <span class="b-grad">feedback</span></h2><p>Rate your peer on five dimensions — honest, specific, kind. They do the same for you.</p></div>
+    {% if not my_feedback_done %}
+    <div class="b-card b-card--form b-reveal">
+        <h3 style="margin-top:0;">Feedback for {{ partner.name if partner else 'your peer' }}</h3>
+        <form id="peer-feedback-form" onsubmit="return false;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;">
+                {% for dim in rubric_dims %}
+                <div>
+                    <label class="b-label" for="peer-fb-{{ dim }}">{{ dim|capitalize }} (1–5)</label>
+                    <select id="peer-fb-{{ dim }}" class="b-input" style="width:100%;">
+                        <option value="5">5 — Excellent</option>
+                        <option value="4" selected>4 — Good</option>
+                        <option value="3">3 — Okay</option>
+                        <option value="2">2 — Weak</option>
+                        <option value="1">1 — Poor</option>
+                    </select>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top:1rem;">
+                <label class="b-label" for="peer-fb-comments">Comments <span style="color:var(--b-muted);">(what worked, what to improve)</span></label>
+                <textarea id="peer-fb-comments" class="b-textarea" rows="4" style="width:100%;" placeholder="Specific, actionable feedback…"></textarea>
+            </div>
+            <div class="b-cta-row" style="margin-top:1.2rem;">
+                <button class="b-btn b-btn--primary" id="peer-feedback-btn" type="submit">Submit feedback</button>
+            </div>
+            <p class="b-form-error" id="peer-feedback-error" style="display:none;" role="alert"></p>
+        </form>
+    </div>
+    {% endif %}
+    {% if feedbacks %}
+    <div class="b-bento" style="margin-top:1rem;">
+        {% for f in feedbacks %}
+        <article class="b-card b-card--feature b-reveal">
+            <span class="b-tag">{% if f.reviewer_id == room.host_id %}{{ room.host.name }}{% elif room.guest %}{{ room.guest.name }}{% else %}Peer{% endif %} → {% if f.reviewee_id == room.host_id %}{{ room.host.name }}{% elif room.guest %}{{ room.guest.name }}{% else %}Peer{% endif %}</span>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0;">
+                {% for dim, val in f.scores.items() %}
+                <span class="b-tag">{{ dim|capitalize }}: {{ val }}/5</span>
+                {% endfor %}
+            </div>
+            {% if f.comments %}<p style="font-size:.92rem;">{{ f.comments }}</p>{% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% elif my_feedback_done %}
+    <div class="b-card b-reveal"><p style="color:var(--b-muted);margin:0;">Feedback submitted. Waiting on your peer's feedback.</p></div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# ---------- Safety ---------- #}
+{% if is_participant and partner_id %}
+<section class="b-section" aria-label="Safety">
+    <div class="b-card b-reveal" style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+        <p style="margin:0;color:var(--b-muted);font-size:.9rem;flex:1;min-width:220px;">Something wrong? Reporting blocks this user from joining your rooms and hides their rooms from your board.</p>
+        <button class="b-btn b-btn--ghost b-btn--sm" id="peer-report" type="button">Report &amp; block user</button>
+    </div>
+</section>
+{% endif %}
+
+<script>
+(function () {
+    'use strict';
+    var TOKEN = {{ room.token|tojson }};
+    function csrfHeaders(extra) {
+        var headers = extra || {};
+        var m = document.querySelector('meta[name="csrf-token"]');
+        if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+        return headers;
+    }
+    function post(url, body) {
+        return fetch(url, {
+            method: 'POST',
+            headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(body || {})
+        }).then(function (r) {
+            return r.json().catch(function () { return { error: 'Bad response' }; });
+        });
+    }
+    function roomErr(msg) {
+        var el = document.getElementById('peer-room-error');
+        el.textContent = msg; el.style.display = 'block';
+    }
+    function bindAction(id, url, body, confirmMsg) {
+        var btn = document.getElementById(id);
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            if (confirmMsg && !window.confirm(confirmMsg)) return;
+            document.getElementById('peer-room-error').style.display = 'none';
+            btn.disabled = true;
+            post(url, body).then(function (data) {
+                if (data.error) { btn.disabled = false; roomErr(data.error); return; }
+                window.location.reload();
+            }).catch(function () { btn.disabled = false; roomErr('Network error — please try again.'); });
+        });
+    }
+    bindAction('peer-join', '/peer/api/room/' + TOKEN + '/join');
+    bindAction('peer-start', '/peer/api/room/' + TOKEN + '/start');
+    bindAction('peer-swap', '/peer/api/room/' + TOKEN + '/swap', {}, 'Swap roles? A fresh set of questions will be drawn.');
+    bindAction('peer-finish', '/peer/api/room/' + TOKEN + '/finish', {}, 'Finish the session? Both of you earn +40 XP and feedback opens.');
+    bindAction('peer-cancel', '/peer/api/room/' + TOKEN + '/cancel', {}, 'Cancel this room?');
+
+    /* ---- copy share link ---- */
+    var copyBtn = document.getElementById('peer-copy');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+            var input = document.getElementById('peer-share-link');
+            input.select();
+            function done(ok) { copyBtn.textContent = ok ? 'Copied!' : 'Copy'; }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(input.value).then(function () { done(true); }, function () { done(false); });
+            } else { try { document.execCommand('copy'); done(true); } catch (e) { done(false); } }
+        });
+    }
+
+    /* ---- per-question timers ---- */
+    function fmt(sec) {
+        var m = Math.floor(sec / 60), s = sec % 60;
+        return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.peer-timer-start'), function (btn) {
+        btn.addEventListener('click', function () {
+            var card = btn.closest('article');
+            var pill = card.querySelector('.peer-timer');
+            var total = parseInt(pill.getAttribute('data-minutes'), 10) * 60 || 300;
+            var remaining = total;
+            btn.disabled = true;
+            pill.textContent = '⏱ ' + fmt(remaining);
+            var iv = setInterval(function () {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    clearInterval(iv);
+                    pill.textContent = "Time's up!";
+                    btn.disabled = false;
+                    return;
+                }
+                pill.textContent = '⏱ ' + fmt(remaining);
+            }, 1000);
+        });
+    });
+
+    /* ---- save answers ---- */
+    Array.prototype.forEach.call(document.querySelectorAll('.peer-save-answer'), function (btn) {
+        btn.addEventListener('click', function () {
+            var qid = btn.getAttribute('data-qid');
+            var ta = document.querySelector('.peer-answer[data-qid="' + qid + '"]');
+            var status = btn.parentElement.querySelector('.peer-answer-status');
+            status.style.display = 'none';
+            btn.disabled = true;
+            post('/peer/api/room/' + TOKEN + '/answer', { question_id: qid, answer_text: ta.value })
+                .then(function (data) {
+                    btn.disabled = false;
+                    if (data.error) { roomErr(data.error); return; }
+                    status.textContent = 'Saved ✓'; status.style.display = 'inline-block';
+                })
+                .catch(function () { btn.disabled = false; roomErr('Network error — please try again.'); });
+        });
+    });
+
+    /* ---- propose slots ---- */
+    var proposeBtn = document.getElementById('peer-propose');
+    if (proposeBtn) {
+        proposeBtn.addEventListener('click', function () {
+            var err = document.getElementById('peer-slot-error');
+            err.style.display = 'none';
+            proposeBtn.disabled = true;
+            post('/peer/api/rooms/' + {{ room.id }} + '/slots', { slots: document.getElementById('peer-slots').value })
+                .then(function (data) {
+                    if (data.error) { proposeBtn.disabled = false; err.textContent = data.error; err.style.display = 'block'; return; }
+                    window.location.reload();
+                })
+                .catch(function () { proposeBtn.disabled = false; err.textContent = 'Network error — please try again.'; err.style.display = 'block'; });
+        });
+    }
+
+    /* ---- accept slot ---- */
+    Array.prototype.forEach.call(document.querySelectorAll('.peer-accept-slot'), function (btn) {
+        btn.addEventListener('click', function () {
+            var err = document.getElementById('peer-slot-error');
+            err.style.display = 'none';
+            btn.disabled = true;
+            post('/peer/api/room/' + TOKEN + '/slot/accept', { slot: btn.getAttribute('data-slot') })
+                .then(function (data) {
+                    if (data.error) { btn.disabled = false; err.textContent = data.error; err.style.display = 'block'; return; }
+                    window.location.reload();
+                })
+                .catch(function () { btn.disabled = false; err.textContent = 'Network error — please try again.'; err.style.display = 'block'; });
+        });
+    });
+
+    /* ---- feedback ---- */
+    var fbBtn = document.getElementById('peer-feedback-btn');
+    if (fbBtn) {
+        fbBtn.addEventListener('click', function () {
+            var err = document.getElementById('peer-feedback-error');
+            err.style.display = 'none';
+            var dims = {{ rubric_dims|tojson }};
+            var body = { reviewee_id: {{ partner_id or 0 }}, comments: document.getElementById('peer-fb-comments').value };
+            for (var i = 0; i < dims.length; i++) {
+                body[dims[i]] = parseInt(document.getElementById('peer-fb-' + dims[i]).value, 10);
+            }
+            fbBtn.disabled = true;
+            post('/peer/api/room/' + TOKEN + '/feedback', body)
+                .then(function (data) {
+                    if (data.error) { fbBtn.disabled = false; err.textContent = data.error; err.style.display = 'block'; return; }
+                    window.location.reload();
+                })
+                .catch(function () { fbBtn.disabled = false; err.textContent = 'Network error — please try again.'; err.style.display = 'block'; });
+        });
+    }
+
+    /* ---- report & block ---- */
+    var reportBtn = document.getElementById('peer-report');
+    if (reportBtn) {
+        reportBtn.addEventListener('click', function () {
+            var reason = window.prompt('Why are you reporting this user? (optional)', '');
+            if (reason === null) return;
+            reportBtn.disabled = true;
+            post('/peer/api/report', { user_id: {{ partner_id or 0 }}, reason: reason })
+                .then(function (data) {
+                    if (data.error) { reportBtn.disabled = false; roomErr(data.error); return; }
+                    window.location.href = '/peer';
+                })
+                .catch(function () { reportBtn.disabled = false; roomErr('Network error — please try again.'); });
+        });
+    }
+})();
+</script>
+{% endblock %}
