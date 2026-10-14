@@ -4311,12 +4311,66 @@ def register_routes(app):
             return jsonify({'error': 'Could not delete the review.'}), 500
         return jsonify({'success': True})
 
+    # ================= Wave 4 #23: research-gap finder =================
     @app.route('/research/gaps')
     @login_required
     def gapfinder_home():
-        """Research-gap finder (stub until feature #23 lands)."""
-        return render_template('study_stub.html', title='Research-Gap Finder',
-                               blurb='Underexplored topics, conflicting claims and single-paper gaps across your library — every gap backed by evidence. This section is being built right now — check back soon.')
+        """Research-gap finder page (replaces stub)."""
+        docs = StudyDoc.query.filter_by(user_id=current_user.id).order_by(
+            StudyDoc.created_at.desc()).all()
+        reports = GapReport.query.filter_by(user_id=current_user.id).order_by(
+            GapReport.created_at.desc()).limit(10).all()
+        return render_template('gapfinder_home.html',
+                               documents=[{'id': d.id, 'title': d.title,
+                                           'chunks': d.num_chunks} for d in docs],
+                               reports=[{'id': r.id,
+                                         'docs': len(r.doc_ids or []),
+                                         'gaps': len((r.data or {}).get('gaps') or []),
+                                         'created': r.created_at.strftime('%Y-%m-%d')}
+                                        for r in reports])
+
+    @app.route('/research/api/gaps/analyze', methods=['POST'])
+    @limiter.limit("10 per hour")
+    def gaps_analyze():
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
+        """Analyze a paper collection for research gaps.
+
+        JSON body: {"doc_ids": [int]} (empty = whole library).
+        CSRF via X-CSRFToken header (not exempt)."""
+        payload = request.get_json(silent=True) or {}
+        raw_ids = payload.get('doc_ids') or []
+        try:
+            wanted = [int(d) for d in raw_ids[:20]] if isinstance(raw_ids, list) else []
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid document selection.'}), 400
+        try:
+            q = StudyDoc.query.filter_by(user_id=current_user.id)
+            docs = q.filter(StudyDoc.id.in_(wanted)).all() if wanted else \
+                q.order_by(StudyDoc.created_at.desc()).all()
+            if not docs:
+                return jsonify({'error': 'Your library is empty — upload a PDF first.'}), 400
+            imports = PaperImport.query.filter_by(user_id=current_user.id).all()
+            report = gf_generate_report(docs, imports)
+            if not isinstance(report, dict):
+                return jsonify({'error': 'Could not analyze these documents.'}), 500
+            gr = GapReport(user_id=current_user.id,
+                           doc_ids=[d.id for d in docs], data=report)
+            db.session.add(gr)
+            db.session.commit()
+        except Exception:
+            log.exception("Gap analysis failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not analyze right now. Please try again.'}), 500
+        return jsonify({'success': True, 'id': gr.id, 'report': report})
+
+    @app.route('/research/api/gaps/<int:gid>')
+    @login_required
+    def gaps_get(gid):
+        """Fetch a saved gap report as JSON."""
+        gr = GapReport.query.filter_by(id=gid, user_id=current_user.id).first_or_404()
+        return jsonify({'success': True, 'report': gr.data or {},
+                        'doc_ids': gr.doc_ids or []})
 
     @app.route('/research/flashcards')
     @login_required

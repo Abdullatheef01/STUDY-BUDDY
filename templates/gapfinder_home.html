@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block theme %}research{% endblock %}
+{% set nav_active = 'research' %}
+{% block title %}Research-Gap Finder | AI Career &amp; Research Assistant{% endblock %}
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding-top:3rem;">
+    <div class="b-bento">
+        <div class="b-card b-card--hero b-span-4 b-reveal">
+            <span class="b-pill"><span class="b-pulse"></span>Study Lab</span>
+            <h1>Find the <span class="b-grad">gaps</span> in your field.</h1>
+            <p class="b-lede">We scan your paper collection for underexplored topics, conflicting claims and single-paper blind spots. Every gap is backed by cited passages — and each one suggests concrete research questions plus papers to read next.</p>
+        </div>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Analyze">
+    <div class="b-card b-card--form b-reveal">
+        <div class="b-sec-head" style="margin-top:0;">
+            <h2>Analyze your <span class="b-grad">collection</span></h2>
+            <p>Pick papers, or analyze the whole library.</p>
+        </div>
+        <div class="b-field">
+            <span class="b-label">Documents (optional — empty = whole library)</span>
+            <div id="gf-docs" style="display:grid;gap:.5rem;max-height:240px;overflow:auto;">
+                {% for d in documents %}
+                <label class="b-card b-card--lite" style="display:flex;gap:.6rem;align-items:center;cursor:pointer;margin:0;">
+                    <input type="checkbox" class="b-check gf-doc" value="{{ d.id }}">
+                    <span><strong>{{ d.title }}</strong></span>
+                </label>
+                {% else %}
+                <p style="color:var(--b-muted);">Your library is empty — <a href="{{ url_for('study_library') }}">upload a PDF</a> first.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="b-cta-row">
+            <button class="b-btn b-btn--primary" id="gf-analyze" type="button">Find research gaps</button>
+            <span class="b-pill" id="gf-status" style="display:none;"></span>
+        </div>
+        <p class="b-form-error" id="gf-error" style="display:none;" role="alert"></p>
+    </div>
+</section>
+
+<section class="b-section" aria-label="Results" id="gf-results-wrap" style="display:none;">
+    <div class="b-sec-head"><h2>Research <span class="b-grad">gaps</span></h2><p id="gf-count"></p></div>
+    <div id="gf-results" style="display:grid;gap:1rem;"></div>
+</section>
+
+{% if reports %}
+<section class="b-section" aria-label="Past analyses">
+    <div class="b-sec-head"><h2>Past <span class="b-grad">analyses</span></h2></div>
+    <div class="b-bento">
+        {% for r in reports %}
+        <article class="b-card b-card--feature b-reveal">
+            <span class="b-tag">{{ r.gaps }} gaps &middot; {{ r.docs }} papers</span>
+            <h3 style="margin:0;">{{ r.created }}</h3>
+            <div class="b-cta-row" style="margin-top:auto;">
+                <button class="b-btn b-btn--primary b-btn--sm gf-open" type="button" data-id="{{ r.id }}">Open report</button>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+<script src="{{ url_for('static', filename='js/gapfinder.js') }}"></script>
+{% endblock %}
