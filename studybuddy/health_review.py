@@ -517,3 +517,144 @@ def generate_review(user_id, month_key, now=None):
     row.next_action = next_action
     M.db.session.commit()
     return row, created
+
+
+# ================= Feature 31 Ultimate Enhancements =================
+# 31.1 Monthly auto-report | 31.2 Peer benchmarks | 31.3 Action nudges
+
+import re as _re21
+from datetime import datetime as _dt21, timezone as _tz21
+
+
+def _clean21(text):
+    return _re21.sub(r"<[^>]*>", "", text or "")
+
+
+def monthly_report(review):
+    """Turn a health review into a readable monthly digest.
+
+    review: dict from generate_review() with {dimensions, overall?}.
+    Returns {headline, highlights, concerns, markdown}.
+    """
+    if not isinstance(review, dict):
+        raise ValueError("review must be a dict.")
+    dims = review.get("dimensions") or {}
+    if not isinstance(dims, dict) or not dims:
+        raise ValueError("Review has no dimensions to report on.")
+    scored = []
+    for name, d in dims.items():
+        if not isinstance(d, dict):
+            continue
+        try:
+            score = float(d.get("score") or 0)
+        except (TypeError, ValueError):
+            continue
+        scored.append((name, score, _clean21(d.get("evidence") or "")[:150]))
+    if not scored:
+        raise ValueError("No scored dimensions found.")
+    scored.sort(key=lambda x: -x[1])
+    overall = round(sum(s for _, s, _ in scored) / len(scored), 1)
+    highlights = [{"dimension": n, "score": s, "evidence": e}
+                  for n, s, e in scored[:2]]
+    concerns = [{"dimension": n, "score": s, "evidence": e}
+                for n, s, e in scored[-2:] if s < 60]
+    month = _clean21(review.get("month") or review.get("month_key") or "")[:20]
+    lines = [f"# Career Health — {month or 'This Month'}", "",
+             f"**Overall: {overall}/100**", "",
+             "## Highlights"]
+    for h in highlights:
+        lines.append(f"- **{h['dimension']}** ({h['score']}): {h['evidence'] or 'strong'}")
+    if concerns:
+        lines.append("")
+        lines.append("## Needs attention")
+        for c in concerns:
+            lines.append(f"- **{c['dimension']}** ({c['score']}): {c['evidence'] or 'weak'}")
+    headline = ("Career health is strong — keep the rhythm." if overall >= 70 else
+                "Career health is steady — push one weak area." if overall >= 50 else
+                "Career health needs work — focus this month.")
+    return {"headline": headline, "overall": overall,
+            "highlights": highlights, "concerns": concerns,
+            "markdown": "\n".join(lines)}
+
+
+def peer_benchmarks(my_scores, peer_scores):
+    """Where do you stand vs peers? Returns percentiles per dimension.
+
+    my_scores: {dimension: score}. peer_scores: list of {dimension: score}.
+    """
+    if not isinstance(my_scores, dict) or not my_scores:
+        raise ValueError("my_scores must be a non-empty dict.")
+    if not isinstance(peer_scores, (list, tuple)) or not peer_scores:
+        raise ValueError("peer_scores must be a non-empty list.")
+    out = []
+    for dim, mine in my_scores.items():
+        try:
+            mine_f = float(mine)
+        except (TypeError, ValueError):
+            continue
+        peers = []
+        for p in peer_scores:
+            if isinstance(p, dict) and dim in p:
+                try:
+                    peers.append(float(p[dim]))
+                except (TypeError, ValueError):
+                    continue
+        if not peers:
+            continue
+        below = sum(1 for v in peers if v < mine_f)
+        pct = round(below / len(peers) * 100, 1)
+        out.append({"dimension": _clean21(dim)[:40], "my_score": mine_f,
+                    "peer_median": round(sorted(peers)[len(peers) // 2], 1),
+                    "peer_count": len(peers), "percentile": pct,
+                    "standing": ("Top 10%" if pct >= 90 else
+                                 f"Top {100 - int(pct)}%" if pct >= 50 else
+                                 f"Bottom {int(pct)}% — room to grow")})
+    out.sort(key=lambda x: x["percentile"])
+    return {"benchmarks": out,
+            "summary": (f"Weakest vs peers: {out[0]['dimension']} "
+                        f"({out[0]['standing']})." if out else "No comparable data.")}
+
+
+# Health-dip triggers -> specific actions.
+_NUDGE_RULES = [
+    ("applications", 3, "Applications stalled",
+     "Apply to 3 roles this week — momentum beats perfection."),
+    ("interview_prep", 40, "Interview prep dropped",
+     "Do one mock interview this week — even a 20-min peer mock."),
+    ("learning", 40, "Learning stalled",
+     "Finish one roadmap module — 2 hours, that's it."),
+    ("networking", 30, "Networking quiet",
+     "Send 2 cold outreaches this week with the outreach generator."),
+]
+
+
+def action_nudges(current_scores, previous_scores=None):
+    """Health dips trigger specific suggested actions.
+
+    Returns {nudges: [{dimension, message, action}], urgent_count}.
+    A nudge fires when a score is low OR dropped vs last month.
+    """
+    if not isinstance(current_scores, dict):
+        raise ValueError("current_scores must be a dict.")
+    previous_scores = previous_scores or {}
+    nudges = []
+    for dim, threshold, label, action in _NUDGE_RULES:
+        try:
+            cur = float(current_scores.get(dim)) if current_scores.get(dim) is not None else None
+        except (TypeError, ValueError):
+            continue
+        if cur is None:
+            continue
+        try:
+            prev = float(previous_scores.get(dim)) if previous_scores.get(dim) is not None else None
+        except (TypeError, ValueError):
+            prev = None
+        dropped = prev is not None and cur < prev - 10
+        if cur < threshold or dropped:
+            why = (f"dropped {prev - cur:.0f} pts" if dropped else f"at {cur:.0f}")
+            nudges.append({"dimension": dim, "label": label,
+                           "message": f"{label} ({why}). {action}",
+                           "action": action, "urgent": dropped})
+    nudges.sort(key=lambda x: (not x["urgent"], x["dimension"]))
+    return {"nudges": nudges, "count": len(nudges),
+            "urgent_count": sum(1 for n in nudges if n["urgent"])}
