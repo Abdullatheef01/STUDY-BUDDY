@@ -972,3 +972,111 @@ def _mastery_stats(set_data) -> Dict:
         "unknown": unknown,
         "mastery_pct": mastery_pct,
     }
+
+
+# ================= Feature 23 Ultimate Enhancements =================
+# 23.1 Anki export | 23.2 Exam mode (timed sprint) | 23.3 Weak-card loop
+
+import re as _re17
+import random as _random17
+from datetime import datetime as _dt17, timezone as _tz17
+
+
+def _clean17(text):
+    return _re17.sub(r"<[^>]*>", "", text or "")
+
+
+def anki_export(cards, deck_name="STUDY-BUDDY"):
+    """Export cards to Anki-importable TSV (tab-separated, UTF-8).
+
+    cards: list of {question/front, answer/back, ...}. Returns {tsv, count,
+    instructions}. Anki: File > Import > select .txt, fields separated by Tab.
+    """
+    if not isinstance(cards, (list, tuple)):
+        raise ValueError("cards must be a list.")
+    deck_name = _clean17(deck_name or "STUDY-BUDDY").strip()[:60] or "STUDY-BUDDY"
+    lines = []
+    for c in cards:
+        if not isinstance(c, dict):
+            continue
+        front = _clean17(c.get("question") or c.get("front") or "").strip()
+        back = _clean17(c.get("answer") or c.get("back") or "").strip()
+        if not front or not back:
+            continue
+        # TSV-safe: tabs/newlines become spaces; quotes doubled is unnecessary for TSV.
+        front = _re17.sub(r"[\t\r\n]+", " ", front)[:500]
+        back = _re17.sub(r"[\t\r\n]+", " ", back)[:1000]
+        lines.append(f"{front}\t{back}")
+    if not lines:
+        raise ValueError("No valid cards to export.")
+    return {"tsv": "\n".join(lines), "count": len(lines),
+            "deck_name": deck_name, "filename": f"{deck_name}.txt",
+            "instructions": ("In Anki: File > Import > choose this .txt > "
+                             "Fields separated by: Tab > Deck: " + deck_name)}
+
+
+def exam_sprint(cards, seconds_per_card=20, seed=None):
+    """Timed recall sprint: N cards, countdown per card.
+
+    Returns {rounds: [{card_id, question, seconds}], total_seconds, rules}.
+    The client runs the timer; the server shuffles + orders.
+    """
+    if not isinstance(cards, (list, tuple)) or not cards:
+        raise ValueError("cards must be a non-empty list.")
+    try:
+        seconds_per_card = int(seconds_per_card)
+    except (TypeError, ValueError):
+        seconds_per_card = 20
+    seconds_per_card = max(5, min(120, seconds_per_card))
+    rng = _random17.Random(seed)
+    order = list(cards)
+    rng.shuffle(order)
+    rounds = []
+    for i, c in enumerate(order):
+        if not isinstance(c, dict):
+            continue
+        q = _clean17(c.get("question") or c.get("front") or "")[:300]
+        if not q:
+            continue
+        rounds.append({"round": i + 1, "card_id": c.get("id"),
+                       "question": q, "seconds": seconds_per_card})
+    if not rounds:
+        raise ValueError("No valid cards for a sprint.")
+    return {"rounds": rounds, "total_cards": len(rounds),
+            "total_seconds": len(rounds) * seconds_per_card,
+            "rules": (f"{seconds_per_card}s per card. Say the answer aloud, then flip. "
+                      "Mark got-it / missed — missed cards come back in the weak loop.")}
+
+
+def weak_card_loop(card_stats, cards):
+    """Missed cards resurface first.
+
+    card_stats: {card_id: {wrong (int), right (int)}}. cards: list of card dicts.
+    Returns {queue: [card dicts ordered weak-first], weak_count}.
+    """
+    if not isinstance(card_stats, dict):
+        raise ValueError("card_stats must be a dict.")
+    if not isinstance(cards, (list, tuple)):
+        raise ValueError("cards must be a list.")
+    scored = []
+    for c in cards:
+        if not isinstance(c, dict):
+            continue
+        cid = str(c.get("id"))
+        st = card_stats.get(cid, {}) if isinstance(card_stats.get(cid), dict) else {}
+        try:
+            wrong = max(0, int(st.get("wrong") or 0))
+            right = max(0, int(st.get("right") or 0))
+        except (TypeError, ValueError):
+            wrong, right = 0, 0
+        total = wrong + right
+        # Weakness = wrong rate, with Laplace smoothing; unseen cards in the middle.
+        weakness = (wrong + 0.5) / (total + 1) if total else 0.5
+        scored.append((weakness, -total, c))
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    queue = [c for _, _, c in scored]
+    weak_count = sum(1 for w, t, _ in scored if w > 0.5 and t < 0)
+    return {"queue": queue, "weak_count": weak_count,
+            "total": len(queue),
+            "guidance": ("Weak cards first. Clear a card with 3 consecutive "
+                         "correct recalls to graduate it.")}
