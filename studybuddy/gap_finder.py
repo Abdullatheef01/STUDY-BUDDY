@@ -761,3 +761,132 @@ def _generate_gap_report(docs: Any, paper_imports: Any) -> Dict:
     next_papers = suggest_next_papers(user_id, paper_imports or [], lib_titles)
 
     return {"gaps": gaps, "next_papers": next_papers}
+
+
+# ================= Feature 22 Ultimate Enhancements =================
+# 22.1 Trend cross-check | 22.2 Feasibility scorer | 22.3 Proposal export
+
+import re as _re16
+
+
+def _clean16(text):
+    return _re16.sub(r"<[^>]*>", "", text or "")
+
+
+def trend_cross_check(gap_text, trending_papers):
+    """Is this gap already being filled? Check against trending papers.
+
+    gap_text: the identified gap. trending_papers: list of {title, abstract?}.
+    Returns {overlap: [...], verdict} — overlap lists papers already on it.
+    """
+    gap = _clean16(gap_text or "").strip().lower()
+    if len(gap) < 10:
+        raise ValueError("Gap description is too short to check.")
+    if not isinstance(trending_papers, (list, tuple)):
+        raise ValueError("trending_papers must be a list.")
+    gap_terms = set(_re16.findall(r"[a-z]{4,}", gap))
+    overlap = []
+    for p in trending_papers:
+        if not isinstance(p, dict):
+            continue
+        blob = (_clean16(p.get("title") or "") + " " +
+                _clean16(p.get("abstract") or "")).lower()
+        p_terms = set(_re16.findall(r"[a-z]{4,}", blob))
+        if not p_terms:
+            continue
+        sim = len(gap_terms & p_terms) / len(gap_terms | p_terms)
+        if sim >= 0.15:
+            overlap.append({"title": _clean16(p.get("title") or "Untitled")[:100],
+                            "similarity": round(sim, 2)})
+    overlap.sort(key=lambda x: -x["similarity"])
+    n = len(overlap)
+    verdict = ("Hot zone — several recent papers touch this. Narrow your angle or move fast."
+               if n >= 3 else
+               "Some activity — read these first, then differentiate."
+               if n >= 1 else
+               "Clear field — no trending paper overlaps strongly. Good hunting ground.")
+    return {"overlap": overlap[:8], "overlap_count": n, "verdict": verdict}
+
+
+# Feasibility signals.
+_FEAS_POSITIVE = [
+    (r"\b(survey|benchmark|analysis|comparison|review)\b", 15, "Survey/benchmark work is very doable"),
+    (r"\b(open (source|data)|public dataset|github)\b", 15, "Open data/code available"),
+    (r"\b(small|toy|prototype|mvp)\b", 10, "Small scope"),
+]
+_FEAS_NEGATIVE = [
+    (r"\b(large scale|massive|distributed cluster|tpu pod|million (dollar|gpu))\b", -20, "Needs heavy compute"),
+    (r"\b(human (study|trial)|clinical|irb)\b", -20, "Needs human subjects approval"),
+    (r"\b(proprietary|confidential|nda)\b", -15, "Needs restricted data access"),
+    (r"\b(novel (architecture|hardware)|chip|asic)\b", -15, "Needs novel hardware"),
+]
+
+
+def feasibility_score(gap_text, skills=None):
+    """Can a student actually do this in 3 months? Score 0-100.
+
+    Returns {score, verdict, factors}.
+    """
+    gap = _clean16(gap_text or "").strip()
+    if len(gap) < 10:
+        raise ValueError("Gap description is too short to score.")
+    skills = [str(s).lower() for s in (skills or []) if isinstance(s, str)]
+    score = 55.0  # neutral start
+    factors = []
+    low = gap.lower()
+    for pattern, pts, label in _FEAS_POSITIVE:
+        if _re16.search(pattern, low):
+            score += pts
+            factors.append({"factor": label, "effect": f"+{pts}"})
+    for pattern, pts, label in _FEAS_NEGATIVE:
+        if _re16.search(pattern, low):
+            score += pts
+            factors.append({"factor": label, "effect": str(pts)})
+    # Skill match: gap mentions skills the student has.
+    if skills:
+        hits = sum(1 for s in skills if s and s in low)
+        if hits:
+            bonus = min(15, hits * 5)
+            score += bonus
+            factors.append({"factor": f"Matches {hits} of your skills", "effect": f"+{bonus}"})
+    score = max(0, min(100, round(score)))
+    verdict = ("Highly feasible — start this month." if score >= 70 else
+               "Feasible with scoping — narrow it down." if score >= 45 else
+               "Risky for 3 months — needs resources you may not have.")
+    return {"score": score, "verdict": verdict, "factors": factors,
+            "tip": "Cut scope until the score crosses 70 — a finished small project beats an unfinished big one."}
+
+
+def gap_to_proposal(gap_text, context=None):
+    """Turn a gap into a research proposal outline.
+
+    Returns {title, sections: [{heading, prompts}]}.
+    """
+    gap = _clean16(gap_text or "").strip()
+    if len(gap) < 10:
+        raise ValueError("Gap description is too short for a proposal.")
+    context = _clean16(context or "").strip()[:500]
+    # Draft a working title from the gap's key nouns.
+    nouns = _re16.findall(r"[A-Z][a-z]{3,}|[a-z]{5,}", gap)
+    seen = []
+    for w in nouns:
+        wl = w.lower()
+        if wl not in seen and wl not in {"with", "from", "that", "this", "have", "more"}:
+            seen.append(wl)
+        if len(seen) >= 4:
+            break
+    title = "Towards " + " ".join(w.capitalize() for w in seen[:4]) if seen else "Research Proposal"
+    sections = [
+        ("Problem Statement", ["State the gap in 3 sentences", "Why does it matter? Who cares?"]),
+        ("Related Work", ["3-5 closest papers", "What did each miss? (table format)"]),
+        ("Research Questions", ["1 primary + 2 secondary questions", "Each must be answerable in 3 months"]),
+        ("Methodology", ["Approach, datasets, baselines", "What will you build first? (MVP)"]),
+        ("Evaluation", ["Metrics + baselines to beat", "Ablation plan"]),
+        ("Timeline", ["Month 1: MVP", "Month 2: experiments", "Month 3: write-up"]),
+        ("Risks", ["What could fail? What's plan B?"]),
+    ]
+    if context:
+        sections.insert(1, ("Context", [context[:200]]))
+    return {"title": title[:120],
+            "sections": [{"heading": h, "prompts": ps} for h, ps in sections],
+            "guidance": "Fill each section in 30 minutes. A rough proposal today beats a perfect one next month."}
