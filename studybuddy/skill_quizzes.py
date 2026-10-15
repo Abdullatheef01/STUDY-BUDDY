@@ -235,3 +235,185 @@ def best_scores(attempt_rows):
                        "attempt_id": r.id,
                        "submitted_at": r.submitted_at.isoformat() if r.submitted_at else None}
     return best
+
+
+# ================= Feature 16 Ultimate Enhancements =================
+# 16.1 Certification-exam mode | 16.2 Weakness-targeted drills | 16.3 Leaderboard
+
+import re as _re10
+
+
+def _clean10(text):
+    return _re10.sub(r"<[^>]*>", "", text or "")
+
+
+# Real certification exam formats (question count, minutes, pass %).
+_EXAM_FORMATS = {
+    "aws-clf-c02": {"name": "AWS Certified Cloud Practitioner", "questions": 65,
+                    "minutes": 90, "pass_pct": 70},
+    "aws-saa-c03": {"name": "AWS Solutions Architect Associate", "questions": 65,
+                    "minutes": 130, "pass_pct": 72},
+    "gcp-ace": {"name": "Google Associate Cloud Engineer", "questions": 50,
+                "minutes": 120, "pass_pct": 70},
+    "az-900": {"name": "Microsoft Azure Fundamentals", "questions": 45,
+               "minutes": 60, "pass_pct": 70},
+    "cka": {"name": "Certified Kubernetes Administrator", "questions": 17,
+            "minutes": 120, "pass_pct": 66},
+    "generic": {"name": "Generic Certification Exam", "questions": 50,
+                "minutes": 90, "pass_pct": 70},
+}
+
+
+def certification_exam_mode(skill, exam_id="generic", seed=None):
+    """Build a quiz like the real certification exam: timed, weighted, pass/fail.
+
+    Returns {exam, questions, minutes, pass_pct, instructions}.
+    """
+    skill = _clean10(skill or "").strip()
+    if not skill:
+        raise ValueError("Skill is required.")
+    fmt = _EXAM_FORMATS.get((_clean10(exam_id or "").strip().lower() or "generic"))
+    if not fmt:
+        fmt = _EXAM_FORMATS["generic"]
+    n = fmt["questions"]
+    # Weight toward medium/hard like real exams.
+    full_questions = build_quiz(skill, n=min(n, 60),
+                                difficulties=["Medium", "Hard", "Medium", "Easy"],
+                                seed=seed)
+    if not full_questions:
+        raise ValueError(f"No questions available for skill '{skill}'.")
+    questions = [public_question(q) for q in full_questions]
+    return {"exam": fmt["name"], "exam_id": exam_id,
+            "questions": questions, "minutes": fmt["minutes"],
+            "pass_pct": fmt["pass_pct"], "total": len(questions),
+            "instructions": (
+                f"{fmt['name']} simulation: {len(questions)} questions, "
+                f"{fmt['minutes']} minutes, pass at {fmt['pass_pct']}%. "
+                "No pausing — train under pressure.")}
+
+
+def grade_exam(questions, answers, exam_id="generic"):
+    """Grade a certification-exam attempt with pass/fail verdict.
+
+    questions may be public (client-safe) or full dicts — full versions are
+    resolved by ID internally so answers never need to leave the server.
+    """
+    fmt = _EXAM_FORMATS.get((_clean10(exam_id or "").strip().lower() or "generic"))
+    if not fmt:
+        fmt = _EXAM_FORMATS["generic"]
+    full = []
+    for q in (questions or []):
+        if not isinstance(q, dict):
+            continue
+        if "answer" in q:
+            full.append(q)
+        else:
+            fq = get_question(q.get("id"))
+            if fq:
+                full.append(fq)
+    results, summary = grade_quiz(full, answers)
+    pct = summary.get("pct", 0)
+    passed = pct >= fmt["pass_pct"]
+    gap = round(fmt["pass_pct"] - pct, 1)
+    return {"results": results, "summary": summary,
+            "pass_pct": fmt["pass_pct"], "scored_pct": pct,
+            "passed": passed,
+            "verdict": ("PASS — exam-ready." if passed else
+                        f"FAIL — {gap:.0f} points short. Drill weak topics and retry."),
+            "weak_topics": summary.get("weak_topics", [])}
+
+
+def weakness_drill(skill, past_results, n=10, seed=None):
+    """Auto-generate a drill set targeting the user's weakest topics.
+
+    past_results: list of {question_id/topic, correct (bool)} or a grade_quiz
+    summary dict with weak_topics. Returns {questions, target_topics}.
+    """
+    try:
+        n = int(n)
+    except (TypeError, ValueError):
+        n = 10
+    n = max(3, min(20, n))
+    weak = []
+    if isinstance(past_results, dict):
+        weak = [str(t) for t in (past_results.get("weak_topics") or [])]
+    elif isinstance(past_results, (list, tuple)):
+        wrong_topics = {}
+        for r in past_results:
+            if not isinstance(r, dict):
+                continue
+            if not r.get("correct", True):
+                t = str(r.get("topic") or r.get("skill") or "general")
+                wrong_topics[t] = wrong_topics.get(t, 0) + 1
+        weak = sorted(wrong_topics, key=wrong_topics.get, reverse=True)
+    weak = [_clean10(t).strip() for t in weak if _clean10(t).strip()][:5]
+
+    skill = _clean10(skill or "").strip()
+    if not skill:
+        raise ValueError("Skill is required.")
+    topics = [t[0] if isinstance(t, (list, tuple)) else str(t)
+              for t in skill_topics(skill)]
+    target = [t for t in topics if any(w.lower() in t.lower() or t.lower() in w.lower()
+                                       for w in weak)] if weak else []
+    questions = []
+    import random
+    rng = random.Random(seed)
+    # Prefer weak topics; fill the rest with general skill questions.
+    if target:
+        for t in target:
+            qs = [q for q in _load()
+                  if q.get("skill") == skill and t in q.get("topics", [])]
+            rng.shuffle(qs)
+            questions.extend(qs[: max(2, n // max(len(target), 1))])
+    if len(questions) < n:
+        rest = [q for q in _load() if q.get("skill") == skill
+                and q not in questions]
+        rng.shuffle(rest)
+        questions.extend(rest[: n - len(questions)])
+    questions = questions[:n]
+    if not questions:
+        raise ValueError(f"No questions available for skill '{skill}'.")
+    return {"questions": [public_question(q) for q in questions],
+            "target_topics": target or ["general"],
+            "total": len(questions),
+            "guidance": f"Drill set on: {', '.join(target) if target else 'mixed review'}."}
+
+
+def leaderboard(entries, current_user_id=None, top_n=10):
+    """Peer leaderboard for quiz scores. Pure function.
+
+    entries: list of {user_id, name, skill, score_pct, quizzes_taken}.
+    Returns ranked list with rank, highlight for current user.
+    """
+    if not isinstance(entries, (list, tuple)):
+        raise ValueError("entries must be a list.")
+    try:
+        top_n = int(top_n)
+    except (TypeError, ValueError):
+        top_n = 10
+    top_n = max(1, min(50, top_n))
+    clean = []
+    for e in entries:
+        if not isinstance(e, dict):
+            continue
+        try:
+            pct = float(e.get("score_pct") or 0)
+        except (TypeError, ValueError):
+            continue
+        clean.append({
+            "user_id": e.get("user_id"),
+            "name": _clean10(e.get("name") or "Anonymous")[:40] or "Anonymous",
+            "skill": _clean10(e.get("skill") or "")[:40],
+            "score_pct": max(0, min(100, round(pct, 1))),
+            "quizzes_taken": max(0, int(e.get("quizzes_taken") or 0)),
+        })
+    clean.sort(key=lambda x: (-x["score_pct"], -x["quizzes_taken"]))
+    ranked = []
+    for i, e in enumerate(clean[:top_n], 1):
+        e["rank"] = i
+        e["is_you"] = (current_user_id is not None
+                       and str(e["user_id"]) == str(current_user_id))
+        ranked.append(e)
+    your_rank = next((e["rank"] for e in ranked if e["is_you"]), None)
+    return {"leaders": ranked, "your_rank": your_rank,
+            "guidance": "Top of the board? Raise difficulty. Bottom half? Drill weak topics."}
