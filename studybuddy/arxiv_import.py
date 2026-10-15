@@ -655,3 +655,146 @@ def download_pdf(pdf_url: str, dest_path: str) -> bool:
                     os.remove(dest)
             except OSError:
                 pass
+
+
+# ================= Feature 19 Ultimate Enhancements =================
+# 19.1 Bulk import | 19.2 Related-paper discovery | 19.3 Reading queue
+
+
+def _clean13(text):
+    return re.sub(r"<[^>]*>", "", text or "")
+
+
+def bulk_import(ids_text, max_ids=10):
+    """Import up to N papers from pasted arXiv IDs / DOIs (one per line/comma).
+
+    Returns {imported: [metadata], failed: [{input, reason}], total}.
+    Never raises on hostile input; each ID is attempted independently.
+    """
+    if not isinstance(ids_text, str):
+        raise ValueError("ids_text must be a string of IDs.")
+    try:
+        max_ids = int(max_ids)
+    except (TypeError, ValueError):
+        max_ids = 10
+    max_ids = max(1, min(25, max_ids))
+    raw_ids = [p.strip() for p in re.split(r"[,\s\n;]+", _clean13(ids_text)) if p.strip()]
+    seen = set()
+    ids = []
+    for rid in raw_ids:
+        if rid.lower() not in seen:
+            seen.add(rid.lower())
+            ids.append(rid)
+        if len(ids) >= max_ids:
+            break
+    imported, failed = [], []
+    for rid in ids:
+        try:
+            arxiv_id = validate_arxiv_id(rid)
+            doi = validate_doi(rid) if not arxiv_id else None
+            if arxiv_id:
+                meta = normalize_metadata(fetch_arxiv(arxiv_id))
+            elif doi:
+                meta = normalize_metadata(fetch_doi(doi))
+            else:
+                failed.append({"input": rid[:60], "reason": "Not a valid arXiv ID or DOI."})
+                continue
+            if meta.get("error"):
+                failed.append({"input": rid[:60], "reason": str(meta["error"])[:120]})
+            else:
+                imported.append(meta)
+        except Exception as e:
+            failed.append({"input": rid[:60], "reason": f"{type(e).__name__}: {str(e)[:80]}"})
+    return {"imported": imported, "failed": failed,
+            "total": len(imported), "attempted": len(ids)}
+
+
+def related_papers(openalex_id, max_results=10):
+    """Discover related papers via the citation graph.
+
+    Returns {cited_by: [...], references: [...], total} — papers that cite
+    this one and papers it cites, with titles + years. Uses cached graph data.
+    """
+    openalex_id = _clean13(openalex_id or "").strip()
+    if not openalex_id:
+        raise ValueError("openalex_id is required.")
+    try:
+        max_results = int(max_results)
+    except (TypeError, ValueError):
+        max_results = 10
+    max_results = max(1, min(25, max_results))
+    try:
+        graph = fetch_citation_graph(openalex_id, max_nodes=50)
+    except Exception as e:
+        return {"cited_by": [], "references": [],
+                "error": f"Could not load citation graph: {type(e).__name__}",
+                "total": 0}
+    nodes = graph.get("nodes", []) if isinstance(graph, dict) else []
+    cited_by, references = [], []
+    for n in nodes:
+        if not isinstance(n, dict) or n.get("id") == openalex_id:
+            continue
+        entry = {"id": n.get("id"), "title": (n.get("title") or "")[:120],
+                 "year": n.get("year")}
+        rel = str(n.get("relation") or "").lower()
+        if "cited" in rel or "cites_this" in rel:
+            cited_by.append(entry)
+        else:
+            references.append(entry)
+    return {"cited_by": cited_by[:max_results],
+            "references": references[:max_results],
+            "total": len(cited_by) + len(references),
+            "guidance": ("'Cited by' = newer work building on this. "
+                         "'References' = foundations to read first.")}
+
+
+def reading_queue(papers, interests=None, minutes_per_paper=45):
+    """Prioritized reading queue with time estimates.
+
+    papers: list of metadata dicts {title, year, abstract?, id}.
+    interests: list of keyword strings to boost relevance.
+    Returns {queue: [{title, year, priority, why, est_minutes}], total_minutes}.
+    """
+    if not isinstance(papers, (list, tuple)) or not papers:
+        raise ValueError("papers must be a non-empty list.")
+    interests = [_clean13(i).strip().lower() for i in (interests or [])
+                 if isinstance(i, str) and _clean13(i).strip()][:10]
+    try:
+        minutes_per_paper = int(minutes_per_paper)
+    except (TypeError, ValueError):
+        minutes_per_paper = 45
+    minutes_per_paper = max(10, min(180, minutes_per_paper))
+
+    now_year = datetime.now(timezone.utc).year
+    queue = []
+    for p in papers:
+        if not isinstance(p, dict):
+            continue
+        title = _clean13(p.get("title") or "Untitled")[:120]
+        abstract = _clean13(p.get("abstract") or "").lower()
+        blob = (title + " " + abstract).lower()
+        hits = sum(1 for kw in interests if kw in blob)
+        try:
+            year = int(p.get("year") or 0)
+        except (TypeError, ValueError):
+            year = 0
+        recency = max(0, 5 - (now_year - year)) if year else 0
+        score = hits * 10 + recency * 2
+        why = []
+        if hits:
+            why.append(f"Matches your interests ({hits} keyword(s))")
+        if recency >= 3:
+            why.append("Recent paper")
+        if not why:
+            why.append("General background reading")
+        # Longer abstracts ≈ denser papers ≈ more time.
+        est = minutes_per_paper + (15 if len(abstract) > 1500 else 0)
+        queue.append({"id": p.get("id"), "title": title, "year": year or None,
+                      "priority": score, "why": "; ".join(why),
+                      "est_minutes": est})
+    queue.sort(key=lambda x: (-x["priority"], -(x["year"] or 0)))
+    total = sum(q["est_minutes"] for q in queue)
+    return {"queue": queue, "total_papers": len(queue),
+            "total_minutes": total,
+            "total_hours": round(total / 60, 1),
+            "guidance": f"~{round(total/60, 1)}h of reading. Do 1-2 papers per day."}
