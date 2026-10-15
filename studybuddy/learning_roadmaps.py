@@ -226,3 +226,125 @@ def progress_summary(progress_rows):
             "pct": round(done / total * 100),
         })
     return out
+
+
+# ================= Feature 15 Ultimate Enhancements =================
+# 15.1 Agentic-AI track | 15.2 Project milestones | 15.3 Weekly auto-planner
+
+import re as _re9
+from datetime import datetime, timedelta, timezone
+
+
+def _clean9(text):
+    return _re9.sub(r"<[^>]*>", "", text or "")
+
+
+# The 234%-growth skill cluster as a first-class roadmap.
+_AGENTIC_TRACK = {
+    "id": "agentic-ai",
+    "name": "Agentic AI Engineer",
+    "tagline": "The fastest-growing skill cluster of 2026: agents, RAG, eval.",
+    "stages": [
+        {"stage": "Foundations", "weeks": 3,
+         "skills": ["Python APIs", "Prompt engineering basics", "LLM fundamentals"],
+         "project": "Build a Q&A bot over your own notes using an LLM API."},
+        {"stage": "RAG", "weeks": 4,
+         "skills": ["Embeddings", "Vector databases", "Chunking strategies", "Retrieval tuning"],
+         "project": "RAG chatbot over 50 PDFs with cited answers."},
+        {"stage": "Agents", "weeks": 4,
+         "skills": ["Tool calling", "Agent loops", "Multi-agent patterns", "LangChain/LlamaIndex"],
+         "project": "Research agent that browses, summarizes, and cites sources."},
+        {"stage": "Eval & Ship", "weeks": 3,
+         "skills": ["LLM evaluation", "Guardrails", "Cost optimization", "Monitoring"],
+         "project": "Production-ready agent with evals, guardrails, and a demo video."},
+    ],
+}
+
+
+def agentic_ai_track():
+    """Return the Agentic AI roadmap (the 234%-growth cluster)."""
+    track = {"id": _AGENTIC_TRACK["id"], "name": _AGENTIC_TRACK["name"],
+             "tagline": _AGENTIC_TRACK["tagline"],
+             "total_weeks": sum(s["weeks"] for s in _AGENTIC_TRACK["stages"]),
+             "stages": [dict(s) for s in _AGENTIC_TRACK["stages"]]}
+    return track
+
+
+def project_milestones(roadmap_stages):
+    """Attach a portfolio-worthy project milestone to each roadmap stage.
+
+    roadmap_stages: list of {stage/name, weeks?, project?}. Stages without a
+    project get a generated one. Returns enriched stages.
+    """
+    if not isinstance(roadmap_stages, (list, tuple)):
+        raise ValueError("roadmap_stages must be a list.")
+    _FALLBACK_PROJECTS = [
+        "Build a small working demo of this stage's core skill and push it to GitHub.",
+        "Write a blog post / LinkedIn post explaining what you built and one lesson.",
+        "Extend the demo with one real-world feature and record a 2-min demo video.",
+        "Polish, document, and add the project to your portfolio with metrics.",
+    ]
+    out = []
+    for i, st in enumerate(roadmap_stages):
+        if not isinstance(st, dict):
+            continue
+        name = _clean9(st.get("stage") or st.get("name") or f"Stage {i+1}")[:80]
+        project = _clean9(st.get("project") or "").strip()
+        if not project:
+            project = _FALLBACK_PROJECTS[i % len(_FALLBACK_PROJECTS)]
+        out.append({"stage": name,
+                    "weeks": st.get("weeks"),
+                    "project": project,
+                    "deliverable": "GitHub repo + README + demo",
+                    "proof": "Recruiters see proof of work, not just claims."})
+    if not out:
+        raise ValueError("No valid stages to attach milestones to.")
+    return {"stages": out, "total_projects": len(out),
+            "guidance": "Finish each stage's project before moving on — half-done tutorials don't count."}
+
+
+def weekly_planner(roadmap_stages, hours_per_week=6, start_date=None):
+    """Turn roadmap stages into a week-by-week calendar plan.
+
+    Returns {weeks: [{week, dates, focus, project, hours}], total_weeks}.
+    """
+    if not isinstance(roadmap_stages, (list, tuple)) or not roadmap_stages:
+        raise ValueError("roadmap_stages must be a non-empty list.")
+    try:
+        hours_per_week = float(hours_per_week)
+    except (TypeError, ValueError):
+        hours_per_week = 6
+    hours_per_week = max(1, min(40, hours_per_week))
+    try:
+        start = datetime.fromisoformat(str(start_date or "").replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        start = datetime.now(timezone.utc)
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=timezone.utc)
+
+    weeks = []
+    week_no = 1
+    for st in roadmap_stages:
+        if not isinstance(st, dict):
+            continue
+        name = _clean9(st.get("stage") or st.get("name") or "Stage")[:80]
+        try:
+            n_weeks = max(1, int(st.get("weeks") or 2))
+        except (TypeError, ValueError):
+            n_weeks = 2
+        project = _clean9(st.get("project") or "Practice + build")[:120]
+        for _ in range(n_weeks):
+            w_start = start + timedelta(weeks=week_no - 1)
+            weeks.append({
+                "week": week_no,
+                "dates": f"{w_start.strftime('%b %d')} – {(w_start + timedelta(days=6)).strftime('%b %d')}",
+                "focus": name,
+                "project": project if week_no and _ == n_weeks - 1 else "Learn + practice",
+                "hours": hours_per_week,
+                "reminder": f"Week {week_no}: {hours_per_week:.0f}h on {name}",
+            })
+            week_no += 1
+    total_hours = round(len(weeks) * hours_per_week, 1)
+    return {"weeks": weeks, "total_weeks": len(weeks),
+            "total_hours": total_hours,
+            "guidance": f"{total_hours:.0f} hours total. Miss a week? Shift — never skip."}
