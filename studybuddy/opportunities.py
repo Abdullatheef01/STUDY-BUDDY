@@ -422,3 +422,102 @@ def get_opportunity(opp_id):
 
 def opp_exists(opp_id):
     return any(o["id"] == opp_id for o in load_dataset()["opportunities"])
+
+
+# ================= Feature 25 Ultimate Enhancements =================
+# 25.1 Deadline alerts | 25.2 Fit scoring | 25.3 One-click tracker add
+
+import re as _re19
+from datetime import date as _date19
+
+
+def _clean19(text):
+    return _re19.sub(r"<[^>]*>", "", text or "")
+
+
+def deadline_alerts(opportunities, today=None):
+    """Bucket opportunities by deadline urgency: 1/3/7-day alerts.
+
+    opportunities: list of enriched dicts (with days_left). Returns
+    {critical (<=1d), soon (<=3d), upcoming (<=7d), expired}.
+    """
+    if not isinstance(opportunities, (list, tuple)):
+        raise ValueError("opportunities must be a list.")
+    buckets = {"critical": [], "soon": [], "upcoming": [], "expired": []}
+    for o in opportunities:
+        if not isinstance(o, dict):
+            continue
+        try:
+            days = o.get("days_left")
+            days = int(days) if days is not None else None
+        except (TypeError, ValueError):
+            continue
+        if days is None:
+            continue
+        entry = {"id": o.get("id"), "title": _clean19(o.get("title") or "")[:80],
+                 "organization": _clean19(o.get("organization") or "")[:60],
+                 "days_left": days, "link": o.get("link")}
+        if days < 0:
+            buckets["expired"].append(entry)
+        elif days <= 1:
+            buckets["critical"].append(entry)
+        elif days <= 3:
+            buckets["soon"].append(entry)
+        elif days <= 7:
+            buckets["upcoming"].append(entry)
+    for k in buckets:
+        buckets[k].sort(key=lambda x: x["days_left"])
+    n_alert = sum(len(buckets[k]) for k in ("critical", "soon", "upcoming"))
+    return {**buckets,
+            "alert_count": n_alert,
+            "message": (f"{n_alert} deadline(s) within 7 days — act now."
+                        if n_alert else "No urgent deadlines. Browse freely.")}
+
+
+def fit_score(opportunity, skills):
+    """Score how well an opportunity matches the user's skills (0-100).
+
+    Returns {score, matched, missing_hint, verdict}.
+    """
+    if not isinstance(opportunity, dict):
+        raise ValueError("opportunity must be a dict.")
+    skills = [_clean19(s).strip().lower() for s in (skills or [])
+              if isinstance(s, str) and _clean19(s).strip()][:30]
+    if not skills:
+        raise ValueError("At least one skill is needed for fit scoring.")
+    blob = (_clean19(opportunity.get("title") or "") + " " +
+            _clean19(opportunity.get("eligibility") or "") + " " +
+            _clean19(opportunity.get("type") or "")).lower()
+    matched = [s for s in skills if s in blob]
+    # Partial credit for related terms.
+    score = round(len(matched) / len(skills) * 100, 1)
+    if matched:
+        score = min(100.0, score + 10)  # bonus for any match
+    verdict = ("Strong match — apply first." if score >= 60 else
+               "Decent match — worth a look." if score >= 30 else
+               "Stretch — apply only if the role excites you.")
+    return {"score": min(100.0, score), "matched": matched,
+            "matched_count": len(matched), "total_skills": len(skills),
+            "verdict": verdict}
+
+
+def to_tracker_payload(opportunity):
+    """Convert an opportunity to a job-tracker add payload (one-click apply tracking).
+
+    Returns {company, role, jd_url, notes, stage}.
+    """
+    if not isinstance(opportunity, dict):
+        raise ValueError("opportunity must be a dict.")
+    org = _clean19(opportunity.get("organization") or "").strip()[:200]
+    title = _clean19(opportunity.get("title") or "").strip()[:200]
+    if not org or not title:
+        raise ValueError("Opportunity needs an organization and title.")
+    link = (opportunity.get("link") or "").strip()[:500]
+    deadline = opportunity.get("deadline")
+    notes = f"From Opportunity Radar ({opportunity.get('type', 'opportunity')})"
+    if deadline:
+        notes += f". Deadline: {deadline}"
+    return {"company": org, "role": title,
+            "jd_url": link if _re19.match(r"^https?://", link, _re19.I) else "",
+            "notes": notes[:500], "stage": "wishlist",
+            "opportunity_id": opportunity.get("id")}
