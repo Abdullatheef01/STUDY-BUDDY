@@ -72,7 +72,8 @@ def _gemini_api_key():
 
 
 def _ai_ready():
-    return _GENAI_IMPORTED and _gemini_api_key() is not None
+    from studybuddy import ai_gateway
+    return ai_gateway.ai_ready()
 
 
 class GeminiError(Exception):
@@ -6685,7 +6686,7 @@ def register_routes(app):
                 or 'Independent Research'
 
             if not _ai_ready():
-                return jsonify({'error': 'API Key Missing. Add GEMINI_API_KEY to use the constructor.'}), 400
+                return jsonify({'error': 'API Key Missing. Add GEMINI_API_KEY, GROQ_API_KEY, or OPENROUTER_API_KEY to use the constructor.'}), 400
 
             match = re.match(
                 r'https?://github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?/?$', repo_url, re.IGNORECASE)
@@ -7446,19 +7447,16 @@ def _save_research_exchange(user_id, client_session_id, user_msg, ai_response, d
 
 
 # --- AI Resiliency Helper (google-genai SDK, P1#9) ---
-def call_gemini_ai(prompt, max_attempts=4):
-    """Call the best available Gemini model with fail-fast semantics (P0#2).
+def call_gemini_direct(prompt, max_attempts=4):
+    """Raw Gemini call (no fallback). Used by the AI gateway as one provider.
 
-    - Model discovery hits the API at most once per hour (module-level cache).
-    - The HTTP client carries a 30s timeout: no more 30-60s hangs.
-    - Any failure raises GeminiError with a user-safe message (never leaks
-      SDK/proxy internals); endpoints translate it to HTTP 502.
+    Raises on any failure — the gateway catches and tries the next provider.
     """
     client = _make_gemini_client()
     if client is None:
         raise GeminiError(
-            "AI features need a Gemini API key. Add GEMINI_API_KEY to your "
-            ".env file (free at Google AI Studio) and restart.")
+            "AI features need an API key. Add GEMINI_API_KEY, GROQ_API_KEY, or "
+            "OPENROUTER_API_KEY to your .env file (all have free tiers) and restart.")
 
     try:
         model_names = _discover_model_names(client)
@@ -7492,6 +7490,19 @@ def call_gemini_ai(prompt, max_attempts=4):
 
     raise GeminiError(
         "The AI service is temporarily unavailable. Please try again shortly.")
+
+
+def call_gemini_ai(prompt, max_attempts=4):
+    """AI generation via the multi-provider gateway (Gemini -> Groq -> OpenRouter).
+
+    Keeps the historic name so all call sites work unchanged; failures raise
+    GeminiError with user-safe messages, as before.
+    """
+    from studybuddy import ai_gateway
+    try:
+        return ai_gateway.generate(prompt)
+    except ai_gateway.AIError as e:
+        raise GeminiError(str(e))
 
 
 app = create_app()
