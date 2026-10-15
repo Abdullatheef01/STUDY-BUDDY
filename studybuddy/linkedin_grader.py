@@ -257,3 +257,144 @@ def validate_linkedin_inputs(payload):
     if total < MIN_ABOUT_CHARS:
         return None, "That looks too short to grade - paste more of your profile."
     return fields, None
+
+
+# ================= Feature 5 Ultimate Enhancements =================
+# 5.1 Recruiter AI-search check | 5.2 Content engine | 5.3 Profile-vs-JD gap
+
+import re as _re
+
+
+def _clean(text):
+    return _re.sub(r"<[^>]*>", "", text or "")
+
+
+def recruiter_search_check(headline, about, skills, target_queries):
+    """Will recruiters FIND this profile? Simulates recruiter search queries.
+
+    LinkedIn ranks headline matches highest, then skills, then about.
+    target_queries: list of strings recruiters would search
+        (e.g. ["python fresher bangalore", "react developer"]).
+    Returns per-query visibility + overall discoverability score.
+    """
+    headline = _clean(headline).lower()
+    about = _clean(about).lower()
+    skills = _clean(skills).lower()
+    if not isinstance(target_queries, (list, tuple)):
+        raise ValueError("target_queries must be a list of search strings.")
+
+    results = []
+    total = 0
+    for q in target_queries:
+        q = _clean(q).lower().strip() if isinstance(q, str) else ""
+        if not q:
+            continue
+        terms = [t for t in _re.split(r"\s+", q) if len(t) > 2]
+        if not terms:
+            continue
+        h_hits = sum(1 for t in terms if t in headline)
+        s_hits = sum(1 for t in terms if t in skills)
+        a_hits = sum(1 for t in terms if t in about)
+        # Headline weighted 3x, skills 2x, about 1x.
+        score = (3 * h_hits + 2 * s_hits + a_hits) / (6 * len(terms)) * 100
+        score = round(min(100, score), 1)
+        total += score
+        missing = [t for t in terms if t not in headline and t not in skills
+                   and t not in about]
+        results.append({
+            "query": q, "visibility": score,
+            "matched_terms": [t for t in terms if t not in missing],
+            "missing_terms": missing,
+            "fix": (f"Add '{missing[0]}' to your headline for this query."
+                    if missing else "Fully visible for this query."),
+        })
+    overall = round(total / len(results), 1) if results else 0.0
+    return {"queries": results, "discoverability_score": overall,
+            "verdict": ("Highly discoverable" if overall >= 70 else
+                        "Partially discoverable" if overall >= 40 else
+                        "Nearly invisible to recruiters" if results else
+                        "No queries to check")}
+
+
+# 4-week content engine: prove skills, don't just claim them.
+_CONTENT_TEMPLATES = [
+    ("Build in public", "Share what you built this week: problem, approach, result. End with one lesson."),
+    ("Teach one concept", "Explain one {skill} concept simply, with a tiny code example or diagram."),
+    ("Break down a project", "Walk through your best project: architecture, hardest bug, what you'd redo."),
+    ("Hot take + evidence", "Opinion about {skill} ecosystem, backed by something you tried."),
+    ("Resource roundup", "5 resources that actually helped you learn {skill} — with one-line reviews."),
+    ("Before/after", "Show a refactor or improvement: old code vs new code, and why it's better."),
+    ("Ask the community", "Genuine question about {skill} you're stuck on — invites experts to reply."),
+    ("Career lesson", "One thing {skill} taught you about problem-solving or teamwork."),
+]
+
+
+def content_plan(skills, weeks=4):
+    """4-week LinkedIn posting plan that demonstrates skills via real work.
+
+    skills: list of skill names. Returns weeks of {week, posts: [{day, format, prompt}]}.
+    3 posts/week — sustainable for students.
+    """
+    if not isinstance(skills, (list, tuple)):
+        raise ValueError("skills must be a list of skill names.")
+    clean_skills = [_clean(s).strip() for s in skills
+                    if isinstance(s, str) and _clean(s).strip()][:8]
+    if not clean_skills:
+        raise ValueError("At least one skill is needed for a content plan.")
+    try:
+        weeks = int(weeks)
+    except (TypeError, ValueError):
+        weeks = 4
+    weeks = max(1, min(12, weeks))
+
+    plan = []
+    ti = 0
+    for w in range(1, weeks + 1):
+        posts = []
+        for day in ("Mon", "Wed", "Fri"):
+            fmt, prompt_tpl = _CONTENT_TEMPLATES[ti % len(_CONTENT_TEMPLATES)]
+            skill = clean_skills[ti % len(clean_skills)]
+            posts.append({"day": day, "format": fmt,
+                          "skill": skill,
+                          "prompt": prompt_tpl.format(skill=skill)})
+            ti += 1
+        plan.append({"week": w, "posts": posts})
+    return {"weeks": plan, "total_posts": weeks * 3,
+            "guidance": ("Post 3x/week. Every post must show real work — "
+                         "74% of 2026 AI-skill mentions that got recruiter attention "
+                         "were tied to projects, not coursework.")}
+
+
+def profile_jd_gap(headline, about, experience, skills, jd_text):
+    """Paste a JD, get the exact profile sections to rewrite.
+
+    Returns per-section {section, missing_keywords, rewrite_tip}.
+    """
+    from studybuddy.jd_matcher import extract_jd_keywords
+    jd = _clean(jd_text)
+    if not jd.strip():
+        raise ValueError("A job description is required.")
+    jd_keywords = [k["keyword"] for k in extract_jd_keywords(jd)]
+
+    sections = {
+        "Headline": _clean(headline).lower(),
+        "About": _clean(about).lower(),
+        "Experience": _clean(experience).lower(),
+        "Skills": _clean(skills).lower(),
+    }
+    tips = {
+        "Headline": "Headline carries the most search weight — put the role title + top 2 skills here.",
+        "About": "First 2 lines show in preview. Open with the JD's core requirement in your own words.",
+        "Experience": "Weave missing keywords into achievement bullets, not as a keyword dump.",
+        "Skills": "Pin the JD's must-have skills in your top 10 — endorsements follow relevance.",
+    }
+    gaps = []
+    for section, text in sections.items():
+        missing = [kw for kw in jd_keywords if kw.lower() not in text][:8]
+        if missing:
+            gaps.append({"section": section, "missing_keywords": missing,
+                         "rewrite_tip": tips[section]})
+    return {"gaps": gaps,
+            "sections_needing_work": len(gaps),
+            "verdict": ("Profile already aligns well with this JD." if not gaps
+                        else f"{len(gaps)} section(s) need keyword work for this JD.")}
