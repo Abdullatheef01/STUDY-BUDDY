@@ -936,3 +936,115 @@ def _build_summary(user_id, now):
         "quests": quests, "league": league, "reflection": reflection,
         "week_start": wk_start.isoformat(),
     }
+
+
+# ================= Feature 27 Ultimate Enhancements =================
+# 27.1 Streak freeze | 27.2 Squad challenges | 27.3 Reward unlocks
+
+import re as _re20
+from datetime import date as _date20, timedelta as _td20
+
+
+def _clean20(text):
+    return _re20.sub(r"<[^>]*>", "", text or "")
+
+
+def streak_freeze_status(last_active, freezes_used_week, week_start, today=None):
+    """Weekly rest day: 1 streak freeze per week, auto-applied on missed days.
+
+    Returns {freezes_available, freeze_would_apply, message}.
+    A freeze preserves the streak through ONE missed day per week.
+    """
+    today = today or _date20.today()
+    try:
+        used = int(freezes_used_week or 0)
+    except (TypeError, ValueError):
+        used = 0
+    available = max(0, 1 - used)
+    # Would a freeze apply right now? (missed yesterday, freeze available)
+    would_apply = False
+    try:
+        if last_active:
+            delta = (today - last_active).days
+            would_apply = delta == 2 and available > 0  # missed exactly yesterday
+    except (TypeError, AttributeError):
+        pass
+    return {"freezes_available": available,
+            "freeze_would_apply": would_apply,
+            "message": ("Rest day available — skip a day guilt-free, streak stays."
+                        if available and not would_apply else
+                        "Freeze would save your streak today — take the rest day."
+                        if would_apply else
+                        "Freeze used this week — stay active to keep the streak.")}
+    
+
+def squad_leaderboard(members, week_key=None):
+    """Weekly XP competition between friends.
+
+    members: list of {user_id, name, weekly_xp}. Returns ranked {squad,
+    leader, your_rank?}.
+    """
+    if not isinstance(members, (list, tuple)):
+        raise ValueError("members must be a list.")
+    clean = []
+    for m in members:
+        if not isinstance(m, dict):
+            continue
+        try:
+            xp = max(0, int(m.get("weekly_xp") or 0))
+        except (TypeError, ValueError):
+            xp = 0
+        clean.append({"user_id": m.get("user_id"),
+                      "name": _clean20(m.get("name") or "Anonymous")[:40] or "Anonymous",
+                      "weekly_xp": xp})
+    if not clean:
+        raise ValueError("Squad needs at least one member.")
+    clean.sort(key=lambda x: -x["weekly_xp"])
+    for i, m in enumerate(clean, 1):
+        m["rank"] = i
+    medals = {1: "gold", 2: "silver", 3: "bronze"}
+    for m in clean:
+        m["medal"] = medals.get(m["rank"])
+    leader = clean[0]
+    return {"squad": clean, "leader": leader["name"],
+            "leader_xp": leader["weekly_xp"],
+            "week": week_key or iso_week_key(),
+            "hype": (f"{leader['name']} leads with {leader['weekly_xp']} XP — "
+                     f"{'can anyone catch up?' if len(clean) > 1 else 'solo grind!'}" )}
+
+
+# Reward tiers: streak/XP milestones unlock perks.
+_REWARD_TIERS = [
+    (7, 0, "7-day streak", "Unlock: premium mock interview pack"),
+    (14, 0, "14-day streak", "Unlock: AI resume deep-review"),
+    (30, 0, "30-day streak", "Unlock: priority mentor matching"),
+    (0, 1000, "1000 XP", "Unlock: exclusive DSA hard pack"),
+    (0, 5000, "5000 XP", "Unlock: 1:1 career strategy session"),
+    (60, 10000, "60-day streak + 10k XP", "Unlock: STUDY-BUDDY champion badge"),
+]
+
+
+def reward_tiers(current_streak, total_xp):
+    """What has the user unlocked? What's next?
+
+    Returns {unlocked: [...], next_up: {...} or None, progress}.
+    """
+    try:
+        streak = max(0, int(current_streak or 0))
+    except (TypeError, ValueError):
+        streak = 0
+    try:
+        xp = max(0, int(total_xp or 0))
+    except (TypeError, ValueError):
+        xp = 0
+    unlocked, locked = [], []
+    for req_streak, req_xp, name, perk in _REWARD_TIERS:
+        got = streak >= req_streak and xp >= req_xp
+        (unlocked if got else locked).append(
+            {"name": name, "perk": perk, "unlocked": got})
+    next_up = locked[0] if locked else None
+    return {"unlocked": unlocked, "next_up": next_up,
+            "unlocked_count": len(unlocked), "total_tiers": len(_REWARD_TIERS),
+            "progress": f"{len(unlocked)}/{len(_REWARD_TIERS)} rewards unlocked",
+            "motivation": (f"Next: {next_up['name']} → {next_up['perk']}"
+                           if next_up else "All rewards unlocked — legend status.")}
