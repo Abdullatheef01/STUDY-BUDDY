@@ -445,6 +445,8 @@ class JobApplication(db.Model):
     jd_url = db.Column(db.String(500))
     notes = db.Column(db.Text)
     applied_date = db.Column(db.Date)
+    resume_version_id = db.Column(db.Integer, db.ForeignKey("resume_version.id"),
+                                 nullable=True, index=True)  # which version was sent
     stage_updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
                                  nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
@@ -1861,6 +1863,13 @@ def _ensure_schema():
             with db.engine.begin() as conn:
                 conn.execute(text('ALTER TABLE "resume_analysis" ADD COLUMN resume_text TEXT'))
             log.info("Schema evolution: added resume_analysis.resume_text")
+    # Ultimate F3.3: which resume version was sent per application.
+    if "job_application" in insp.get_table_names():
+        ja_existing = {c["name"] for c in insp.get_columns("job_application")}
+        if "resume_version_id" not in ja_existing:
+            with db.engine.begin() as conn:
+                conn.execute(text('ALTER TABLE "job_application" ADD COLUMN resume_version_id INTEGER'))
+            log.info("Schema evolution: added job_application.resume_version_id")
 
 
 # ========================================================
@@ -3133,6 +3142,79 @@ def register_routes(app):
             'lines': out_lines[:500],
         })
 
+    # ---------- RESUME VERSIONS ULTIMATE (F3: diff+impact, tailor, linkage) ----------
+    @app.route('/resume-versions/compare-jd', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def compare_versions_for_jd_route():
+        """Which of two saved versions scores higher against a JD (F3.1)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        data = request.get_json(silent=True) or {}
+        va = ResumeVersion.query.filter_by(id=data.get('version_a'),
+                                           user_id=current_user.id).first()
+        vb = ResumeVersion.query.filter_by(id=data.get('version_b'),
+                                           user_id=current_user.id).first()
+        jd_text = (data.get('jd_text') or '').strip()
+        if not va or not vb:
+            return jsonify({'error': 'Both versions must exist.'}), 404
+        if not jd_text:
+            return jsonify({'error': 'Job description is required.'}), 400
+        from studybuddy.resume_versions import compare_versions_for_jd
+        try:
+            result = compare_versions_for_jd(va.resume_text, vb.resume_text,
+                                             jd_text, name_a=va.name, name_b=vb.name)
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
+        return jsonify({'success': True, **result})
+
+    @app.route('/resume-versions/tailor', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def tailor_resume_version():
+        """One-click JD-tailored variant saved as a new version (F3.2)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        data = request.get_json(silent=True) or {}
+        version = ResumeVersion.query.filter_by(id=data.get('version_id'),
+                                                user_id=current_user.id).first()
+        jd_text = (data.get('jd_text') or '').strip()
+        if not version:
+            return jsonify({'error': 'Version not found.'}), 404
+        if not jd_text:
+            return jsonify({'error': 'Job description is required.'}), 400
+        from studybuddy.resume_versions import tailor_resume_for_jd
+        try:
+            result = tailor_resume_for_jd(version.resume_text, jd_text)
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
+        try:
+            new_v = ResumeVersion(user_id=current_user.id,
+                                  name=result['name'][:120],
+                                  resume_text=result['tailored_text'])
+            db.session.add(new_v)
+            db.session.commit()
+        except Exception:
+            log.exception("Tailor save failed")
+            db.session.rollback()
+            return jsonify({'error': 'Could not save the tailored version.'}), 500
+        return jsonify({'success': True, 'version_id': new_v.id, **result})
+
+    @app.route('/resume-versions/performance', methods=['GET'])
+    def resume_version_performance():
+        """Which saved version actually got interviews/offers (F3.3)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in.'}), 401
+        from studybuddy.resume_versions import version_performance
+        versions = {v.id: v.name for v in
+                    ResumeVersion.query.filter_by(user_id=current_user.id).all()}
+        apps = [{'version_id': a.resume_version_id,
+                 'version_name': versions.get(a.resume_version_id),
+                 'stage': a.stage}
+                for a in JobApplication.query.filter_by(user_id=current_user.id).all()
+                if a.resume_version_id]
+        return jsonify({'success': True,
+                        'performance': version_performance(apps),
+                        'linked_applications': len(apps)})
+
     # ---------- COVER LETTER + OUTREACH GENERATOR (Wave 1 #4) ----------
     @app.route('/generate-cover', methods=['POST'])
     @limiter.limit("10 per hour")
@@ -3286,6 +3368,7 @@ def register_routes(app):
             'applied_date': a.applied_date.isoformat() if a.applied_date else None,
             'stage_updated_at': a.stage_updated_at.isoformat() if a.stage_updated_at else None,
             'created_at': a.created_at.isoformat() if a.created_at else None,
+            'resume_version_id': a.resume_version_id,
         }
 
     def _validate_tracker_payload(payload, require_company_role=True):
@@ -3315,6 +3398,12 @@ def register_routes(app):
         if len(notes) > 5000:
             return None, 'Notes are too long (max 5,000 characters).'
         data['notes'] = notes or None
+        raw_version = payload.get('resume_version_id')
+        if raw_version not in (None, ''):
+            try:
+                data['resume_version_id'] = int(raw_version)
+            except (TypeError, ValueError):
+                return None, 'Invalid resume version.'
         raw_date = (payload.get('applied_date') or '').strip()
         if raw_date:
             try:
