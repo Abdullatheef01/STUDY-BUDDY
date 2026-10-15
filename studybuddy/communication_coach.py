@@ -204,3 +204,168 @@ def validate_coach_inputs(payload):
     if len(text) > MAX_CHARS:
         return None, f"Please keep your answer under {MAX_CHARS} characters."
     return text, None
+
+
+# ================= Feature 13 Ultimate Enhancements =================
+# 13.1 Video presence checklist | 13.2 HR-round simulator | 13.3 Clarity score
+
+import re as _re7
+
+
+def _clean7(text):
+    return _re7.sub(r"<[^>]*>", "", text or "")
+
+
+# Video presence rubric: what the camera sees.
+_VIDEO_CHECKS = [
+    ("eye_contact", "Look at the camera, not your own video tile", 20),
+    ("framing", "Head + shoulders visible, centered, well-lit face", 15),
+    ("background", "Clean, uncluttered background (or subtle blur)", 15),
+    ("posture", "Sit upright, lean slightly forward — shows engagement", 15),
+    ("gestures", "Hands visible occasionally; avoid fidgeting", 10),
+    ("audio", "Clear mic, no echo; test before the call", 15),
+    ("attire", "Dress one level above the company's daily wear", 10),
+]
+
+
+def video_presence_checklist(self_scores=None):
+    """Self-scored video presence checklist for AI video screens.
+
+    self_scores: optional dict {check_id: True/False}. Returns {checks,
+    score, priority_fixes}.
+    """
+    self_scores = self_scores or {}
+    checks = []
+    total = 0
+    fixes = []
+    for cid, label, pts in _VIDEO_CHECKS:
+        done = bool(self_scores.get(cid)) if isinstance(self_scores, dict) else False
+        earned = pts if done else 0
+        total += earned
+        checks.append({"id": cid, "label": label, "points": earned, "max": pts,
+                       "done": done})
+        if not done:
+            fixes.append((pts, label))
+    fixes.sort(reverse=True)
+    return {"checks": checks, "score": total,
+            "priority_fixes": [f[1] for f in fixes[:3]],
+            "verdict": ("Camera-ready." if total >= 85 else
+                        "Almost there — fix the top priority." if total >= 60 else
+                        "Do a dry run before any real interview.")}
+
+
+# HR round: classic questions with model answer frameworks.
+_HR_QUESTIONS = [
+    {"id": "tell_me", "question": "Tell me about yourself.",
+     "framework": "Present → Past → Future (60-90 seconds).",
+     "model": ("I am a {role} with {n} years building {what}. Recently I {win}. "
+               "I am excited about this role because {why_company}."),
+     "tips": ["End with why THIS company", "No life story — stay professional",
+              "Quantify one win"]},
+    {"id": "why_us", "question": "Why do you want to work here?",
+     "framework": "Specific → Personal → Forward.",
+     "model": ("Three reasons: your {specific_thing} (I used it in {project}), "
+               "the team's focus on {value}, and the growth path for {role}s here."),
+     "tips": ["Name something specific — never 'great culture'",
+              "Connect it to YOUR work", "Show you researched"]},
+    {"id": "strength_weakness", "question": "What is your greatest weakness?",
+     "framework": "Real weakness → What you're doing → Progress.",
+     "model": ("I used to {weakness}. I have been {action} — for example, {example}. "
+               "It is still a work in progress, but {progress}."),
+     "tips": ["Pick a real, non-fatal weakness", "Show the fix in action",
+              "Never say 'I am a perfectionist'"]},
+    {"id": "why_leave", "question": "Why are you leaving your current role?",
+     "framework": "Grateful → Growth → Forward.",
+     "model": ("I have learned a lot at {current} — especially {skill}. "
+               "I am looking for {growth}, which this role offers through {specific}."),
+     "tips": ["Never badmouth", "Make it about growth, not escape",
+              "Tie to this specific role"]},
+    {"id": "salary_expect", "question": "What are your salary expectations?",
+     "framework": "Deflect → Range → Flexible.",
+     "model": ("I would rather focus on fit first. Based on market data, roles like this "
+               "are typically ₹{lo}-{hi} LPA — I am flexible for the right opportunity."),
+     "tips": ["Give a range, not a number", "Anchor on market data",
+              "Signal flexibility"]},
+]
+
+
+def hr_round_simulator(question_id=None):
+    """HR-round practice: questions + frameworks + model answers.
+
+    question_id: specific one, or None for the full set.
+    """
+    if question_id:
+        qid = _clean7(question_id).strip().lower()
+        for q in _HR_QUESTIONS:
+            if q["id"] == qid:
+                return {"question": dict(q), "count": 1}
+        raise ValueError(f"Unknown HR question '{question_id}'.")
+    return {"questions": [dict(q) for q in _HR_QUESTIONS],
+            "count": len(_HR_QUESTIONS),
+            "guidance": "Practice each aloud in 90 seconds. Record yourself once."}
+
+
+def clarity_score(transcript):
+    """Accent-clarity score for Indian English speakers (0-100).
+
+    Checks: pace (via analyze_transcript if available), sentence length,
+    filler density, jargon density, repetition. Never raises on hostile input.
+    """
+    text = _clean7(transcript or "")
+    words = _words(text)
+    n = len(words)
+    if n == 0:
+        return {"score": 0, "grade": "F", "signals": [], "fixes": ["No speech detected."]}
+    signals = []
+    total = 100.0
+
+    # Sentence length: long sentences hurt clarity.
+    sents = _sentences(text)
+    avg_len = n / max(len(sents), 1)
+    if avg_len > 25:
+        total -= 15
+        signals.append({"signal": "long_sentences", "effect": -15,
+                        "detail": f"Avg {avg_len:.0f} words/sentence — break them up."})
+    else:
+        signals.append({"signal": "good_sentence_length", "effect": 0,
+                        "detail": f"Avg {avg_len:.0f} words/sentence."})
+
+    # Filler density.
+    try:
+        fillers = find_filler_hits(text)
+        filler_rate = len(fillers) / n * 100
+    except Exception:
+        filler_rate = 0
+    if filler_rate > 5:
+        total -= 15
+        signals.append({"signal": "high_filler_rate", "effect": -15,
+                        "detail": f"{filler_rate:.1f}% filler words — pause instead."})
+    elif filler_rate > 2:
+        total -= 5
+        signals.append({"signal": "some_fillers", "effect": -5,
+                        "detail": f"{filler_rate:.1f}% filler words."})
+
+    # Repetition: same word 3+ times in a row or overused crutch words.
+    crutch = _re7.findall(r"\b(actually|basically|literally|stuff|things)\b", text, _re7.I)
+    if len(crutch) > 3:
+        total -= 10
+        signals.append({"signal": "crutch_words", "effect": -10,
+                        "detail": f"{len(crutch)} crutch words (actually/basically/...)."})
+
+    # Jargon density: too much unexplained jargon.
+    jargon = _re7.findall(r"\b(synergy|leverage|paradigm|bandwidth|deep dive|circle back)\b",
+                          text, _re7.I)
+    if jargon:
+        total -= 5 * min(len(jargon), 3)
+        signals.append({"signal": "jargon", "effect": -5 * min(len(jargon), 3),
+                        "detail": f"{len(jargon)} jargon phrases — use plain words."})
+
+    total = max(0, min(100, round(total, 1)))
+    grade = ("A — crystal clear" if total >= 85 else
+             "B — clear" if total >= 70 else
+             "C — needs work" if total >= 50 else
+             "D — hard to follow")
+    fixes = [s["detail"] for s in signals if s["effect"] < 0][:4]
+    return {"score": total, "grade": grade, "signals": signals,
+            "fixes": fixes or ["Clear speech — keep it up."],
+            "word_count": n}
