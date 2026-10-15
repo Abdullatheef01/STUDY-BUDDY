@@ -284,3 +284,163 @@ def public_questions():
          "options": [o["text"] for o in q["options"]]}
         for q in QUESTIONS
     ]
+
+
+# ================= Feature 7 Ultimate Enhancements =================
+# 7.1 AI-role fit track | 7.2 Roadmap export | 7.3 Re-take delta
+
+import re as _re2
+
+
+def _clean2(text):
+    return _re2.sub(r"<[^>]*>", "", text or "")
+
+
+# 2026's new AI-native roles with the skills they demand.
+_AI_ROLES = [
+    {"id": "genai_engineer", "name": "GenAI Engineer",
+     "tagline": "Ship production LLM features: RAG, agents, evals.",
+     "skills": ["python", "llm", "rag", "langchain", "prompt engineering",
+                "api", "vector db", "evaluation"],
+     "demand": "Very high — 234% YoY growth in GenAI skill demand (2026)."},
+    {"id": "ai_pm", "name": "AI Product Manager",
+     "tagline": "Own AI features end-to-end: problem, prompt, metrics.",
+     "skills": ["product thinking", "llm", "analytics", "communication",
+                "sql", "user research", "prompt engineering"],
+     "demand": "High — every SaaS company is hiring AI PMs."},
+    {"id": "ai_ops", "name": "AI Operations / LLMOps",
+     "tagline": "Keep AI systems reliable: monitoring, cost, safety.",
+     "skills": ["python", "monitoring", "cloud", "evaluation", "api",
+                "data pipeline", "cost optimization"],
+     "demand": "Growing — production AI needs operators."},
+    {"id": "ai_workflow", "name": "AI Workflow Engineer",
+     "tagline": "Automate business processes with AI agents.",
+     "skills": ["automation", "api", "prompt engineering", "python",
+                "no-code tools", "process design"],
+     "demand": "High — non-tech teams are the biggest buyers."},
+    {"id": "ai_governance", "name": "AI Governance Specialist",
+     "tagline": "Make AI safe and compliant: policy, audits, risk.",
+     "skills": ["communication", "policy", "risk assessment", "analytics",
+                "documentation", "ethics"],
+     "demand": "Emerging — regulation is creating this role."},
+]
+
+
+def ai_role_fit(user_skills):
+    """Score the user against 2026's AI-native roles.
+
+    user_skills: list of skill name strings. Returns roles ranked by fit
+    with {name, tagline, fit (0-100), matched, missing, demand}.
+    """
+    if not isinstance(user_skills, (list, tuple)):
+        raise ValueError("user_skills must be a list of skill names.")
+    mine = set()
+    for s in user_skills:
+        if isinstance(s, str):
+            cleaned = _clean2(s).strip().lower()
+            if cleaned:
+                mine.add(cleaned)
+    out = []
+    for role in _AI_ROLES:
+        matched = [sk for sk in role["skills"] if sk in mine]
+        # Fuzzy: partial word overlap counts half.
+        fuzzy = [sk for sk in role["skills"]
+                 if sk not in matched
+                 and any(w in mine or mine and any(w in m for m in mine)
+                         for w in sk.split())]
+        fit = round((len(matched) + 0.5 * len(fuzzy)) / len(role["skills"]) * 100, 1)
+        missing = [sk for sk in role["skills"]
+                   if sk not in matched and sk not in fuzzy][:5]
+        out.append({"id": role["id"], "name": role["name"],
+                    "tagline": role["tagline"], "fit": min(100.0, fit),
+                    "matched": matched, "missing": missing,
+                    "demand": role["demand"]})
+    out.sort(key=lambda r: -r["fit"])
+    return {"roles": out, "best_bet": out[0]["name"] if out else None,
+            "guidance": "Pick ONE role. Close its top-3 missing skills in 90 days."}
+
+
+def roadmap_export(cluster, weeks=26):
+    """Turn an assessment result into a concrete weekly plan.
+
+    cluster: dict with {name, skills (list)}. Returns {weeks: [{week, focus,
+    tasks}], total_weeks}. Pure function — no AI needed.
+    """
+    if not isinstance(cluster, dict):
+        raise ValueError("cluster must be an assessment result dict.")
+    name = _clean2(cluster.get("name") or "your target role").strip()[:80] or "your target role"
+    skills = [_clean2(s).strip() for s in (cluster.get("skills") or [])
+              if isinstance(s, str) and _clean2(s).strip()][:10]
+    if not skills:
+        raise ValueError("The cluster has no skills to build a plan from.")
+    try:
+        weeks = int(weeks)
+    except (TypeError, ValueError):
+        weeks = 26
+    weeks = max(4, min(52, weeks))
+
+    phases = ["Foundations", "Build", "Ship", "Polish"]
+    plan = []
+    for w in range(1, weeks + 1):
+        phase = phases[min(3, (w - 1) * 4 // weeks)]
+        skill = skills[(w - 1) % len(skills)]
+        if phase == "Foundations":
+            tasks = [f"Learn {skill} fundamentals (3 hrs)", "Do 5 practice problems",
+                     "Write notes in your own words"]
+        elif phase == "Build":
+            tasks = [f"Build a small project using {skill}", "Push to GitHub with README",
+                     "Get feedback (peer or mentor)"]
+        elif phase == "Ship":
+            tasks = [f"Ship a portfolio-worthy {skill} project", "Write a LinkedIn post about it",
+                     "Add it to your resume"]
+        else:
+            tasks = [f"Mock interview / quiz on {skill}", "Fill gaps from feedback",
+                     "Apply to 5 roles using this skill"]
+        plan.append({"week": w, "phase": phase, "focus": skill, "tasks": tasks})
+    return {"role": name, "total_weeks": weeks, "weeks": plan,
+            "milestones": [f"Week {weeks//4}: foundations done",
+                           f"Week {weeks//2}: first shipped project",
+                           f"Week {3*weeks//4}: portfolio complete",
+                           f"Week {weeks}: interview-ready"]}
+
+
+def assessment_delta(old_results, new_results):
+    """Compare two assessment runs: where did you grow?
+
+    Each results list: [{id, name, match}]. Returns {grew, shrank, stable,
+    top_mover, summary}.
+    """
+    def _norm(results):
+        out = {}
+        for r in (results or []):
+            if isinstance(r, dict) and r.get("id"):
+                try:
+                    out[r["id"]] = (r.get("name") or r["id"], float(r.get("match") or 0))
+                except (TypeError, ValueError):
+                    continue
+        return out
+    old, new = _norm(old_results), _norm(new_results)
+    if not old or not new:
+        raise ValueError("Both old and new results are needed for a delta.")
+    grew, shrank, stable = [], [], []
+    for cid, (name, nmatch) in new.items():
+        if cid in old:
+            delta = round(nmatch - old[cid][1], 1)
+            entry = {"id": cid, "name": name, "old": old[cid][1],
+                     "new": nmatch, "delta": delta}
+            if delta >= 5:
+                grew.append(entry)
+            elif delta <= -5:
+                shrank.append(entry)
+            else:
+                stable.append(entry)
+    grew.sort(key=lambda x: -x["delta"])
+    shrank.sort(key=lambda x: x["delta"])
+    top = grew[0] if grew else None
+    summary = ("You have grown most in {}.".format(top["name"]) if top else
+               "No big movers — steady profile.")
+    if shrank:
+        summary += " Watch {} (down {} pts).".format(shrank[0]["name"], -shrank[0]["delta"])
+    new_ids = [cid for cid in new if cid not in old]
+    return {"grew": grew, "shrank": shrank, "stable": stable,
+            "new_clusters": new_ids, "top_mover": top, "summary": summary}
