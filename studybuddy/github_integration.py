@@ -240,3 +240,203 @@ def analyze_github_profile(username):
         "suggestions": suggestions[:8],
         "snapshot": snapshot,
     }
+
+
+# ================= Feature 6 Ultimate Enhancements =================
+# 6.1 README grader | 6.2 Contribution story builder | 6.3 Pin optimizer
+
+# What recruiters look for in a README (in order of impact).
+_README_SECTIONS = [
+    ("one_line_pitch", re.compile(r"^#\s+.+", re.M), 15,
+     "Title + one-line pitch at the top"),
+    ("what_it_does", re.compile(r"\b(what|overview|about|description)\b.{0,30}:", re.I), 10,
+     "A 'what this does' section"),
+    ("demo_link", re.compile(r"\b(demo|live|try it|playground)\b.{0,40}https?://", re.I), 20,
+     "A live demo link (recruiters click, don't clone)"),
+    ("screenshots", re.compile(r"!\[.*?\]\(.*?\)|<img", re.I), 10,
+     "Screenshots or GIFs"),
+    ("tech_stack", re.compile(r"\b(tech stack|built with|technologies)\b", re.I), 10,
+     "Tech stack listed"),
+    ("how_to_run", re.compile(r"\b(install|getting started|quickstart|usage|run)\b", re.I), 15,
+     "Install / how-to-run instructions"),
+    ("features", re.compile(r"\b(features)\b", re.I), 10,
+     "Feature list"),
+    ("metrics", re.compile(r"\d+\s*(users|stars|downloads|requests|ms|%)", re.I), 10,
+     "Numbers that prove impact"),
+]
+
+
+def grade_readme(readme_text):
+    """Grade a README the way a recruiter scans it (0-100).
+
+    Returns {score, grade, checks: [{label, points, hit}], fixes, verdict}.
+    Never raises on hostile input.
+    """
+    text = re.sub(r"<script[^>]*>.*?</script>", "", readme_text or "",
+                  flags=re.I | re.S)
+    checks = []
+    total = 0
+    fixes = []
+    for key, pattern, pts, label in _README_SECTIONS:
+        try:
+            hit = bool(pattern.search(text))
+        except Exception:
+            hit = False
+        earned = pts if hit else 0
+        total += earned
+        checks.append({"label": label, "points": earned, "max": pts,
+                       "hit": hit})
+        if not hit:
+            fixes.append(label)
+    # Length sanity: too short = no substance.
+    words = len(text.split())
+    if words < 50:
+        total -= 10
+        fixes.insert(0, "README is too short — add substance (aim 150+ words)")
+    total = max(0, min(100, total))
+    grade = ("A — recruiter-ready" if total >= 80 else
+             "B — good, polish needed" if total >= 60 else
+             "C — thin" if total >= 40 else
+             "D — rewrite it")
+    return {"score": total, "grade": grade, "checks": checks,
+            "fixes": fixes[:5], "word_count": words,
+            "verdict": ("Add a demo link — it's the single highest-impact fix."
+                        if not checks[2]["hit"] else
+                        "Solid README." if total >= 70 else
+                        "Work through the fixes above.")}
+
+
+# Commit message -> resume bullet patterns.
+_COMMIT_PATTERNS = [
+    (re.compile(r"\b(add|implement|create|build)\b(.{5,80})", re.I),
+     "Built{}"),
+    (re.compile(r"\b(fix|resolve|patch)\b(.{5,80})", re.I),
+     "Fixed{}"),
+    (re.compile(r"\b(refactor|optimize|improve|speed up)\b(.{5,80})", re.I),
+     "Improved{}"),
+    (re.compile(r"\b(migrate|upgrade)\b(.{5,80})", re.I),
+     "Migrated{}"),
+    (re.compile(r"\b(test|add tests|coverage)\b(.{5,80})", re.I),
+     "Added tests for{}"),
+]
+
+
+def commit_messages_to_bullets(commit_messages, repo_name=""):
+    """Turn commit history into resume bullets.
+
+    commit_messages: list of strings. Returns {bullets, skipped}.
+    Picks the most substantial commits, dedupes themes.
+    """
+    if not isinstance(commit_messages, (list, tuple)):
+        raise ValueError("commit_messages must be a list of strings.")
+    repo = re.sub(r"<[^>]*>", "", repo_name or "").strip()[:60]
+    seen_themes = set()
+    bullets = []
+    skipped = 0
+    for msg in commit_messages:
+        if not isinstance(msg, str):
+            skipped += 1
+            continue
+        clean = re.sub(r"<[^>]*>", "", msg).strip()
+        if len(clean) < 12 or len(clean) > 300:
+            skipped += 1
+            continue
+        low = clean.lower()
+        # Skip noise commits.
+        if re.match(r"^(merge|wip|tmp|fix typo|update readme\.?$)", low):
+            skipped += 1
+            continue
+        bullet = None
+        for pattern, template in _COMMIT_PATTERNS:
+            m = pattern.search(clean)
+            if m:
+                rest = m.group(2).strip().rstrip(".")
+                theme = rest.split()[0] if rest.split() else ""
+                if theme in seen_themes:
+                    break
+                seen_themes.add(theme)
+                bullet = template.format(" " + rest)
+                break
+        if not bullet:
+            # Generic but honest fallback.
+            words = clean.split()
+            theme = words[0] if words else ""
+            if theme.lower() in seen_themes:
+                skipped += 1
+                continue
+            seen_themes.add(theme.lower())
+            bullet = "Shipped: " + clean[0].upper() + clean[1:]
+        if repo:
+            bullet += f" [{repo}]"
+        bullets.append(bullet[:200])
+        if len(bullets) >= 8:
+            break
+    return {"bullets": bullets, "skipped": skipped,
+            "tip": "Add numbers to 2-3 of these (users, %, time saved) before putting them on your resume."}
+
+
+def pin_optimizer(repos, target_role=""):
+    """Which 6 repos to pin for a target role.
+
+    repos: list of {name, description, language, stars, updated_at, topics}.
+    Scores: role-keyword match (40) + recency (20) + stars (15) +
+            has description (15) + has demo/readme signal (10).
+    Returns ranked list with {name, score, reasons}.
+    """
+    if not isinstance(repos, (list, tuple)):
+        raise ValueError("repos must be a list of repo dicts.")
+    role_kw = set(re.findall(r"[a-z]{3,}", _clean_role(target_role).lower()))
+
+    ranked = []
+    for r in repos:
+        if not isinstance(r, dict):
+            continue
+        name = str(r.get("name") or "")[:100]
+        if not name:
+            continue
+        desc = str(r.get("description") or "").lower()
+        lang = str(r.get("language") or "").lower()
+        topics = " ".join(str(t) for t in (r.get("topics") or [])).lower()
+        blob = f"{name} {desc} {lang} {topics}".lower()
+        score = 0
+        reasons = []
+        hits = [kw for kw in role_kw if kw in blob]
+        if hits and role_kw:
+            pts = min(40, len(hits) * 10)
+            score += pts
+            reasons.append(f"Matches role keywords: {', '.join(hits[:4])} (+{pts})")
+        try:
+            stars = int(r.get("stars") or 0)
+        except (TypeError, ValueError):
+            stars = 0
+        if stars >= 10:
+            score += 15
+            reasons.append(f"{stars} stars (+15)")
+        elif stars >= 1:
+            score += 8
+            reasons.append(f"{stars} stars (+8)")
+        if desc.strip():
+            score += 15
+            reasons.append("Has description (+15)")
+        else:
+            reasons.append("No description — add one (-15 missed)")
+        # Recency: updated within 6 months.
+        upd = str(r.get("updated_at") or "")
+        if re.match(r"20(2[4-9]|[3-9]\d)", upd):
+            score += 20
+            reasons.append("Recently updated (+20)")
+        if "demo" in desc or "live" in desc:
+            score += 10
+            reasons.append("Mentions demo (+10)")
+        ranked.append({"name": name, "score": min(100, score),
+                       "reasons": reasons, "language": lang or "unknown"})
+    ranked.sort(key=lambda x: -x["score"])
+    picks = ranked[:6]
+    return {"picks": picks,
+            "pinned_names": [p["name"] for p in picks],
+            "guidance": ("Pin these 6 in this order. Your top-2 pins get 80% of "
+                         "recruiter clicks — make sure they have READMEs with demo links.")}
+
+
+def _clean_role(role):
+    return re.sub(r"<[^>]*>", "", role or "")
