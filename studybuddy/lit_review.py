@@ -939,3 +939,136 @@ def review_to_html(review: Dict) -> str:
     except Exception:
         return ("<div class=\"lit-review\"><h1>Literature Review</h1>"
                 "<p><em>Could not render this review.</em></p></div>")
+
+
+# ================= Feature 21 Ultimate Enhancements =================
+# 21.1 Thematic clustering | 21.2 Gap-highlight mode | 21.3 Length presets
+
+import re as _re15
+from collections import Counter
+
+
+def _clean15(text):
+    return _re15.sub(r"<[^>]*>", "", text or "")
+
+
+# Theme keyword fingerprints.
+_THEMES = [
+    ("Deep Learning", ["neural", "deep learning", "cnn", "transformer", "llm"]),
+    ("NLP", ["nlp", "language", "bert", "gpt", "translation", "sentiment"]),
+    ("Computer Vision", ["vision", "image", "cnn", "detection", "segmentation"]),
+    ("Reinforcement Learning", ["reinforcement", "rl ", "policy", "reward", "agent"]),
+    ("Optimization", ["optim", "gradient", "convergence", "adam", "sgd"]),
+    ("Theory", ["theorem", "proof", "bound", "complexity", "generalization"]),
+    ("Applications", ["application", "deployment", "real-world", "industry", "clinical"]),
+    ("Datasets & Benchmarks", ["dataset", "benchmark", "corpus", "evaluation"]),
+    ("Explainability", ["explainab", "interpret", "attention map", "saliency"]),
+    ("Efficiency", ["efficient", "compress", "pruning", "quantiz", "distill"]),
+]
+
+
+def cluster_by_theme(papers):
+    """Auto-group papers by research theme.
+
+    papers: list of {title, abstract?, id?}. Returns {clusters:
+    [{theme, papers: [...]}], unclustered}.
+    """
+    if not isinstance(papers, (list, tuple)):
+        raise ValueError("papers must be a list.")
+    clusters = {theme: [] for theme, _ in _THEMES}
+    unclustered = []
+    for p in papers:
+        if not isinstance(p, dict):
+            continue
+        blob = (_clean15(p.get("title") or "") + " " +
+                _clean15(p.get("abstract") or "")).lower()
+        if not blob.strip():
+            continue
+        best, best_hits = None, 0
+        for theme, keywords in _THEMES:
+            hits = sum(1 for kw in keywords if kw in blob)
+            if hits > best_hits:
+                best, best_hits = theme, hits
+        entry = {"id": p.get("id"), "title": _clean15(p.get("title") or "Untitled")[:100],
+                 "year": p.get("year")}
+        if best:
+            clusters[best].append(entry)
+        else:
+            unclustered.append(entry)
+    out = [{"theme": t, "papers": ps, "count": len(ps)}
+           for t, ps in clusters.items() if ps]
+    out.sort(key=lambda x: -x["count"])
+    return {"clusters": out, "unclustered": unclustered,
+            "total": sum(c["count"] for c in out) + len(unclustered),
+            "guidance": "Structure your review one section per theme — readers think in themes, not paper lists."}
+
+
+# Gap signals in abstracts.
+_GAP_SIGNALS = [
+    (r"\b(future work|open problem|limitation|remains (an? )?open|not (yet )?addressed)\b", "explicit gap"),
+    (r"\b(however|although|despite)\b.{0,60}\b(not|no|limited|fails?)\b", "hedged limitation"),
+    (r"\b(small|limited) (dataset|sample|scale)\b", "scale limitation"),
+    (r"\b(only|merely) (tested|evaluated) on\b", "narrow evaluation"),
+]
+
+
+def gap_highlight_review(papers):
+    """Structure a review around what's MISSING, not just what's done.
+
+    Returns {gaps: [{paper, signal, excerpt}], coverage_note}.
+    """
+    if not isinstance(papers, (list, tuple)):
+        raise ValueError("papers must be a list.")
+    gaps = []
+    for p in papers:
+        if not isinstance(p, dict):
+            continue
+        title = _clean15(p.get("title") or "Untitled")[:100]
+        abstract = _clean15(p.get("abstract") or "")
+        if not abstract.strip():
+            continue
+        for pattern, label in _GAP_SIGNALS:
+            m = _re15.search(pattern, abstract, _re15.I)
+            if m:
+                start = max(0, m.start() - 60)
+                excerpt = abstract[start:m.end() + 80].strip()
+                gaps.append({"paper": title, "signal": label,
+                             "excerpt": excerpt[:220]})
+                break
+    # Coverage: which themes have NO gaps mentioned = overconfident areas.
+    return {"gaps": gaps, "papers_with_gaps": len({g["paper"] for g in gaps}),
+            "total_papers": len([p for p in papers if isinstance(p, dict)]),
+            "framing": ("Open your review's conclusion with these gaps — "
+                        "a review that only summarizes is a list; a review that "
+                        "identifies gaps is a contribution."),
+            "tip": "Each gap above is a potential research direction."}
+
+
+_LENGTH_PRESETS = {
+    "survey": {"words": 500, "sections": ["Overview", "Key themes", "Open gaps"],
+               "label": "500-word survey"},
+    "standard": {"words": 1500, "sections": ["Introduction", "Thematic review",
+                 "Comparative analysis", "Gaps & future work", "Conclusion"],
+                 "label": "1500-word standard review"},
+    "chapter": {"words": 3000, "sections": ["Introduction", "Background",
+                 "Thematic review", "Methodological comparison", "Comparative analysis",
+                 "Gaps & future work", "Conclusion"],
+                 "label": "3000-word chapter"},
+}
+
+
+def length_preset(preset="standard"):
+    """Get the structure for a review length preset.
+
+    preset: survey | standard | chapter. Returns {label, words, sections,
+    guidance}.
+    """
+    key = _clean15(preset or "").strip().lower()
+    if key not in _LENGTH_PRESETS:
+        raise ValueError(f"Unknown preset '{preset}'. Try: survey, standard, chapter.")
+    p = _LENGTH_PRESETS[key]
+    per_section = p["words"] // len(p["sections"])
+    return {"preset": key, "label": p["label"], "target_words": p["words"],
+            "sections": [{"heading": s, "target_words": per_section} for s in p["sections"]],
+            "guidance": (f"Aim ~{per_section} words per section. "
+                         "Write the gaps section first — it focuses the rest.")}
