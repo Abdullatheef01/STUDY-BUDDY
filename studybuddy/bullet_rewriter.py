@@ -144,3 +144,183 @@ def improve_bullet(bullet_text):
 
 BULLET_MIN_CHARS = 10
 BULLET_MAX_CHARS = 1000
+
+
+# ================= Feature 2 Ultimate Enhancements =================
+# 2.1 STAR auto-converter | 2.2 Verb power ranking | 2.3 Metric finder
+
+# Context clues that hint at each STAR part.
+_STAR_CLUES = {
+    "situation": [r"\b(when|while|during|amid|facing)\b", r"\b(team|project|company|client)\b"],
+    "task": [r"\b(needed to|tasked|goal was|responsible)\b", r"\b(improve|fix|build|launch|reduce)\b"],
+    "action": [r"\b(i |we )?(built|designed|implemented|led|created|developed|migrated)\b"],
+    "result": [r"\b\d+\s*%", r"\b(result|outcome|impact|achieved|increased|decreased)\b"],
+}
+
+# Metric prompts by bullet topic.
+_METRIC_PROMPTS = [
+    (re.compile(r"\b(api|backend|server|database|query)\b", re.I),
+     ["What was the latency before/after?", "How many requests per second/day?",
+      "How much data volume did it handle?"]),
+    (re.compile(r"\b(team|led|managed|mentored)\b", re.I),
+     ["How many people on the team?", "Over what time period?",
+      "What did the team deliver?"]),
+    (re.compile(r"\b(frontend|ui|ux|app|website)\b", re.I),
+     ["How many users?", "Did engagement/conversion change? By how much?",
+      "Page load time improvement?"]),
+    (re.compile(r"\b(test|qa|bug|ci|deploy)\b", re.I),
+     ["Test coverage before/after?", "How many bugs caught?",
+      "Deploy frequency change?"]),
+    (re.compile(r"\b(cost|budget|infra|cloud)\b", re.I),
+     ["How much money saved?", "Percentage cost reduction?",
+      "Resource usage before/after?"]),
+]
+
+
+def star_convert(bullet_text):
+    """Convert a flat bullet into Situation/Task/Action/Result parts.
+
+    Heuristically splits the bullet into STAR components and flags which
+    parts are thin or missing, with prompts to fill them. Never raises
+    on hostile input (ValueError only for empty/too-short, like improve_bullet).
+    Returns {situation, task, action, result, gaps, star_bullet}.
+    """
+    bullet = _strip_html((bullet_text or "")).strip()
+    if not bullet:
+        raise ValueError("Please enter a bullet to rewrite.")
+    if len(bullet) < BULLET_MIN_CHARS:
+        raise ValueError(
+            f"That bullet looks too short (minimum {BULLET_MIN_CHARS} characters).")
+
+    # Split on sentence/clause boundaries for analysis.
+    clauses = [c.strip() for c in re.split(r"[.;]|(?:\s+-\s+)", bullet) if c.strip()]
+    if not clauses:
+        clauses = [bullet]
+
+    parts = {"situation": "", "task": "", "action": "", "result": ""}
+    used = set()
+    order = ["situation", "task", "action", "result"]
+    for part in order:
+        best, best_score = "", 0
+        for i, clause in enumerate(clauses):
+            if i in used:
+                continue
+            score = sum(len(re.findall(p, clause, re.I))
+                        for p in _STAR_CLUES[part])
+            # Positional prior: situation early, result late.
+            pos_bonus = 0
+            if part == "situation" and i == 0:
+                pos_bonus = 1
+            elif part == "result" and i == len(clauses) - 1:
+                pos_bonus = 1
+            elif part == "action" and 0 < i < len(clauses) - 1:
+                pos_bonus = 0.5
+            if score + pos_bonus > best_score:
+                best, best_score = clause, score + pos_bonus
+        if best:
+            parts[part] = best
+            used.add(clauses.index(best))
+
+    # Anything unassigned goes to action (the core of a bullet).
+    for i, clause in enumerate(clauses):
+        if i not in used:
+            parts["action"] = (parts["action"] + " " + clause).strip()
+            used.add(i)
+
+    # Rescue: if task is empty but another part's text contains a task
+    # clause ("needed to X", "goal was Y"), carve it out.
+    if not parts["task"]:
+        m = re.search(r"\bi needed to ([^.]+)", bullet, re.I)
+        if not m:
+            m = re.search(r"\b(goal was|tasked with|aim was)\s+([^.]+)", bullet, re.I)
+        if m:
+            task_text = (m.group(1) if m.lastindex == 1 else m.group(2)).strip()
+            if task_text:
+                parts["task"] = _capitalize_first(task_text.rstrip(". ")) + "."
+
+    gaps = []
+    prompts = {
+        "situation": "Add context: what was the situation? (team size, project, challenge)",
+        "task": "Add your goal: what were you trying to achieve?",
+        "action": "Add what YOU specifically did (verbs, tools, decisions).",
+        "result": "Add the outcome with a number: %, users, time saved, revenue.",
+    }
+    for part in order:
+        if not parts[part]:
+            gaps.append({"part": part, "prompt": prompts[part]})
+
+    star_bullet = " ".join(
+        f"[{p[0].upper()}: {parts[p]}]" for p in order if parts[p])
+    return {"situation": parts["situation"], "task": parts["task"],
+            "action": parts["action"], "result": parts["result"],
+            "gaps": gaps, "star_bullet": star_bullet,
+            "completeness": f"{4 - len(gaps)}/4 parts present"}
+
+
+def verb_power_report(bullets):
+    """Rank verbs across a whole resume's bullets.
+
+    Returns {weak_hits: [{bullet_index, weak_verb, suggestion}], diversity_score,
+    verdict}. diversity_score = unique strong verbs / total bullets (0-100).
+    Accepts a list of bullet strings; never raises on hostile input.
+    """
+    if not isinstance(bullets, (list, tuple)):
+        raise ValueError("bullets must be a list of strings.")
+    weak_hits = []
+    strong_verbs = set()
+    total = 0
+    for idx, b in enumerate(bullets):
+        if not isinstance(b, str):
+            continue
+        total += 1
+        clean = _strip_html(b).strip()
+        if not clean:
+            continue
+        first_word = clean.split()[0].lower() if clean.split() else ""
+        # Check weak patterns.
+        for pattern, suggestion in WEAK_VERB_MAP:
+            if pattern.search(clean):
+                weak_hits.append({"bullet_index": idx, "weak_verb": pattern.pattern,
+                                  "suggestion": suggestion,
+                                  "bullet": clean[:80]})
+                break
+        else:
+            # Strong if it starts with a punchy verb (capitalized action word).
+            m = re.match(r"^([A-Z][a-z]+)\b", clean)
+            if m:
+                strong_verbs.add(m.group(1).lower())
+    diversity = round(len(strong_verbs) / max(total, 1) * 100, 1)
+    verdict = ("Excellent verb diversity" if diversity >= 70 else
+               "Good — a few repeats" if diversity >= 45 else
+               "Weak — many bullets start the same way" if total else
+               "No bullets to analyze")
+    return {"weak_hits": weak_hits, "diversity_score": diversity,
+            "unique_strong_verbs": sorted(strong_verbs),
+            "total_bullets": total, "verdict": verdict}
+
+
+def metric_finder(bullet_text):
+    """Suggest plausible metrics to quantify a bullet.
+
+    Detects the bullet's topic and returns targeted questions the user can
+    answer to add numbers. Returns {topic, questions, has_metric}.
+    """
+    bullet = _strip_html((bullet_text or "")).strip()
+    if not bullet:
+        raise ValueError("Please enter a bullet to analyze.")
+    has_metric = bool(QUANT_HINTS.search(bullet))
+    questions = []
+    topic = "general"
+    for pattern, qs in _METRIC_PROMPTS:
+        if pattern.search(bullet):
+            topic = pattern.pattern.strip("\\b()")
+            questions.extend(qs)
+            break
+    if not questions:
+        questions = ["Can you add a number — users, %, time, or money?",
+                     "What changed because of this work?",
+                     "How big was the scale (team, data, traffic)?"]
+    return {"topic": topic, "questions": questions[:3],
+            "has_metric": has_metric,
+            "verdict": ("Already quantified — nice." if has_metric
+                        else "No metrics found — answer one question above to strengthen it.")}
