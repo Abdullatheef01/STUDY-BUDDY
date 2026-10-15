@@ -885,3 +885,152 @@ def style_guide(style):
     return {"in_text": guide["in_text"],
             "reference_rules": list(guide["reference_rules"]),
             "notes": guide["notes"]}
+
+
+# ================= Feature 20 Ultimate Enhancements =================
+# 20.1 In-text citation inserter | 20.2 Journal style matcher | 20.3 Duplicate detector
+
+import re as _re14
+
+
+def _clean14(text):
+    return _re14.sub(r"<[^>]*>", "", text or "")
+
+
+def _intext_bibtex_key(meta):
+    authors = _authors(meta)
+    first = _split_name(authors[0])[1] if authors else "unknown"
+    year = _str(meta, "year") or "nodate"
+    title_word = (_str(meta, "title") or "untitled").split()
+    tw = _re14.sub(r"\W", "", title_word[0]).lower() if title_word else "untitled"
+    key = f"{_re14.sub(r'\\W', '', first).lower()}{year}{tw}"[:40]
+    return key or "ref"
+
+
+def in_text_citation(meta, style="apa"):
+    """Copy-paste-ready in-text citation snippets.
+
+    Returns {bibtex_key, snippets: {latex, apa, mla, ieee, numeric}}.
+    meta: {authors (list), year, title}. Never raises on hostile input.
+    """
+    if not isinstance(meta, dict):
+        raise ValueError("meta must be a dict.")
+    style = _norm_style(style) if isinstance(style, str) else "apa"
+    authors = _authors(meta)
+    year = _clean14(_str(meta, "year") or "n.d.")
+    surnames = [_split_name(a)[1] or a for a in authors]
+    surnames = [s for s in surnames if s][:3]
+    key = _intext_bibtex_key(meta)
+
+    if len(surnames) >= 3:
+        apa_auth = f"{surnames[0]} et al."
+    elif len(surnames) == 2:
+        apa_auth = f"{surnames[0]} & {surnames[1]}"
+    elif surnames:
+        apa_auth = surnames[0]
+    else:
+        apa_auth = "Unknown"
+    snippets = {
+        "latex": f"\\cite{{{key}}}",
+        "apa": f"({apa_auth}, {year})",
+        "mla": f"({surnames[0] if surnames else 'Unknown'} {year})" if surnames else f"({year})",
+        "ieee": "[1]  % replace with your reference number",
+        "numeric": "[1]  % replace with your reference number",
+        "narrative": f"{apa_auth} ({year})",
+    }
+    return {"bibtex_key": key, "snippets": snippets,
+            "default_for_style": snippets.get(style, snippets["apa"]),
+            "tip": "Paste the snippet, then add the full reference to your bibliography."}
+
+
+# Heuristic fingerprints for common journal styles.
+_STYLE_FINGERPRINTS = [
+    ("apa", [_re14.compile(r"\(\d{4}\)"), _re14.compile(r"&"),
+             _re14.compile(r"https?://|doi:", _re14.I)],
+     "APA: (Year), & between authors, DOI at end."),
+    ("mla", [_re14.compile(r'"[^"]+"'), _re14.compile(r"\d{4},\s*pp\.")],
+     "MLA: \"Quoted Title,\" pp. pages."),
+    ("ieee", [_re14.compile(r"\[\d+\]"), _re14.compile(r"pp\.\s*\d+\s*-\s*\d+"),
+             _re14.compile(r"\bin\b\s+(Proc\.|IEEE|Trans\.)", _re14.I)],
+     "IEEE: [1] numbered, in Proc./Trans., pp. xx-xx."),
+    ("chicago", [_re14.compile(r"\d{4}\."), _re14.compile(r"University Press|Press,")],
+     "Chicago: Year. Publisher location: Press."),
+    ("harvard", [_re14.compile(r"\d{4}[a-z]?\s+[A-Z]"), _re14.compile(r"Available at:")],
+     "Harvard: Year + Available at: URL."),
+    ("vancouver", [_re14.compile(r"\d+\.\s+[A-Z][a-z]+ [A-Z]"),
+                   _re14.compile(r";\d+(\(\d+\))?:\d+-\d+")],
+     "Vancouver: numbered, journalabbrev;vol:pages."),
+]
+
+
+def match_journal_style(sample_citation):
+    """Guess which citation style a sample reference follows.
+
+    Returns {guesses: [{style, confidence, why}], best}.
+    """
+    sample = _clean14(sample_citation or "")
+    if len(sample.strip()) < 20:
+        raise ValueError("Sample citation is too short to analyze.")
+    scored = []
+    for style, patterns, why in _STYLE_FINGERPRINTS:
+        hits = sum(1 for p in patterns if p.search(sample))
+        if hits:
+            scored.append({"style": style, "hits": hits,
+                           "confidence": round(hits / len(patterns) * 100),
+                           "why": why})
+    scored.sort(key=lambda x: (-x["hits"], -x["confidence"]))
+    if not scored:
+        return {"guesses": [], "best": None,
+                "verdict": "No clear style fingerprint — check the journal's author guidelines."}
+    return {"guesses": scored[:3], "best": scored[0]["style"],
+            "verdict": f"Closest match: {scored[0]['style'].upper()} ({scored[0]['why']})"}
+
+
+def find_duplicates(references, threshold=0.85):
+    """Flag near-duplicate references in a bibliography.
+
+    references: list of formatted reference strings (or dicts with title).
+    Returns {duplicates: [{a_index, b_index, similarity, a, b}], count}.
+    """
+    if not isinstance(references, (list, tuple)):
+        raise ValueError("references must be a list.")
+    try:
+        threshold = float(threshold)
+    except (TypeError, ValueError):
+        threshold = 0.85
+    threshold = max(0.5, min(1.0, threshold))
+
+    def _norm(ref):
+        if isinstance(ref, dict):
+            text = str(ref.get("title") or "") + " " + str(ref.get("doi") or "")
+        else:
+            text = str(ref or "")
+        text = _clean14(text).lower()
+        return set(_re14.findall(r"[a-z0-9]{3,}", text))
+
+    normed = [_norm(r) for r in references]
+    dupes = []
+    for i in range(len(normed)):
+        for j in range(i + 1, len(normed)):
+            a, b = normed[i], normed[j]
+            if not a or not b:
+                continue
+            # DOI exact match = definite duplicate.
+            doi_a = _re14.search(r"10\.\d{4,}/[^\s]+", _clean14(str(references[i] if not isinstance(references[i], dict) else references[i].get("doi") or "")).lower())
+            doi_b = _re14.search(r"10\.\d{4,}/[^\s]+", _clean14(str(references[j] if not isinstance(references[j], dict) else references[j].get("doi") or "")).lower())
+            if doi_a and doi_b and doi_a.group(0) == doi_b.group(0):
+                sim = 1.0
+            else:
+                inter = len(a & b)
+                union = len(a | b)
+                sim = inter / union if union else 0
+            if sim >= threshold:
+                dupes.append({
+                    "a_index": i, "b_index": j,
+                    "similarity": round(sim, 2),
+                    "a": _clean14(str(references[i]))[:100],
+                    "b": _clean14(str(references[j]))[:100],
+                })
+    return {"duplicates": dupes, "count": len(dupes),
+            "verdict": (f"{len(dupes)} duplicate pair(s) found — merge them."
+                        if dupes else "No duplicates detected.")}
