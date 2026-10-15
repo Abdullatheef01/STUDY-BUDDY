@@ -215,3 +215,139 @@ def get_trending(limit=30):
 
 def get_freshness():
     return freshness_badge(load_trending().get("meta", {}), STALE_AFTER_DAYS)
+
+
+# ================= Feature 24 Ultimate Enhancements =================
+# 24.1 Personalized feed | 24.2 Paper-to-project ideas | 24.3 Weekly digest
+
+import re as _re18
+
+
+def _clean18(text):
+    return _re18.sub(r"<[^>]*>", "", text or "")
+
+
+def personalized_feed(papers, skills, limit=15):
+    """Filter trending papers by the user's skills/interests.
+
+    papers: list of {title, abstract?, ...}. skills: list of strings.
+    Returns ranked {papers, matched_skills per paper}.
+    """
+    if not isinstance(papers, (list, tuple)):
+        raise ValueError("papers must be a list.")
+    skills = [_clean18(s).strip().lower() for s in (skills or [])
+              if isinstance(s, str) and _clean18(s).strip()][:20]
+    if not skills:
+        raise ValueError("At least one skill/interest is needed.")
+    try:
+        limit = int(limit)
+    except (TypeError, ValueError):
+        limit = 15
+    limit = max(1, min(50, limit))
+    ranked = []
+    for p in papers:
+        if not isinstance(p, dict):
+            continue
+        blob = (_clean18(p.get("title") or "") + " " +
+                _clean18(p.get("abstract") or p.get("summary") or "")).lower()
+        if not blob.strip():
+            continue
+        hits = [s for s in skills if s in blob]
+        if hits:
+            ranked.append({"paper": {k: p.get(k) for k in
+                                     ("title", "authors", "published", "link", "id")
+                                     if p.get(k)},
+                           "matched": hits, "relevance": len(hits)})
+    ranked.sort(key=lambda x: -x["relevance"])
+    return {"papers": ranked[:limit], "total": len(ranked),
+            "skills": skills,
+            "verdict": (f"{len(ranked)} trending papers match your skills."
+                        if ranked else
+                        "No trending papers match — broaden your interests or check back tomorrow.")}
+
+
+def paper_to_project_ideas(paper):
+    """Turn a trending paper into implementable project ideas.
+
+    paper: {title, abstract?}. Returns {ideas: [{title, difficulty, steps}]}.
+    """
+    if not isinstance(paper, dict):
+        raise ValueError("paper must be a dict.")
+    title = _clean18(paper.get("title") or "").strip()
+    if not title:
+        raise ValueError("Paper title is required.")
+    abstract = _clean18(paper.get("abstract") or paper.get("summary") or "")
+    blob = (title + " " + abstract).lower()
+
+    ideas = []
+    # Idea 1: minimal reproduction.
+    ideas.append({
+        "title": f"Reproduce: {title[:60]} (minimal)",
+        "difficulty": "Medium",
+        "steps": ["Read the paper's method section twice",
+                  "Implement the core idea on a toy dataset",
+                  "Compare against the paper's reported baseline",
+                  "Write up what matched / what didn't"],
+    })
+    # Idea 2: applied variant.
+    domain = "your domain"
+    for kw, dom in [("vision", "images"), ("nlp", "text"), ("language", "text"),
+                    ("graph", "graphs"), ("audio", "audio"), ("robot", "robotics")]:
+        if kw in blob:
+            domain = dom
+            break
+    ideas.append({
+        "title": f"Apply it: use the paper's method on {domain} you care about",
+        "difficulty": "Medium-Hard",
+        "steps": [f"Pick a {domain} dataset (Kaggle / HuggingFace)",
+                  "Adapt the paper's method to it",
+                  "Benchmark vs a simple baseline",
+                  "Publish code + 2-min demo video"],
+    })
+    # Idea 3: extend / critique.
+    ideas.append({
+        "title": "Extend or stress-test the paper's claims",
+        "difficulty": "Hard",
+        "steps": ["Find an assumption the paper makes",
+                  "Design an experiment that breaks it",
+                  "Report honestly — negative results are valuable",
+                  "Write it as a blog post or workshop paper"],
+    })
+    return {"paper": title[:100], "ideas": ideas,
+            "guidance": "Start with idea 1. A reproduction that works is a portfolio piece."}
+
+
+def weekly_digest(papers, skills=None, top_n=5):
+    """Top-N weekly digest of trending papers for the user's field.
+
+    Returns {digest: [...], generated_at, headline}.
+    """
+    try:
+        top_n = int(top_n)
+    except (TypeError, ValueError):
+        top_n = 5
+    top_n = max(1, min(10, top_n))
+    if skills:
+        try:
+            feed = personalized_feed(papers, skills, limit=top_n)
+            picks = feed["papers"]
+        except (ValueError, TypeError):
+            picks = []
+    else:
+        picks = [{"paper": p, "matched": [], "relevance": 0}
+                 for p in (papers or []) if isinstance(p, dict)][:top_n]
+    digest = []
+    for i, item in enumerate(picks[:top_n], 1):
+        p = item.get("paper", {}) if isinstance(item, dict) else {}
+        digest.append({
+            "rank": i,
+            "title": _clean18(p.get("title") or "Untitled")[:120],
+            "why": (f"Matches: {', '.join(item.get('matched', [])[:3])}"
+                    if item.get("matched") else "Trending in your field"),
+            "link": p.get("link") or p.get("id"),
+        })
+    from datetime import datetime, timezone
+    return {"digest": digest, "count": len(digest),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "headline": (f"This week's top {len(digest)} papers for you."
+                         if digest else "No papers this week — check back soon.")}
