@@ -299,3 +299,147 @@ def get_freshness():
     except Exception:
         meta = {}
     return freshness_badge(meta, CERT_STALE_AFTER_DAYS)
+
+
+# ================= Feature 17 Ultimate Enhancements =================
+# 17.1 Exam-day simulator | 17.2 ROI calculator | 17.3 Renewal tracker
+
+import re as _re11
+from datetime import datetime, timedelta, timezone, date
+
+
+def _clean11(text):
+    return _re11.sub(r"<[^>]*>", "", text or "")
+
+
+def _parse_exam_format(exam_format):
+    """Extract (questions, minutes) from 'exam_format' text. Defaults (50, 90)."""
+    text = _clean11(exam_format or "")
+    q = _re11.search(r"(\d+)\s*(questions|multiple-choice|items)", text, _re11.I)
+    m = _re11.search(r"(\d+)\s*minutes", text, _re11.I)
+    try:
+        n_q = int(q.group(1)) if q else 50
+    except (TypeError, ValueError):
+        n_q = 50
+    try:
+        n_m = int(m.group(1)) if m else 90
+    except (TypeError, ValueError):
+        n_m = 90
+    return max(5, min(200, n_q)), max(15, min(300, n_m))
+
+
+def exam_day_simulator(cert_id, seed=None):
+    """Full exam-day mock: real question count + time limit.
+
+    Pulls matching skill-quiz questions where possible; falls back to a
+    timed checklist when the bank lacks coverage. Returns {cert, questions,
+    minutes, total, instructions}.
+    """
+    cert_id = _clean11(cert_id or "").strip()
+    cert = get_cert(cert_id)
+    if not cert:
+        raise ValueError(f"Unknown certification '{cert_id}'.")
+    n_q, minutes = _parse_exam_format(cert.get("exam_format"))
+    questions = []
+    try:
+        from studybuddy.skill_quizzes import build_quiz, public_question, quiz_skills
+        skill_ids = [s[0] for s in quiz_skills()]
+        # Map cert domain to closest quiz skill.
+        domain = _clean11(cert.get("domain") or "").lower()
+        skill = next((s for s in skill_ids if s in domain or domain in s), None)
+        if skill:
+            full = build_quiz(skill, n=min(n_q, 40), seed=seed)
+            questions = [public_question(q) for q in full]
+    except Exception:
+        questions = []
+    return {"cert": {"id": cert["id"], "name": cert["name"],
+                     "provider": cert.get("provider")},
+            "questions": questions, "minutes": minutes,
+            "total": len(questions), "target_questions": n_q,
+            "instructions": (
+                f"Exam-day simulation for {cert['name']}: "
+                f"{len(questions) or n_q} questions in {minutes} minutes. "
+                "Same chair, same time of day as the real exam. No pauses.")}
+
+
+# Expected salary bump per certification (indicative, India 2026).
+_CERT_BUMP = {
+    "Beginner": 0.8, "Intermediate": 1.5, "Advanced": 2.5,
+}
+
+
+def cert_roi(cert_id, current_lpa):
+    """Cost vs expected salary bump for a certification.
+
+    Returns {cert, cost_inr, expected_bump_lpa, payback_months, verdict}.
+    Indicative estimates — labelled as such.
+    """
+    cert_id = _clean11(cert_id or "").strip()
+    cert = get_cert(cert_id)
+    if not cert:
+        raise ValueError(f"Unknown certification '{cert_id}'.")
+    try:
+        current = float(current_lpa)
+    except (TypeError, ValueError):
+        raise ValueError("current_lpa must be a number.")
+    if not (0 <= current < 1000):
+        raise ValueError("current_lpa looks unrealistic.")
+    try:
+        cost = float(cert.get("cost_inr") or 0)
+    except (TypeError, ValueError):
+        cost = 0
+    difficulty = _clean11(cert.get("difficulty") or "Beginner")
+    bump = _CERT_BUMP.get(difficulty, 0.8)
+    monthly_gain = bump * 100000 / 12
+    payback = round(cost / monthly_gain, 1) if monthly_gain > 0 else None
+    return {"cert": cert["name"], "cost_inr": round(cost),
+            "expected_bump_lpa": bump,
+            "expected_bump_note": "Indicative India-2026 estimate, not a guarantee.",
+            "payback_months": payback,
+            "verdict": ("Pays for itself in under 6 months — strong ROI."
+                        if payback is not None and payback < 6 else
+                        "Pays for itself within a year — decent ROI."
+                        if payback is not None and payback < 12 else
+                        "Slow payback — do it for skills, not salary.")}
+
+
+def renewal_status(cert_id, earned_date):
+    """Track certification expiry; 90/30/7-day reminders.
+
+    earned_date: ISO date string or date. Returns {cert, earned, expires,
+    days_left, urgency, action}.
+    """
+    cert_id = _clean11(cert_id or "").strip()
+    cert = get_cert(cert_id)
+    if not cert:
+        raise ValueError(f"Unknown certification '{cert_id}'.")
+    try:
+        if isinstance(earned_date, date) and not isinstance(earned_date, datetime):
+            earned = datetime(earned_date.year, earned_date.month, earned_date.day,
+                              tzinfo=timezone.utc)
+        else:
+            earned = datetime.fromisoformat(str(earned_date).replace("Z", "+00:00"))
+            if earned.tzinfo is None:
+                earned = earned.replace(tzinfo=timezone.utc)
+    except (ValueError, TypeError):
+        raise ValueError("earned_date must be an ISO date (YYYY-MM-DD).")
+    try:
+        validity = int(cert.get("validity_years") or 3)
+    except (TypeError, ValueError):
+        validity = 3
+    expires = earned + timedelta(days=365 * validity)
+    now = datetime.now(timezone.utc)
+    days_left = (expires - now).days
+    if days_left < 0:
+        urgency, action = "expired", "Recertify now — expired certs hurt credibility."
+    elif days_left <= 7:
+        urgency, action = "critical", "7 days left — book the recert exam today."
+    elif days_left <= 30:
+        urgency, action = "warning", "30 days left — schedule recertification."
+    elif days_left <= 90:
+        urgency, action = "upcoming", "90 days left — start light revision."
+    else:
+        urgency, action = "healthy", "No action needed."
+    return {"cert": cert["name"], "earned": earned.date().isoformat(),
+            "expires": expires.date().isoformat(), "days_left": days_left,
+            "validity_years": validity, "urgency": urgency, "action": action}
