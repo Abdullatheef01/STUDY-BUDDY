@@ -286,3 +286,125 @@ def validate_interview_setup(payload):
     if category not in opts["categories"]:
         return None, "Unknown category selected."
     return {"company": company, "role": role, "category": category, "n": n}, None
+
+
+# ================= Feature 11 Ultimate Enhancements =================
+# 11.1 Voice interview prep | 11.2 Company intel cards | 11.3 Redo loop
+
+import re as _re5
+import time as _time5
+
+
+def _clean5(text):
+    return _re5.sub(r"<[^>]*>", "", text or "")
+
+
+def voice_interview_prep(question, answer_text, seconds_taken):
+    """Spoken-answer simulator: score content + delivery pacing.
+
+    question: dict with question text. answer_text: what they said (transcribed).
+    seconds_taken: how long they spoke. Returns {wpm, pacing verdict,
+    content score (via score_answer), delivery tips}.
+    Ideal speaking pace: 130-160 wpm.
+    """
+    if not isinstance(question, dict):
+        raise ValueError("question must be a dict.")
+    answer = _clean5(answer_text or "")
+    words = len(answer.split())
+    try:
+        secs = float(seconds_taken)
+    except (TypeError, ValueError):
+        raise ValueError("seconds_taken must be a number.")
+    if secs <= 0:
+        raise ValueError("seconds_taken must be positive.")
+    wpm = round(words / secs * 60, 1)
+
+    if wpm < 100:
+        pacing = "Too slow — you sound unsure. Aim for 130-160 wpm."
+    elif wpm <= 170:
+        pacing = "Good pace — clear and confident."
+    else:
+        pacing = "Too fast — slow down, interviewers can't follow."
+    tips = []
+    if words < 40:
+        tips.append("Answer is thin — add an example or a number.")
+    if _re5.search(r"\b(um+|uh+|like,)\b", answer, _re5.I):
+        tips.append("Filler words detected — pause silently instead.")
+    if secs > 180:
+        tips.append("Over 3 minutes — tighten to 90 seconds for behavioral questions.")
+
+    try:
+        content = score_answer(question, answer)
+        content_score = content.get("score", 0)
+    except Exception:
+        content_score = 0
+    return {"wpm": wpm, "word_count": words, "seconds": round(secs, 1),
+            "pacing": pacing, "content_score": content_score,
+            "delivery_tips": tips,
+            "verdict": ("Ready for voice screens." if wpm >= 100 and wpm <= 170
+                        and content_score >= 60 and not tips
+                        else "Keep practicing — see tips above.")}
+
+
+def company_intel(company):
+    """Interview intel card per company from the question bank.
+
+    Returns {company, total_questions, categories: {cat: count},
+    top_roles, sample_questions, focus_tip}.
+    """
+    company = _clean5(company or "").strip()
+    if not company:
+        raise ValueError("Company name is required.")
+    bank = _load_bank()
+    matched = [q for q in bank
+               if any(company.lower() in c.lower() for c in q.get("companies", []))]
+    if not matched:
+        # Fallback: all-questions overview so the card is never empty.
+        matched = bank
+        note = f"No company-specific data for '{company}' — showing overall trends."
+    else:
+        note = f"Based on {len(matched)} banked questions for {company}."
+    cats = {}
+    roles = {}
+    for q in matched:
+        cats[q.get("category", "General")] = cats.get(q.get("category", "General"), 0) + 1
+        for r in q.get("roles", []):
+            roles[r] = roles.get(r, 0) + 1
+    top_roles = sorted(roles, key=roles.get, reverse=True)[:5]
+    samples = [{"question": q.get("question", "")[:120],
+                "category": q.get("category", "")} for q in matched[:5]]
+    top_cat = max(cats, key=cats.get) if cats else "General"
+    return {"company": company, "total_questions": len(matched),
+            "categories": cats, "top_roles": top_roles,
+            "sample_questions": samples, "note": note,
+            "focus_tip": f"{top_cat} questions dominate — master those first."}
+
+
+def redo_tracker(attempts):
+    """Track re-answers of the same question; measure improvement.
+
+    attempts: list of {question_id, score, timestamp?} in chronological order.
+    Returns per-question {attempts, first, latest, improvement, trend}.
+    """
+    if not isinstance(attempts, (list, tuple)):
+        raise ValueError("attempts must be a list.")
+    by_q = {}
+    for a in attempts:
+        if not isinstance(a, dict) or not a.get("question_id"):
+            continue
+        try:
+            score = float(a.get("score") or 0)
+        except (TypeError, ValueError):
+            continue
+        by_q.setdefault(str(a["question_id"]), []).append(max(0, min(100, score)))
+    out = []
+    for qid, scores in by_q.items():
+        first, latest = scores[0], scores[-1]
+        imp = round(latest - first, 1)
+        trend = ("improving" if imp >= 5 else "declining" if imp <= -5 else "flat")
+        out.append({"question_id": qid, "attempts": len(scores),
+                    "first": first, "latest": latest,
+                    "improvement": imp, "trend": trend})
+    out.sort(key=lambda x: x["improvement"])
+    return {"questions": out, "total_redos": sum(o["attempts"] - 1 for o in out),
+            "guidance": "Redo any question until improvement plateaus — that is mastery."}

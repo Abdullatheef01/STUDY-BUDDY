@@ -206,3 +206,155 @@ def weak_topic_diagnosis(progress_rows):
             "solve_rate": round(solved / total * 100, 1) if total else 0.0,
         },
     }
+
+
+# ================= Feature 12 Ultimate Enhancements =================
+# 12.1 Pattern mastery map | 12.2 Mock OA simulator | 12.3 Spaced repetition
+
+import re as _re6
+from datetime import datetime, timedelta, timezone
+
+
+def _clean6(text):
+    return _re6.sub(r"<[^>]*>", "", text or "")
+
+
+# The 14 canonical DSA patterns mapped from the bank's topic vocabulary.
+_PATTERNS = [
+    ("Sliding Window", ["sliding-window", "subarray"]),
+    ("Two Pointers", ["two-pointers", "pointers", "cyclic-sort"]),
+    ("Binary Search", ["searching", "binary", "quickselect"]),
+    ("DFS / BFS", ["dfs", "bfs", "graphs", "trees", "topological-sort", "cycles"]),
+    ("Dynamic Programming", ["dynamic programming", "dp", "knapsack", "interval-dp"]),
+    ("Greedy", ["greedy", "intervals"]),
+    ("Heap", ["heaps", "priority queue"]),
+    ("Stack / Queue", ["stacks", "queues", "monotonic-stack", "deque"]),
+    ("Hashing", ["hash maps", "hashing", "hash set", "bucket-sort", "prefix-sums"]),
+    ("Linked List", ["linked lists", "reversal"]),
+    ("Recursion / Backtracking", ["recursion", "backtracking"]),
+    ("Sorting", ["sorting"]),
+    ("Bit Manipulation", ["bit manipulation", "binary-exponentiation"]),
+    ("Graphs Advanced", ["dijkstra", "union-find", "matrix", "bst"]),
+]
+
+
+def pattern_mastery(solved_ids, attempted_ids=None):
+    """Mastery % per DSA pattern from solved problem IDs.
+
+    solved_ids: list of problem ids (str or int) the user solved.
+    Returns {patterns: [{pattern, solved, total, mastery_pct}], overall}.
+    """
+    if not isinstance(solved_ids, (list, tuple)):
+        raise ValueError("solved_ids must be a list.")
+    solved = set()
+    for pid in solved_ids:
+        if isinstance(pid, str) and pid.strip():
+            solved.add(pid.strip())
+        elif isinstance(pid, int):
+            solved.add(str(pid))
+    by_id = {str(p["id"]): p for p in _load()}
+    out = []
+    total_solved = total_bank = 0
+    for pattern, keywords in _PATTERNS:
+        pids = [pid for pid, p in by_id.items()
+                if any(kw in " ".join(p.get("topics", [])).lower() for kw in keywords)]
+        n_total = len(pids)
+        n_solved = sum(1 for pid in pids if pid in solved)
+        total_solved += n_solved
+        total_bank += n_total
+        mastery = round(n_solved / n_total * 100, 1) if n_total else 0.0
+        out.append({"pattern": pattern, "solved": n_solved, "total": n_total,
+                    "mastery_pct": mastery,
+                    "status": ("mastered" if mastery >= 80 else
+                               "progressing" if mastery >= 40 else "weak")})
+    out.sort(key=lambda x: x["mastery_pct"])
+    overall = round(total_solved / total_bank * 100, 1) if total_bank else 0.0
+    weakest = out[0]["pattern"] if out else None
+    return {"patterns": out, "overall_mastery_pct": overall,
+            "weakest_pattern": weakest,
+            "guidance": (f"Attack '{weakest}' next — it is your bottleneck."
+                         if weakest else "No pattern data.")}
+
+
+def mock_oa(num_questions=2, minutes=60, seed=None):
+    """Simulate a real Online Assessment: N questions, time limit, mixed difficulty.
+
+    Returns {questions: [public dicts], minutes, total, instructions}.
+    Picks 1 medium + rest mixed for realism.
+    """
+    try:
+        num_questions = int(num_questions)
+    except (TypeError, ValueError):
+        num_questions = 2
+    num_questions = max(1, min(4, num_questions))
+    try:
+        minutes = int(minutes)
+    except (TypeError, ValueError):
+        minutes = 60
+    minutes = max(10, min(180, minutes))
+
+    import random
+    rng = random.Random(seed)
+    bank = _load()
+    mediums = [p for p in bank if p.get("difficulty") == "Medium"]
+    rest = [p for p in bank if p.get("difficulty") != "Medium"]
+    picks = []
+    if mediums:
+        picks.append(rng.choice(mediums))
+    pool = [p for p in rest if p not in picks]
+    rng.shuffle(pool)
+    picks += pool[:num_questions - len(picks)]
+    rng.shuffle(picks)
+    questions = [{"id": p["id"], "title": p["title"],
+                  "difficulty": p.get("difficulty"),
+                  "topics": p.get("topics", [])} for p in picks]
+    return {"questions": questions, "minutes": minutes,
+            "total": len(questions),
+            "instructions": (
+                f"You have {minutes} minutes for {len(questions)} questions. "
+                "No hints, no solutions — like the real thing. "
+                "Score yourself after: 1 point per solved, 0.5 per partial.")}
+
+
+def spaced_repetition_queue(mistakes, now=None):
+    """Wrong problems resurface after 3/7/14 days.
+
+    mistakes: list of {problem_id, wrong_at (iso str), streak (consecutive
+    wrong count)}. Returns {due: [...], upcoming: [...]} sorted by urgency.
+    """
+    if not isinstance(mistakes, (list, tuple)):
+        raise ValueError("mistakes must be a list.")
+    now = now or datetime.now(timezone.utc)
+    intervals = {1: 3, 2: 7}
+    due, upcoming = [], []
+    for m in mistakes:
+        if not isinstance(m, dict) or m.get("problem_id") is None:
+            continue
+        pid = m["problem_id"]
+        if isinstance(pid, str) and not pid.strip():
+            continue
+        if not isinstance(pid, (str, int)):
+            continue
+        try:
+            streak = max(1, int(m.get("streak") or 1))
+        except (TypeError, ValueError):
+            streak = 1
+        days = intervals.get(streak, 14)
+        try:
+            wrong_at = datetime.fromisoformat(str(m.get("wrong_at") or "").replace("Z", "+00:00"))
+            if wrong_at.tzinfo is None:
+                wrong_at = wrong_at.replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError):
+            wrong_at = now
+        due_at = wrong_at + timedelta(days=days)
+        entry = {"problem_id": pid, "streak": streak,
+                 "interval_days": days, "due_at": due_at.isoformat(),
+                 "overdue_days": max(0, (now - due_at).days)}
+        (due if now >= due_at else upcoming).append(entry)
+    due.sort(key=lambda x: -x["overdue_days"])
+    upcoming.sort(key=lambda x: x["due_at"])
+    return {"due": due, "upcoming": upcoming,
+            "due_count": len(due),
+            "guidance": (f"{len(due)} problem(s) due for review — spaced repetition "
+                         "is how patterns stick." if due else
+                         "Nothing due. Keep solving — mistakes will queue here.")}
