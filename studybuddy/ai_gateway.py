@@ -26,7 +26,7 @@ _GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 _GROQ_MODEL = "llama-3.3-70b-versatile"
 
 _OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-_OPENROUTER_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+_OPENROUTER_MODEL = "google/gemma-4-31b-it:free"  # verified in :free list 2026-10-15
 
 _KEY_SENTINELS = frozenset({
     "", "your_actual_api_key_here", "<redacted>", "change-me",
