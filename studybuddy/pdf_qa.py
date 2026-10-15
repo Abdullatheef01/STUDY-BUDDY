@@ -675,3 +675,130 @@ def answer_question(
     intro = "Here is what the document says:"
     answer = intro + " " + " ".join(claims)
     return {"answer": answer, "citations": citations, "passages": list(citations)}
+
+
+# ================= Feature 18 Ultimate Enhancements =================
+# 18.1 Multi-doc synthesis | 18.2 Citation verifier | 18.3 Export to notes
+
+import re as _re12
+
+
+def _clean12(text):
+    return _re12.sub(r"<[^>]*>", "", text or "")
+
+
+def answer_across_docs(query, docs, top_k=3):
+    """Ask one question across multiple documents.
+
+    docs: list of {title, chunks}. Retrieves from the merged pool, then
+    groups evidence per document. Returns {answer, per_doc: [...], citations}.
+    """
+    query = _clean12(query or "").strip()
+    if not query:
+        raise ValueError("Query is required.")
+    if not isinstance(docs, (list, tuple)) or not docs:
+        raise ValueError("At least one document is needed.")
+    merged = []
+    titles = {}
+    for di, d in enumerate(docs):
+        if not isinstance(d, dict):
+            continue
+        title = _clean12(d.get("title") or f"Doc {di+1}")[:80]
+        titles[di] = title
+        for c in (d.get("chunks") or []):
+            if isinstance(c, dict):
+                c2 = dict(c)
+                c2["_doc_idx"] = di
+                merged.append(c2)
+    if not merged:
+        return {"answer": NO_RESULT_ANSWER, "per_doc": [], "citations": []}
+
+    retrieved = retrieve(merged, query, top_k=top_k * 2)
+    if not retrieved or retrieved[0]["score"] < RELEVANCE_THRESHOLD:
+        return {"answer": NO_RESULT_ANSWER, "per_doc": [], "citations": []}
+
+    query_tokens = _tokenize(query)
+    per_doc = {}
+    citations = []
+    for chunk in retrieved[:top_k]:
+        di = chunk.get("_doc_idx", 0)
+        title = titles.get(di, "Doc")
+        sentence = _normalize_whitespace(_best_sentence(chunk.get("text", ""), query_tokens))
+        if len(sentence) > 300:
+            sentence = sentence[:297].rstrip() + "…"
+        entry = per_doc.setdefault(title, {"doc": title, "claims": []})
+        entry["claims"].append({"text": sentence, "page": int(chunk.get("page", 0))})
+        citations.append({"doc": title, "page": int(chunk.get("page", 0)),
+                          "excerpt": _excerpt(chunk.get("text", ""))})
+    doc_list = list(per_doc.values())
+    n_docs = len(doc_list)
+    if n_docs > 1:
+        answer = (f"Across {n_docs} documents: " +
+                  " ".join(f"[{e['doc']}] " + " ".join(
+                      f'"{c["text"]}" [p.{c["page"]}]' for c in e["claims"][:2])
+                      for e in doc_list))
+    else:
+        e = doc_list[0]
+        answer = (f"[{e['doc']}] " + " ".join(
+            f'"{c["text"]}" [p.{c["page"]}]' for c in e["claims"][:3]))
+    return {"answer": answer, "per_doc": doc_list, "citations": citations,
+            "docs_consulted": n_docs}
+
+
+def verify_citations(answer_dict):
+    """Check that every claim in an answer carries a citation marker.
+
+    Returns {claims, cited, uncited, ok}. A claim = one quoted segment.
+    """
+    if not isinstance(answer_dict, dict):
+        raise ValueError("answer_dict must be a dict.")
+    answer = _clean12(answer_dict.get("answer") or "")
+    quotes = _re12.findall(r'"([^"]{10,})"', answer)
+    cited = sum(1 for _ in _re12.finditer(r'"[^"]{10,}"\s*\[', answer))
+    uncited = len(quotes) - cited
+    return {"claims": len(quotes), "cited": cited, "uncited": max(0, uncited),
+            "ok": bool(quotes) and uncited <= 0,
+            "verdict": ("All claims cited." if quotes and uncited <= 0 else
+                        "No verifiable claims found." if not quotes else
+                        f"{uncited} claim(s) missing citations.")}
+
+
+def qa_to_notes(qa_pairs, title="Study Notes"):
+    """Export Q&A pairs to structured markdown study notes.
+
+    qa_pairs: list of {question, answer, citations?}. Returns {markdown, sections}.
+    """
+    if not isinstance(qa_pairs, (list, tuple)) or not qa_pairs:
+        raise ValueError("At least one Q&A pair is needed.")
+    title = _clean12(title or "Study Notes").strip()[:120] or "Study Notes"
+    lines = [f"# {title}", ""]
+    sections = 0
+    for i, qa in enumerate(qa_pairs, 1):
+        if not isinstance(qa, dict):
+            continue
+        q = _clean12(qa.get("question") or "").strip()
+        a = _clean12(qa.get("answer") or "").strip()
+        if not q and not a:
+            continue
+        lines.append(f"## Q{i}: {q[:120]}")
+        lines.append("")
+        if a:
+            # Bullet-ify long answers at sentence boundaries.
+            sents = [_s.strip() for _s in _re12.split(r"(?<=[.!?])\s+", a) if _s.strip()]
+            if len(sents) > 2:
+                lines.extend(f"- {s}" for s in sents[:8])
+            else:
+                lines.append(a)
+        cites = qa.get("citations") or []
+        if cites:
+            lines.append("")
+            lines.append("**Sources:** " + "; ".join(
+                f"{_clean12(c.get('doc') or 'doc')[:30]} p.{c.get('page', '?')}"
+                for c in cites[:5] if isinstance(c, dict)))
+        lines.append("")
+        sections += 1
+    if not sections:
+        raise ValueError("No valid Q&A pairs to export.")
+    lines.append(f"_Generated from {sections} Q&A pairs._")
+    return {"markdown": "\n".join(lines), "sections": sections,
+            "title": title}
