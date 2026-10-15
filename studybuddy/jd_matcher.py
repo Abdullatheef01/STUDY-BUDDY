@@ -270,3 +270,170 @@ def generate_rule_based_suggestions(report):
                     "graphics for critical information."),
         })
     return suggestions[:6]
+
+
+# ================= Feature 1 Ultimate Enhancements =================
+# 1.1 AI pre-screen simulator | 1.2 Keyword action plan | 1.3 Offer probability
+
+# Signals AI screening bots (2026: 66% of recruiters) actually check.
+_BOT_POSITIVE = [
+    (r"\b\d+\s*%", "quantified impact (%)"),
+    (r"\b\d+\s*(x|times)\b", "quantified multiplier"),
+    (r"\$\s?\d|₹\s?\d|\d+\s*(lpa|lakh|k\b)", "monetary/scale numbers"),
+    (r"\b(led|built|shipped|launched|owned|drove|architected|scaled)\b", "strong action verbs"),
+    (r"\b(20\d{2})\s*[-–—]\s*(20\d{2}|present|now)\b", "dated experience ranges"),
+]
+_BOT_NEGATIVE = [
+    (r"\b(responsible for|duties included|helped with)\b", "passive phrasing"),
+    (r"\b(lorem|asdf|xxx+)\b", "placeholder text"),
+    (r"(.)\1{5,}", "repeated-character filler"),
+]
+
+# Where each keyword type belongs on a resume.
+_SECTION_FOR_KEYWORD = {
+    "skill": "Skills",
+    "tool": "Skills",
+    "keyword": "Experience",
+}
+
+
+def _strip_html(text):
+    return re.sub(r"<[^>]*>", "", text or "")
+
+
+def simulate_ai_screen(report, resume_text):
+    """Score the resume the way AI pre-screening bots see it (0-100).
+
+    Bots check: quantified achievements, action verbs, dated ranges,
+    skill density — and penalize passive phrasing, placeholders, gaps.
+    Returns a bot's-eye breakdown dict; never raises on hostile input.
+    """
+    text = _strip_html(resume_text or "")
+    lower = text.lower()
+    signals = []
+    score = 50.0  # neutral start; signals move it
+
+    for pattern, label in _BOT_POSITIVE:
+        hits = len(re.findall(pattern, lower))
+        if hits:
+            gain = min(8.0, 2.0 * hits)
+            score += gain
+            signals.append({"signal": label, "effect": f"+{gain:.0f}",
+                            "hits": hits, "tone": "positive"})
+    for pattern, label in _BOT_NEGATIVE:
+        hits = len(re.findall(pattern, lower))
+        if hits:
+            loss = min(15.0, 5.0 * hits)
+            score -= loss
+            signals.append({"signal": label, "effect": f"-{loss:.0f}",
+                            "hits": hits, "tone": "negative"})
+
+    # Skill density: bots love skills-per-100-words in a sane band.
+    words = len(lower.split())
+    skills = (report or {}).get("matched_skills", []) or []
+    if words > 20:
+        density = len(skills) / words * 100
+        if density < 1.0:
+            score -= 5
+            signals.append({"signal": "low skill density", "effect": "-5",
+                            "hits": 0, "tone": "negative"})
+        elif density > 12.0:
+            score -= 8  # keyword stuffing looks bot-generated
+            signals.append({"signal": "keyword stuffing suspected", "effect": "-8",
+                            "hits": 0, "tone": "negative"})
+        else:
+            score += 4
+            signals.append({"signal": "healthy skill density", "effect": "+4",
+                            "hits": 0, "tone": "positive"})
+
+    # Length sanity: bots downrank 1-line and 5-page resumes alike.
+    if words and words < 80:
+        score -= 10
+        signals.append({"signal": "resume too short", "effect": "-10",
+                        "hits": 0, "tone": "negative"})
+    elif words > 1200:
+        score -= 6
+        signals.append({"signal": "resume too long", "effect": "-6",
+                        "hits": 0, "tone": "negative"})
+
+    score = max(0.0, min(100.0, round(score, 1)))
+    verdict = ("Likely to pass AI screening" if score >= 70
+               else "Borderline — bots may filter you out" if score >= 45
+               else "Likely to be filtered out by AI screening")
+    return {"score": score, "verdict": verdict, "signals": signals,
+            "word_count": words}
+
+
+def keyword_action_plan(report, resume_text, sections=None):
+    """Top-5 missing keywords with exactly WHERE to add each one.
+
+    Returns a prioritized checklist: [{keyword, where, why, example}].
+    Skills/tools -> Skills section; the rest -> Experience bullets.
+    """
+    report = report or {}
+    missing = list(report.get("missing_keywords", []) or [])[:12]
+    skills_missing = {s.lower() for s in (report.get("missing_skills", []) or [])}
+    resume_lower = (_strip_html(resume_text or "")).lower()
+
+    plan = []
+    for kw in missing:
+        if not kw or not isinstance(kw, str):
+            continue
+        kl = kw.lower().strip()
+        if not kl or kl in resume_lower:
+            continue  # already present (belated match)
+        is_skill = kl in skills_missing
+        where = _SECTION_FOR_KEYWORD["skill"] if is_skill else _SECTION_FOR_KEYWORD["keyword"]
+        if is_skill:
+            example = f"Add '{kw}' to your Skills section as a comma-separated item."
+            why = "The JD lists it as a required skill; bots match the Skills section first."
+        else:
+            example = (f"Weave '{kw}' into an Experience bullet: "
+                       f"e.g. '... using {kw} to ... [quantified outcome]'.")
+            why = "Bots weight keywords inside achievement bullets higher than bare lists."
+        plan.append({"keyword": kw, "where": where, "why": why, "example": example})
+        if len(plan) >= 5:
+            break
+    return plan
+
+
+def offer_probability(report, applicants_estimate=None):
+    """Blend ATS score into an offer-chances meter.
+
+    applicants_estimate: rough applicant count for the role (optional).
+    Returns {probability_pct, band, reasoning}. Never raises.
+    """
+    report = report or {}
+    score = report.get("score", 0) or 0
+    try:
+        score = float(score)
+    except (TypeError, ValueError):
+        score = 0.0
+    score = max(0.0, min(100.0, score))
+
+    # Base probability from score via a logistic-ish curve.
+    base = 100.0 / (1.0 + 2.71828 ** (-(score - 55) / 12))
+
+    # Competition adjustment: more applicants -> lower chances.
+    try:
+        n = int(applicants_estimate) if applicants_estimate is not None else 0
+    except (TypeError, ValueError):
+        n = 0
+    if n > 0:
+        # Halve roughly every 10x applicants beyond ~50.
+        import math
+        factor = 0.5 ** (max(0.0, math.log10(max(n, 1)) - math.log10(50)))
+        base *= 0.35 + 0.65 * factor
+
+    pct = round(max(1.0, min(97.0, base)), 1)
+    band = ("Strong chance" if pct >= 60 else
+            "Decent chance" if pct >= 35 else
+            "Long shot" if pct >= 15 else "Very unlikely")
+    reasoning = (
+        f"ATS match {score:.0f}/100"
+        + (f" against ~{n} applicants" if n > 0 else " (applicant count unknown)")
+        + f" -> estimated {band.lower()}."
+    )
+    return {"probability_pct": pct, "band": band, "reasoning": reasoning,
+            "ats_score": round(score, 1),
+            "applicants_estimate": n if n > 0 else None}
