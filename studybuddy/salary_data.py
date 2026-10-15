@@ -102,3 +102,142 @@ def get_freshness():
     except SalaryDataError:
         meta = {}
     return freshness_badge(meta, SALARY_STALE_AFTER_DAYS)
+
+
+# ================= Feature 8 Ultimate Enhancements =================
+# 8.1 Offer evaluator | 8.2 Negotiation coach | 8.3 Band comparison
+
+import re as _re3
+
+
+def _clean3(text):
+    return _re3.sub(r"<[^>]*>", "", text or "")
+
+
+def evaluate_offer(role, tier, band, offer_lpa):
+    """Paste an offer, get a verdict: below/at/above market + negotiation script.
+
+    Returns {verdict, percentile_hint, market: {min, median, max}, script, gap_lpa}.
+    offer_lpa in LPA (float). Never raises on hostile input.
+    """
+    role = _clean3(role); tier = _clean3(tier); band = _clean3(band)
+    try:
+        offer = float(offer_lpa)
+    except (TypeError, ValueError):
+        raise ValueError("Offer must be a number in LPA.")
+    if not (0 < offer < 1000):
+        raise ValueError("Offer looks unrealistic (0-1000 LPA expected).")
+
+    entry = lookup(role, tier, band)
+    if not entry:
+        raise ValueError("No market data for that role/tier/band combination.")
+
+    lo, med, hi = entry["min_lpa"], entry["median_lpa"], entry["max_lpa"]
+    if offer < lo:
+        verdict = "Below market"
+        detail = f"₹{offer:.1f} LPA is below the market floor of ₹{lo:.1f} LPA."
+    elif offer < med:
+        verdict = "Lower half of market"
+        detail = f"₹{offer:.1f} LPA sits between floor ₹{lo:.1f} and median ₹{med:.1f} LPA."
+    elif offer <= hi:
+        verdict = "At or above market"
+        detail = f"₹{offer:.1f} LPA is at/above the median of ₹{med:.1f} LPA."
+    else:
+        verdict = "Above market"
+        detail = f"₹{offer:.1f} LPA beats the market ceiling of ₹{hi:.1f} LPA — strong offer."
+
+    gap = round(med - offer, 1)
+    if verdict in ("Below market", "Lower half of market") and gap > 0:
+        script = (
+            f"Thank you for the offer. Based on market data for {role} "
+            f"({tier}, {band}), the median is around ₹{med:.1f} LPA. "
+            f"Given my skills in [your top 2 skills], would you consider ₹{med:.1f} LPA? "
+            f"I am excited about the team and happy to discuss.")
+    elif verdict == "Above market":
+        script = ("This is a strong offer — accept graciously, and confirm the "
+                  "breakup (fixed vs variable), joining bonus, and review cycle in writing.")
+    else:
+        script = ("Solid offer. If you have competing offers, you can still ask: "
+                  "'Is there flexibility on the joining bonus or first review?'")
+    return {"verdict": verdict, "detail": detail,
+            "market": {"min_lpa": lo, "median_lpa": med, "max_lpa": hi},
+            "offer_lpa": round(offer, 1), "gap_to_median_lpa": gap,
+            "negotiation_script": script}
+
+
+def negotiation_coach(situation):
+    """Rule-based negotiation playbook for common situations.
+
+    situation: one of 'lowball', 'at_median', 'competing_offers',
+    'fresher_no_leverage', 'intern_to_ppo'. Returns {do, say, dont}.
+    """
+    situation = _clean3(situation or "").strip().lower().replace(" ", "_")
+    playbooks = {
+        "lowball": {
+            "do": ["Thank them warmly first", "Cite market data, not feelings",
+                   "Give a specific counter (median, not max)", "Ask what is flexible besides base"],
+            "say": ("I am excited about the role. Market data suggests ₹X LPA is typical "
+                    "for this profile — would ₹Y work for you?"),
+            "dont": ["Never accept on the spot", "Don't threaten to walk away",
+                     "Don't mention personal expenses as justification"],
+        },
+        "at_median": {
+            "do": ["Confirm the full breakup in writing", "Negotiate joining bonus / ESOPs",
+                   "Ask about the first appraisal cycle"],
+            "say": ("The base looks fair. Could we discuss a joining bonus or an "
+                    "early performance review at 6 months?"),
+            "dont": ["Don't push base 20% higher without leverage", "Don't delay deciding too long"],
+        },
+        "competing_offers": {
+            "do": ["Use the better offer as data, not a threat", "Give a deadline",
+                   "Let them know they are your first choice (if true)"],
+            "say": ("I have another offer at ₹X. I prefer your team — can you match ₹X "
+                    "or close the gap? I can decide by Friday."),
+            "dont": ["Don't lie about fake offers — it backfires", "Don't share the offer letter"],
+        },
+        "fresher_no_leverage": {
+            "do": ["Negotiate learning velocity, not salary", "Ask for mentorship + review timeline",
+                   "Get the role title right (titles compound)"],
+            "say": ("I understand fresher bands are fixed. Could we agree on a 6-month "
+                    "performance review with a raise linked to goals?"),
+            "dont": ["Don't reject your first offer over 0.5 LPA", "Don't compare with FAANG outliers"],
+        },
+        "intern_to_ppo": {
+            "do": ["Remind them of your shipped work", "Ask for the PPO band, not a number",
+                   "Negotiate start date flexibility"],
+            "say": ("During my internship I shipped [X, Y]. What does the PPO band look like "
+                    "for converting interns at my level?"),
+            "dont": ["Don't assume PPO equals market — verify", "Don't wait till the last week"],
+        },
+    }
+    if situation not in playbooks:
+        raise ValueError(
+            "Unknown situation. Try: lowball, at_median, competing_offers, "
+            "fresher_no_leverage, intern_to_ppo.")
+    pb = playbooks[situation]
+    return {"situation": situation, "do": pb["do"], "say": pb["say"],
+            "dont": pb["dont"]}
+
+
+def band_comparison(role, tier):
+    """Fresher vs experienced bands side-by-side: the growth trajectory.
+
+    Returns {bands: [{band, min, median, max}], growth_note}.
+    """
+    role = _clean3(role); tier = _clean3(tier)
+    data = load_dataset()
+    if role not in data["roles"] or tier not in data["tiers"]:
+        raise ValueError("Unknown role or tier.")
+    rows = query(role=role, tier=tier)
+    if not rows:
+        raise ValueError("No market data for that role/tier.")
+    bands = [{"band": r["experience_band"], "min_lpa": r["min_lpa"],
+              "median_lpa": r["median_lpa"], "max_lpa": r["max_lpa"]}
+             for r in rows]
+    medians = [b["median_lpa"] for b in bands]
+    growth = round(max(medians) - min(medians), 1) if len(medians) > 1 else 0.0
+    return {"role": role, "tier": tier, "bands": bands,
+            "growth_note": (
+                f"Median grows ~₹{growth:.1f} LPA from {bands[0]['band']} to "
+                f"{bands[-1]['band']} — skills compound faster than tenure."
+                if growth else "Single band available for this role/tier.")}
