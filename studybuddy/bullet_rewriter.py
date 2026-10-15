@@ -83,7 +83,7 @@ def quantified_version(bullet):
 
 def concise_version(bullet):
     """Tighten the bullet: strip filler, cap length, keep one line."""
-    text = strengthen_verbs(bullet)
+    text = strengthen_verbs(_strip_html(bullet))
     for pattern, replacement in INLINE_FIXES:
         text = pattern.sub(replacement, text)
     text = re.sub(r"\b(very|really|quite|basically|actually|just)\b", "", text, flags=re.I)
@@ -94,13 +94,18 @@ def concise_version(bullet):
     return _capitalize_first(text) + "."
 
 
+def _strip_html(text):
+    """Remove HTML tags — these are plain-text outputs, tags are never legitimate."""
+    return re.sub(r"<[^>]*>", "", text or "")
+
+
 def improve_bullet(bullet_text):
     """Return 3 rule-based rewrite variants for a resume bullet.
 
     Each variant is a dict {"label": ..., "text": ..., "tip": ...}.
     Raises ValueError on invalid input.
     """
-    bullet = (bullet_text or "").strip()
+    bullet = _strip_html((bullet_text or "")).strip()
     if not bullet:
         raise ValueError("Please enter a bullet to rewrite.")
     if len(bullet) < BULLET_MIN_CHARS:

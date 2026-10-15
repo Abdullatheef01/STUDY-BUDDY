@@ -79,6 +79,9 @@ class _FakeClient:
 def test_gemini_fails_fast_on_discovery_error(monkeypatch, reset_model_cache):
     monkeypatch.setattr(unified_app, "_make_gemini_client",
                         lambda: _FakeClient(fail_list=True))
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key-for-test")
+    monkeypatch.setenv("GROQ_API_KEY", "")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "")
     start = time.monotonic()
     with pytest.raises(GeminiError) as exc:
         unified_app.call_gemini_ai("hello")
@@ -90,6 +93,9 @@ def test_gemini_fails_fast_on_discovery_error(monkeypatch, reset_model_cache):
 def test_gemini_fails_fast_when_all_models_fail(monkeypatch, reset_model_cache):
     monkeypatch.setattr(unified_app, "_make_gemini_client",
                         lambda: _FakeClient(fail_generate=True))
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key-for-test")
+    monkeypatch.setenv("GROQ_API_KEY", "")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "")
     start = time.monotonic()
     with pytest.raises(GeminiError):
         unified_app.call_gemini_ai("hello", max_attempts=2)
@@ -99,6 +105,9 @@ def test_gemini_fails_fast_when_all_models_fail(monkeypatch, reset_model_cache):
 def test_gemini_model_list_cached_hourly(monkeypatch, reset_model_cache):
     fake = _FakeClient()
     monkeypatch.setattr(unified_app, "_make_gemini_client", lambda: fake)
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key-for-test")
+    monkeypatch.setenv("GROQ_API_KEY", "")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "")
     assert unified_app.call_gemini_ai("hi") == "ok from models/gemini-2.0-flash"
     assert unified_app.call_gemini_ai("hi again").startswith("ok from")
     assert fake.models.list_calls == 1, "discovery must be cached"
@@ -108,9 +117,13 @@ def test_gemini_model_list_cached_hourly(monkeypatch, reset_model_cache):
 
 def test_gemini_needs_key(monkeypatch):
     monkeypatch.setattr(unified_app, "_make_gemini_client", lambda: None)
+    # No provider keys configured -> gateway raises AIError -> GeminiError
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("GROQ_API_KEY", "")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "")
     with pytest.raises(GeminiError) as exc:
         unified_app.call_gemini_ai("hi")
-    assert "api key" in str(exc.value).lower()
+    assert "no ai provider" in str(exc.value).lower()
 
 
 def test_gemini_key_sentinels_rejected(monkeypatch):

@@ -209,6 +209,7 @@ def load_trending():
 
 
 def get_trending(limit=30):
+    limit = max(int(limit or 0), 0)
     return load_trending().get("papers", [])[:limit]
 
 

@@ -461,13 +461,31 @@ _FORMATTERS = {
 # Public API
 # ---------------------------------------------------------------------------
 
+def _strip_html(text):
+    """Remove HTML tags from citation fields — never legitimate in citations."""
+    return re.sub(r"<[^>]*>", "", text or "")
+
+
+def _clean_meta(meta):
+    """Strip HTML from all string values in a citation metadata dict."""
+    cleaned = {}
+    for k, v in (meta or {}).items():
+        if isinstance(v, str):
+            cleaned[k] = _strip_html(v)
+        elif isinstance(v, list):
+            cleaned[k] = [_strip_html(i) if isinstance(i, str) else i for i in v]
+        else:
+            cleaned[k] = v
+    return cleaned
+
+
 def format_citation(meta, style):
     """Format one metadata dict in the given style.
 
     Raises ValueError for an unknown style name.
     """
     style = _norm_style(style)
-    return _FORMATTERS[style](meta or {})
+    return _FORMATTERS[style](_clean_meta(meta))
 
 
 def _sort_key(meta):

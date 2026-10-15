@@ -64,8 +64,15 @@ def _tone_openers(tone):
     }[tone]
 
 
+def _strip_html(text):
+    """Remove HTML tags — plain-text output, tags are never legitimate."""
+    return re.sub(r"<[^>]*>", "", text or "")
+
+
 def rule_based_cover_letter(resume_text, jd_text, tone="professional"):
     """Build a tailored cover letter from templates (fallback path)."""
+    resume_text = _strip_html(resume_text)
+    jd_text = _strip_html(jd_text)
     if tone not in TONES:
         tone = "professional"
     contact = extract_contact(resume_text)
