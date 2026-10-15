@@ -1,0 +1,498 @@
+{% extends "base.html" %}
+
+{% block title %}Ultimate Lab | Study-Buddy{% endblock %}
+
+{% block head %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<style>
+  /* ---- Ultimate Lab layout (page-specific) ---- */
+  .lab-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    margin-top: 28px;
+  }
+  .lab-side {
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .lab-side h2 { font-size: 0.95rem; margin: 0 0 12px; letter-spacing: 0.02em; }
+  .lab-pills { display: flex; flex-direction: column; gap: 6px; }
+  .lab-pill {
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    width: 100%; text-align: left; cursor: pointer;
+    background: transparent; border: 1px solid transparent; border-radius: 10px;
+    color: var(--b-text); font: inherit; font-size: 0.88rem; font-weight: 500;
+    padding: 8px 12px; transition: background 0.15s, border-color 0.15s;
+  }
+  .lab-pill:hover { background: rgba(255, 255, 255, 0.05); }
+  .lab-pill.b-active {
+    background: var(--b-accent-soft); border-color: var(--b-accent-border);
+    color: var(--b-a3); font-weight: 700;
+  }
+  .lab-count {
+    font-size: 0.72rem; font-weight: 700; color: var(--b-a3);
+    background: var(--b-accent-soft); border: 1px solid var(--b-accent-border);
+    border-radius: 999px; padding: 1px 9px; flex-shrink: 0;
+  }
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+  }
+  .lab-card { padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+  .lab-card h3 { margin: 0; font-size: 1.05rem; line-height: 1.35; }
+  .lab-card p.lab-desc { margin: 0; font-size: 0.88rem; opacity: 0.78; line-height: 1.55; flex: 1; }
+  .lab-form { display: none; border-top: 1px solid var(--b-border); padding-top: 16px; margin-top: 4px; }
+  .lab-form.b-open { display: block; }
+  .lab-hint { display: block; font-size: 0.75rem; opacity: 0.65; margin-top: 4px; }
+  .lab-req { color: #f87171; font-weight: 700; }
+  .lab-checkrow { display: flex; align-items: center; gap: 10px; }
+  .lab-checkrow .b-label { margin-bottom: 0; }
+  .lab-result { margin-top: 14px; }
+  .lab-pre {
+    background: rgba(0, 0, 0, 0.35); border: 1px solid var(--b-border);
+    border-radius: 12px; padding: 14px 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+    max-height: 420px; overflow: auto; margin: 10px 0 0; color: var(--b-text);
+  }
+  .lab-spinner {
+    display: inline-block; width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--b-border); border-top-color: var(--b-a1);
+    animation: lab-spin 0.7s linear infinite; vertical-align: -3px; margin-right: 8px;
+  }
+  @keyframes lab-spin { to { transform: rotate(360deg); } }
+  .lab-status { font-size: 0.88rem; opacity: 0.7; margin: 14px 2px 0; }
+  .lab-empty { grid-column: 1 / -1; text-align: center; padding: 48px 20px; }
+  .lab-search { max-width: 420px; margin-top: 18px; }
+  .lab-hero-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  @media (max-width: 960px) {
+    .lab-layout { grid-template-columns: 1fr; }
+    .lab-side { position: static; max-height: none; overflow: visible; }
+    .lab-pills { flex-direction: row; overflow-x: auto; padding-bottom: 6px; }
+    .lab-pill { width: auto; white-space: nowrap; flex-shrink: 0; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="b-section">
+  <div class="b-card b-card--hero">
+    <div class="b-pill">Power tools</div>
+    <h1 class="b-hero-title">Ultimate Lab</h1>
+    <p class="b-lede"><span id="lab-hero-count">91</span> power tools across 31 features — every ultimate enhancement, runnable right here.</p>
+    <div class="lab-search">
+      <label class="b-label" for="lab-search">Search tools</label>
+      <input type="text" id="lab-search" class="b-input" placeholder="Search by name, description or feature…" autocomplete="off">
+    </div>
+    <div class="lab-hero-meta">
+      <span class="b-tag" id="lab-live-count">Loading…</span>
+    </div>
+  </div>
+
+  <div class="lab-layout">
+    <aside class="lab-side b-card b-card--lite" aria-label="Feature filters">
+      <h2>Features</h2>
+      <div class="lab-pills" id="lab-pills" role="listbox" aria-label="Filter tools by feature"></div>
+    </aside>
+    <div>
+      <div id="lab-status" class="lab-status" aria-live="polite"></div>
+      <div id="lab-grid" class="lab-grid"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* Ultimate Lab: dynamic tool grid. XSS-safe: textContent only, no innerHTML with API data. */
+(function () {
+    'use strict';
+
+    var TOOLS_URL = '/api/ultimate/tools';
+    function runUrl(id) { return '/api/ultimate/run/' + encodeURIComponent(id); }
+
+    var grid = document.getElementById('lab-grid');
+    var pillsBox = document.getElementById('lab-pills');
+    var statusEl = document.getElementById('lab-status');
+    var searchInput = document.getElementById('lab-search');
+    var heroCount = document.getElementById('lab-hero-count');
+    var liveCount = document.getElementById('lab-live-count');
+
+    var state = {
+        tools: [],
+        features: [],
+        activeFeature: 'all',
+        query: '',
+        formsBuilt: {}
+    };
+
+    function el(tag, cls, text) {
+        var node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text !== undefined && text !== null) node.textContent = text;
+        return node;
+    }
+
+    /* Exact CSRF pattern used across this codebase (see static/js/aptitude.js). */
+    function csrfHeaders(extra) {
+        var headers = extra || {};
+        var m = document.querySelector('meta[name="csrf-token"]');
+        if (m) headers['X-CSRFToken'] = m.getAttribute('content');
+        return headers;
+    }
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    function copyText(text, btn) {
+        function done(ok) {
+            var original = btn.textContent;
+            btn.textContent = ok ? 'Copied!' : 'Copy failed';
+            setTimeout(function () { btn.textContent = original; }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { done(document.execCommand('copy')); } catch (e) { done(false); }
+            document.body.removeChild(ta);
+        }
+    }
+
+    function buildPills() {
+        pillsBox.innerHTML = '';
+        var frag = document.createDocumentFragment();
+        frag.appendChild(makePill('all', 'All', state.tools.length));
+        state.features.forEach(function (f) {
+            var n = state.tools.filter(function (t) { return t.feature === f; }).length;
+            frag.appendChild(makePill(f, f, n));
+        });
+        pillsBox.appendChild(frag);
+    }
+
+    function makePill(key, label, count) {
+        var btn = el('button', 'lab-pill' + (state.activeFeature === key ? ' b-active' : ''));
+        btn.type = 'button';
+        btn.setAttribute('role', 'option');
+        btn.setAttribute('aria-selected', state.activeFeature === key ? 'true' : 'false');
+        var name = el('span', null, label);
+        var c = el('span', 'lab-count', String(count));
+        btn.appendChild(name);
+        btn.appendChild(c);
+        btn.addEventListener('click', function () {
+            state.activeFeature = key;
+            buildPills();
+            applyFilters();
+        });
+        return btn;
+    }
+
+    function matches(tool) {
+        if (state.activeFeature !== 'all' && tool.feature !== state.activeFeature) return false;
+        var q = state.query.trim().toLowerCase();
+        if (!q) return true;
+        return (tool.name || '').toLowerCase().indexOf(q) !== -1 ||
+               (tool.description || '').toLowerCase().indexOf(q) !== -1 ||
+               (tool.feature || '').toLowerCase().indexOf(q) !== -1;
+    }
+
+    function applyFilters() {
+        grid.innerHTML = '';
+        var frag = document.createDocumentFragment();
+        var shown = 0;
+        state.tools.forEach(function (tool) {
+            if (!matches(tool)) return;
+            shown++;
+            frag.appendChild(toolCard(tool));
+        });
+        if (shown === 0) {
+            var empty = el('div', 'b-card b-card--lite lab-empty');
+            empty.appendChild(el('h3', null, 'No tools match'));
+            empty.appendChild(el('p', 'lab-desc', 'Try a different search term or feature filter.'));
+            frag.appendChild(empty);
+        }
+        grid.appendChild(frag);
+        setStatus('Showing ' + shown + ' of ' + state.tools.length + ' tools');
+    }
+
+    function toolCard(tool) {
+        var card = el('article', 'b-card b-card--lite lab-card');
+        card.appendChild(el('span', 'b-tag', tool.feature || 'Tool'));
+        card.appendChild(el('h3', null, tool.name || tool.id || 'Untitled tool'));
+        card.appendChild(el('p', 'lab-desc', tool.description || ''));
+
+        var toggle = el('button', 'b-btn b-btn--sm', 'Open tool');
+        toggle.type = 'button';
+        toggle.setAttribute('aria-expanded', 'false');
+
+        var formWrap = el('div', 'lab-form');
+        var resultBox = el('div', 'lab-result');
+        resultBox.setAttribute('aria-live', 'polite');
+
+        toggle.addEventListener('click', function () {
+            var opening = !formWrap.classList.contains('b-open');
+            if (opening && !state.formsBuilt[tool.id]) {
+                buildForm(tool, formWrap, resultBox, toggle);
+                state.formsBuilt[tool.id] = true;
+            }
+            formWrap.classList.toggle('b-open', opening);
+            toggle.textContent = opening ? 'Close tool' : 'Open tool';
+            toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+        });
+
+        card.appendChild(toggle);
+        card.appendChild(formWrap);
+        card.appendChild(resultBox);
+        return card;
+    }
+
+    function buildForm(tool, formWrap, resultBox, toggle) {
+        var fields = Array.isArray(tool.fields) ? tool.fields : [];
+        if (fields.length === 0) {
+            formWrap.appendChild(el('p', 'lab-desc', 'This tool takes no inputs — just hit Run.'));
+        }
+        fields.forEach(function (f) {
+            formWrap.appendChild(fieldNode(f));
+        });
+
+        var runBtn = el('button', 'b-btn b-btn--primary', 'Run');
+        runBtn.type = 'button';
+        runBtn.addEventListener('click', function () {
+            runTool(tool, fields, formWrap, resultBox, runBtn, toggle);
+        });
+        formWrap.appendChild(runBtn);
+    }
+
+    function fieldNode(f) {
+        var wrap = el('div', 'b-field');
+        var label = el('label', 'b-label', (f.label || f.name || 'Field') + ' ');
+        if (f.required) {
+            var star = el('span', 'lab-req', '*');
+            star.setAttribute('aria-label', 'required');
+            label.appendChild(star);
+        }
+        var input;
+        var type = f.type || 'text';
+
+        if (type === 'textarea') {
+            input = el('textarea', 'b-textarea');
+            input.rows = 4;
+        } else if (type === 'number') {
+            input = el('input', 'b-input');
+            input.type = 'number';
+        } else if (type === 'select') {
+            input = el('select', 'b-select');
+            var opts = Array.isArray(f.options) ? f.options : [];
+            opts.forEach(function (o) {
+                var opt = document.createElement('option');
+                if (o !== null && typeof o === 'object') {
+                    var v = o.value !== undefined ? o.value : (o.id !== undefined ? o.id : String(o.label || ''));
+                    opt.value = String(v);
+                    opt.textContent = o.label !== undefined ? String(o.label) : String(v);
+                } else {
+                    opt.value = String(o);
+                    opt.textContent = String(o);
+                }
+                input.appendChild(opt);
+            });
+        } else if (type === 'checkbox') {
+            var row = el('div', 'lab-checkrow');
+            input = el('input', 'b-check');
+            input.type = 'checkbox';
+            row.appendChild(input);
+            row.appendChild(label);
+            wrap.appendChild(row);
+        } else {
+            input = el('input', 'b-input');
+            input.type = 'text';
+        }
+
+        if (type !== 'checkbox') {
+            input.name = f.name || '';
+            input.id = 'lab-' + Math.random().toString(36).slice(2) + '-' + (f.name || 'f');
+            label.setAttribute('for', input.id);
+            wrap.appendChild(label);
+            wrap.appendChild(input);
+        } else {
+            input.name = f.name || '';
+            wrap.dataset.checkboxName = f.name || '';
+        }
+
+        if (f.json) {
+            wrap.appendChild(el('small', 'lab-hint', 'JSON format — must be valid JSON.'));
+        }
+        wrap.dataset.fieldType = type;
+        wrap.dataset.fieldName = f.name || '';
+        wrap.dataset.fieldJson = f.json ? '1' : '';
+        wrap.dataset.fieldRequired = f.required ? '1' : '';
+        return wrap;
+    }
+
+    function collectValues(fields, formWrap) {
+        var values = {};
+        var nodes = formWrap.querySelectorAll('[data-field-name]');
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            var name = node.dataset.fieldName;
+            var type = node.dataset.fieldType;
+            var isJson = node.dataset.fieldJson === '1';
+            var required = node.dataset.fieldRequired === '1';
+            var input = node.querySelector('input, textarea, select');
+            if (!input || !name) continue;
+
+            var raw;
+            if (type === 'checkbox') {
+                values[name] = !!input.checked;
+                continue;
+            }
+            raw = (input.value || '').trim();
+
+            if (!raw) {
+                if (required) {
+                    return { error: 'Required field "' + name + '" is empty.' };
+                }
+                continue; // omit empty optional fields
+            }
+            if (isJson) {
+                try {
+                    values[name] = JSON.parse(raw);
+                } catch (e) {
+                    return { error: 'Field "' + name + '" must be valid JSON.' };
+                }
+                continue;
+            }
+            if (type === 'number') {
+                var num = Number(raw);
+                if (isNaN(num)) {
+                    return { error: 'Field "' + name + '" must be a number.' };
+                }
+                values[name] = num;
+                continue;
+            }
+            values[name] = input.value;
+        }
+        return { values: values };
+    }
+
+    function runTool(tool, fields, formWrap, resultBox, runBtn, toggle) {
+        var collected = collectValues(fields, formWrap);
+        resultBox.innerHTML = '';
+        if (collected.error) {
+            resultBox.appendChild(el('div', 'b-flash b-flash--error', collected.error));
+            return;
+        }
+
+        runBtn.disabled = true;
+        var spin = el('span', 'lab-spinner');
+        spin.setAttribute('aria-hidden', 'true');
+        runBtn.textContent = '';
+        runBtn.appendChild(spin);
+        runBtn.appendChild(document.createTextNode('Running…'));
+
+        fetch(runUrl(tool.id), {
+            method: 'POST',
+            headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(collected.values)
+        })
+        .then(function (resp) {
+            return resp.json().catch(function () {
+                throw new Error('Server returned an unreadable response (HTTP ' + resp.status + ').');
+            });
+        })
+        .then(function (payload) {
+            renderResult(resultBox, payload);
+        })
+        .catch(function (err) {
+            resultBox.innerHTML = '';
+            resultBox.appendChild(el('div', 'b-flash b-flash--error',
+                'Request failed: ' + (err && err.message ? err.message : 'network error') +
+                ' — check your connection and try again.'));
+        })
+        .finally(function () {
+            runBtn.disabled = false;
+            runBtn.textContent = 'Run';
+        });
+    }
+
+    function renderResult(box, payload) {
+        box.innerHTML = '';
+        if (!payload || payload.ok !== true) {
+            box.appendChild(el('div', 'b-flash b-flash--error',
+                (payload && payload.error) || 'Tool failed with no message.'));
+            return;
+        }
+        var result = payload.result;
+        var pre = el('pre', 'lab-pre');
+        if (result !== null && typeof result === 'object' && typeof result.markdown === 'string') {
+            pre.textContent = result.markdown;
+        } else {
+            pre.textContent = JSON.stringify(result, null, 2);
+        }
+        var copyBtn = el('button', 'b-btn b-btn--sm b-btn--ghost', 'Copy result');
+        copyBtn.type = 'button';
+        copyBtn.style.marginBottom = '0';
+        copyBtn.addEventListener('click', function () { copyText(pre.textContent, copyBtn); });
+        box.appendChild(copyBtn);
+        box.appendChild(pre);
+    }
+
+    function load() {
+        setStatus('Loading tools…');
+        grid.innerHTML = '';
+        fetch(TOOLS_URL, { headers: { 'Accept': 'application/json' } })
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                if (!data || !Array.isArray(data.tools)) {
+                    throw new Error('Unexpected API response shape.');
+                }
+                state.tools = data.tools;
+                var seen = {};
+                state.features = [];
+                data.tools.forEach(function (t) {
+                    var f = t.feature || 'Other';
+                    if (!seen[f]) { seen[f] = true; state.features.push(f); }
+                });
+                var count = data.count || data.tools.length;
+                heroCount.textContent = String(count);
+                liveCount.textContent = count + ' tools · ' + state.features.length + ' features';
+                buildPills();
+                applyFilters();
+            })
+            .catch(function (err) {
+                setStatus('');
+                grid.innerHTML = '';
+                var box = el('div', 'b-card b-card--lite lab-empty');
+                box.appendChild(el('h3', null, 'Could not load tools'));
+                box.appendChild(el('p', 'lab-desc',
+                    'The tool registry did not respond' +
+                    (err && err.message ? ' (' + err.message + ')' : '') +
+                    '. Please check your connection and retry.'));
+                var retry = el('button', 'b-btn b-btn--primary', 'Retry');
+                retry.type = 'button';
+                retry.addEventListener('click', load);
+                box.appendChild(retry);
+                grid.appendChild(box);
+                liveCount.textContent = 'Offline';
+            });
+    }
+
+    searchInput.addEventListener('input', function () {
+        state.query = searchInput.value;
+        applyFilters();
+    });
+
+    load();
+})();
+</script>
+{% endblock %}

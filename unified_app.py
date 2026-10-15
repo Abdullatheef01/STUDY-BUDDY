@@ -2403,6 +2403,10 @@ def _generate_cover_ai(resume_text, jd_text, tone):
 
 def register_routes(app):
 
+    # ---------- ULTIMATE LAB (91 power tools) ----------
+    from studybuddy.ultimate_routes import register_ultimate_routes
+    register_ultimate_routes(app)
+
     # ---------- MAIN HUB ----------
     @app.route('/')
     def index():

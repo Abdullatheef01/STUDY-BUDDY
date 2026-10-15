@@ -949,7 +949,7 @@ def _clean20(text):
     return _re20.sub(r"<[^>]*>", "", text or "")
 
 
-def streak_freeze_status(last_active, freezes_used_week, week_start, today=None):
+def streak_freeze_status(last_active, freezes_used_week, week_start=None, today=None):
     """Weekly rest day: 1 streak freeze per week, auto-applied on missed days.
 
     Returns {freezes_available, freeze_would_apply, message}.

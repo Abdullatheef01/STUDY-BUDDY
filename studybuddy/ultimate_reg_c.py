@@ -1,0 +1,402 @@
+TOOLS_C = [
+    # ---------- Feature 21: Literature Review Generator ----------
+    {
+        "id": "litreview/cluster",
+        "feature": "Literature Review Generator",
+        "name": "Thematic Clustering",
+        "description": "Auto-groups your papers into research themes with one click.",
+        "module": "studybuddy.lit_review",
+        "function": "cluster_by_theme",
+        "fields": [
+            {"name": "papers", "label": "Papers (JSON array of {title, abstract})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "litreview/gap-highlight",
+        "feature": "Literature Review Generator",
+        "name": "Gap-Highlight Review",
+        "description": "Structures your review around what's missing in the literature, not just what's done.",
+        "module": "studybuddy.lit_review",
+        "function": "gap_highlight_review",
+        "fields": [
+            {"name": "papers", "label": "Papers (JSON array of {title, abstract})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "litreview/length-preset",
+        "feature": "Literature Review Generator",
+        "name": "Length Preset",
+        "description": "Get the section structure for a survey, standard paper, or thesis chapter review.",
+        "module": "studybuddy.lit_review",
+        "function": "length_preset",
+        "fields": [
+            {"name": "preset", "label": "Preset", "type": "select", "required": False,
+             "options": ["survey", "standard", "chapter"]},
+        ],
+    },
+    # ---------- Feature 22: Gap Finder ----------
+    {
+        "id": "gaps/trend-crosscheck",
+        "feature": "Gap Finder",
+        "name": "Trend Cross-Check",
+        "description": "Checks if your research gap is already being filled by trending papers.",
+        "module": "studybuddy.gap_finder",
+        "function": "trend_cross_check",
+        "fields": [
+            {"name": "gap_text", "label": "Gap description", "type": "textarea", "required": True},
+            {"name": "trending_papers", "label": "Trending papers (JSON array of {title, abstract})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "gaps/feasibility",
+        "feature": "Gap Finder",
+        "name": "3-Month Feasibility Score",
+        "description": "Scores whether a student can realistically tackle this gap in 3 months.",
+        "module": "studybuddy.gap_finder",
+        "function": "feasibility_score",
+        "fields": [
+            {"name": "gap_text", "label": "Gap description", "type": "textarea", "required": True},
+            {"name": "skills", "label": "Your skills (JSON array of strings)", "type": "textarea", "required": False, "json": True},
+        ],
+    },
+    {
+        "id": "gaps/to-proposal",
+        "feature": "Gap Finder",
+        "name": "Gap to Proposal Outline",
+        "description": "Turns a research gap into a structured proposal outline.",
+        "module": "studybuddy.gap_finder",
+        "function": "gap_to_proposal",
+        "fields": [
+            {"name": "gap_text", "label": "Gap description", "type": "textarea", "required": True},
+            {"name": "context", "label": "Extra context (optional)", "type": "textarea", "required": False},
+        ],
+    },
+    # ---------- Feature 23: Flashcards ----------
+    {
+        "id": "flashcards/anki-export",
+        "feature": "Flashcards",
+        "name": "Anki Export",
+        "description": "Exports your cards to Anki-importable TSV format.",
+        "module": "studybuddy.flashcards",
+        "function": "anki_export",
+        "fields": [
+            {"name": "cards", "label": "Cards (JSON array of {question, answer})", "type": "textarea", "required": True, "json": True},
+            {"name": "deck_name", "label": "Deck name", "type": "text", "required": False},
+        ],
+    },
+    {
+        "id": "flashcards/exam-sprint",
+        "feature": "Flashcards",
+        "name": "Timed Exam Sprint",
+        "description": "Shuffles your cards into a timed recall sprint with a countdown per card.",
+        "module": "studybuddy.flashcards",
+        "function": "exam_sprint",
+        "fields": [
+            {"name": "cards", "label": "Cards (JSON array)", "type": "textarea", "required": True, "json": True},
+            {"name": "seconds_per_card", "label": "Seconds per card (5-120)", "type": "number", "required": False},
+        ],
+    },
+    {
+        "id": "flashcards/weak-card-loop",
+        "feature": "Flashcards",
+        "name": "Weak-Card-First Loop",
+        "description": "Reorders your deck so the cards you keep missing surface first.",
+        "module": "studybuddy.flashcards",
+        "function": "weak_card_loop",
+        "fields": [
+            {"name": "card_stats", "label": "Card stats (JSON object {card_id: {wrong, right}})", "type": "textarea", "required": True, "json": True},
+            {"name": "cards", "label": "Cards (JSON array)", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    # ---------- Feature 24: Trending Research ----------
+    {
+        "id": "trending/personalized-feed",
+        "feature": "Trending Research",
+        "name": "Personalized Feed",
+        "description": "Filters trending papers down to the ones matching your skills and interests.",
+        "module": "studybuddy.trending",
+        "function": "personalized_feed",
+        "fields": [
+            {"name": "papers", "label": "Trending papers (JSON array)", "type": "textarea", "required": True, "json": True},
+            {"name": "skills", "label": "Your skills/interests (JSON array of strings)", "type": "textarea", "required": True, "json": True},
+            {"name": "limit", "label": "Max papers (1-50)", "type": "number", "required": False},
+        ],
+    },
+    {
+        "id": "trending/paper-to-projects",
+        "feature": "Trending Research",
+        "name": "Paper to Project Ideas",
+        "description": "Turns a trending paper into implementable project ideas with difficulty and steps.",
+        "module": "studybuddy.trending",
+        "function": "paper_to_project_ideas",
+        "fields": [
+            {"name": "paper", "label": "Paper (JSON object {title, abstract})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "trending/weekly-digest",
+        "feature": "Trending Research",
+        "name": "Weekly Digest",
+        "description": "Builds a top-N weekly digest of trending papers for your field.",
+        "module": "studybuddy.trending",
+        "function": "weekly_digest",
+        "fields": [
+            {"name": "papers", "label": "Trending papers (JSON array)", "type": "textarea", "required": True, "json": True},
+            {"name": "skills", "label": "Your skills/interests (JSON array of strings)", "type": "textarea", "required": False, "json": True},
+            {"name": "top_n", "label": "Number of papers (1-10)", "type": "number", "required": False},
+        ],
+    },
+    # ---------- Feature 25: Opportunity Radar ----------
+    {
+        "id": "opportunities/deadline-alerts",
+        "feature": "Opportunity Radar",
+        "name": "Deadline Alerts",
+        "description": "Buckets opportunities by deadline urgency: 1-day, 3-day, and 7-day alerts.",
+        "module": "studybuddy.opportunities",
+        "function": "deadline_alerts",
+        "fields": [
+            {"name": "opportunities", "label": "Opportunities (JSON array, each with days_left)", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "opportunities/fit-score",
+        "feature": "Opportunity Radar",
+        "name": "Skill-Fit Score",
+        "description": "Scores how well an opportunity matches your skills, 0-100.",
+        "module": "studybuddy.opportunities",
+        "function": "fit_score",
+        "fields": [
+            {"name": "opportunity", "label": "Opportunity (JSON object)", "type": "textarea", "required": True, "json": True},
+            {"name": "skills", "label": "Your skills (JSON array of strings)", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "opportunities/to-tracker",
+        "feature": "Opportunity Radar",
+        "name": "Add to Tracker",
+        "description": "Converts an opportunity into a one-click job-tracker payload.",
+        "module": "studybuddy.opportunities",
+        "function": "to_tracker_payload",
+        "fields": [
+            {"name": "opportunity", "label": "Opportunity (JSON object {organization, title})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    # ---------- Feature 26: Job Tracker ----------
+    {
+        "id": "tracker/pipeline-analytics",
+        "feature": "Job Tracker",
+        "name": "Pipeline Analytics",
+        "description": "Shows conversion rates across your job pipeline funnel.",
+        "module": "studybuddy.tracker_analytics",
+        "function": "pipeline_analytics",
+        "fields": [
+            {"name": "applications", "label": "Applications (JSON array of {stage})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "tracker/followup-nudges",
+        "feature": "Job Tracker",
+        "name": "Follow-Up Nudges",
+        "description": "Flags applications that have gone stale and need a follow-up.",
+        "module": "studybuddy.tracker_analytics",
+        "function": "followup_nudges",
+        "fields": [
+            {"name": "applications", "label": "Applications (JSON array of {id, company, role, stage, stage_updated_at})", "type": "textarea", "required": True, "json": True},
+            {"name": "nudge_after_days", "label": "Nudge after days", "type": "number", "required": False},
+        ],
+    },
+    {
+        "id": "tracker/compare-offers",
+        "feature": "Job Tracker",
+        "name": "Offer Comparator",
+        "description": "Side-by-side comparison of offers on salary, growth, and culture signals.",
+        "module": "studybuddy.tracker_analytics",
+        "function": "compare_offers",
+        "fields": [
+            {"name": "offers", "label": "Offers (JSON array of {company, role, base_lpa, ...})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    # ---------- Feature 27: Momentum ----------
+    {
+        "id": "momentum/streak-freeze",
+        "feature": "Momentum",
+        "name": "Streak Freeze Status",
+        "description": "Checks your weekly rest-day freeze: available, used, or about to save your streak.",
+        "module": "studybuddy.momentum",
+        "function": "streak_freeze_status",
+        "fields": [
+            {"name": "last_active", "label": "Last active date (YYYY-MM-DD)", "type": "text", "required": True},
+            {"name": "freezes_used_week", "label": "Freezes used this week", "type": "number", "required": True},
+        ],
+    },
+    {
+        "id": "momentum/squad-leaderboard",
+        "feature": "Momentum",
+        "name": "Squad Leaderboard",
+        "description": "Ranks your squad's weekly XP competition with medals.",
+        "module": "studybuddy.momentum",
+        "function": "squad_leaderboard",
+        "fields": [
+            {"name": "members", "label": "Squad members (JSON array of {user_id, name, weekly_xp})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "momentum/reward-tiers",
+        "feature": "Momentum",
+        "name": "Reward Tiers",
+        "description": "Shows which rewards your streak and XP have unlocked — and what's next.",
+        "module": "studybuddy.momentum",
+        "function": "reward_tiers",
+        "fields": [
+            {"name": "current_streak", "label": "Current streak (days)", "type": "number", "required": True},
+            {"name": "total_xp", "label": "Total XP", "type": "number", "required": True},
+        ],
+    },
+    # ---------- Feature 28: Peer Mocks ----------
+    {
+        "id": "peermocks/match-partners",
+        "feature": "Peer Mocks",
+        "name": "Skill-Matched Pairing",
+        "description": "Pairs you with a partner whose strengths fill your weaknesses, and vice versa.",
+        "module": "studybuddy.peer_mocks",
+        "function": "match_partners",
+        "fields": [
+            {"name": "users", "label": "Users (JSON array of {user_id, name, strengths, weaknesses})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "peermocks/score-rubric",
+        "feature": "Peer Mocks",
+        "name": "Rubric Scoring",
+        "description": "Scores a mock on a shared rubric and compares interviewer vs candidate perceptions.",
+        "module": "studybuddy.peer_mocks",
+        "function": "score_rubric",
+        "fields": [
+            {"name": "scores", "label": "Scores (JSON object: {dimension: 1-5} or {interviewer, candidate})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "peermocks/recurring-slot",
+        "feature": "Peer Mocks",
+        "name": "Recurring Slot",
+        "description": "Creates a weekly standing mock-interview appointment.",
+        "module": "studybuddy.peer_mocks",
+        "function": "recurring_slot",
+        "fields": [
+            {"name": "day", "label": "Day", "type": "select", "required": True,
+             "options": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]},
+            {"name": "time_hhmm", "label": "Time (HH:MM, 24h)", "type": "text", "required": True},
+            {"name": "duration_min", "label": "Duration in minutes (30-180)", "type": "number", "required": False},
+        ],
+    },
+    # ---------- Feature 29: Retrospectives ----------
+    {
+        "id": "retro/pattern-alerts",
+        "feature": "Retrospectives",
+        "name": "Rejection Pattern Alerts",
+        "description": "Detects recurring rejection themes across your retrospectives — your bottleneck, named.",
+        "module": "studybuddy.retro_insights",
+        "function": "pattern_alerts",
+        "fields": [
+            {"name": "retrospectives", "label": "Retrospectives (JSON array of {notes, feedback})", "type": "textarea", "required": True, "json": True},
+            {"name": "min_mentions", "label": "Minimum mentions to trigger an alert", "type": "number", "required": False},
+        ],
+    },
+    {
+        "id": "retro/track-experiment",
+        "feature": "Retrospectives",
+        "name": "A/B Experiment Tracker",
+        "description": "A/B tests resume versions or outreach templates and declares a winner with sample-size caution.",
+        "module": "studybuddy.retro_insights",
+        "function": "track_experiment",
+        "fields": [
+            {"name": "name", "label": "Experiment name", "type": "text", "required": False},
+            {"name": "variants", "label": "Variants (JSON array of {name, sent, callbacks})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "retro/win-library",
+        "feature": "Retrospectives",
+        "name": "Win Library",
+        "description": "Saves what worked and extracts your repeatable winning playbook.",
+        "module": "studybuddy.retro_insights",
+        "function": "win_library",
+        "fields": [
+            {"name": "wins", "label": "Wins (JSON array of {title, what_worked, context})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    # ---------- Feature 30: Mentors ----------
+    {
+        "id": "mentors/async-qa-digest",
+        "feature": "Mentors",
+        "name": "Async Q&A Digest",
+        "description": "Bundles pending questions into a mentor-friendly digest they can answer in one sitting.",
+        "module": "studybuddy.mentor_extras",
+        "function": "async_qa_digest",
+        "fields": [
+            {"name": "questions", "label": "Questions (JSON array of {question, topic, asker})", "type": "textarea", "required": True, "json": True},
+            {"name": "mentor_name", "label": "Mentor name", "type": "text", "required": False},
+        ],
+    },
+    {
+        "id": "mentors/prep-packet",
+        "feature": "Mentors",
+        "name": "Session Prep Packet",
+        "description": "Auto-generates a briefing packet for both sides before a mentoring call, with an agenda.",
+        "module": "studybuddy.mentor_extras",
+        "function": "prep_packet",
+        "fields": [
+            {"name": "mentee", "label": "Mentee (JSON object {name, headline, goals})", "type": "textarea", "required": True, "json": True},
+            {"name": "mentor", "label": "Mentor (JSON object {name, headline})", "type": "textarea", "required": True, "json": True},
+            {"name": "topic", "label": "Session topic", "type": "text", "required": True},
+        ],
+    },
+    {
+        "id": "mentors/alumni-outcomes",
+        "feature": "Mentors",
+        "name": "Alumni Outcomes",
+        "description": "Shows where a mentor's mentees landed — social proof with top companies.",
+        "module": "studybuddy.mentor_extras",
+        "function": "alumni_outcomes",
+        "fields": [
+            {"name": "mentor_id", "label": "Mentor ID", "type": "text", "required": True},
+            {"name": "placements", "label": "Placements (JSON array of {mentor_id, company, role})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    # ---------- Feature 31: Career Health Review ----------
+    {
+        "id": "health/monthly-report",
+        "feature": "Career Health Review",
+        "name": "Monthly Report",
+        "description": "Turns your health review into a readable monthly digest with highlights and concerns.",
+        "module": "studybuddy.health_review",
+        "function": "monthly_report",
+        "fields": [
+            {"name": "review", "label": "Review (JSON object {month, dimensions: {name: {score, evidence}}})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "health/peer-benchmarks",
+        "feature": "Career Health Review",
+        "name": "Peer Benchmarks",
+        "description": "Shows where you stand vs peers per dimension, as percentiles.",
+        "module": "studybuddy.health_review",
+        "function": "peer_benchmarks",
+        "fields": [
+            {"name": "my_scores", "label": "My scores (JSON object {dimension: score})", "type": "textarea", "required": True, "json": True},
+            {"name": "peer_scores", "label": "Peer scores (JSON array of {dimension: score})", "type": "textarea", "required": True, "json": True},
+        ],
+    },
+    {
+        "id": "health/action-nudges",
+        "feature": "Career Health Review",
+        "name": "Action Nudges",
+        "description": "Converts health dips into specific suggested actions, flagged urgent when scores drop.",
+        "module": "studybuddy.health_review",
+        "function": "action_nudges",
+        "fields": [
+            {"name": "current_scores", "label": "Current scores (JSON object)", "type": "textarea", "required": True, "json": True},
+            {"name": "previous_scores", "label": "Previous month's scores (JSON object)", "type": "textarea", "required": False, "json": True},
+        ],
+    },
+]
