@@ -903,7 +903,10 @@ def _intext_bibtex_key(meta):
     year = _str(meta, "year") or "nodate"
     title_word = (_str(meta, "title") or "untitled").split()
     tw = _re14.sub(r"\W", "", title_word[0]).lower() if title_word else "untitled"
-    key = f"{_re14.sub(r'\\W', '', first).lower()}{year}{tw}"[:40]
+    # NOTE: the regex sub is hoisted out of the f-string because Python < 3.12
+    # forbids backslashes inside f-string expression parts (Render runs 3.10).
+    first_clean = _re14.sub(r"\W", "", first).lower()
+    key = f"{first_clean}{year}{tw}"[:40]
     return key or "ref"
 
 
