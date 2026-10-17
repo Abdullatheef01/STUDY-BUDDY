@@ -1,8 +1,19 @@
 """
 ATS Scorer - Calculates ATS (Applicant Tracking System) resume score.
 Evaluates resume quality based on multiple criteria.
+
+NOTE: This is a *heuristic* resume-quality estimate. Real applicant-tracking
+systems do not publish 0-100 scores, so the number below is a checklist-style
+quality signal, not a prediction of any real ATS outcome.
 """
 import re
+
+# Phone patterns: Indian 10-digit mobile (with optional +91/91/0 handling via
+# the 5+5 or 10-digit grouping) plus US/international 3-3-4 grouping.
+PHONE_RE = re.compile(
+    r'(?:\+?91[-.\s]?)?[6-9]\d{4}[-.\s]?\d{5}'
+    r'|(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+)
 
 
 def calculate_ats_score(resume_text, sections, skills, experience_years):
@@ -19,6 +30,23 @@ def calculate_ats_score(resume_text, sections, skills, experience_years):
         dict: ATS score breakdown with total score and category scores
     """
     scores = {}
+
+    # De-duplicate skills (case-insensitive) so repeated listings can't inflate
+    # the skills score.
+    _seen_skill_names = set()
+    _uniq_skills = []
+    for _s in skills or []:
+        _nm = (_s.get('name') or '').strip().lower() if isinstance(_s, dict) else str(_s).strip().lower()
+        if _nm and _nm not in _seen_skill_names:
+            _seen_skill_names.add(_nm)
+            _uniq_skills.append(_s)
+    skills = _uniq_skills
+
+    # Repetition / gaming guard: pathological copy-paste repetition (very low
+    # unique-word ratio) zeroes the word-count component and is disclosed.
+    _words_lc = resume_text.lower().split()
+    _gaming_detected = bool(_words_lc) and len(_words_lc) > 100 and \
+        (len(set(_words_lc)) / len(_words_lc)) < 0.2
     
     # 1. Section Completeness (20 points)
     essential_sections = ['summary', 'education', 'experience', 'skills']
@@ -67,13 +95,14 @@ def calculate_ats_score(resume_text, sections, skills, experience_years):
     word_count = len(resume_text.split())
     content_score = 0
     
-    # Word count scoring
-    if 300 <= word_count <= 1200:
-        content_score += 8
-    elif 200 <= word_count <= 1500:
-        content_score += 5
-    elif word_count > 100:
-        content_score += 3
+    # Word count scoring (disabled when copy-paste repetition is detected)
+    if not _gaming_detected:
+        if 300 <= word_count <= 1200:
+            content_score += 8
+        elif 200 <= word_count <= 1500:
+            content_score += 5
+        elif word_count > 100:
+            content_score += 3
     
     # Action verbs
     action_verbs = [
@@ -83,24 +112,36 @@ def calculate_ats_score(resume_text, sections, skills, experience_years):
         'established', 'maintained', 'automated', 'integrated', 'resolved',
         'collaborated', 'mentored', 'presented', 'published', 'engineered'
     ]
-    verbs_found = sum(1 for v in action_verbs if v in resume_text.lower())
+    # Action verbs: word-boundary matched (so 'led' can't match inside
+    # unrelated words) and counted as distinct verbs only.
+    _text_lower = resume_text.lower()
+    verbs_found = sum(
+        1 for v in action_verbs
+        if re.search(r'\b' + re.escape(v) + r'\b', _text_lower)
+    )
     content_score += min(verbs_found * 1.5, 7)
     
-    # Quantifiable achievements (numbers, percentages)
+    # Quantifiable achievements - unique values only, so repeating "50%"
+    # sixty times can't inflate the score.
     metrics = re.findall(r'\d+[%+]|\$[\d,]+|\d+\s*(?:users|clients|projects|team|members)', resume_text, re.IGNORECASE)
-    content_score += min(len(metrics) * 1.5, 5)
+    unique_metrics = {m.strip().lower() for m in metrics}
+    content_score += min(len(unique_metrics) * 1.5, 5)
     
+    _content_details = (f"{word_count} words, {verbs_found} action verbs, "
+                        f"{len(unique_metrics)} quantified achievements")
+    if _gaming_detected:
+        _content_details += " \u2014 repetitive text detected, word-count points withheld"
     scores['content'] = {
         'score': round(min(content_score, 20), 1),
         'max': 20,
         'label': 'Content Quality',
-        'details': f"{word_count} words, {verbs_found} action verbs, {len(metrics)} quantified achievements"
+        'details': _content_details
     }
     
     # 4. Contact Information (10 points)
     contact_score = 0
     has_email = bool(re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', resume_text))
-    has_phone = bool(re.search(r'(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', resume_text))
+    has_phone = bool(PHONE_RE.search(resume_text))
     has_linkedin = bool(re.search(r'linkedin', resume_text, re.IGNORECASE))
     has_github = bool(re.search(r'github', resume_text, re.IGNORECASE))
     has_portfolio = bool(re.search(r'portfolio|website|blog', resume_text, re.IGNORECASE))
@@ -204,5 +245,9 @@ def calculate_ats_score(resume_text, sections, skills, experience_years):
         'percentage': round(percentage, 1),
         'grade': grade,
         'grade_label': grade_label,
-        'breakdown': scores
+        'breakdown': scores,
+        'gaming_detected': _gaming_detected,
+        'method_note': ('Heuristic resume-quality estimate, not a real ATS score. '
+                        'Real applicant-tracking systems do not publish 0-100 scores; '
+                        'treat this as a checklist-style quality signal.')
     }

@@ -70,8 +70,9 @@ def extract_email(text):
 
 
 def extract_phone(text):
-    """Extract phone numbers from text."""
-    pattern = r'(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+    """Extract phone numbers from text (India 10-digit + US/intl formats)."""
+    pattern = (r'(?:\+?91[-.\s]?)?[6-9]\d{4}[-.\s]?\d{5}'
+               r'|(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}')
     phones = re.findall(pattern, text)
     return phones[0] if phones else None
 

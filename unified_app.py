@@ -30,6 +30,7 @@ from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from werkzeug.middleware.proxy_fix import ProxyFix
 from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -1978,10 +1979,10 @@ def create_app(config_overrides=None):
     secret = os.getenv("SECRET_KEY")
     _insecure = {None, "", "change-me-to-a-long-random-secret",
                  "unified-ai-platform-secret-2026"}
+    _is_prod_env = bool(os.getenv("FLASK_ENV") == "production"
+                       or os.getenv("RENDER") or os.getenv("DYNO"))
     if secret in _insecure:
-        is_prod = (os.getenv("FLASK_ENV") == "production"
-                   or os.getenv("RENDER") or os.getenv("DYNO"))
-        if is_prod:
+        if _is_prod_env:
             raise RuntimeError(
                 "SECRET_KEY is not set (or is still the placeholder). "
                 "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\" "
@@ -1990,6 +1991,13 @@ def create_app(config_overrides=None):
         print("WARNING: SECRET_KEY is not set - using an ephemeral key for this "
               "local dev run. Set SECRET_KEY in .env for real use.")
     app.secret_key = secret
+
+    # --- Session cookie hardening (scorecard S1) ---
+    # Secure cookies only in production: local dev runs over plain HTTP and
+    # would silently lose sessions with the Secure flag set.
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["SESSION_COOKIE_SECURE"] = _is_prod_env
 
     app.config["SQLALCHEMY_DATABASE_URI"] = get_db_url()
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -2015,12 +2023,46 @@ def create_app(config_overrides=None):
 
     register_routes(app)
     register_error_handlers(app)
+    register_security_headers(app)
 
     with app.app_context():
         db.create_all()
         _ensure_schema()
 
     return app
+
+
+def register_security_headers(app):
+    """Security headers + ProxyFix (scorecard: headers/cookies/proxy gaps).
+
+    Render terminates TLS at its edge proxy, so we trust exactly one hop:
+    request.is_secure and remote_addr then reflect the real client, which
+    also makes Flask-Limiter's per-IP limits meaningful again.
+    """
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+
+    @app.after_request
+    def _set_security_headers(resp):
+        resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+        resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+        resp.headers.setdefault("Referrer-Policy",
+                                "strict-origin-when-cross-origin")
+        # Inline scripts/styles are used across templates, and fonts/CDN
+        # assets come from Google Fonts + cdnjs + unpkg — the policy
+        # allowlists exactly those.
+        resp.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com data:; "
+            "img-src 'self' data: https://unpkg.com; "
+            "connect-src 'self'; frame-ancestors 'self'")
+        if request.is_secure:
+            resp.headers.setdefault(
+                "Strict-Transport-Security",
+                "max-age=31536000; includeSubDomains")
+        return resp
 
 
 def _error_payload(code, message):

@@ -10,7 +10,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)](https://flask.palletsprojects.com/)
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?logo=render)](https://ai-career-research-assistant-resume.onrender.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-1216%20passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Tests-8720%20passing-brightgreen)]()
 
 [Live Demo](https://ai-career-research-assistant-resume.onrender.com) · [Features](#-features) · [Setup](#-installation--setup) · [Contributing](#-contributing)
 
@@ -22,7 +22,7 @@
 
 **STUDY-BUDDY** is an all-in-one platform that helps students navigate their entire career journey: discovering the right career path, building a standout resume, preparing for interviews, finding opportunities, learning new skills, conducting research, and staying motivated — all in one place.
 
-Built as a Flask monolith, it combines **Google Gemini** and **BERT** models with large curated content banks (hundreds of interview questions, aptitude drills, DSA problems, and learning resources) so students get AI-powered guidance backed by real substance — not empty chat.
+Built as a Flask monolith, it pairs **Google Gemini** (with automatic fallback to Groq and OpenRouter) with **classic retrieval (TF-IDF/BM25)** and large curated content banks (hundreds of interview questions, aptitude drills, DSA problems, and learning resources) so students get AI-powered guidance backed by real substance — not empty chat. Semantic embeddings via sentence-transformers are supported where installed; production currently uses the keyword/retrieval path.
 
 ### Why STUDY-BUDDY?
 
@@ -101,7 +101,7 @@ Built as a Flask monolith, it combines **Google Gemini** and **BERT** models wit
 | Feature | What it does |
 |---|---|
 | Peer Mock Interviews | Create a room, share the link, and practice with a friend — question cards from the 339-question bank, timers, role swap, and reciprocal 5-dimension rubric feedback |
-| Mentor & Alumni Office Hours | Book group sessions with verified mentors across domains; structured question templates keep conversations useful, with post-session action notes |
+| Mentor & Alumni Office Hours | Book group sessions with mentors across domains — sample profiles ship with the app; real mentors apply and are marked verified only after review. Structured question templates keep conversations useful, with post-session action notes |
 
 ### 📊 Review & Analytics
 
@@ -118,6 +118,20 @@ Built as a Flask monolith, it combines **Google Gemini** and **BERT** models wit
 | Smart Merging | Curated entries are never touched; expired auto-entries are pruned, duplicates removed |
 | Filters & Bookmarks | Filter by type (hackathon / internship / competition), bookmark what matters |
 
+### ⚡ Ultimate Lab
+
+| Feature | What it does |
+|---|---|
+| 91 Power Tools | Every feature's deep "ultimate" enhancements (streak freeze, squad challenges, peer mocks, rejection-pattern alerts, mentor prep packets, monthly health review…) runnable from one dashboard at `/ultimate/lab` |
+| Tool API | `GET /api/ultimate/tools` lists all tools; `POST /api/ultimate/run/<tool_id>` runs one with a JSON body |
+
+### 🔑 Sign-in & Extras
+
+| Feature | What it does |
+|---|---|
+| Google Sign-in | One-click OAuth login alongside email/password (email verified via Google) |
+| India Salary Explorer | Explore salary ranges by role, experience, and city, grounded in the curated salary dataset |
+
 ---
 
 ## 🛠 Tech Stack
@@ -126,10 +140,10 @@ Built as a Flask monolith, it combines **Google Gemini** and **BERT** models wit
 |---|---|
 | Backend | Python 3.12, Flask 3.x, Flask-SQLAlchemy, Flask-Login |
 | Database | SQLite (dev) / PostgreSQL (prod via `DATABASE_URL`) |
-| AI | Google Gemini API, BERT (sentence-transformers) |
+| AI | Google Gemini API with Groq/OpenRouter fallback; TF-IDF/BM25 retrieval (sentence-transformers optional — keyword fallback in production) |
 | Frontend | Jinja2 templates, custom Bento CSS design system, vanilla JS |
 | Server | Gunicorn |
-| Testing | pytest (1216 tests) |
+| Testing | pytest (8720 tests) |
 | Deployment | Render (free tier) |
 
 ---
@@ -139,26 +153,30 @@ Built as a Flask monolith, it combines **Google Gemini** and **BERT** models wit
 ```
 acra/
 ├── unified_app.py          # Flask app: models, routes, app factory (~7000 lines)
-├── momentum.py             # XP / streaks / leagues / quests engine
-├── community.py            # Peer mocks + mentor office hours
-├── health_review.py        # Monthly career health aggregation
-├── flashcards.py           # Flashcard generation (TF-IDF, cloze, MCQ)
-├── gap_finder.py           # Research-gap analysis
-├── lit_review.py           # Literature review generator
-├── arxiv_import.py         # arXiv / DOI import + citation graph
-├── citation_fmt.py         # IEEE / APA / MLA / Vancouver / Chicago / BibTeX
-├── pdf_qa.py               # Source-grounded PDF question answering
-├── opportunity_sources.py  # Devpost + SimplifyJobs auto-ingest
-├── learning_roadmaps.py    # Skill roadmaps + resources
-├── skill_quizzes.py        # Quiz engine
-├── mock_interview.py       # Interview question bank + rubric scoring
-├── dsa_practice.py         # DSA problems + hints
-├── ...                     # 15+ more feature modules
+├── studybuddy/             # Feature modules (pure-logic, no Flask/network/LLM)
+│   ├── momentum.py         # XP / streaks / leagues / quests engine
+│   ├── community.py        # Peer mocks + mentor office hours
+│   ├── health_review.py    # Monthly career health aggregation
+│   ├── flashcards.py       # Flashcard generation (TF-IDF, cloze, MCQ)
+│   ├── gap_finder.py       # Research-gap analysis
+│   ├── lit_review.py       # Literature review generator
+│   ├── arxiv_import.py     # arXiv / DOI import + citation graph
+│   ├── citation_fmt.py     # IEEE / APA / MLA / Vancouver / Chicago / BibTeX
+│   ├── pdf_qa.py           # Source-grounded PDF question answering
+│   ├── opportunity_sources.py  # Devpost + SimplifyJobs auto-ingest
+│   ├── learning_roadmaps.py    # Skill roadmaps + resources
+│   ├── skill_quizzes.py    # Quiz engine
+│   ├── mock_interview.py   # Interview question bank + rubric scoring
+│   ├── dsa_practice.py     # DSA problems + hints
+│   ├── ai_gateway.py       # Gemini → Groq → OpenRouter fallback chain
+│   ├── ultimate_reg_*.py   # Ultimate Lab tool registry (91 tools)
+│   ├── ultimate_routes.py  # /ultimate/lab dashboard + /api/ultimate API
+│   └── ...                 # 15+ more feature modules
 ├── templates/              # Jinja2 templates (Bento UI)
 ├── static/
 │   ├── css/bento.css       # Design system
 │   └── img/                # STUDY-BUDDY owl logo + favicons
-├── tests/                  # pytest suite (1216 tests)
+├── tests/                  # pytest suite (8720 tests)
 └── data/                   # JSON content banks (questions, resources)
 ```
 
@@ -217,7 +235,7 @@ Open **http://localhost:5000** and create an account to get started.
 pytest tests/ -q
 ```
 
-- **1216 tests**, covering every feature module: happy paths, validation, auth isolation, CSRF, rate limits, and error/edge cases
+- **8720 tests**, covering every feature module: happy paths, validation, auth isolation, CSRF, rate limits, and error/edge cases
 - Run the suite twice before any release; the project standard is **100% green, 0 failures**
 
 ---
