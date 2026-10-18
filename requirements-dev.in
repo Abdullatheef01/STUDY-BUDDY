@@ -1,0 +1,10 @@
+# Dev/test dependencies (OPS-01). Compile with:
+#   uv pip compile --generate-hashes --python-version 3.12 --output-file=requirements-dev.txt requirements-dev.in
+-r requirements.in
+pytest==9.1.1
+pytest-xdist==3.8.0
+ruff==0.9.4
+bandit==1.9.4
+pip-audit==2.10.1
+pre-commit
+flask-migrate  # also in requirements.in (needed for flask db in prod)
