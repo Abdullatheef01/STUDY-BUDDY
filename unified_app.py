@@ -2022,6 +2022,11 @@ def create_app(config_overrides=None):
     login_manager.init_app(app)
     login_manager.login_view = "login"
     login_manager.login_message_category = "info"
+    # SEC-06: strong session protection (tracks user agent + IP, invalidates
+    # the session on mismatch), 12h absolute lifetime, no sliding refresh.
+    login_manager.session_protection = "strong"
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)
+    app.config["SESSION_REFRESH_EACH_REQUEST"] = False
     csrf.init_app(app)
     limiter.init_app(app)
     oauth.init_app(app)
@@ -2452,6 +2457,12 @@ def _generate_cover_ai(resume_text, jd_text, tone):
     return fallback, False
 
 
+def _rotate_session_on_login():
+    """Session-fixation defense (SEC-06): drop any pre-login session data so
+    the session cookie is re-issued fresh at the moment of login."""
+    session.clear()
+
+
 def register_routes(app):
 
     # ---------- ULTIMATE LAB (91 power tools) ----------
@@ -2501,6 +2512,7 @@ def register_routes(app):
                 user.set_password(password)
                 db.session.add(user)
                 db.session.commit()
+                _rotate_session_on_login()
                 login_user(user)
                 flash('Welcome, {}! Your account is ready.'.format(user.name), 'success')
                 return redirect(url_for('dashboard'))
@@ -2517,6 +2529,7 @@ def register_routes(app):
             password = request.form.get('password') or ''
             user = User.query.filter_by(email=email).first()
             if user and user.check_password(password):
+                _rotate_session_on_login()
                 login_user(user, remember=bool(request.form.get('remember')))
                 flash('Welcome back, {}!'.format(user.name), 'success')
                 nxt = request.args.get('next') or request.form.get('next')
@@ -2572,6 +2585,7 @@ def register_routes(app):
             except ValueError as e:
                 flash(str(e), 'error')
                 return redirect(url_for('login'))
+            _rotate_session_on_login()
             login_user(user, remember=True)
             flash('Welcome{}!'.format(
                 ', {}'.format(user.name) if is_new else ' back, {}'.format(user.name)),
