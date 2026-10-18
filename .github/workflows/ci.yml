@@ -66,6 +66,13 @@ jobs:
       - run: pip install --require-hashes -r requirements.txt
       - run: pip install pytest pytest-xdist
       - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
+      # ARC-03: migration round-trip + drift check on Postgres
+      - run: flask db upgrade head
+        env:
+          FLASK_APP: unified_app
+      - run: flask db check
+        env:
+          FLASK_APP: unified_app
 
   security:
     name: Bandit + pip-audit

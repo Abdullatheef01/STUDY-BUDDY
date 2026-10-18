@@ -412,6 +412,13 @@ from studybuddy.star_builder import (
 )
 
 db = SQLAlchemy()
+# ARC-03: Alembic migrations via Flask-Migrate. Initialized in create_app().
+migrate = None  # set to Migrate() once flask-migrate is importable
+try:
+    from flask_migrate import Migrate as _Migrate
+    migrate = _Migrate()
+except ImportError:  # pragma: no cover - dev without flask-migrate
+    pass
 login_manager = LoginManager()
 csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address, default_limits=[])
@@ -430,8 +437,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
     # --- Social login + profile integrations (added post-Phase-1) ---
-    # google_sub is unique but enforced via a manual unique index (see
-    # _ensure_schema) so pre-Phase-2 databases can adopt it without a rebuild.
+    # google_sub is unique via ix_user_google_sub (see the Alembic baseline migration).
     google_sub = db.Column(db.String(255), nullable=True)
     avatar_url = db.Column(db.String(512), nullable=True)
     github_username = db.Column(db.String(39), nullable=True)
@@ -452,7 +458,7 @@ class ResumeAnalysis(db.Model):
     ats_score = db.Column(db.Float)
     result_json = db.Column(db.JSON)  # full analysis payload (dashboard rendering)
     # Cleaned resume text (truncated) so Wave-1 JD matching can reuse the
-    # latest saved analysis without a re-upload. Backfilled via _ensure_schema.
+    # latest saved analysis without a re-upload.
     resume_text = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
@@ -1930,53 +1936,6 @@ def is_safe_next(target):
     return target and target.startswith("/") and not target.startswith("//")
 
 
-def _ensure_schema():
-    """Backfill social/integration columns on pre-existing databases.
-
-    Phase 1 used db.create_all() with no migrations, and create_all() never
-    adds columns to an existing table. This inspects the `user` table and
-    ALTERs in any missing columns (SQLite + Postgres compatible), plus a
-    unique index on google_sub (NULLs stay non-conflicting on both dialects).
-    Safe to run on every boot; a no-op when the schema is current.
-    """
-    from sqlalchemy import inspect, text
-    insp = inspect(db.engine)
-    if "user" not in insp.get_table_names():
-        return
-    existing = {c["name"] for c in insp.get_columns("user")}
-    wanted = {
-        "google_sub": "VARCHAR(255)",
-        "avatar_url": "VARCHAR(512)",
-        "github_username": "VARCHAR(39)",
-        "leetcode_username": "VARCHAR(39)",
-    }
-    have_index = any(i["name"] == "ix_user_google_sub"
-                     for i in insp.get_indexes("user"))
-    missing = [(col, ddl) for col, ddl in wanted.items() if col not in existing]
-    if missing or not have_index:
-        with db.engine.begin() as conn:
-            for col, ddl in missing:
-                conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col} {ddl}'))
-                log.info("Schema evolution: added user.%s", col)
-            conn.execute(text(
-                'CREATE UNIQUE INDEX IF NOT EXISTS ix_user_google_sub ON "user" (google_sub)'))
-    # Wave-1: resume_text on resume_analysis (TEXT works on SQLite + Postgres).
-    # Independent of the user-table backfill above (no shared early return).
-    if "resume_analysis" in insp.get_table_names():
-        ra_existing = {c["name"] for c in insp.get_columns("resume_analysis")}
-        if "resume_text" not in ra_existing:
-            with db.engine.begin() as conn:
-                conn.execute(text('ALTER TABLE "resume_analysis" ADD COLUMN resume_text TEXT'))
-            log.info("Schema evolution: added resume_analysis.resume_text")
-    # Ultimate F3.3: which resume version was sent per application.
-    if "job_application" in insp.get_table_names():
-        ja_existing = {c["name"] for c in insp.get_columns("job_application")}
-        if "resume_version_id" not in ja_existing:
-            with db.engine.begin() as conn:
-                conn.execute(text('ALTER TABLE "job_application" ADD COLUMN resume_version_id INTEGER'))
-            log.info("Schema evolution: added job_application.resume_version_id")
-
-
 # ========================================================
 # --- GOOGLE OAUTH (Authlib) ---
 # ========================================================
@@ -2114,6 +2073,9 @@ def create_app(config_overrides=None):
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     db.init_app(app)
+    # ARC-03: Alembic migrations. render_as_batch keeps SQLite dev/test working.
+    if migrate is not None:
+        migrate.init_app(app, db, render_as_batch=True)
     login_manager.init_app(app)
     login_manager.login_view = "login"
     login_manager.login_message_category = "info"
@@ -2135,8 +2097,17 @@ def create_app(config_overrides=None):
     register_security_headers(app)
 
     with app.app_context():
-        db.create_all()
-        _ensure_schema()
+        # ARC-03: DDL at worker boot is gone in production — schema is managed
+        # by Alembic migrations (flask db upgrade as a release step). We keep
+        # create_all() for SQLite dev/test and the TESTING fixture so the
+        # 8k+ test suite keeps working without a migration run per test.
+        # SKIP_DB_INIT=1 forces the skip (used when generating migrations).
+        _db_url = app.config.get("SQLALCHEMY_DATABASE_URI") or ""
+        _is_prod_db = _db_url.startswith(("postgresql", "postgres"))
+        if os.environ.get("SKIP_DB_INIT") == "1":
+            _is_prod_db = True  # treat as migration-managed
+        if not _is_prod_db:
+            db.create_all()
 
     return app
 
