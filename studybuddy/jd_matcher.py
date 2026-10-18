@@ -400,7 +400,7 @@ def keyword_action_plan(report, resume_text, sections=None):
 def competitiveness_checklist(report, applicants_estimate=None):
     """Qualitative competitiveness checklist — explicitly NOT a prediction.
 
-    ENG-08 (Phase 0): the old ``offer_probability()`` turned an ATS score
+    ENG-08 (Phase 0): the old ``offer_probability()`` turned a resume-readiness score
     into a made-up "offer chance %" via an arbitrary logistic curve. No data
     links those numbers to real hiring outcomes, so the percentages were
     removed. This returns a qualitative, explicitly illustrative checklist

@@ -302,3 +302,45 @@ class TestDefaultDenyExpensiveEndpoints:
             json={"current_skills": [], "target_role": "backend-dev"})
         assert r.status_code == 200
         assert calls == [], "AI was called for an anonymous request"
+
+
+class TestEng01Rename:
+    """ENG-01: user-visible 'ATS score' renamed to 'Resume Readiness'.
+
+    The 0-100 number is a heuristic resume-quality estimate, not a real
+    applicant-tracking-system score (real ATSs don't publish scores).
+    Internal identifiers (ats_score column, calculate_ats_score) are
+    intentionally untouched — no DB migration.
+    """
+
+    def test_no_ats_score_in_templates(self):
+        import re
+        tmpl_dir = os.path.join(os.path.dirname(__file__), "..", "templates")
+        offenders = []
+        for fname in os.listdir(tmpl_dir):
+            if not fname.endswith(".html"):
+                continue
+            text = open(os.path.join(tmpl_dir, fname)).read()
+            if re.search(r"ATS score", text, re.IGNORECASE):
+                offenders.append(fname)
+        assert not offenders, f"templates still say 'ATS score': {offenders}"
+
+    def test_no_ats_score_in_user_facing_py(self):
+        import re
+        py_files = [
+            "studybuddy/health_review.py",
+            "studybuddy/jd_matcher.py",
+            "studybuddy/ultimate_reg_a.py",
+        ]
+        repo = os.path.join(os.path.dirname(__file__), "..")
+        offenders = []
+        for rel in py_files:
+            text = open(os.path.join(repo, rel)).read()
+            # allow internal identifiers like ats_score / calculate_ats_score
+            cleaned = re.sub(r"[A-Za-z_]*ats_score[A-Za-z_]*", "", text,
+                             flags=re.IGNORECASE)
+            cleaned = re.sub(r"calculate_ats_score", "", cleaned,
+                             flags=re.IGNORECASE)
+            if re.search(r"ATS score", cleaned, re.IGNORECASE):
+                offenders.append(rel)
+        assert not offenders, f"user-facing copy still says 'ATS score': {offenders}"

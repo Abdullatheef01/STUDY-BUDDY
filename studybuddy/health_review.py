@@ -140,7 +140,7 @@ def _agg_direction(M, user_id):
 
 
 def _agg_proof(M, user_id):
-    """ResumeAnalysis count + max ATS score, Portfolio exists?, CertPlan count."""
+    """ResumeAnalysis count + max resume-readiness score, Portfolio exists?, CertPlan count."""
     analyses = M.ResumeAnalysis.query.filter_by(user_id=user_id).all()
     ats_scores = [a.ats_score for a in analyses
                   if isinstance(a.ats_score, (int, float))]

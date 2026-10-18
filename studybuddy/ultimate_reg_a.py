@@ -35,7 +35,7 @@ TOOLS_A = [
         "id": "jd/offer-odds",
         "feature": "JD-Matched ATS Scoring",
         "name": "Competitiveness Checklist",
-        "description": "An honest, illustrative checklist from your ATS score — no made-up offer percentages.",
+        "description": "An honest, illustrative checklist from your resume-readiness score — no made-up offer percentages.",
         "module": "studybuddy.jd_matcher",
         "function": "competitiveness_checklist",
         "fields": [
