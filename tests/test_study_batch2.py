@@ -4,12 +4,11 @@ flashcards & paper quizzes (#26).
 Happy paths + the zero-error protocol: auth, invalid input, missing CSRF
 (where enabled), empty library, cross-user isolation, malformed payloads.
 """
-import json
 
-import pytest
 
-from unified_app import db, User, StudyDoc, LitReview, GapReport, FlashcardSet
-from conftest import register, login  # noqa: F401
+from conftest import login, register  # noqa: F401
+
+from unified_app import FlashcardSet, StudyDoc, User, db
 
 
 def _authed(client):

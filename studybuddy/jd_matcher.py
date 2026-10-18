@@ -143,8 +143,8 @@ def score_jd_match(resume_text, resume_skill_names, experience_years,
     resume_years = experience_years or 0
     if req_years:
         exp_ratio = min(resume_years / req_years, 1.0) if req_years > 0 else 1.0
-        exp_note = ("Resume shows ~{} yr vs {} yr required."
-                    .format(resume_years, req_years))
+        exp_note = (f"Resume shows ~{resume_years} yr vs {req_years} yr required."
+                    )
     else:
         # No explicit bar in the JD: neutral, not punitive, and labelled.
         exp_ratio = 0.6
@@ -176,15 +176,13 @@ def score_jd_match(resume_text, resume_skill_names, experience_years,
                 "score": kw_score, "max": WEIGHTS["keyword_coverage"],
                 "label": "Keyword Coverage",
                 "matched": len(matched_kw), "total": kw_total,
-                "details": "{}/{} JD keywords appear in your resume.".format(
-                    len(matched_kw), kw_total),
+                "details": f"{len(matched_kw)}/{kw_total} JD keywords appear in your resume.",
             },
             "skills_hit_rate": {
                 "score": sk_score, "max": WEIGHTS["skills_hit_rate"],
                 "label": "Required-Skills Hit Rate",
                 "matched": len(matched_skills), "total": sk_total,
-                "details": "{}/{} skills the JD asks for are on your resume.".format(
-                    len(matched_skills), sk_total),
+                "details": f"{len(matched_skills)}/{sk_total} skills the JD asks for are on your resume.",
             },
             "experience_alignment": {
                 "score": exp_score, "max": WEIGHTS["experience_alignment"],
@@ -223,8 +221,7 @@ def generate_rule_based_suggestions(report):
     if missing_skills:
         suggestions.append({
             "section": "Skills",
-            "issue": "Missing {} skill(s) the JD explicitly asks for.".format(
-                len(missing_skills)),
+            "issue": f"Missing {len(missing_skills)} skill(s) the JD explicitly asks for.",
             "fix": ("Add a Skills section entry for: {}. Only list skills "
                     "you genuinely have; mirror the JD's exact wording so "
                     "ATS parsers catch them.".format(", ".join(missing_skills[:8]))),
@@ -244,8 +241,7 @@ def generate_rule_based_suggestions(report):
     if req_years and resume_years < req_years:
         suggestions.append({
             "section": "Experience",
-            "issue": "JD asks for ~{} yr; your resume shows ~{} yr.".format(
-                req_years, resume_years),
+            "issue": f"JD asks for ~{req_years} yr; your resume shows ~{resume_years} yr.",
             "fix": ("Quantify every bullet (%, counts, scale) and surface "
                     "internships, freelance, and project work as experience "
                     "to close the perceived gap."),
@@ -255,9 +251,9 @@ def generate_rule_based_suggestions(report):
         suggestions.append({
             "section": "Summary",
             "issue": "Resume headline does not mirror the target role.",
-            "fix": ("Open with the exact role title from the JD ('{}') "
+            "fix": (f"Open with the exact role title from the JD ('{job_title}') "
                     "followed by your strongest matching qualification."
-                    .format(job_title)),
+                    ),
         })
     ats = (report.get("breakdown") or {}).get("ats_friendliness", {})
     if ats.get("score", 10) < 7:

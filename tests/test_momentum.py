@@ -5,7 +5,7 @@ bonus, shield forgiveness & graceful reset, quest progress/claims, leagues,
 reflections, opt-out, routes (auth + CSRF), and hook integration through
 real route handlers.
 """
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -27,6 +27,7 @@ from studybuddy.momentum import (
     week_start_date,
     xp_for_level,
 )
+from tests.conftest import login, register
 from unified_app import (
     LeagueMember,
     LeagueResult,
@@ -39,10 +40,8 @@ from unified_app import (
     create_app,
     db,
 )
-from tests.conftest import register, login
 
-
-UTC = timezone.utc
+UTC = UTC
 
 
 def _dt(y, m, d, hh=12):
@@ -810,7 +809,7 @@ def test_hook_dsa_solved_only_on_solved(authed_client, app):
 
 
 def test_hook_skill_quiz_submit_mints_xp(authed_client, app):
-    from studybuddy.skill_quizzes import quiz_skills, get_question
+    from studybuddy.skill_quizzes import get_question, quiz_skills
     uid = _uid(app)
     skill = quiz_skills()[0][0]
     r = authed_client.post("/learn/quizzes/start",

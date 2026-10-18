@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 os.environ["OPP_NO_AUTO_REFRESH"] = "1"
 
-from unified_app import create_app, db, User, StudyDoc, FlashcardSet  # noqa: E402
+from unified_app import FlashcardSet, StudyDoc, User, create_app, db  # noqa: E402
 
 
 def _make_app(**overrides):
@@ -196,8 +196,9 @@ class TestOfferProbabilityRemoved:
             or "illustrative" in tool["description"].lower()
 
     def test_run_tool_has_no_fabricated_numbers(self):
-        from studybuddy.ultimate_routes import run_tool
         import json as _json
+
+        from studybuddy.ultimate_routes import run_tool
         r, e = run_tool("jd/offer-odds",
                        {"report": _json.dumps({"score": 82})})
         assert e is None

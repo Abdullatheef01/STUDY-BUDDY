@@ -10,8 +10,14 @@ import re
 
 import pytest
 
-from studybuddy.citation_fmt import (STYLES, format_bibliography, format_citation,
-                          from_bibtex, style_guide, to_bibtex)
+from studybuddy.citation_fmt import (
+    STYLES,
+    format_bibliography,
+    format_citation,
+    from_bibtex,
+    style_guide,
+    to_bibtex,
+)
 
 # ---------------------------------------------------------------------------
 # Fixtures

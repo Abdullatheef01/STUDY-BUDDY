@@ -272,7 +272,7 @@ def certification_exam_mode(skill, exam_id="generic", seed=None):
     skill = _clean10(skill or "").strip()
     if not skill:
         raise ValueError("Skill is required.")
-    fmt = _EXAM_FORMATS.get((_clean10(exam_id or "").strip().lower() or "generic"))
+    fmt = _EXAM_FORMATS.get(_clean10(exam_id or "").strip().lower() or "generic")
     if not fmt:
         fmt = _EXAM_FORMATS["generic"]
     n = fmt["questions"]
@@ -298,7 +298,7 @@ def grade_exam(questions, answers, exam_id="generic"):
     questions may be public (client-safe) or full dicts — full versions are
     resolved by ID internally so answers never need to leave the server.
     """
-    fmt = _EXAM_FORMATS.get((_clean10(exam_id or "").strip().lower() or "generic"))
+    fmt = _EXAM_FORMATS.get(_clean10(exam_id or "").strip().lower() or "generic")
     if not fmt:
         fmt = _EXAM_FORMATS["generic"]
     full = []

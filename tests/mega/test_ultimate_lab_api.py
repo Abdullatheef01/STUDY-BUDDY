@@ -1,14 +1,15 @@
 """Ultimate Lab API dispatcher tests."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 os.environ["OPP_NO_AUTO_REFRESH"] = "1"
 
 import pytest
 
-from unified_app import create_app, db, User
-from studybuddy.ultimate_routes import run_tool, ALL_TOOLS, _TOOL_INDEX
+from studybuddy.ultimate_routes import _TOOL_INDEX, ALL_TOOLS, run_tool
+from unified_app import User, create_app, db
 
 
 @pytest.fixture(scope="module")

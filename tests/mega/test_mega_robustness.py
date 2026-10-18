@@ -3,8 +3,9 @@
 Tests wrong types, malformed JSON structures, concurrent access to
 caches, and recovery from corrupted state. ~400 tests.
 """
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import copy
@@ -14,8 +15,12 @@ import threading
 import pytest
 
 from studybuddy import (
-    salary_data, cert_guide, dsa_practice, aptitude_test, skill_quizzes,
-    star_builder, learning_roadmaps, live_data,
+    aptitude_test,
+    cert_guide,
+    dsa_practice,
+    live_data,
+    salary_data,
+    skill_quizzes,
 )
 
 WRONG_TYPES = [None, 123, 45.6, [], {}, set(), True, False, b"bytes",

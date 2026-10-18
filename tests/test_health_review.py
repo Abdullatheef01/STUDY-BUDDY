@@ -5,12 +5,10 @@ with seeded data, honest empty states, trend vs previous month, next_action
 selection, idempotent regeneration, route auth/validation/isolation,
 XP awarded exactly once, and momentum opt-out handling.
 """
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from studybuddy import health_review
-import studybuddy.momentum
 from studybuddy.health_review import (
     DIMENSION_IDS,
     current_month_key,
@@ -19,6 +17,7 @@ from studybuddy.health_review import (
     valid_month_key,
 )
 from studybuddy.momentum import XP_RULES
+from tests.conftest import login, register
 from unified_app import (
     AptitudeAttempt,
     CareerAssessment,
@@ -39,10 +38,8 @@ from unified_app import (
     XPLedger,
     db,
 )
-from tests.conftest import register, login
 
-
-UTC = timezone.utc
+UTC = UTC
 XP_EVENT = "health_review_completed"
 
 
@@ -311,7 +308,7 @@ def test_preparation_empty_is_honest(app, uid):
 
 
 def test_preparation_quiz_avg_evidence(app, uid):
-    for i in range(12):
+    for _i in range(12):
         _add(app, _quiz(uid, pct=78))
     d = _dims(app, uid)["preparation"]
     assert d["score"] is not None

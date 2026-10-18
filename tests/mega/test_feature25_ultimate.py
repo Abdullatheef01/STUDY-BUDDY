@@ -1,13 +1,14 @@
 """Feature 25 ultimate: harsh tests for deadline alerts, fit score, tracker add."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.opportunities import deadline_alerts, fit_score, to_tracker_payload
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

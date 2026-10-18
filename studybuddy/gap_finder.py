@@ -51,7 +51,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from studybuddy.pdf_qa import _excerpt, _tokenize, retrieve
 
@@ -147,7 +147,7 @@ def _safe_str(value: Any) -> str:
     return value if isinstance(value, str) else ""
 
 
-def _normalize_entries(chunks_with_doc: Any) -> List[Dict]:
+def _normalize_entries(chunks_with_doc: Any) -> list[dict]:
     """Coerce the heterogeneous ``chunks_with_doc`` input into clean entries.
 
     Each entry: ``{"doc_id", "doc", "page", "chunk", "text"}``. Malformed
@@ -156,7 +156,7 @@ def _normalize_entries(chunks_with_doc: Any) -> List[Dict]:
     """
     if not isinstance(chunks_with_doc, (list, tuple)):
         return []
-    entries: List[Dict] = []
+    entries: list[dict] = []
     for item in chunks_with_doc:
         if not isinstance(item, dict):
             continue
@@ -181,7 +181,7 @@ def _normalize_entries(chunks_with_doc: Any) -> List[Dict]:
     return entries
 
 
-def _terms(text: str) -> List[str]:
+def _terms(text: str) -> list[str]:
     """Meaningful unigram terms: pdf_qa tokenization + length/stopword rules.
 
     Keeps tokenization consistent with ``pdf_qa._tokenize`` (same alphabet,
@@ -190,7 +190,7 @@ def _terms(text: str) -> List[str]:
     """
     if not isinstance(text, str):
         return []
-    out: List[str] = []
+    out: list[str] = []
     for tok in _tokenize(text):
         if len(tok) < _TERM_MIN_LEN:
             continue
@@ -202,11 +202,11 @@ def _terms(text: str) -> List[str]:
     return out
 
 
-def _bigrams(tokens: List[str]) -> List[str]:
-    return ["%s %s" % (a, b) for a, b in zip(tokens, tokens[1:])]
+def _bigrams(tokens: list[str]) -> list[str]:
+    return ["%s %s" % (a, b) for a, b in zip(tokens, tokens[1:], strict=False)]
 
 
-def _split_sentences(text: str) -> List[str]:
+def _split_sentences(text: str) -> list[str]:
     return [s.strip() for s in _SENTENCE_RE.findall(text or "") if s.strip()]
 
 
@@ -216,11 +216,11 @@ def _sentence_with_term(sentence: str, term: str) -> bool:
     ]
 
 
-def _sort_key_entry(entry: Dict) -> Tuple[str, int]:
+def _sort_key_entry(entry: dict) -> tuple[str, int]:
     return (str(entry.get("doc_id")), _safe_int(entry.get("chunk")))
 
 
-def _entry_citation(entry: Dict) -> Dict:
+def _entry_citation(entry: dict) -> dict:
     return {
         "doc": entry["doc"],
         "page": _safe_int(entry.get("page"), 1),
@@ -248,7 +248,7 @@ def _titles_match(a: Any, b: Any) -> bool:
 # 1. Term statistics
 # ---------------------------------------------------------------------------
 
-def term_stats(chunks_with_doc: Any) -> Dict[str, Dict]:
+def term_stats(chunks_with_doc: Any) -> dict[str, dict]:
     """Index meaningful terms (and frequent bigrams) over the collection.
 
     Returns ``{term: {"docs": set(doc_id), "count": int, "chunks": set}}``
@@ -259,7 +259,7 @@ def term_stats(chunks_with_doc: Any) -> Dict[str, Dict]:
     times. Never raises; bad input yields ``{}``.
     """
     entries = _normalize_entries(chunks_with_doc)
-    per_entry_terms: List[Tuple[Dict, List[str]]] = []
+    per_entry_terms: list[tuple[dict, list[str]]] = []
     bigram_counter: Counter = Counter()
     for entry in entries:
         toks = _terms(entry["text"])
@@ -267,7 +267,7 @@ def term_stats(chunks_with_doc: Any) -> Dict[str, Dict]:
         per_entry_terms.append((entry, toks + bigr))
         bigram_counter.update(bigr)
 
-    stats: Dict[str, Dict] = {}
+    stats: dict[str, dict] = {}
     for entry, terms in per_entry_terms:
         for term in terms:
             if " " in term and bigram_counter[term] < BIGRAM_MIN_COUNT:
@@ -289,7 +289,7 @@ def term_stats(chunks_with_doc: Any) -> Dict[str, Dict]:
 # 2. Underexplored topics
 # ---------------------------------------------------------------------------
 
-def _underexplored_qualifies(rec: Dict, min_docs: int) -> bool:
+def _underexplored_qualifies(rec: dict, min_docs: int) -> bool:
     """Shared predicate: deep-but-narrow term per the underexplored rules."""
     n_docs = len(rec["docs"])
     n_chunks = len(rec["chunks"])
@@ -304,9 +304,9 @@ def _underexplored_qualifies(rec: Dict, min_docs: int) -> bool:
     )
 
 
-def _term_hits(entries: List[Dict], term: str) -> List[Tuple[Dict, int]]:
+def _term_hits(entries: list[dict], term: str) -> list[tuple[dict, int]]:
     """(entry, in-chunk mention count) for every entry containing ``term``."""
-    hits: List[Tuple[Dict, int]] = []
+    hits: list[tuple[dict, int]] = []
     for entry in entries:
         toks = _terms(entry["text"])
         hay = toks + _bigrams(toks)
@@ -318,7 +318,7 @@ def _term_hits(entries: List[Dict], term: str) -> List[Tuple[Dict, int]]:
     return hits
 
 
-def _term_sentence(term: str, entry: Dict) -> str:
+def _term_sentence(term: str, entry: dict) -> str:
     """First sentence of the entry that actually contains the term."""
     for sent in _split_sentences(entry["text"]):
         if _sentence_with_term(sent, term):
@@ -326,7 +326,7 @@ def _term_sentence(term: str, entry: Dict) -> str:
     return ""
 
 
-def _underexplored_questions(term: str, only_doc: str, sentence: str) -> List[str]:
+def _underexplored_questions(term: str, only_doc: str, sentence: str) -> list[str]:
     questions = [
         "Only one paper in your collection discusses '%s'. What aspects of "
         "'%s' remain unexplored?" % (term, term),
@@ -343,7 +343,7 @@ def _underexplored_questions(term: str, only_doc: str, sentence: str) -> List[st
     return questions[:4]
 
 
-def find_underexplored(chunks_with_doc: Any, min_docs: int = 2) -> List[Dict]:
+def find_underexplored(chunks_with_doc: Any, min_docs: int = 2) -> list[dict]:
     """Find topics discussed deeply but narrowly.
 
     A term qualifies when it appears in >= 3 chunk-occurrences but in fewer
@@ -362,7 +362,7 @@ def find_underexplored(chunks_with_doc: Any, min_docs: int = 2) -> List[Dict]:
         return []
 
     stats = term_stats(entries)
-    gaps: List[Dict] = []
+    gaps: list[dict] = []
     for term in sorted(stats):
         rec = stats[term]
         if not _underexplored_qualifies(rec, min_docs):
@@ -394,7 +394,7 @@ def find_underexplored(chunks_with_doc: Any, min_docs: int = 2) -> List[Dict]:
 # 3. Conflicts
 # ---------------------------------------------------------------------------
 
-def _best_sentence_overlap(text: str, query_tokens: Set[str]) -> Tuple[str, int]:
+def _best_sentence_overlap(text: str, query_tokens: set[str]) -> tuple[str, int]:
     """Sentence in ``text`` with the most query-token overlap."""
     best, best_n = "", 0
     for sent in _split_sentences(text):
@@ -405,11 +405,11 @@ def _best_sentence_overlap(text: str, query_tokens: Set[str]) -> Tuple[str, int]
     return best, best_n
 
 
-def _contrast_sentences(entry: Dict) -> List[str]:
+def _contrast_sentences(entry: dict) -> list[str]:
     return [s for s in _split_sentences(entry["text"]) if _CONTRAST_RE.search(s)]
 
 
-def find_conflicts(chunks_with_doc: Any) -> List[Dict]:
+def find_conflicts(chunks_with_doc: Any) -> list[dict]:
     """Detect cross-paper disagreements via contrast markers.
 
     A sentence containing a contrast marker ("however", "in contrast",
@@ -426,7 +426,7 @@ def find_conflicts(chunks_with_doc: Any) -> List[Dict]:
         return []
 
     # Chunk dicts shaped for retrieve(); the original entry rides along.
-    chunk_dicts: List[Dict] = []
+    chunk_dicts: list[dict] = []
     for entry in entries:
         chunk_dicts.append(
             {
@@ -438,8 +438,8 @@ def find_conflicts(chunks_with_doc: Any) -> List[Dict]:
             }
         )
 
-    gaps: List[Dict] = []
-    seen_topics: Set[str] = set()
+    gaps: list[dict] = []
+    seen_topics: set[str] = set()
     for entry in sorted(entries, key=_sort_key_entry):
         for sent in _contrast_sentences(entry):
             query_tokens = {t for t in _terms(sent) if len(t) >= _TERM_MIN_LEN}
@@ -511,7 +511,7 @@ def find_conflicts(chunks_with_doc: Any) -> List[Dict]:
 # 4. Single-paper topics
 # ---------------------------------------------------------------------------
 
-def find_single_paper_topics(chunks_with_doc: Any) -> List[Dict]:
+def find_single_paper_topics(chunks_with_doc: Any) -> list[dict]:
     """Find substantive topics covered by exactly one paper.
 
     A term with >= :data:`SINGLE_PAPER_MIN_COUNT` mentions that appears in a
@@ -524,7 +524,7 @@ def find_single_paper_topics(chunks_with_doc: Any) -> List[Dict]:
         return []
 
     stats = term_stats(entries)
-    gaps: List[Dict] = []
+    gaps: list[dict] = []
     for term in sorted(stats):
         rec = stats[term]
         if len(rec["docs"]) != 1 or rec["count"] < SINGLE_PAPER_MIN_COUNT:
@@ -566,7 +566,7 @@ def suggest_next_papers(
     paper_imports: Any,
     library_titles: Any,
     max_n: int = 8,
-) -> List[Dict]:
+) -> list[dict]:
     """Suggest follow-up papers from cached citation graphs.
 
     For each :class:`PaperImport`, reads ``.data["graph"]`` (the
@@ -596,8 +596,8 @@ def suggest_next_papers(
         else (list(library_titles) if isinstance(library_titles, (list, tuple)) else [])
     )
 
-    suggestions: List[Dict] = []
-    seen: Set[str] = set()
+    suggestions: list[dict] = []
+    seen: set[str] = set()
 
     for imp in paper_imports:
         if not isinstance(imp, dict) and not hasattr(imp, "title"):
@@ -628,7 +628,7 @@ def suggest_next_papers(
                 center_id = node.get("id")
                 break
 
-        direction: Dict[Any, str] = {}
+        direction: dict[Any, str] = {}
         for edge in edges:
             if not isinstance(edge, dict):
                 continue
@@ -678,14 +678,14 @@ def suggest_next_papers(
 _GAP_TYPE_RANK = {"conflict": 0, "underexplored": 1, "single-paper": 2}
 
 
-def _gap_sort_key(gap: Dict) -> Tuple[int, str]:
+def _gap_sort_key(gap: dict) -> tuple[int, str]:
     return (_GAP_TYPE_RANK.get(gap.get("type"), 99), str(gap.get("title", "")))
 
 
 def generate_gap_report(
     docs: Any,
     paper_imports: Any = None,
-) -> Dict:
+) -> dict:
     """Build the full gap report dict (the ``GapReport.data`` contract).
 
     ``docs`` is a list of :class:`StudyDoc` rows (duck-typed: anything with
@@ -708,7 +708,7 @@ def generate_gap_report(
         }
 
 
-def _doc_chunks(doc: Any, doc_id: Any) -> Tuple[str, List[Dict]]:
+def _doc_chunks(doc: Any, doc_id: Any) -> tuple[str, list[dict]]:
     title = getattr(doc, "title", None)
     title = title if isinstance(title, str) and title.strip() else "Untitled"
     data = getattr(doc, "data", None)
@@ -718,9 +718,9 @@ def _doc_chunks(doc: Any, doc_id: Any) -> Tuple[str, List[Dict]]:
     return title, chunks
 
 
-def _generate_gap_report(docs: Any, paper_imports: Any) -> Dict:
-    entries: List[Dict] = []
-    lib_titles: List[str] = []
+def _generate_gap_report(docs: Any, paper_imports: Any) -> dict:
+    entries: list[dict] = []
+    lib_titles: list[str] = []
     doc_list = list(docs) if isinstance(docs, (list, tuple)) else []
     for pos, doc in enumerate(doc_list):
         doc_id = getattr(doc, "id", None)

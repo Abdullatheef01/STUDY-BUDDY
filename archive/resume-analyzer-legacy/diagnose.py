@@ -6,16 +6,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 print("Testing parser imports...")
 try:
-    from parser.pdf_reader import extract_text_from_pdf
-    from parser.docx_reader import extract_text_from_docx
     print("Parser imports OK")
 except Exception as e:
     print(f"Parser import FAILED: {e}")
 
 print("\nTesting model imports...")
 try:
-    from models.skill_extractor import extract_skills
-    from models.bert_matcher import get_recommendations
     print("Model imports OK")
 except Exception as e:
     print(f"Model import FAILED: {e}")

@@ -1,13 +1,14 @@
 """Feature 23 ultimate: harsh tests for Anki export, exam sprint, weak loop."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.flashcards import anki_export, exam_sprint, weak_card_loop
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

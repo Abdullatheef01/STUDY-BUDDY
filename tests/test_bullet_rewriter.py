@@ -1,13 +1,16 @@
 """Tests for Wave 1 feature #2: AI bullet rewriter."""
-import json
 
 import pytest
 
-from unified_app import create_app, db, BulletRewrite
-from studybuddy.bullet_rewriter import (improve_bullet, strengthen_verbs,
-                             quantified_version, concise_version,
-                             BULLET_MIN_CHARS, BULLET_MAX_CHARS)
-from tests.conftest import register, login
+from studybuddy.bullet_rewriter import (
+    BULLET_MAX_CHARS,
+    concise_version,
+    improve_bullet,
+    quantified_version,
+    strengthen_verbs,
+)
+from tests.conftest import login, register
+from unified_app import BulletRewrite
 
 
 @pytest.fixture()

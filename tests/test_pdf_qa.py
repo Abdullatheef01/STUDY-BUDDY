@@ -13,8 +13,8 @@ import os
 import tempfile
 
 import pytest
-
 from conftest import make_pdf_bytes
+
 from studybuddy.pdf_qa import (
     CHUNK_CAP,
     NO_RESULT_ANSWER,
@@ -25,7 +25,6 @@ from studybuddy.pdf_qa import (
     retrieve,
     validate_upload,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers (test-only)
@@ -93,7 +92,7 @@ def make_two_page_pdf_bytes(pages_lines):
     kids = " ".join("%d 0 R" % (3 + 2 * i) for i in range(n_pages))
     objects.append(("<< /Type /Pages /Kids [%s] /Count %d >>" % (kids, n_pages)).encode())
     for i, content in enumerate(contents):
-        page_obj, content_obj = 3 + 2 * i, 4 + 2 * i
+        _page_obj, content_obj = 3 + 2 * i, 4 + 2 * i
         objects.append(
             ("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
              "/Contents %d 0 R /Resources << /Font << /F1 %d 0 R >> >> >>"

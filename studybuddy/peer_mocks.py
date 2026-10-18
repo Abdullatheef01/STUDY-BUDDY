@@ -6,7 +6,7 @@ Feature 28 x3:
   28.3 recurring_slot — weekly standing mock appointments.
 """
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _clean(text):
@@ -137,7 +137,7 @@ def recurring_slot(day, time_hhmm, duration_min=60):
         duration_min = 60
     duration_min = max(30, min(180, duration_min))
     # Next occurrence of that weekday.
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     target = _VALID_DAYS.index(day)
     days_ahead = (target - now.weekday()) % 7
     nxt = now + __import__("datetime").timedelta(days=days_ahead)

@@ -4,12 +4,11 @@ Includes negative paths: auth, invalid input, bad uploads, mocked external
 failures. CSRF-enabled app fixture proves missing-token rejection.
 """
 import io
-import json
 
 import pytest
+from conftest import login, make_pdf_bytes, register  # noqa: F401
 
-from unified_app import db, User, StudyDoc, StudyQuestion, PaperImport
-from conftest import register, login, make_pdf_bytes  # noqa: F401
+from unified_app import PaperImport, StudyDoc, StudyQuestion, db
 
 
 def _pdf_file(lines=("The mitochondria is the powerhouse of the cell.",

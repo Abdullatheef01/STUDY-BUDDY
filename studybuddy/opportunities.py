@@ -127,7 +127,7 @@ def _load_from_disk():
     if not os.path.exists(DATA_PATH):
         raise OpportunityDataError("Opportunity dataset not found.")
     try:
-        with open(DATA_PATH, "r", encoding="utf-8") as f:
+        with open(DATA_PATH, encoding="utf-8") as f:
             data = json.load(f)
     except (OSError, ValueError) as exc:
         raise OpportunityDataError("Opportunity dataset is unreadable.") from exc
@@ -158,7 +158,7 @@ def _is_stale(meta, today=None):
 def _refresh_already_running():
     """Cross-process guard: True if a fresh lock file exists."""
     try:
-        with open(_LOCK_PATH, "r", encoding="utf-8") as f:
+        with open(_LOCK_PATH, encoding="utf-8") as f:
             ts = float(f.read().strip())
         return (time.time() - ts) < LOCK_TTL_SECONDS
     except (OSError, ValueError):
@@ -428,7 +428,6 @@ def opp_exists(opp_id):
 # 25.1 Deadline alerts | 25.2 Fit scoring | 25.3 One-click tracker add
 
 import re as _re19
-from datetime import date as _date19
 
 
 def _clean19(text):

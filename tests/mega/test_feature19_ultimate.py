@@ -1,13 +1,14 @@
 """Feature 19 ultimate: harsh tests for bulk import, related papers, reading queue."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
+from studybuddy.arxiv_import import bulk_import, reading_queue, related_papers
 from tests.mega.harsh_corpus import HARSH_STRINGS
-from studybuddy.arxiv_import import bulk_import, related_papers, reading_queue
 
 
 def _ok(fn, *args, **kwargs):

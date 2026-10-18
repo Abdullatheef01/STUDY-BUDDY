@@ -15,12 +15,15 @@ import os
 import re
 import time
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 
 from studybuddy.safe_fetch import (  # SEC-02: SSRF-safe fetching
-    validate_url, safe_fetch_stream, SSRFError)
+    SSRFError,
+    safe_fetch_stream,
+    validate_url,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +35,7 @@ TIMEOUT = 15
 _MAX_RETRIES = 2  # max 2 retries -> up to 3 attempts per external call
 MAILTO = "research@student.local"
 USER_AGENT = (
-    "ACRA-ResearchAssistant/1.0 (mailto:{mailto}; educational research assistant)".format(
-        mailto=MAILTO
-    )
+    f"ACRA-ResearchAssistant/1.0 (mailto:{MAILTO}; educational research assistant)"
 )
 ARXIV_API = "http://export.arxiv.org/api/query"
 OPENALEX_API = "https://api.openalex.org"
@@ -175,7 +176,7 @@ def normalize_metadata(raw: dict | None) -> dict:
         out["year"] = None
     if out["source"] not in ("arxiv", "openalex"):
         out["source"] = raw.get("source") or None
-    out["fetched_at"] = raw.get("fetched_at") or datetime.now(timezone.utc).isoformat()
+    out["fetched_at"] = raw.get("fetched_at") or datetime.now(UTC).isoformat()
     title = out.get("title")
     out["title"] = re.sub(r"\s+", " ", str(title)).strip() if title else None
     return out
@@ -599,7 +600,7 @@ def cache_set(key: str, value, ttl: int = 86400) -> bool:
 def cache_get(key: str, default=None):
     """Return the cached value, or default if missing/expired/corrupt."""
     try:
-        with open(_cache_path(key), "r", encoding="utf-8") as fh:
+        with open(_cache_path(key), encoding="utf-8") as fh:
             payload = json.load(fh)
     except (OSError, ValueError):
         return default
@@ -781,7 +782,7 @@ def reading_queue(papers, interests=None, minutes_per_paper=45):
         minutes_per_paper = 45
     minutes_per_paper = max(10, min(180, minutes_per_paper))
 
-    now_year = datetime.now(timezone.utc).year
+    now_year = datetime.now(UTC).year
     queue = []
     for p in papers:
         if not isinstance(p, dict):

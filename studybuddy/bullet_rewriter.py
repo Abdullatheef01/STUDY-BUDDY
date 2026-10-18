@@ -105,7 +105,7 @@ def improve_bullet(bullet_text):
     Each variant is a dict {"label": ..., "text": ..., "tip": ...}.
     Raises ValueError on invalid input.
     """
-    bullet = _strip_html((bullet_text or "")).strip()
+    bullet = _strip_html(bullet_text or "").strip()
     if not bullet:
         raise ValueError("Please enter a bullet to rewrite.")
     if len(bullet) < BULLET_MIN_CHARS:
@@ -185,7 +185,7 @@ def star_convert(bullet_text):
     on hostile input (ValueError only for empty/too-short, like improve_bullet).
     Returns {situation, task, action, result, gaps, star_bullet}.
     """
-    bullet = _strip_html((bullet_text or "")).strip()
+    bullet = _strip_html(bullet_text or "").strip()
     if not bullet:
         raise ValueError("Please enter a bullet to rewrite.")
     if len(bullet) < BULLET_MIN_CHARS:
@@ -276,7 +276,7 @@ def verb_power_report(bullets):
         clean = _strip_html(b).strip()
         if not clean:
             continue
-        first_word = clean.split()[0].lower() if clean.split() else ""
+        _first_word = clean.split()[0].lower() if clean.split() else ""
         # Check weak patterns.
         for pattern, suggestion in WEAK_VERB_MAP:
             if pattern.search(clean):
@@ -305,7 +305,7 @@ def metric_finder(bullet_text):
     Detects the bullet's topic and returns targeted questions the user can
     answer to add numbers. Returns {topic, questions, has_metric}.
     """
-    bullet = _strip_html((bullet_text or "")).strip()
+    bullet = _strip_html(bullet_text or "").strip()
     if not bullet:
         raise ValueError("Please enter a bullet to analyze.")
     has_metric = bool(QUANT_HINTS.search(bullet))

@@ -1,15 +1,18 @@
 """Feature 9 ultimate: harsh tests for case study, link checker, recruiter preview."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.portfolio import (
-    generate_case_study, check_demo_links, recruiter_preview,
+    check_demo_links,
+    generate_case_study,
+    recruiter_preview,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

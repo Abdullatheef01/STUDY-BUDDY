@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 log = logging.getLogger(__name__)
 
@@ -166,11 +166,11 @@ def booking_eligibility(session_row, booking_count, existing_booking):
         return False, "This office hour does not exist."
     if session_row.status != "open":
         return False, "This office hour is %s." % session_row.status
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     scheduled = session_row.scheduled_at
     if scheduled is not None:
         if scheduled.tzinfo is None:
-            scheduled = scheduled.replace(tzinfo=timezone.utc)
+            scheduled = scheduled.replace(tzinfo=UTC)
         if scheduled <= now:
             return False, "This session already started. Pick an upcoming one."
     if existing_booking is not None:
@@ -182,13 +182,13 @@ def booking_eligibility(session_row, booking_count, existing_booking):
 
 def can_cancel(session_row, now=None):
     """Cancellations are allowed until 60 minutes before the session."""
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     if session_row.status not in ("open", "full"):
         return False, "This session is %s and cannot be cancelled." % session_row.status
     scheduled = session_row.scheduled_at
     if scheduled is not None:
         if scheduled.tzinfo is None:
-            scheduled = scheduled.replace(tzinfo=timezone.utc)
+            scheduled = scheduled.replace(tzinfo=UTC)
         delta_minutes = (scheduled - now).total_seconds() / 60
         if delta_minutes < CANCEL_CUTOFF_MINUTES:
             return False, ("Cancellations close 1 hour before the session. "
@@ -218,7 +218,7 @@ def seed_mentors():
     Returns the number of rows inserted (0 when the table already has
     rows). Rows are created with is_seed=True and verified=True.
     """
-    from unified_app import db, Mentor
+    from unified_app import Mentor, db
 
     if Mentor.query.first() is not None:
         return 0
@@ -404,7 +404,7 @@ def seed_office_hours():
     Returns the number of rows inserted (0 when any office hour exists).
     Sessions land 2-8 days out at 12:30 UTC with capacity 12.
     """
-    from unified_app import db, Mentor, OfficeHour
+    from unified_app import Mentor, OfficeHour, db
 
     if OfficeHour.query.first() is not None:
         return 0
@@ -418,7 +418,7 @@ def seed_office_hours():
         "Beyond the degree: picking your first role wisely",
         "Office hours: careers, higher studies and everything between",
     ]
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     inserted = 0
     for i, mentor in enumerate(mentors):
         day = now + timedelta(days=2 + i * 2)

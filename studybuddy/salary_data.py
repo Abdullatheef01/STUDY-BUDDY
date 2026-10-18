@@ -24,7 +24,7 @@ def load_dataset():
     if not os.path.exists(DATA_PATH):
         raise SalaryDataError("Salary dataset not found.")
     try:
-        with open(DATA_PATH, "r", encoding="utf-8") as f:
+        with open(DATA_PATH, encoding="utf-8") as f:
             data = json.load(f)
     except (OSError, ValueError) as exc:
         raise SalaryDataError("Salary dataset is unreadable.") from exc
@@ -120,7 +120,9 @@ def evaluate_offer(role, tier, band, offer_lpa):
     Returns {verdict, percentile_hint, market: {min, median, max}, script, gap_lpa}.
     offer_lpa in LPA (float). Never raises on hostile input.
     """
-    role = _clean3(role); tier = _clean3(tier); band = _clean3(band)
+    role = _clean3(role)
+    tier = _clean3(tier)
+    band = _clean3(band)
     try:
         offer = float(offer_lpa)
     except (TypeError, ValueError):
@@ -224,7 +226,8 @@ def band_comparison(role, tier):
 
     Returns {bands: [{band, min, median, max}], growth_note}.
     """
-    role = _clean3(role); tier = _clean3(tier)
+    role = _clean3(role)
+    tier = _clean3(tier)
     data = load_dataset()
     if role not in data["roles"] or tier not in data["tiers"]:
         raise ValueError("Unknown role or tier.")

@@ -19,14 +19,17 @@ import json
 import logging
 import re
 import xml.etree.ElementTree as ET
-from datetime import date, timedelta
+from datetime import UTC, date, timedelta
 from functools import lru_cache
 
 import requests
 
 from studybuddy.live_data import (
-    atomic_write, data_path, freshness_badge,
-    maybe_refresh, touch_updated,
+    atomic_write,
+    data_path,
+    freshness_badge,
+    maybe_refresh,
+    touch_updated,
 )
 
 log = logging.getLogger(__name__)
@@ -346,8 +349,8 @@ def weekly_digest(papers, skills=None, top_n=5):
                     if item.get("matched") else "Trending in your field"),
             "link": p.get("link") or p.get("id"),
         })
-    from datetime import datetime, timezone
+    from datetime import datetime
     return {"digest": digest, "count": len(digest),
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "headline": (f"This week's top {len(digest)} papers for you."
                          if digest else "No papers this week — check back soon.")}

@@ -4,10 +4,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from studybuddy import github_integration
-from studybuddy import leetcode_integration
 import unified_app
-from unified_app import create_app, db, User, ProfileSnapshot
+from studybuddy import github_integration, leetcode_integration
+from unified_app import User, create_app, db
 
 
 def make_app(**overrides):

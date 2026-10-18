@@ -6,7 +6,7 @@ Feature 26 x3:
   26.3 compare_offers — side-by-side offer comparison.
 """
 import re
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 
 STAGE_ORDER = ["wishlist", "applied", "oa", "interview", "offer", "rejected"]
 # Highest stage reached per application (rejected is terminal, not a funnel step).

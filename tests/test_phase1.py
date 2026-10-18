@@ -1,10 +1,9 @@
 """Phase 1 (Foundation) tests: auth, persistence, and no-regression checks."""
 import io
-import re
 
-from unified_app import db, User, ResumeAnalysis, ResearchSession, Goal, AnonymousAnalysis
-from conftest import register, login, sample_pdf  # noqa: F401  (fixtures)
+from conftest import login, register  # noqa: F401  (fixtures)
 
+from unified_app import AnonymousAnalysis, Goal, ResearchSession, ResumeAnalysis, User, db
 
 # ---------- Existing GET routes: no regressions ----------
 

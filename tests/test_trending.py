@@ -2,10 +2,8 @@
 import json
 import os
 
-import pytest
-
 from studybuddy import trending
-from studybuddy.trending import fetch_all, get_trending, get_freshness
+from studybuddy.trending import fetch_all, get_freshness, get_trending
 
 
 def test_fetch_all_never_raises(monkeypatch):

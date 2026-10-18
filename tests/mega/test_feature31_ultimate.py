@@ -1,13 +1,14 @@
 """Feature 31 ultimate: harsh tests for monthly report, benchmarks, nudges."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
+from studybuddy.health_review import action_nudges, monthly_report, peer_benchmarks
 from tests.mega.harsh_corpus import HARSH_STRINGS
-from studybuddy.health_review import monthly_report, peer_benchmarks, action_nudges
 
 
 def _ok(fn, *args, **kwargs):

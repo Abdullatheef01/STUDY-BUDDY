@@ -1,13 +1,17 @@
 """Tests for Wave 2 feature #13: company-specific AI mock interviews."""
-import json
 
 import pytest
 
-from unified_app import create_app, db, InterviewSession
-from studybuddy.mock_interview import (interview_options, pick_questions, score_answer,
-                            generate_rule_based_feedback, validate_interview_setup,
-                            _load_bank)
-from tests.conftest import register, login
+from studybuddy.mock_interview import (
+    _load_bank,
+    generate_rule_based_feedback,
+    interview_options,
+    pick_questions,
+    score_answer,
+    validate_interview_setup,
+)
+from tests.conftest import login, register
+from unified_app import InterviewSession
 
 
 @pytest.fixture()
@@ -211,12 +215,14 @@ def test_submit_rejects_empty_and_unknown(authed_client):
 
 
 def test_cross_user_isolation(client):
-    register(client, email="u1@example.com"); login(client, email="u1@example.com")
+    register(client, email="u1@example.com")
+    login(client, email="u1@example.com")
     r = client.post("/interview/start", json={"company": "Google", "role": "sde",
                                               "category": "hr", "num_questions": 1})
     sid = r.get_json()["session_id"]
     client.post("/logout", follow_redirects=True)
-    register(client, name="Two", email="u2@example.com"); login(client, email="u2@example.com")
+    register(client, name="Two", email="u2@example.com")
+    login(client, email="u2@example.com")
     assert client.get(f"/interview/{sid}").status_code == 404
     r2 = client.post(f"/interview/{sid}/submit", json={"answers": [{"question_id": "x", "answer": "y"}]})
     assert r2.status_code == 404

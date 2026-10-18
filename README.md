@@ -10,7 +10,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)](https://flask.palletsprojects.com/)
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?logo=render)](https://ai-career-research-assistant-resume.onrender.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-8720%20passing-brightgreen)]()
+[![CI](https://github.com/Vivek492005/AI-Career-Research-Assistant-Resume-Analysis-Job-Recommendation-Research-Paper-Intelligence-Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Vivek492005/AI-Career-Research-Assistant-Resume-Analysis-Job-Recommendation-Research-Paper-Intelligence-Platform/actions/workflows/ci.yml)
 
 [Live Demo](https://ai-career-research-assistant-resume.onrender.com) · [Features](#-features) · [Setup](#-installation--setup) · [Contributing](#-contributing)
 

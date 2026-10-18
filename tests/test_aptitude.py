@@ -1,14 +1,19 @@
 """Tests for Wave 2 feature #16: timed aptitude and reasoning tests."""
-import json
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from unified_app import create_app, db, AptitudeAttempt
-from studybuddy.aptitude_test import (all_questions, categories, pick_questions,
-                           validate_test_setup, score_attempt,
-                           public_question, get_question)
-from tests.conftest import register, login
+from studybuddy.aptitude_test import (
+    all_questions,
+    categories,
+    get_question,
+    pick_questions,
+    public_question,
+    score_attempt,
+    validate_test_setup,
+)
+from tests.conftest import login, register
+from unified_app import AptitudeAttempt, db
 
 
 @pytest.fixture()
@@ -173,7 +178,7 @@ def test_submit_validates_time_window(authed_client, app):
     # rewind the server start timestamp to simulate expiry
     with app.app_context():
         row = db.session.get(AptitudeAttempt, attempt_id)
-        row.started_at = datetime.now(timezone.utc) - timedelta(seconds=9999)
+        row.started_at = datetime.now(UTC) - timedelta(seconds=9999)
         db.session.commit()
     r2 = authed_client.post(f"/aptitude/{attempt_id}/submit",
                             json={"answers": {}},

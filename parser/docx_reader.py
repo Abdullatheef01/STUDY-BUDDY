@@ -1,8 +1,8 @@
 """
 DOCX Resume Reader - Extracts text from Word documents using python-docx.
 """
+
 from docx import Document
-import io
 
 
 def extract_text_from_docx(file_path=None, file_stream=None):

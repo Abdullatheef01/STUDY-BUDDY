@@ -37,7 +37,7 @@ import os
 import re
 import unicodedata
 from collections import Counter
-from typing import BinaryIO, Dict, List, Tuple, Union
+from typing import BinaryIO
 
 import pypdf
 
@@ -91,7 +91,7 @@ _SENT_END_RE = re.compile(r"[.!?](?=\s|$)")
 # 1. Upload validation
 # ---------------------------------------------------------------------------
 
-def validate_upload(file_storage) -> Tuple[bool, str]:
+def validate_upload(file_storage) -> tuple[bool, str]:
     """Validate an uploaded file before any PDF parsing is attempted.
 
     Accepts any object with a ``filename`` attribute and either a ``stream``
@@ -176,7 +176,7 @@ def validate_upload(file_storage) -> Tuple[bool, str]:
 # 2. PDF parsing
 # ---------------------------------------------------------------------------
 
-def parse_pdf_pages(file_stream_or_path: Union[str, os.PathLike, BinaryIO, bytes]) -> List[str]:
+def parse_pdf_pages(file_stream_or_path: str | os.PathLike | BinaryIO | bytes) -> list[str]:
     """Extract text per PDF page.
 
     Accepts a filesystem path, raw ``bytes``, or a binary file-like object
@@ -202,7 +202,7 @@ def parse_pdf_pages(file_stream_or_path: Union[str, os.PathLike, BinaryIO, bytes
                 pass
             reader = pypdf.PdfReader(stream)
 
-        pages: List[str] = []
+        pages: list[str] = []
         for page in reader.pages:
             try:
                 text = page.extract_text() or ""
@@ -237,7 +237,7 @@ def _normalize_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def _is_heading(line: str) -> Union[str, None]:
+def _is_heading(line: str) -> str | None:
     """Best-effort section-heading detection. Returns the heading text or None.
 
     Recognizes, in order:
@@ -273,16 +273,16 @@ def _is_heading(line: str) -> Union[str, None]:
     return None
 
 
-def _split_by_headings(raw_text: str) -> List[Tuple[str, str]]:
+def _split_by_headings(raw_text: str) -> list[tuple[str, str]]:
     """Split page text into (heading, text) segments at heading boundaries.
 
     The heading line itself stays at the start of its segment's text so its
     words remain searchable. Text before the first detected heading gets
     ``heading == ""``.
     """
-    segments: List[Tuple[str, List[str]]] = []
+    segments: list[tuple[str, list[str]]] = []
     current_heading = ""
-    current_lines: List[str] = []
+    current_lines: list[str] = []
     for line in raw_text.splitlines():
         heading = _is_heading(line)
         if heading is not None:
@@ -297,7 +297,7 @@ def _split_by_headings(raw_text: str) -> List[Tuple[str, str]]:
     return [(h, "\n".join(lines)) for h, lines in segments]
 
 
-def _split_text(text: str, chunk_chars: int, overlap: int) -> List[str]:
+def _split_text(text: str, chunk_chars: int, overlap: int) -> list[str]:
     """Sentence-aware sliding-window split. Never returns empty strings.
 
     The window edge prefers a sentence boundary (``.``/``!``/``?``) so chunks
@@ -306,7 +306,7 @@ def _split_text(text: str, chunk_chars: int, overlap: int) -> List[str]:
     """
     text = _normalize_whitespace(text)
     n = len(text)
-    out: List[str] = []
+    out: list[str] = []
     start = 0
     while start < n:
         end = min(start + chunk_chars, n)
@@ -335,7 +335,7 @@ def _split_text(text: str, chunk_chars: int, overlap: int) -> List[str]:
 
 
 def chunk_pages(
-    pages: List[str],
+    pages: list[str],
     chunk_chars: int = 500,
     overlap: int = 100,
 ) -> ChunkList:
@@ -365,7 +365,7 @@ def chunk_pages(
     chunk_chars = max(1, chunk_chars)
     overlap = max(0, min(overlap, chunk_chars - 1)) if chunk_chars > 1 else 0
 
-    chunks: List[Dict] = []
+    chunks: list[dict] = []
     truncated = False
     index = 0
     for page_no, page_text in enumerate(pages or [], start=1):
@@ -391,14 +391,14 @@ def chunk_pages(
 # 4. Hybrid retrieval: BM25-ish keyword scoring + TF-IDF cosine (stdlib only)
 # ---------------------------------------------------------------------------
 
-def _tokenize(text: str) -> List[str]:
+def _tokenize(text: str) -> list[str]:
     """Lowercase alphanumeric unigrams with stopwords removed."""
     if not isinstance(text, str):
         return []
     return [t for t in _TOKEN_RE.findall(text.lower()) if t not in _STOPWORDS]
 
 
-def _smooth_idf(tokenized_docs: List[List[str]]) -> Dict[str, float]:
+def _smooth_idf(tokenized_docs: list[list[str]]) -> dict[str, float]:
     """Smoothed IDF for TF-IDF: log((N+1)/(df+1)) + 1, always positive."""
     n = len(tokenized_docs)
     df = Counter()
@@ -407,7 +407,7 @@ def _smooth_idf(tokenized_docs: List[List[str]]) -> Dict[str, float]:
     return {tok: math.log((n + 1) / (freq + 1)) + 1.0 for tok, freq in df.items()}
 
 
-def _bm25_idf(tokenized_docs: List[List[str]]) -> Dict[str, float]:
+def _bm25_idf(tokenized_docs: list[list[str]]) -> dict[str, float]:
     """BM25 IDF: log((N - df + 0.5) / (df + 0.5) + 1), always non-negative."""
     n = len(tokenized_docs)
     df = Counter()
@@ -419,7 +419,7 @@ def _bm25_idf(tokenized_docs: List[List[str]]) -> Dict[str, float]:
     }
 
 
-def _tfidf_vector(tokens: List[str], idf: Dict[str, float]) -> Dict[str, float]:
+def _tfidf_vector(tokens: list[str], idf: dict[str, float]) -> dict[str, float]:
     """L2-normalized sparse TF-IDF vector as a token->weight dict."""
     if not tokens:
         return {}
@@ -432,7 +432,7 @@ def _tfidf_vector(tokens: List[str], idf: Dict[str, float]) -> Dict[str, float]:
     return {tok: w / norm for tok, w in vec.items()}
 
 
-def _cosine(a: Dict[str, float], b: Dict[str, float]) -> float:
+def _cosine(a: dict[str, float], b: dict[str, float]) -> float:
     if not a or not b:
         return 0.0
     if len(a) > len(b):
@@ -441,10 +441,10 @@ def _cosine(a: Dict[str, float], b: Dict[str, float]) -> float:
 
 
 def _bm25_score(
-    query_tokens: List[str],
-    doc_tokens: List[str],
+    query_tokens: list[str],
+    doc_tokens: list[str],
     avgdl: float,
-    idf: Dict[str, float],
+    idf: dict[str, float],
     k1: float = 1.2,
     b: float = 0.75,
 ) -> float:
@@ -464,7 +464,7 @@ def _bm25_score(
     return score
 
 
-def _minmax_normalize(values: List[float]) -> List[float]:
+def _minmax_normalize(values: list[float]) -> list[float]:
     """Scale to [0, 1]; all-equal input maps to all zeros (no signal)."""
     if not values:
         return []
@@ -475,7 +475,7 @@ def _minmax_normalize(values: List[float]) -> List[float]:
     return [(v - lo) / span for v in values]
 
 
-def retrieve(chunks: List[Dict], query: str, top_k: int = 5) -> List[Dict]:
+def retrieve(chunks: list[dict], query: str, top_k: int = 5) -> list[dict]:
     """Rank chunks with a hybrid BM25 + TF-IDF-cosine score.
 
     ``score`` is ``0.5 * norm(BM25) + 0.5 * norm(TF-IDF cosine)`` where each
@@ -520,9 +520,9 @@ def retrieve(chunks: List[Dict], query: str, top_k: int = 5) -> List[Dict]:
 
     query_vec = _tfidf_vector(query_tokens, smooth_idf)
 
-    raw_bm25: List[float] = []
-    raw_cosine: List[float] = []
-    doc_vecs: List[Dict[str, float]] = []
+    raw_bm25: list[float] = []
+    raw_cosine: list[float] = []
+    doc_vecs: list[dict[str, float]] = []
     for tokens in corpus_tokens:
         raw_bm25.append(_bm25_score(query_tokens, tokens, avgdl, bm25_idf))
         vec = _tfidf_vector(tokens, smooth_idf)
@@ -594,7 +594,7 @@ def retrieve(chunks: List[Dict], query: str, top_k: int = 5) -> List[Dict]:
 # 5. Extractive, citation-honest answering
 # ---------------------------------------------------------------------------
 
-def _best_sentence(text: str, query_tokens: List[str]) -> str:
+def _best_sentence(text: str, query_tokens: list[str]) -> str:
     """Pick the sentence in ``text`` with the most query-token overlap."""
     sentences = [s.strip() for s in _SENTENCE_RE.findall(text) if s.strip()]
     if not sentences:
@@ -624,7 +624,7 @@ def _excerpt(text: str, max_chars: int = EXCERPT_MAX) -> str:
     return text[:cut].rstrip()
 
 
-def _citation(chunk: Dict, doc_title: str) -> Dict:
+def _citation(chunk: dict, doc_title: str) -> dict:
     return {
         "doc": doc_title,
         "page": int(chunk.get("page", 0)),
@@ -636,9 +636,9 @@ def _citation(chunk: Dict, doc_title: str) -> Dict:
 def answer_question(
     query: str,
     doc_title: str,
-    chunks: List[Dict],
+    chunks: list[dict],
     top_k: int = 5,
-) -> Dict:
+) -> dict:
     """Answer ``query`` extractively from ``chunks``, with honest citations.
 
     The answer is a 2–4 sentence synthesis composed ONLY of key phrases quoted
@@ -663,8 +663,8 @@ def answer_question(
 
     doc_label = doc_title if isinstance(doc_title, str) else ""
 
-    claims: List[str] = []
-    citations: List[Dict] = []
+    claims: list[str] = []
+    citations: list[dict] = []
     for chunk in selected:
         sentence = _normalize_whitespace(_best_sentence(chunk.get("text", ""), query_tokens))
         if len(sentence) > 400:

@@ -212,7 +212,7 @@ def weak_topic_diagnosis(progress_rows):
 # 12.1 Pattern mastery map | 12.2 Mock OA simulator | 12.3 Spaced repetition
 
 import re as _re6
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 
 def _clean6(text):
@@ -324,7 +324,7 @@ def spaced_repetition_queue(mistakes, now=None):
     """
     if not isinstance(mistakes, (list, tuple)):
         raise ValueError("mistakes must be a list.")
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     intervals = {1: 3, 2: 7}
     due, upcoming = [], []
     for m in mistakes:
@@ -343,7 +343,7 @@ def spaced_repetition_queue(mistakes, now=None):
         try:
             wrong_at = datetime.fromisoformat(str(m.get("wrong_at") or "").replace("Z", "+00:00"))
             if wrong_at.tzinfo is None:
-                wrong_at = wrong_at.replace(tzinfo=timezone.utc)
+                wrong_at = wrong_at.replace(tzinfo=UTC)
         except (ValueError, TypeError):
             wrong_at = now
         due_at = wrong_at + timedelta(days=days)

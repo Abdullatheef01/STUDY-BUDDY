@@ -3,11 +3,15 @@ import json
 
 import pytest
 
-from unified_app import create_app, db, CareerAssessment
-from studybuddy.career_assessment import (score_assessment, validate_assessment_inputs,
-                               rule_based_why, QUESTIONS, CLUSTERS,
-                               TOP_N_CLUSTERS)
-from tests.conftest import register, login
+from studybuddy.career_assessment import (
+    QUESTIONS,
+    TOP_N_CLUSTERS,
+    rule_based_why,
+    score_assessment,
+    validate_assessment_inputs,
+)
+from tests.conftest import login, register
+from unified_app import CareerAssessment
 
 
 @pytest.fixture()

@@ -68,7 +68,6 @@ import math
 import random
 import re
 from collections import Counter
-from typing import Dict, List, Tuple
 
 # ---------------------------------------------------------------------------
 # Tunables
@@ -162,20 +161,20 @@ _PAGE_HINT_RE = re.compile(r"\(from p\. \d+\)", re.IGNORECASE)
 # Small helpers (all defensive)
 # ---------------------------------------------------------------------------
 
-def _sentences(text: str) -> List[str]:
+def _sentences(text: str) -> list[str]:
     """Split text into stripped, non-empty sentences."""
     if not isinstance(text, str):
         return []
     return [s.strip() for s in _SENT_RE.findall(text) if s.strip()]
 
 
-def _unpack(chunks_with_meta) -> List[Tuple[Dict, str, int]]:
+def _unpack(chunks_with_meta) -> list[tuple[dict, str, int]]:
     """Normalize ``chunks_with_meta`` to (chunk, doc_title, position) triples.
 
     Accepts ``(chunk, doc_title)`` tuples (preferred) or bare chunk dicts.
     Anything else is skipped silently.
     """
-    out: List[Tuple[Dict, str, int]] = []
+    out: list[tuple[dict, str, int]] = []
     try:
         items = list(chunks_with_meta or [])
     except TypeError:
@@ -194,26 +193,26 @@ def _unpack(chunks_with_meta) -> List[Tuple[Dict, str, int]]:
     return out
 
 
-def _chunk_index(chunk: Dict, fallback: int) -> int:
+def _chunk_index(chunk: dict, fallback: int) -> int:
     try:
         return int(chunk.get("index", fallback))
     except (TypeError, ValueError):
         return fallback
 
 
-def _chunk_page(chunk: Dict) -> int:
+def _chunk_page(chunk: dict) -> int:
     try:
         return int(chunk.get("page", 0))
     except (TypeError, ValueError):
         return 0
 
 
-def _chunk_text(chunk: Dict) -> str:
+def _chunk_text(chunk: dict) -> str:
     text = chunk.get("text", "")
     return text if isinstance(text, str) else ""
 
 
-def _assign_ids(cards: List[Dict], kind: str) -> None:
+def _assign_ids(cards: list[dict], kind: str) -> None:
     """Give cards deterministic ``"<kind>-N"`` ids in generation order."""
     for n, card in enumerate(cards):
         card["id"] = "%s-%d" % (kind, n)
@@ -239,7 +238,7 @@ def _valid_index(value, n: int):
 # 1. Key-term extraction: TF-IDF over chunks, multi-word phrases preferred
 # ---------------------------------------------------------------------------
 
-def _phrase_ok(words: List[str]) -> bool:
+def _phrase_ok(words: list[str]) -> bool:
     """A candidate phrase is 1-3 content words, none a stopword/digit."""
     if not (1 <= len(words) <= 3):
         return False
@@ -263,7 +262,7 @@ def _unigram_qualified(norm: str, tf: int, surfaces: Counter) -> bool:
     return capitalized >= 2
 
 
-def key_terms(chunks, top_n: int = DEFAULT_TOP_TERMS) -> List[Tuple[str, float]]:
+def key_terms(chunks, top_n: int = DEFAULT_TOP_TERMS) -> list[tuple[str, float]]:
     """Extract the document's key terms with TF-IDF scores.
 
     Candidate terms are uni/bi/trigrams of content words (nothing from the
@@ -283,7 +282,7 @@ def key_terms(chunks, top_n: int = DEFAULT_TOP_TERMS) -> List[Tuple[str, float]]
         return []
 
 
-def _key_terms(chunks, top_n) -> List[Tuple[str, float]]:
+def _key_terms(chunks, top_n) -> list[tuple[str, float]]:
     try:
         top_n = int(top_n)
     except (TypeError, ValueError):
@@ -304,7 +303,7 @@ def _key_terms(chunks, top_n) -> List[Tuple[str, float]]:
 
     tf: Counter = Counter()
     df: Counter = Counter()
-    surfaces: Dict[str, Counter] = {}
+    surfaces: dict[str, Counter] = {}
     for text in texts:
         # N-grams never cross sentence boundaries: "of the cell. Cellular
         # respiration" must not yield the phantom phrase "cell Cellular".
@@ -323,7 +322,7 @@ def _key_terms(chunks, top_n) -> List[Tuple[str, float]]:
         for norm in seen:
             df[norm] += 1
 
-    scored: List[Tuple[str, float]] = []
+    scored: list[tuple[str, float]] = []
     for norm, count in tf.items():
         n_words = norm.count(" ") + 1
         if n_words == 1 and not _unigram_qualified(norm, count, surfaces[norm]):
@@ -382,7 +381,7 @@ def _match_definition(sentence: str):
     return None
 
 
-def make_qa_cards(chunks_with_meta, max_n: int = 12) -> List[Dict]:
+def make_qa_cards(chunks_with_meta, max_n: int = 12) -> list[dict]:
     """Build definition-style QA cards from definition sentences.
 
     Matches "X is/are/was/were Y", "X refers to Y", "X is defined as Y".
@@ -397,13 +396,13 @@ def make_qa_cards(chunks_with_meta, max_n: int = 12) -> List[Dict]:
         return []
 
 
-def _make_qa_cards(chunks_with_meta, max_n) -> List[Dict]:
+def _make_qa_cards(chunks_with_meta, max_n) -> list[dict]:
     try:
         max_n = int(max_n)
     except (TypeError, ValueError):
         max_n = 12
     max_n = max(0, max_n)
-    cards: List[Dict] = []
+    cards: list[dict] = []
     seen_terms = set()
     for chunk, title, pos in _unpack(chunks_with_meta):
         text = _chunk_text(chunk)
@@ -446,7 +445,7 @@ def _make_qa_cards(chunks_with_meta, max_n) -> List[Dict]:
 # 3. Cloze (fill-in-the-blank) cards
 # ---------------------------------------------------------------------------
 
-def _usable_terms(terms) -> List[str]:
+def _usable_terms(terms) -> list[str]:
     """Normalize the ``terms`` arg to a deduped list of usable term strings.
 
     Accepts ``key_terms`` output ``[(term, score), ...]`` or plain strings.
@@ -458,7 +457,7 @@ def _usable_terms(terms) -> List[str]:
         items = list(terms or [])
     except TypeError:
         return []
-    out: List[str] = []
+    out: list[str] = []
     seen = set()
     for t in items:
         if isinstance(t, (tuple, list)) and t:
@@ -533,7 +532,7 @@ def _first_placement(items, usable, term, used):
     return None
 
 
-def make_cloze_cards(chunks_with_meta, terms, max_n: int = 12) -> List[Dict]:
+def make_cloze_cards(chunks_with_meta, terms, max_n: int = 12) -> list[dict]:
     """Build fill-in-the-blank cards from sentences containing top key terms.
 
     For each usable term (in term order), the first sentence containing it as
@@ -562,7 +561,7 @@ def _make_cloze_cards(chunks_with_meta, terms, max_n, skip=frozenset()):
         skip = set(skip or ())
     except TypeError:
         skip = set()
-    cards: List[Dict] = []
+    cards: list[dict] = []
     used_sentences = set()
     for term in usable:
         if len(cards) >= max_n:
@@ -603,7 +602,7 @@ def _make_cloze_cards(chunks_with_meta, terms, max_n, skip=frozenset()):
 # 4. MCQ cards (paper quiz)
 # ---------------------------------------------------------------------------
 
-def _pick_distractors(answer: str, stem: str, terms: List[str]) -> List[str]:
+def _pick_distractors(answer: str, stem: str, terms: list[str]) -> list[str]:
     """Pick 3 distractors from the doc's own terms.
 
     A distractor must: (a) differ from the answer, (b) not occur in the stem
@@ -613,7 +612,7 @@ def _pick_distractors(answer: str, stem: str, terms: List[str]) -> List[str]:
     """
     ans = answer.lower()
     stem_l = stem.lower()
-    picked: List[str] = []
+    picked: list[str] = []
     for t in terms:
         if len(picked) >= 3:
             break
@@ -638,7 +637,7 @@ def _shuffle_seed(card_id: str) -> int:
     return int.from_bytes(digest[:8], "big")
 
 
-def make_mcq_cards(chunks_with_meta, terms, max_n: int = 12) -> List[Dict]:
+def make_mcq_cards(chunks_with_meta, terms, max_n: int = 12) -> list[dict]:
     """Build multiple-choice cards: blanked key sentence + 4 options.
 
     The stem is a key sentence with the key term blanked; the correct answer
@@ -670,7 +669,7 @@ def _make_mcq_cards(chunks_with_meta, terms, max_n, skip=frozenset()):
         skip = set(skip or ())
     except TypeError:
         skip = set()
-    cards: List[Dict] = []
+    cards: list[dict] = []
     used_sentences = set()
     for term in usable:
         if len(cards) >= max_n:
@@ -718,7 +717,7 @@ def _make_mcq_cards(chunks_with_meta, terms, max_n, skip=frozenset()):
 # 5. Deck generation from a StudyDoc
 # ---------------------------------------------------------------------------
 
-def generate_deck(doc, max_per_kind: int = DEFAULT_MAX_PER_KIND) -> Dict:
+def generate_deck(doc, max_per_kind: int = DEFAULT_MAX_PER_KIND) -> dict:
     """Generate a full flashcard deck from a StudyDoc.
 
     ``doc`` is duck-typed: it needs ``.data["chunks"]`` (pdf_qa chunk dicts)
@@ -742,7 +741,7 @@ def generate_deck(doc, max_per_kind: int = DEFAULT_MAX_PER_KIND) -> Dict:
         return {"cards": [], "progress": {}}
 
 
-def _generate_deck(doc, max_per_kind) -> Dict:
+def _generate_deck(doc, max_per_kind) -> dict:
     try:
         max_per_kind = int(max_per_kind)
     except (TypeError, ValueError):
@@ -770,7 +769,7 @@ def _generate_deck(doc, max_per_kind) -> Dict:
     meta = [(c, title) for c in chunks]
     terms = key_terms(chunks, top_n=DEFAULT_TOP_TERMS)
 
-    cards: List[Dict] = []
+    cards: list[dict] = []
     cards.extend(make_qa_cards(meta, max_n=max_per_kind))
     # Cloze and MCQ share one sentence pool: ranked terms are dealt out
     # alternating kinds (term 0 -> cloze, term 1 -> mcq, ...) and both draw
@@ -831,7 +830,7 @@ def _generate_deck(doc, max_per_kind) -> Dict:
     # Cross-kind near-duplicate detection (a cloze and an mcq built from the
     # same sentence must not both survive).
     seen_questions = set()
-    final: List[Dict] = []
+    final: list[dict] = []
     counters = {"qa": 0, "cloze": 0, "mcq": 0}
     for card in cards:
         qk = _qkey(card.get("question", ""))
@@ -853,7 +852,7 @@ def _generate_deck(doc, max_per_kind) -> Dict:
 # 6. MCQ grading -> PaperQuizAttempt.data
 # ---------------------------------------------------------------------------
 
-def grade_mcq(cards, answers: Dict) -> Dict:
+def grade_mcq(cards, answers: dict) -> dict:
     """Grade an MCQ attempt; returns the PaperQuizAttempt.data shape.
 
     Only ``kind == "mcq"`` cards are scored. ``answers`` maps card id ->
@@ -868,7 +867,7 @@ def grade_mcq(cards, answers: Dict) -> Dict:
         return {"answers": {}, "details": [], "score": 0, "total": 0}
 
 
-def _grade_mcq(cards, answers) -> Dict:
+def _grade_mcq(cards, answers) -> dict:
     try:
         card_list = list(cards or [])
     except TypeError:
@@ -879,8 +878,8 @@ def _grade_mcq(cards, answers) -> Dict:
     ]
     ans = answers if isinstance(answers, dict) else {}
 
-    echoed: Dict = {}
-    details: List[Dict] = []
+    echoed: dict = {}
+    details: list[dict] = []
     score = 0
     for card in mcq_cards:
         cid = card.get("id")
@@ -930,7 +929,7 @@ def _grade_mcq(cards, answers) -> Dict:
 # 7. Mastery statistics from the progress map
 # ---------------------------------------------------------------------------
 
-def mastery_stats(set_data) -> Dict:
+def mastery_stats(set_data) -> dict:
     """Summarize review progress: total/reviewed/known/unknown/mastery_pct.
 
     A card counts as "reviewed" once its progress entry has ``reviews >= 1``;
@@ -945,7 +944,7 @@ def mastery_stats(set_data) -> Dict:
                 "unknown": 0, "mastery_pct": 0}
 
 
-def _mastery_stats(set_data) -> Dict:
+def _mastery_stats(set_data) -> dict:
     data = set_data if isinstance(set_data, dict) else {}
     cards = data.get("cards")
     total = len(cards) if isinstance(cards, list) else 0
@@ -977,9 +976,8 @@ def _mastery_stats(set_data) -> Dict:
 # ================= Feature 23 Ultimate Enhancements =================
 # 23.1 Anki export | 23.2 Exam mode (timed sprint) | 23.3 Weak-card loop
 
-import re as _re17
 import random as _random17
-from datetime import datetime as _dt17, timezone as _tz17
+import re as _re17
 
 
 def _clean17(text):

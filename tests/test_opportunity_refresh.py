@@ -6,7 +6,6 @@ lock-file behavior, source failure tolerance, and atomic writes.
 """
 import json
 import os
-import threading
 import time
 from datetime import date, datetime
 from unittest.mock import patch
@@ -15,13 +14,20 @@ import pytest
 
 from studybuddy import opportunities
 from studybuddy.opportunities import (
-    TYPES, STALE_AFTER_DAYS, MAX_AUTO_ENTRIES,
-    _normalize_link, _is_stale,
-    merge_opportunities, freshness_label, _is_curated,
-    refresh_opportunities, load_dataset,
+    MAX_AUTO_ENTRIES,
+    STALE_AFTER_DAYS,
+    TYPES,
+    _is_curated,
+    _is_stale,
+    freshness_label,
+    merge_opportunities,
+    refresh_opportunities,
 )
 from studybuddy.opportunity_sources import (
-    DevpostSource, SimplifyJobsSource, parse_age_days, fetch_all,
+    DevpostSource,
+    SimplifyJobsSource,
+    fetch_all,
+    parse_age_days,
     parse_devpost_deadline,
 )
 

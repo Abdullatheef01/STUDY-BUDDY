@@ -4,17 +4,20 @@ XSS payloads in output must be neutralized (no raw <script> in HTML contexts),
 SQLi payloads must not alter queries, path traversal must not read files.
 ~400 tests.
 """
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-import html
 import re
 
 import pytest
 
 from studybuddy import (
-    bullet_rewriter, cover_generator, citation_fmt, mock_interview,
+    bullet_rewriter,
+    citation_fmt,
+    cover_generator,
+    mock_interview,
     portfolio,
 )
 
@@ -68,7 +71,7 @@ def test_cover_xss_neutralized(payload):
             "John " + payload, "Role at Company")
     except (ValueError, TypeError):
         return
-    assert not _contains_raw_script(res), f"XSS escaped in cover output"
+    assert not _contains_raw_script(res), "XSS escaped in cover output"
 
 
 @pytest.mark.parametrize("payload", XSS)
@@ -97,7 +100,7 @@ def test_sqli_in_text_functions(payload):
 @pytest.mark.parametrize("payload", TRAVERSAL)
 def test_traversal_in_ids(payload):
     """Traversal payloads as IDs must not read arbitrary files."""
-    from studybuddy import dsa_practice, aptitude_test
+    from studybuddy import aptitude_test, dsa_practice
     for fn in (dsa_practice.get_problem, aptitude_test.get_question):
         try:
             res = fn(payload)

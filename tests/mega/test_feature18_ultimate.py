@@ -1,15 +1,19 @@
 """Feature 18 ultimate: harsh tests for multi-doc QA, citation verify, notes export."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.pdf_qa import (
-    answer_across_docs, verify_citations, qa_to_notes, chunk_pages,
+    answer_across_docs,
+    chunk_pages,
+    qa_to_notes,
+    verify_citations,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

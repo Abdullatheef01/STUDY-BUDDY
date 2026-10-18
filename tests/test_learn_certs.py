@@ -2,8 +2,13 @@
 import pytest
 
 from studybuddy.cert_guide import (
-    all_certs, get_cert, domains, filter_certs, recommend, build_study_plan,
-    validate_recommend_payload, validate_plan_payload)
+    all_certs,
+    build_study_plan,
+    domains,
+    recommend,
+    validate_plan_payload,
+    validate_recommend_payload,
+)
 
 
 def test_bank_size_and_schema():
@@ -90,7 +95,8 @@ def test_validate_payloads():
 @pytest.fixture
 def authed_client(client, app):
     from werkzeug.security import generate_password_hash
-    from unified_app import db, User
+
+    from unified_app import User, db
     with app.app_context():
         u = User(email="learn20@test.com", name="CertSeeker",
                  password_hash=generate_password_hash("password123"))
@@ -155,7 +161,7 @@ def test_plan_requires_login(client):
 
 
 def test_plan_roundtrip(authed_client, app):
-    from unified_app import db, CertPlan, User
+    from unified_app import CertPlan, User
     cid = all_certs()[0]["id"]
     r = authed_client.post("/learn/certs/plan", json={"cert_id": cid, "weeks": 6})
     assert r.status_code == 200

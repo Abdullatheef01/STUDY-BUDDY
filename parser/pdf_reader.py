@@ -1,9 +1,9 @@
 """
 PDF Resume Reader - Extracts text from PDF files using pypdf.
 """
-import pypdf
-import io
 import re
+
+import pypdf
 
 
 def extract_text_from_pdf(file_path=None, file_stream=None):

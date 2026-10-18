@@ -8,7 +8,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ["OPP_NO_AUTO_REFRESH"] = "1"
 
-from unified_app import create_app, db, User  # noqa: E402
+from unified_app import User, create_app, db  # noqa: E402
 
 
 def _make_app(**overrides):
@@ -112,14 +112,14 @@ class TestSafeFetch:
     """SEC-02: SSRF-safe fetcher blocks server-side request forgery."""
 
     def test_blocks_private_ipv4_literal(self):
-        from studybuddy.safe_fetch import validate_url, SSRFError
+        from studybuddy.safe_fetch import SSRFError, validate_url
         for bad in ("http://127.0.0.1/", "http://10.0.0.5:8080/x",
                     "http://192.168.1.1/", "http://169.254.169.254/latest/"):
             with pytest.raises(SSRFError):
                 validate_url(bad)
 
     def test_blocks_private_ipv6_and_reserved(self):
-        from studybuddy.safe_fetch import validate_url, SSRFError
+        from studybuddy.safe_fetch import SSRFError, validate_url
         for bad in ("http://[::1]/", "http://[fc00::1]/",
                     "http://0.0.0.0/"):
             with pytest.raises(SSRFError):
@@ -127,14 +127,15 @@ class TestSafeFetch:
 
     def test_blocks_dns_to_private_ip(self):
         import unittest.mock as mock
-        from studybuddy.safe_fetch import validate_url, SSRFError
+
+        from studybuddy.safe_fetch import SSRFError, validate_url
         with mock.patch("socket.getaddrinfo",
                         return_value=_addrinfo("10.1.2.3")):
             with pytest.raises(SSRFError):
                 validate_url("http://internal.example.com/")
 
     def test_blocks_non_http_schemes(self):
-        from studybuddy.safe_fetch import validate_url, SSRFError
+        from studybuddy.safe_fetch import SSRFError, validate_url
         for bad in ("file:///etc/passwd", "ftp://x/y", "gopher://x/",
                     "http://user:pass@example.com/"):
             with pytest.raises(SSRFError):
@@ -142,6 +143,7 @@ class TestSafeFetch:
 
     def test_allows_public_ip(self):
         import unittest.mock as mock
+
         from studybuddy.safe_fetch import validate_url
         with mock.patch("socket.getaddrinfo",
                         return_value=_addrinfo("93.184.216.34")):
@@ -151,6 +153,7 @@ class TestSafeFetch:
     def test_safe_fetch_blocks_before_network(self):
         """Validation happens before any socket is opened."""
         import unittest.mock as mock
+
         from studybuddy import safe_fetch as sf
         with mock.patch("socket.getaddrinfo",
                         return_value=_addrinfo("169.254.169.254")), \
@@ -161,6 +164,7 @@ class TestSafeFetch:
 
     def test_safe_fetch_follows_safe_redirects(self):
         import unittest.mock as mock
+
         from studybuddy import safe_fetch as sf
 
         def fake_request(method, url, **kw):
@@ -185,6 +189,7 @@ class TestSafeFetch:
 
     def test_safe_fetch_blocks_redirect_to_private(self):
         import unittest.mock as mock
+
         from studybuddy import safe_fetch as sf
 
         def fake_request(method, url, **kw):
@@ -207,6 +212,7 @@ class TestSafeFetch:
     def test_check_demo_links_never_touches_private(self):
         """Portfolio link checker must not open sockets to private IPs."""
         import unittest.mock as mock
+
         from studybuddy import portfolio
         with mock.patch("socket.getaddrinfo",
                         return_value=_addrinfo("127.0.0.1")), \

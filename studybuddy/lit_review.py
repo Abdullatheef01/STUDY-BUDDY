@@ -65,10 +65,10 @@ from __future__ import annotations
 import html
 import math
 import re
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable
 
-from studybuddy.pdf_qa import _tokenize
 from studybuddy.citation_fmt import to_bibtex
+from studybuddy.pdf_qa import _tokenize
 
 # ---------------------------------------------------------------------------
 # Tunables
@@ -138,7 +138,7 @@ def _mask_abbreviations(text: str) -> str:
     return masked
 
 
-def split_sentences(text: str) -> List[str]:
+def split_sentences(text: str) -> list[str]:
     """Split text into sentences.
 
     Abbreviation-aware (``e.g.``, ``Fig.``, ``et al.`` do not split), keeps
@@ -151,7 +151,7 @@ def split_sentences(text: str) -> List[str]:
     if not isinstance(text, str) or not text.strip():
         return []
     masked = _mask_abbreviations(text)
-    sentences: List[str] = []
+    sentences: list[str] = []
     start = 0
     for match in _SENT_BOUNDARY_RE.finditer(masked):
         piece = masked[start:match.start()].replace(
@@ -169,7 +169,7 @@ def split_sentences(text: str) -> List[str]:
 # Chunk normalisation helpers
 # ---------------------------------------------------------------------------
 
-def _norm_chunk(chunk: Any) -> Dict[str, Any]:
+def _norm_chunk(chunk: Any) -> dict[str, Any]:
     """Return a defensive copy of a chunk dict with guaranteed keys."""
     if not isinstance(chunk, dict):
         return {"page": 1, "index": 0, "text": "", "heading": "",
@@ -189,7 +189,7 @@ def _norm_chunk(chunk: Any) -> Dict[str, Any]:
     }
 
 
-def _sentences_of(chunk: Dict[str, Any]) -> List[Tuple[str, int]]:
+def _sentences_of(chunk: dict[str, Any]) -> list[tuple[str, int]]:
     """(sentence, position-in-chunk) pairs for a normalised chunk."""
     return list(enumerate(split_sentences(chunk["text"])))
 
@@ -198,18 +198,18 @@ def _sentences_of(chunk: Dict[str, Any]) -> List[Tuple[str, int]]:
 # Sentence scoring (TF-IDF weighted + position bonus)
 # ---------------------------------------------------------------------------
 
-def _smooth_idf(tokenized_chunks: List[List[str]]) -> Dict[str, float]:
+def _smooth_idf(tokenized_chunks: list[list[str]]) -> dict[str, float]:
     """Smoothed IDF over chunk token lists: log((1+N)/(1+df)) + 1."""
     n = len(tokenized_chunks)
-    df: Dict[str, int] = {}
+    df: dict[str, int] = {}
     for tokens in tokenized_chunks:
         for term in set(tokens):
             df[term] = df.get(term, 0) + 1
     return {t: math.log((1.0 + n) / (1.0 + c)) + 1.0 for t, c in df.items()}
 
 
-def _score_all(chunks: List[Dict[str, Any]],
-               query_terms: Optional[List[str]] = None) -> List[Dict]:
+def _score_all(chunks: list[dict[str, Any]],
+               query_terms: list[str] | None = None) -> list[dict]:
     """Score every sentence of every chunk; fully sorted, no truncation."""
     normed = [_norm_chunk(c) for c in chunks]
     tokenized_chunks = [_tokenize(c["text"]) for c in normed]
@@ -222,12 +222,12 @@ def _score_all(chunks: List[Dict[str, Any]],
         except Exception:
             query_set = set()
 
-    scored: List[Dict] = []
-    for chunk, _ in zip(normed, tokenized_chunks):
+    scored: list[dict] = []
+    for chunk, _ in zip(normed, tokenized_chunks, strict=False):
         for pos, sentence in _sentences_of(chunk):
             tokens = _tokenize(sentence)
             if tokens:
-                counts: Dict[str, int] = {}
+                counts: dict[str, int] = {}
                 for t in tokens:
                     counts[t] = counts.get(t, 0) + 1
                 tfidf = sum((counts[t] / len(tokens)) * idf.get(t, 0.0)
@@ -255,9 +255,9 @@ def _score_all(chunks: List[Dict[str, Any]],
     return scored
 
 
-def score_sentences(chunks: List[Dict],
-                    query_terms: Optional[List[str]] = None,
-                    top_n: int = 8) -> List[Dict]:
+def score_sentences(chunks: list[dict],
+                    query_terms: list[str] | None = None,
+                    top_n: int = 8) -> list[dict]:
     """Score sentences across chunks and return the top ``top_n``.
 
     Score = TF-IDF-weighted term importance (IDF computed over the chunk
@@ -328,7 +328,7 @@ def _jaccard(a: set, b: set) -> float:
     return len(a & b) / len(a | b)
 
 
-def extract_claims(chunks_with_doc: List[Dict]) -> List[Dict]:
+def extract_claims(chunks_with_doc: list[dict]) -> list[dict]:
     """Extract claim sentences (those containing finding-verbs).
 
     Each result is ``{"claim", "doc_id", "doc_title", "chunk_index",
@@ -347,8 +347,8 @@ def extract_claims(chunks_with_doc: List[Dict]) -> List[Dict]:
         return []
     chunks.sort(key=lambda c: (c["doc_id"] if c["doc_id"] is not None else -1,
                                c["index"]))
-    claims: List[Dict] = []
-    seen: List[set] = []  # token sets of kept claims, for near-dup detection
+    claims: list[dict] = []
+    seen: list[set] = []  # token sets of kept claims, for near-dup detection
     seen_exact: set = set()
     try:
         for chunk in chunks:
@@ -411,7 +411,7 @@ _THEME_STOPWORDS = frozenset(
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 
 
-def _theme_tokens(text: str) -> List[str]:
+def _theme_tokens(text: str) -> list[str]:
     """Lowercased alphanumeric tokens minus the theme stoplist."""
     if not isinstance(text, str):
         return []
@@ -419,8 +419,8 @@ def _theme_tokens(text: str) -> List[str]:
             if t not in _THEME_STOPWORDS and len(t) > 2 and not t.isdigit()]
 
 
-def cluster_themes(chunks_with_doc: List[Dict],
-                   max_themes: int = DEFAULT_MAX_THEMES) -> List[Dict]:
+def cluster_themes(chunks_with_doc: list[dict],
+                   max_themes: int = DEFAULT_MAX_THEMES) -> list[dict]:
     """Cluster chunks into themes from discriminative terms.
 
     Term document-frequencies are computed across chunks; terms are ranked by
@@ -448,7 +448,7 @@ def cluster_themes(chunks_with_doc: List[Dict],
     try:
         tokenized = [_theme_tokens(c["text"]) for c in chunks]
         n = len(chunks)
-        df: Dict[str, int] = {}
+        df: dict[str, int] = {}
         for tokens in tokenized:
             for term in set(tokens):
                 df[term] = df.get(term, 0) + 1
@@ -456,11 +456,11 @@ def cluster_themes(chunks_with_doc: List[Dict],
                for t, c in df.items()}
 
         # Term score: summed TF-IDF over chunks.
-        term_score: Dict[str, float] = {}
+        term_score: dict[str, float] = {}
         for tokens in tokenized:
             if not tokens:
                 continue
-            counts: Dict[str, int] = {}
+            counts: dict[str, int] = {}
             for t in tokens:
                 counts[t] = counts.get(t, 0) + 1
             for t, c in counts.items():
@@ -471,14 +471,14 @@ def cluster_themes(chunks_with_doc: List[Dict],
             return []
 
         # Chunk-id set per candidate term (for seed merging).
-        term_chunks: Dict[str, set] = {}
+        term_chunks: dict[str, set] = {}
         for i, tokens in enumerate(tokenized):
             for term in set(tokens):
                 term_chunks.setdefault(term, set()).add(i)
 
         # Greedy seeding: merge a candidate into an accepted theme when its
         # chunk set overlaps an existing seed's set heavily.
-        themes: List[Dict] = []  # {"seed", "terms", "chunk_set"}
+        themes: list[dict] = []  # {"seed", "terms", "chunk_set"}
         for term in ranked[:max_themes * 3]:
             cset = term_chunks.get(term, set())
             if not cset:
@@ -507,7 +507,7 @@ def cluster_themes(chunks_with_doc: List[Dict],
         token_sets = [set(t) for t in tokenized]
 
         # Assign each chunk to up to THEMES_PER_CHUNK best themes.
-        assignments: List[List[int]] = [[] for _ in themes]
+        assignments: list[list[int]] = [[] for _ in themes]
         for i, tset in enumerate(token_sets):
             scored_th = []
             for ti, weights in enumerate(theme_term_weights):
@@ -546,7 +546,7 @@ def cluster_themes(chunks_with_doc: List[Dict],
 # Review generation
 # ---------------------------------------------------------------------------
 
-def _empty_error(message: str) -> Dict:
+def _empty_error(message: str) -> dict:
     """Honest empty review shape for insufficient input."""
     return {"error": message, "per_paper": [], "themes": [],
             "claims_table": [], "coverage_gaps": "", "bibtex": ""}
@@ -558,7 +558,7 @@ def _norm_title(title: Any) -> str:
 
 
 def _citation(title: str, page: int, chunk_index: int,
-              excerpt: str) -> Dict:
+              excerpt: str) -> dict:
     """App-standard citation dict; excerpt is a verbatim chunk substring."""
     if not isinstance(excerpt, str):
         excerpt = ""
@@ -570,7 +570,7 @@ def _cite_marker(title: str, page: int) -> str:
     return CITATION_MARKER.format(title=title, page=page)
 
 
-def _doc_chunks(doc: Any) -> List[Dict]:
+def _doc_chunks(doc: Any) -> list[dict]:
     """Extract chunk dicts from a StudyDoc-like object (duck-typed)."""
     try:
         data = getattr(doc, "data", None) or {}
@@ -582,9 +582,9 @@ def _doc_chunks(doc: Any) -> List[Dict]:
         return []
 
 
-def _build_bibtex(docs: List[Tuple[Any, str]],
-                  paper_metas: Optional[Dict[int, dict]],
-                  paper_imports: Optional[List[dict]]) -> str:
+def _build_bibtex(docs: list[tuple[Any, str]],
+                  paper_metas: dict[int, dict] | None,
+                  paper_imports: list[dict] | None) -> str:
     """One BibTeX entry per paper.
 
     Metadata precedence per paper: ``paper_metas[doc.id]`` first, then a
@@ -592,7 +592,7 @@ def _build_bibtex(docs: List[Tuple[Any, str]],
     deterministic), else title-only. Key collisions across entries are
     resolved deterministically via ``to_bibtex``'s ``existing_keys``.
     """
-    import_lookup: Dict[str, dict] = {}
+    import_lookup: dict[str, dict] = {}
     try:
         imports = list(paper_imports or [])
     except TypeError:
@@ -604,10 +604,10 @@ def _build_bibtex(docs: List[Tuple[Any, str]],
         if key and key not in import_lookup:
             import_lookup[key] = imp
 
-    entries: List[str] = []
+    entries: list[str] = []
     used_keys: set = set()
     for doc, title in docs:
-        meta: Dict = {}
+        meta: dict = {}
         try:
             raw = (paper_metas or {}).get(getattr(doc, "id", None))
             if isinstance(raw, dict):
@@ -631,10 +631,10 @@ def _build_bibtex(docs: List[Tuple[Any, str]],
     return "\n\n".join(entries)
 
 
-def generate_review(docs: List[Any],
-                    paper_metas: Optional[Dict[int, dict]] = None,
-                    gemini_polish: Optional[Callable[[str], str]] = None,
-                    paper_imports: Optional[List[dict]] = None) -> Dict:
+def generate_review(docs: list[Any],
+                    paper_metas: dict[int, dict] | None = None,
+                    gemini_polish: Callable[[str], str] | None = None,
+                    paper_imports: list[dict] | None = None) -> dict:
     """Build the full literature-review dict for a set of StudyDoc rows.
 
     ``docs`` are duck-typed StudyDoc objects (``.id``, ``.title``,
@@ -663,8 +663,8 @@ def generate_review(docs: List[Any],
             "%d provided." % len(doc_list))
 
     # (doc, title) pairs with extractable chunks, deterministic order.
-    usable: List[Tuple[Any, str, List[Dict]]] = []
-    excluded_titles: List[str] = []
+    usable: list[tuple[Any, str, list[dict]]] = []
+    excluded_titles: list[str] = []
     for doc in doc_list:
         try:
             title = getattr(doc, "title", None)
@@ -689,8 +689,8 @@ def generate_review(docs: List[Any],
                                getattr(u[0], "id", None) or 0))
 
     # Enriched chunk list shared by every stage.
-    all_chunks: List[Dict] = []
-    per_doc_chunks: Dict[int, List[Dict]] = {}
+    all_chunks: list[dict] = []
+    per_doc_chunks: dict[int, list[dict]] = {}
     for pos, (doc, title, chunks) in enumerate(usable):
         doc_id = getattr(doc, "id", None)
         enriched = []
@@ -759,7 +759,7 @@ def generate_review(docs: List[Any],
 
         # ---- claims table (grouped by normalized claim text) ----
         raw_claims = extract_claims(all_chunks)
-        grouped: Dict[str, Dict] = {}
+        grouped: dict[str, dict] = {}
         for cl in raw_claims:
             key = _normalize_claim(cl["claim"])
             if key not in grouped:
@@ -812,13 +812,13 @@ def generate_review(docs: List[Any],
 # Export: Markdown and HTML
 # ---------------------------------------------------------------------------
 
-def _safe_review(review: Any) -> Dict:
+def _safe_review(review: Any) -> dict:
     if not isinstance(review, dict):
         return _empty_error("No review data.")
     return review
 
 
-def review_to_markdown(review: Dict) -> str:
+def review_to_markdown(review: dict) -> str:
     """Render a review dict as Markdown. Never raises."""
     try:
         r = _safe_review(review)
@@ -878,7 +878,7 @@ def review_to_markdown(review: Dict) -> str:
         return "# Literature Review\n\n*Could not render this review.*\n"
 
 
-def review_to_html(review: Dict) -> str:
+def review_to_html(review: dict) -> str:
     """Render a review dict as an HTML fragment.
 
     Every user/doc-supplied string is passed through ``html.escape`` —
@@ -945,7 +945,6 @@ def review_to_html(review: Dict) -> str:
 # 21.1 Thematic clustering | 21.2 Gap-highlight mode | 21.3 Length presets
 
 import re as _re15
-from collections import Counter
 
 
 def _clean15(text):

@@ -6,8 +6,6 @@ checks this for every gap produced by every finder over a mixed collection.
 """
 from types import SimpleNamespace
 
-import pytest
-
 from studybuddy.gap_finder import (
     find_conflicts,
     find_single_paper_topics,
@@ -16,7 +14,6 @@ from studybuddy.gap_finder import (
     suggest_next_papers,
     term_stats,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixture builders
@@ -197,7 +194,7 @@ def test_conflict_golden_dropout():
     gaps = find_conflicts(entries_of(docs))
     conflicts = [g for g in gaps if g["type"] == "conflict"]
     assert conflicts, "expected a conflict gap for the dropout disagreement"
-    cited = {e["doc"] for g in conflicts for e in g["evidence"]}
+    _cited = {e["doc"] for g in conflicts for e in g["evidence"]}
     pair = next(
         g for g in conflicts
         if {e["doc"] for e in g["evidence"]} == {"Paper One", "Paper Two"}

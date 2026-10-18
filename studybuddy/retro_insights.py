@@ -6,7 +6,7 @@ Feature 29 x3:
   29.3 win_library — save what worked; replay the playbook.
 """
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _clean(text):
@@ -119,7 +119,7 @@ def win_library(wins):
             "title": title[:80] or "Win",
             "what_worked": what[:500],
             "context": _clean(w.get("context") or "")[:200],
-            "saved_at": datetime.now(timezone.utc).isoformat(),
+            "saved_at": datetime.now(UTC).isoformat(),
         })
     # Extract repeatable patterns: most common action verbs.
     verbs = []

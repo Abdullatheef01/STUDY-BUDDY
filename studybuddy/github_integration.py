@@ -6,7 +6,7 @@ raises the API rate limit (60 -> 5000 requests/hour).
 import base64
 import os
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 
@@ -54,7 +54,7 @@ def _get(path, params=None, what="GitHub"):
         ) from e
     if resp.status_code == 404:
         raise GithubAPIError(
-            "{} was not found on GitHub. Check the spelling and try again.".format(what))
+            f"{what} was not found on GitHub. Check the spelling and try again.")
     if resp.status_code == 403:
         body = (resp.text or "").lower()
         if "rate limit" in body or resp.headers.get("X-RateLimit-Remaining") == "0":
@@ -75,11 +75,11 @@ def _get(path, params=None, what="GitHub"):
 def fetch_github_profile(username):
     """Fetch public user profile + owned (non-fork) repos. Returns dict."""
     username = validate_github_username(username)
-    user = _get("/users/" + username, what="GitHub user '@{}'".format(username))
+    user = _get("/users/" + username, what=f"GitHub user '@{username}'")
     repos = []
     page = 1
     while page <= 3:  # up to 300 repos is plenty for a profile snapshot
-        batch = _get("/users/{}/repos".format(username),
+        batch = _get(f"/users/{username}/repos",
                      params={"per_page": 100, "page": page,
                              "type": "owner", "sort": "pushed"},
                      what="repositories")
@@ -95,7 +95,7 @@ def fetch_github_profile(username):
 def _readme_quality(owner, repo_name):
     """Heuristic README check for one repo: exists? length? useful sections?"""
     try:
-        data = _get("/repos/{}/{}/readme".format(owner, repo_name), what="README")
+        data = _get(f"/repos/{owner}/{repo_name}/readme", what="README")
     except GithubAPIError:
         return {"exists": False, "length": 0, "has_sections": False}
     try:
@@ -203,11 +203,11 @@ def analyze_github_profile(username):
     activity_pts = 0
     if pushed:
         latest = max(pushed)
-        age_days = (datetime.now(timezone.utc) - latest).days
+        age_days = (datetime.now(UTC) - latest).days
         activity_pts = 10 if age_days <= 30 else 6 if age_days <= 90 else 3 if age_days <= 365 else 0
         if age_days > 90:
             suggestions.append(
-                "No pushes in {} days — push something small to show you're active.".format(age_days))
+                f"No pushes in {age_days} days — push something small to show you're active.")
     else:
         suggestions.append("Push your work regularly — an active contribution graph builds trust.")
     breakdown["Recent activity"] = activity_pts
@@ -277,7 +277,7 @@ def grade_readme(readme_text):
     checks = []
     total = 0
     fixes = []
-    for key, pattern, pts, label in _README_SECTIONS:
+    for _key, pattern, pts, label in _README_SECTIONS:
         try:
             hit = bool(pattern.search(text))
         except Exception:

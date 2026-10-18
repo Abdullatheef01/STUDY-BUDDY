@@ -218,7 +218,7 @@ def check_demo_links(projects, timeout=8):
     projects: list of {title, link, demo_link}. Never raises on network
     failure — a dead link is a result, not an exception.
     """
-    from studybuddy.safe_fetch import validate_url, safe_fetch, SSRFError
+    from studybuddy.safe_fetch import SSRFError, safe_fetch, validate_url
     if not isinstance(projects, (list, tuple)):
         raise ValueError("projects must be a list.")
     results = []

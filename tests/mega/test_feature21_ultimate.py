@@ -1,13 +1,14 @@
 """Feature 21 ultimate: harsh tests for theme clustering, gap mode, length presets."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.lit_review import cluster_by_theme, gap_highlight_review, length_preset
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

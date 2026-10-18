@@ -8,16 +8,16 @@ Phase 1 (Foundation): Flask-SQLAlchemy + Flask-Login persistence.
 - /dashboard (login required) shows analysis history + career goals.
 - Research chat sessions are saved per-user when logged in.
 """
+import hashlib
+import json
+import logging
 import os
+import random
 import re
+import secrets
 import sys
 import time
 import uuid
-import json
-import random
-import hashlib
-import secrets
-import logging
 
 # When run as `python unified_app.py`, make `import unified_app` resolve to
 # this already-running module instead of loading a second copy. Without this,
@@ -28,28 +28,53 @@ import logging
 if __name__ == "__main__" and "unified_app" not in sys.modules:
     sys.modules["unified_app"] = sys.modules["__main__"]
 
-from datetime import datetime, date, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 import requests
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash, Response
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import (LoginManager, UserMixin, login_user, logout_user,
-                         login_required, current_user)
-from flask_wtf import CSRFProtect
-from flask_wtf.csrf import CSRFError
+from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
+from flask import (
+    Flask,
+    Response,
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import CSRFError
 from werkzeug.middleware.proxy_fix import ProxyFix
-from authlib.integrations.flask_client import OAuth
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
-from dotenv import load_dotenv
 
-from studybuddy.github_integration import (analyze_github_profile, GithubAPIError,
-                                validate_github_username)
-from studybuddy.leetcode_integration import (fetch_leetcode_stats, get_card_stats,
-                                  render_leetcode_card_svg, render_error_svg,
-                                  LeetCodeAPIError, validate_leetcode_username)
+from studybuddy.github_integration import (
+    GithubAPIError,
+    analyze_github_profile,
+    validate_github_username,
+)
+from studybuddy.leetcode_integration import (
+    LeetCodeAPIError,
+    fetch_leetcode_stats,
+    get_card_stats,
+    render_error_svg,
+    render_leetcode_card_svg,
+    validate_leetcode_username,
+)
 
 log = logging.getLogger("acra")
 
@@ -151,7 +176,7 @@ def _github_get(path):
                "User-Agent": "acra-student-platform"}
     token = os.getenv("GITHUB_TOKEN")
     if token:
-        headers["Authorization"] = "Bearer {}".format(token.strip())
+        headers["Authorization"] = f"Bearer {token.strip()}"
     try:
         resp = requests.get("https://api.github.com" + path, headers=headers, timeout=10)
     except requests.RequestException as e:
@@ -163,17 +188,17 @@ def _github_get(path):
     if resp.status_code == 403 and "rate limit" in resp.text.lower():
         raise GithubRepoError("GitHub's API rate limit was hit. Please try again in a few minutes.")
     if not resp.ok:
-        raise GithubRepoError("GitHub returned an unexpected response ({}).".format(resp.status_code))
+        raise GithubRepoError(f"GitHub returned an unexpected response ({resp.status_code}).")
     return resp.json()
 
 
 def _fetch_repo_data(owner, repo):
     """Fetch real repository facts from the GitHub API for the constructor."""
-    meta = _github_get("/repos/{}/{}".format(owner, repo))
-    languages = _github_get("/repos/{}/{}/languages".format(owner, repo)) or {}
+    meta = _github_get(f"/repos/{owner}/{repo}")
+    languages = _github_get(f"/repos/{owner}/{repo}/languages") or {}
     readme_text = ""
     try:
-        readme = _github_get("/repos/{}/{}/readme".format(owner, repo))
+        readme = _github_get(f"/repos/{owner}/{repo}/readme")
         import base64
         readme_text = base64.b64decode(readme.get("content", "") or "").decode(
             "utf-8", "ignore")[:4000]
@@ -181,7 +206,7 @@ def _fetch_repo_data(owner, repo):
         readme_text = ""
     files, dirs = [], set()
     try:
-        tree = _github_get("/repos/{}/{}/git/trees/HEAD?recursive=1".format(owner, repo))
+        tree = _github_get(f"/repos/{owner}/{repo}/git/trees/HEAD?recursive=1")
         for entry in (tree.get("tree") or [])[:3000]:
             if entry.get("type") == "blob":
                 files.append(entry.get("path", ""))
@@ -195,7 +220,7 @@ def _fetch_repo_data(owner, repo):
     complexity = ("High" if file_count > 200 or len(languages) > 6
                   else "Moderate" if file_count > 50 else "Focused")
     return {
-        "full_name": meta.get("full_name", "{}/{}".format(owner, repo)),
+        "full_name": meta.get("full_name", f"{owner}/{repo}"),
         "description": (meta.get("description") or "No description provided.")[:500],
         "stars": meta.get("stargazers_count", 0),
         "forks": meta.get("forks_count", 0),
@@ -226,94 +251,164 @@ def _parse_json_safely(text):
 sys.path.insert(0, os.path.dirname(__file__))
 
 # Import logic from Resume Analyzer components
-from parser.pdf_reader import extract_text_from_pdf
-from parser.docx_reader import extract_text_from_docx
-from parser.text_cleaning import clean_text, extract_email, extract_phone, extract_links
-from parser.section_extractor import extract_sections, extract_education_details, extract_experience_years
-from models.skill_extractor import extract_skills, get_skills_by_category, get_skill_names
-from models.ats_scorer import calculate_ats_score
-from models.resume_feedback import generate_feedback, get_overall_summary
-from studybuddy.jd_matcher import (score_jd_match, generate_rule_based_suggestions,
-                        JD_MIN_CHARS, JD_MAX_CHARS)
-from studybuddy.bullet_rewriter import (improve_bullet, BULLET_MIN_CHARS, BULLET_MAX_CHARS)
-from studybuddy.cover_generator import (rule_based_cover_letter, rule_based_outreach,
-                             validate_cover_inputs, TONES)
-from studybuddy.linkedin_grader import (grade_linkedin_profile, generate_rule_based_summary,
-                             validate_linkedin_inputs)
-from studybuddy.career_assessment import (score_assessment, rule_based_why,
-                               validate_assessment_inputs, public_questions,
-                               QUESTIONS, TOP_N_CLUSTERS)
-from studybuddy.salary_data import (get_options as salary_options, query as salary_query,
-                          get_freshness as salary_freshness, SalaryDataError)
-from studybuddy.opportunities import (list_opportunities, get_meta as opp_meta,
-                           opp_exists, TYPES as OPP_TYPES, OpportunityDataError)
-from studybuddy.portfolio import validate_portfolio_payload, unique_slug
-from studybuddy.mock_interview import (interview_options, pick_questions, score_answer,
-                            generate_rule_based_feedback, validate_interview_setup)
-from studybuddy.communication_coach import analyze_transcript, validate_coach_inputs
-from studybuddy.dsa_practice import (all_problems, get_problem, topics as dsa_topics,
-                          difficulties as dsa_difficulties,
-                          filter_problems, public_problem, reveal_hint,
-                          reveal_approach, validate_status_payload,
-                          weak_topic_diagnosis, VALID_STATUSES)
-from studybuddy.aptitude_test import (categories as aptitude_categories,
-                           pick_questions as aptitude_pick,
-                           validate_test_setup, score_attempt,
-                           SUBMIT_GRACE_SEC, all_questions as aptitude_all)
-from studybuddy.star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
-                          SECTION_GUIDE, all_examples, examples_for,
-                          get_example, validate_draft, score_draft,
-                          generate_rule_based_rewrite_tip)
-from studybuddy.learning_roadmaps import (list_skills as roadmap_skills,
-                               list_domains as roadmap_domains,
-                               get_skill as get_roadmap_skill,
-                               list_roles as roadmap_roles,
-                               analyze_gap, build_personal_roadmap,
-                               validate_progress_payload, validate_gap_payload,
-                               progress_summary as roadmap_progress_summary)
-from studybuddy.skill_quizzes import (quiz_skills, skill_topics, public_question,
-                           build_quiz, check_answer, grade_quiz,
-                           validate_start_payload, best_scores as quiz_best_scores,
-                           get_question as get_quiz_question)
-from studybuddy.cert_guide import (all_certs, get_cert, domains as cert_domains,
-                        get_freshness as cert_freshness,
-                        filter_certs, recommend as recommend_certs,
-                        build_study_plan, validate_recommend_payload,
-                        validate_plan_payload)
-from studybuddy.pdf_qa import (validate_upload as pdfqa_validate_upload,
-                    parse_pdf_pages as pdfqa_parse_pages,
-                    chunk_pages as pdfqa_chunk_pages,
-                    retrieve as pdfqa_retrieve,
-                    answer_question as pdfqa_answer)
-from studybuddy.arxiv_import import (validate_arxiv_id, validate_doi,
-                          fetch_arxiv, fetch_doi, normalize_metadata,
-                          fetch_citation_graph, download_pdf as arxiv_download_pdf)
-from studybuddy.citation_fmt import (format_citation, format_bibliography,
-                          to_bibtex, from_bibtex, style_guide,
-                          STYLES as CITATION_STYLES)
-from studybuddy.lit_review import (generate_review as lr_generate_review,
-                        review_to_markdown as lr_to_markdown,
-                        review_to_html as lr_to_html)
-from studybuddy.gap_finder import generate_gap_report as gf_generate_report
-from studybuddy.flashcards import (generate_deck as fc_generate_deck,
-                        grade_mcq as fc_grade_mcq,
-                        mastery_stats as fc_mastery_stats)
+import studybuddy.community as community_mod
 import studybuddy.momentum as momentum_mod
 import studybuddy.retrospective_data as retro_data
-from studybuddy.health_review import (DIMENSIONS as HR_DIMENSIONS,
-                           generate_review as hr_generate_review,
-                           valid_month_key as hr_valid_month_key,
-                           current_month_key as hr_current_month_key)
-import studybuddy.community as community_mod
-from recommendation.job_recommender import get_recommendations
-from recommendation.skill_gap_analysis import analyze_skill_gaps
-from recommendation.learning_roadmap import generate_roadmap, estimate_total_time
-from recommendation.career_guidance import suggest_career_paths
-from preparation.interview_questions import generate_interview_questions
-from preparation.company_questions import get_company_questions, get_available_companies as get_interview_companies, get_company_stats
+from models.ats_scorer import calculate_ats_score
+from models.resume_feedback import generate_feedback, get_overall_summary
+from models.skill_extractor import extract_skills, get_skill_names, get_skills_by_category
+from parser.docx_reader import extract_text_from_docx
+from parser.pdf_reader import extract_text_from_pdf
+from parser.section_extractor import (
+    extract_education_details,
+    extract_experience_years,
+    extract_sections,
+)
+from parser.text_cleaning import clean_text, extract_email, extract_links, extract_phone
+from preparation.coding_practice import get_available_companies as get_coding_companies
 from preparation.coding_practice import (
-    get_coding_questions, get_available_companies as get_coding_companies,
-    get_available_topics, get_company_coding_stats, get_recommended_problems
+    get_available_topics,
+    get_coding_questions,
+    get_company_coding_stats,
+)
+from preparation.company_questions import get_available_companies as get_interview_companies
+from preparation.company_questions import get_company_questions, get_company_stats
+from preparation.interview_questions import generate_interview_questions
+from recommendation.career_guidance import suggest_career_paths
+from recommendation.job_recommender import get_recommendations
+from recommendation.learning_roadmap import estimate_total_time, generate_roadmap
+from recommendation.skill_gap_analysis import analyze_skill_gaps
+from studybuddy.aptitude_test import SUBMIT_GRACE_SEC, score_attempt, validate_test_setup
+from studybuddy.aptitude_test import all_questions as aptitude_all
+from studybuddy.aptitude_test import categories as aptitude_categories
+from studybuddy.aptitude_test import pick_questions as aptitude_pick
+from studybuddy.arxiv_import import download_pdf as arxiv_download_pdf
+from studybuddy.arxiv_import import (
+    fetch_arxiv,
+    fetch_citation_graph,
+    fetch_doi,
+    normalize_metadata,
+    validate_arxiv_id,
+    validate_doi,
+)
+from studybuddy.bullet_rewriter import BULLET_MAX_CHARS, BULLET_MIN_CHARS, improve_bullet
+from studybuddy.career_assessment import (
+    QUESTIONS,
+    public_questions,
+    rule_based_why,
+    score_assessment,
+    validate_assessment_inputs,
+)
+from studybuddy.cert_guide import (
+    all_certs,
+    build_study_plan,
+    filter_certs,
+    get_cert,
+    validate_plan_payload,
+    validate_recommend_payload,
+)
+from studybuddy.cert_guide import domains as cert_domains
+from studybuddy.cert_guide import get_freshness as cert_freshness
+from studybuddy.cert_guide import recommend as recommend_certs
+from studybuddy.citation_fmt import STYLES as CITATION_STYLES
+from studybuddy.citation_fmt import (
+    format_citation,
+    from_bibtex,
+    style_guide,
+    to_bibtex,
+)
+from studybuddy.communication_coach import analyze_transcript, validate_coach_inputs
+from studybuddy.cover_generator import (
+    rule_based_cover_letter,
+    rule_based_outreach,
+    validate_cover_inputs,
+)
+from studybuddy.dsa_practice import (
+    all_problems,
+    filter_problems,
+    get_problem,
+    public_problem,
+    reveal_approach,
+    reveal_hint,
+    validate_status_payload,
+    weak_topic_diagnosis,
+)
+from studybuddy.dsa_practice import difficulties as dsa_difficulties
+from studybuddy.dsa_practice import topics as dsa_topics
+from studybuddy.flashcards import generate_deck as fc_generate_deck
+from studybuddy.flashcards import grade_mcq as fc_grade_mcq
+from studybuddy.flashcards import mastery_stats as fc_mastery_stats
+from studybuddy.gap_finder import generate_gap_report as gf_generate_report
+from studybuddy.health_review import DIMENSIONS as HR_DIMENSIONS
+from studybuddy.health_review import current_month_key as hr_current_month_key
+from studybuddy.health_review import generate_review as hr_generate_review
+from studybuddy.health_review import valid_month_key as hr_valid_month_key
+from studybuddy.jd_matcher import (
+    JD_MAX_CHARS,
+    JD_MIN_CHARS,
+    generate_rule_based_suggestions,
+    score_jd_match,
+)
+from studybuddy.learning_roadmaps import (
+    analyze_gap,
+    build_personal_roadmap,
+    validate_gap_payload,
+    validate_progress_payload,
+)
+from studybuddy.learning_roadmaps import get_skill as get_roadmap_skill
+from studybuddy.learning_roadmaps import list_domains as roadmap_domains
+from studybuddy.learning_roadmaps import list_roles as roadmap_roles
+from studybuddy.learning_roadmaps import list_skills as roadmap_skills
+from studybuddy.learning_roadmaps import progress_summary as roadmap_progress_summary
+from studybuddy.linkedin_grader import (
+    generate_rule_based_summary,
+    grade_linkedin_profile,
+    validate_linkedin_inputs,
+)
+from studybuddy.lit_review import generate_review as lr_generate_review
+from studybuddy.lit_review import review_to_html as lr_to_html
+from studybuddy.lit_review import review_to_markdown as lr_to_markdown
+from studybuddy.mock_interview import (
+    generate_rule_based_feedback,
+    interview_options,
+    pick_questions,
+    score_answer,
+    validate_interview_setup,
+)
+from studybuddy.opportunities import TYPES as OPP_TYPES
+from studybuddy.opportunities import OpportunityDataError, list_opportunities, opp_exists
+from studybuddy.opportunities import get_meta as opp_meta
+from studybuddy.pdf_qa import answer_question as pdfqa_answer
+from studybuddy.pdf_qa import chunk_pages as pdfqa_chunk_pages
+from studybuddy.pdf_qa import parse_pdf_pages as pdfqa_parse_pages
+from studybuddy.pdf_qa import retrieve as pdfqa_retrieve
+from studybuddy.pdf_qa import validate_upload as pdfqa_validate_upload
+from studybuddy.portfolio import unique_slug, validate_portfolio_payload
+from studybuddy.salary_data import SalaryDataError
+from studybuddy.salary_data import get_freshness as salary_freshness
+from studybuddy.salary_data import get_options as salary_options
+from studybuddy.salary_data import query as salary_query
+from studybuddy.skill_quizzes import best_scores as quiz_best_scores
+from studybuddy.skill_quizzes import (
+    build_quiz,
+    check_answer,
+    grade_quiz,
+    public_question,
+    quiz_skills,
+    skill_topics,
+    validate_start_payload,
+)
+from studybuddy.skill_quizzes import get_question as get_quiz_question
+from studybuddy.star_builder import (
+    COMPETENCIES,
+    COMPETENCY_IDS,
+    SECTION_GUIDE,
+    SECTIONS,
+    all_examples,
+    examples_for,
+    generate_rule_based_rewrite_tip,
+    score_draft,
+    validate_draft,
 )
 
 db = SQLAlchemy()
@@ -333,7 +428,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
     # --- Social login + profile integrations (added post-Phase-1) ---
     # google_sub is unique but enforced via a manual unique index (see
     # _ensure_schema) so pre-Phase-2 databases can adopt it without a rebuild.
@@ -359,7 +454,7 @@ class ResumeAnalysis(db.Model):
     # Cleaned resume text (truncated) so Wave-1 JD matching can reuse the
     # latest saved analysis without a re-upload. Backfilled via _ensure_schema.
     resume_text = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("analyses", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
@@ -372,7 +467,7 @@ class JDMatchReport(db.Model):
     job_title = db.Column(db.String(255))
     score = db.Column(db.Float)
     report_json = db.Column(db.JSON)  # full match report payload
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("jd_match_reports", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
@@ -385,7 +480,7 @@ class BulletRewrite(db.Model):
     original = db.Column(db.Text, nullable=False)
     rewrites = db.Column(db.JSON)  # [{"label","text","tip"}...] + optional AI variant
     ai_powered = db.Column(db.Boolean, default=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("bullet_rewrites", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
@@ -398,9 +493,9 @@ class ResumeVersion(db.Model):
     name = db.Column(db.String(120), nullable=False)  # e.g. "Backend v1"
     resume_text = db.Column(db.Text, nullable=False)
     is_default = db.Column(db.Boolean, default=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("resume_versions", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
@@ -415,7 +510,7 @@ class CoverDoc(db.Model):
     tone = db.Column(db.String(20), default="professional", nullable=False)
     content = db.Column(db.Text, nullable=False)
     ai_powered = db.Column(db.Boolean, default=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("cover_docs", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
@@ -427,7 +522,7 @@ class LinkedInReport(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
     score = db.Column(db.Float)
     report_json = db.Column(db.JSON)  # full grading report payload
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("linkedin_reports", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -457,9 +552,9 @@ class JobApplication(db.Model):
     applied_date = db.Column(db.Date)
     resume_version_id = db.Column(db.Integer, db.ForeignKey("resume_version.id"),
                                  nullable=True, index=True)  # which version was sent
-    stage_updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    stage_updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                                  nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("job_applications", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -485,9 +580,9 @@ class Retrospective(db.Model):
     stage_reached = db.Column(db.String(20))  # step 1: pipeline stage reached
     completed = db.Column(db.Boolean, nullable=False, default=False)
     completed_at = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     application = db.relationship("JobApplication",
                                   backref=db.backref("retrospective", uselist=False,
@@ -513,9 +608,9 @@ class Experiment(db.Model):
     result = db.Column(db.Text)                       # logged when done
     status = db.Column(db.String(20), nullable=False, default="planned", index=True)
     linked_application_id = db.Column(db.Integer, db.ForeignKey("job_application.id"))
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("experiments", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -530,7 +625,7 @@ class CareerAssessment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
     top_clusters = db.Column(db.JSON)  # ranked cluster results
     answers_json = db.Column(db.JSON)  # {question_id: option_index}
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("career_assessments", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -547,7 +642,7 @@ class InterviewSession(db.Model):
     answers_json = db.Column(db.JSON)    # [{question_id, answer, scoring, feedback}]
     total_score = db.Column(db.Float)
     ai_powered = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("interview_sessions", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -559,7 +654,7 @@ class CommunicationAnalysis(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
     clarity_score = db.Column(db.Float)
     analysis_json = db.Column(db.JSON)  # full analysis payload
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("communication_analyses", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -573,9 +668,9 @@ class DSAProgress(db.Model):
     status = db.Column(db.String(20), default="attempted", nullable=False)  # attempted|solved|stuck
     hints_used = db.Column(db.Integer, default=0, nullable=False)
     code = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     __table_args__ = (db.UniqueConstraint("user_id", "problem_id", name="uq_dsa_user_problem"),)
 
@@ -597,7 +692,7 @@ class AptitudeAttempt(db.Model):
     expired = db.Column(db.Boolean, default=False, nullable=False)
     started_at = db.Column(db.DateTime, nullable=False)  # server timestamp
     submitted_at = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("aptitude_attempts", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -615,9 +710,9 @@ class STARDraft(db.Model):
     scores_json = db.Column(db.JSON)       # per-section + overall scores
     suggestions_json = db.Column(db.JSON)  # rewrite suggestions
     ai_powered = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("star_drafts", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -630,9 +725,9 @@ class RoadmapProgress(db.Model):
     skill_id = db.Column(db.String(50), nullable=False, index=True)
     stage = db.Column(db.String(20), nullable=False)  # beginner|intermediate|advanced
     status = db.Column(db.String(20), default="not_started", nullable=False)  # not_started|in_progress|completed
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     __table_args__ = (db.UniqueConstraint("user_id", "skill_id", "stage",
                                           name="uq_roadmap_user_skill_stage"),)
@@ -657,7 +752,7 @@ class QuizAttempt(db.Model):
     summary_json = db.Column(db.JSON)     # score + topic/difficulty analytics
     started_at = db.Column(db.DateTime, nullable=False)  # server timestamp
     submitted_at = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("quiz_attempts", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -670,7 +765,7 @@ class CertPlan(db.Model):
     cert_id = db.Column(db.String(50), nullable=False, index=True)
     weeks = db.Column(db.Integer, nullable=False)
     plan_json = db.Column(db.JSON)  # week-by-week plan
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("cert_plans", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -688,7 +783,7 @@ class StudyDoc(db.Model):
     num_chunks = db.Column(db.Integer, default=0)
     char_count = db.Column(db.Integer, default=0)
     data = db.Column(db.JSON)  # {"chunks": [{"page":1,"index":0,"text":"...","heading":...}], "truncated": bool}
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("study_docs", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -702,7 +797,7 @@ class StudyQuestion(db.Model):
     question = db.Column(db.Text, nullable=False)
     answer = db.Column(db.Text)
     citations = db.Column(db.JSON)  # [{"doc": title, "page": n, "chunk": i, "excerpt": str}]
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("study_questions", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -726,7 +821,7 @@ class PaperImport(db.Model):
     source = db.Column(db.String(20))  # arxiv | openalex
     fetched_at = db.Column(db.String(32))  # UTC ISO provenance timestamp
     data = db.Column(db.JSON)  # {"graph": {...}} cached citation graph
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("paper_imports", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -741,7 +836,7 @@ class LitReview(db.Model):
     data = db.Column(db.JSON)  # {"per_paper": [...], "themes": [...],
                                #  "claims_table": [...], "coverage_gaps": str,
                                #  "bibtex": str}
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("lit_reviews", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -754,7 +849,7 @@ class GapReport(db.Model):
     doc_ids = db.Column(db.JSON)  # [study_doc ids] analyzed
     data = db.Column(db.JSON)  # {"gaps": [{"title","type","evidence":[...],
                                #  "suggested_questions":[]}], "next_papers": [...]}
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("gap_reports", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -769,7 +864,7 @@ class FlashcardSet(db.Model):
     data = db.Column(db.JSON)  # {"cards": [{"id","kind","question","answer",
                                #  "options":[],"chunk":i,"page":n,"doc_title":""}],
                                #  "progress": {card_id: {"known": bool, "reviews": int}}}
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("flashcard_sets", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -785,7 +880,7 @@ class PaperQuizAttempt(db.Model):
     score = db.Column(db.Integer, default=0)
     total = db.Column(db.Integer, default=0)
     data = db.Column(db.JSON)  # {"answers": {card_id: chosen_idx}, "details": [...]}
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("paper_quiz_attempts", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -797,9 +892,9 @@ class ResearchSession(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
     title = db.Column(db.String(255))
     data = db.Column(db.JSON)  # {"messages": [{"role":..., "content":...}], "doc_hash": ...}
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("research_sessions", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -812,7 +907,7 @@ class Goal(db.Model):
     title = db.Column(db.String(255), nullable=False)
     target_date = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(20), default="active", nullable=False)  # active | done
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("goals", lazy="dynamic",
                                                      cascade="all, delete-orphan"))
@@ -824,7 +919,7 @@ class OpportunityBookmark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
     opp_id = db.Column(db.String(64), nullable=False, index=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     __table_args__ = (db.UniqueConstraint("user_id", "opp_id",
                                          name="uq_bookmark_user_opp"),)
@@ -848,9 +943,9 @@ class Portfolio(db.Model):
     show_github = db.Column(db.Boolean, default=False, nullable=False)
     show_leetcode = db.Column(db.Boolean, default=False, nullable=False)
     is_published = db.Column(db.Boolean, default=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("portfolio", uselist=False,
                                                       cascade="all, delete-orphan"))
@@ -885,7 +980,7 @@ class PeerRoom(db.Model):
     drawn_ids = db.Column(db.JSON)
     round_no = db.Column(db.Integer, nullable=False, default=0)
     proposed_slots = db.Column(db.JSON)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     host = db.relationship("User", foreign_keys=[host_id])
@@ -908,7 +1003,7 @@ class PeerAnswer(db.Model):
     question_id = db.Column(db.String(20), nullable=False)
     question_text = db.Column(db.Text)
     answer_text = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     room = db.relationship("PeerRoom", backref=db.backref(
@@ -939,7 +1034,7 @@ class PeerFeedback(db.Model):
     relevance = db.Column(db.Integer, nullable=False)
     confidence = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     room = db.relationship("PeerRoom", backref=db.backref(
@@ -963,7 +1058,7 @@ class PeerBlock(db.Model):
     blocked_id = db.Column(db.Integer, db.ForeignKey("user.id"),
                           nullable=False, index=True)
     reason = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
 
@@ -990,7 +1085,7 @@ class Mentor(db.Model):
     is_seed = db.Column(db.Boolean, nullable=False, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True,
                         index=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     user = db.relationship("User", foreign_keys=[user_id])
@@ -1013,7 +1108,7 @@ class MentorApplication(db.Model):
     linkedin_url = db.Column(db.String(300))
     status = db.Column(db.String(20), nullable=False, default="pending",
                        index=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     user = db.relationship("User", foreign_keys=[user_id])
@@ -1033,7 +1128,7 @@ class OfficeHour(db.Model):
     duration_min = db.Column(db.Integer, nullable=False, default=45)
     capacity = db.Column(db.Integer, nullable=False, default=12)
     status = db.Column(db.String(20), nullable=False, default="open", index=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     mentor = db.relationship("Mentor",
@@ -1056,7 +1151,7 @@ class OHBooking(db.Model):
                                nullable=False, index=True)
     question_text = db.Column(db.Text)
     status = db.Column(db.String(20), nullable=False, default="booked", index=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     user = db.relationship("User", foreign_keys=[user_id])
@@ -1076,7 +1171,7 @@ class OHNote(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
                         index=True)
     note_text = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     booking = db.relationship("OHBooking",
@@ -1098,7 +1193,7 @@ class OHFeedback(db.Model):
                         index=True)
     rating = db.Column(db.Integer, nullable=False)
     what_helped = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
     booking = db.relationship("OHBooking",
@@ -1121,7 +1216,7 @@ class OHReport(db.Model):
     reason = db.Column(db.String(40), nullable=False)
     details = db.Column(db.Text)
     status = db.Column(db.String(20), nullable=False, default="open", index=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
                            nullable=False)
 
 
@@ -1135,7 +1230,7 @@ class AnonymousAnalysis(db.Model):
     id = db.Column(db.String(36), primary_key=True)  # uuid4 hex
     filename = db.Column(db.String(255))
     result_json = db.Column(db.JSON)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False, index=True)
 
 
@@ -1153,7 +1248,7 @@ class ProfileSnapshot(db.Model):
     provider = db.Column(db.String(20), nullable=False)  # "github" | "leetcode"
     username = db.Column(db.String(80), nullable=False)
     data = db.Column(db.JSON)
-    fetched_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    fetched_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("profile_snapshots", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -1178,7 +1273,7 @@ class XPLedger(db.Model):
     event_type = db.Column(db.String(40), nullable=False, index=True)
     xp = db.Column(db.Integer, nullable=False, default=0)
     dedupe_key = db.Column(db.String(120), nullable=False, unique=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("xp_ledger", lazy="dynamic",
                                                       cascade="all, delete-orphan"))
@@ -1216,7 +1311,7 @@ class LeagueMember(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
                         unique=True, index=True)
     league_key = db.Column(db.String(16), nullable=False, index=True)
-    joined_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    joined_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
     opted_out = db.Column(db.Boolean, default=False, nullable=False)
 
     user = db.relationship("User", backref=db.backref("league_member", uselist=False,
@@ -1274,9 +1369,9 @@ class WeeklyReflection(db.Model):
     week_start = db.Column(db.Date, nullable=False)
     wins = db.Column(db.Text)
     focus_next = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     __table_args__ = (db.UniqueConstraint("user_id", "week_start",
                                           name="uq_weekly_reflection"),)
@@ -1294,8 +1389,8 @@ class MomentumSettings(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
                         unique=True, index=True)
     momentum_opt_out = db.Column(db.Boolean, default=False, nullable=False)
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           onupdate=lambda: datetime.now(UTC), nullable=False)
 
     user = db.relationship("User", backref=db.backref("momentum_settings", uselist=False,
                                                       cascade="all, delete-orphan"))
@@ -1318,7 +1413,7 @@ class HealthReview(db.Model):
     dimensions_json = db.Column(db.JSON)  # per-dimension payloads (see docstring)
     narrative = db.Column(db.Text)         # 2-3 plain sentences, no jargon
     next_action = db.Column(db.Text)      # single smallest high-leverage action
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     __table_args__ = (db.UniqueConstraint("user_id", "month_key",
                                           name="uq_health_review_user_month"),)
@@ -1329,7 +1424,7 @@ class HealthReview(db.Model):
 
 def _utcnow_naive():
     """UTC now without tzinfo (SQLite returns naive datetimes)."""
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 def _purge_expired_anonymous():
@@ -1861,7 +1956,7 @@ def _ensure_schema():
     if missing or not have_index:
         with db.engine.begin() as conn:
             for col, ddl in missing:
-                conn.execute(text('ALTER TABLE "user" ADD COLUMN {} {}'.format(col, ddl)))
+                conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col} {ddl}'))
                 log.info("Schema evolution: added user.%s", col)
             conn.execute(text(
                 'CREATE UNIQUE INDEX IF NOT EXISTS ix_user_google_sub ON "user" (google_sub)'))
@@ -1954,7 +2049,7 @@ def _fresh_snapshot(user_id, provider, max_age_seconds=_SNAPSHOT_TTL_SECONDS):
     row = ProfileSnapshot.query.filter_by(user_id=user_id, provider=provider).first()
     if not row or not row.fetched_at:
         return None
-    age = (datetime.now(timezone.utc).replace(tzinfo=None)
+    age = (datetime.now(UTC).replace(tzinfo=None)
            - row.fetched_at.replace(tzinfo=None)).total_seconds()
     return row if age < max_age_seconds else None
 
@@ -1966,7 +2061,7 @@ def _store_snapshot(user_id, provider, username, data):
     if row:
         row.username = username
         row.data = payload
-        row.fetched_at = datetime.now(timezone.utc)
+        row.fetched_at = datetime.now(UTC)
     else:
         row = ProfileSnapshot(user_id=user_id, provider=provider,
                               username=username, data=payload)
@@ -2196,7 +2291,7 @@ def _linkedin_suggestions(report, fields):
         "fix must reference the actual profile text above - no generic advice."
     ).format(
         report.get("score"),
-        ", ".join("{} ({})".format(k, v) for k, v in weakest) or "none",
+        ", ".join(f"{k} ({v})" for k, v in weakest) or "none",
         (fields.get("headline") or "")[:600],
         (fields.get("about") or "")[:1500],
         (fields.get("experience") or "")[:2000],
@@ -2234,9 +2329,9 @@ def _interview_feedback(scored_answers, questions):
     LLM; a Gemini outage degrades the wording only.
     """
     fallback = [generate_rule_based_feedback(s, q)
-                for s, q in zip(scored_answers, questions)]
+                for s, q in zip(scored_answers, questions, strict=False)]
     compact = []
-    for s, q in zip(scored_answers, questions):
+    for s, q in zip(scored_answers, questions, strict=False):
         compact.append({
             "q": (q.get("question") or "")[:300],
             "key_points": (q.get("key_points") or [])[:4],
@@ -2514,7 +2609,7 @@ def register_routes(app):
                 db.session.commit()
                 _rotate_session_on_login()
                 login_user(user)
-                flash('Welcome, {}! Your account is ready.'.format(user.name), 'success')
+                flash(f'Welcome, {user.name}! Your account is ready.', 'success')
                 return redirect(url_for('dashboard'))
         return render_template('register.html', error=error,
                                google_configured=_google_configured())
@@ -2531,7 +2626,7 @@ def register_routes(app):
             if user and user.check_password(password):
                 _rotate_session_on_login()
                 login_user(user, remember=bool(request.form.get('remember')))
-                flash('Welcome back, {}!'.format(user.name), 'success')
+                flash(f'Welcome back, {user.name}!', 'success')
                 nxt = request.args.get('next') or request.form.get('next')
                 return redirect(nxt if is_safe_next(nxt) else url_for('dashboard'))
             error = 'Invalid email or password.'
@@ -2588,7 +2683,7 @@ def register_routes(app):
             _rotate_session_on_login()
             login_user(user, remember=True)
             flash('Welcome{}!'.format(
-                ', {}'.format(user.name) if is_new else ' back, {}'.format(user.name)),
+                f', {user.name}' if is_new else f' back, {user.name}'),
                 'success')
             nxt = session.pop('google_next', None)
             return redirect(nxt if is_safe_next(nxt) else url_for('dashboard'))
@@ -2625,7 +2720,7 @@ def register_routes(app):
         if fresh and (fresh.username or '').lower() == username.lower():
             current_user.github_username = fresh.username
             db.session.commit()
-            flash('GitHub reconnected: @{}'.format(fresh.username), 'success')
+            flash(f'GitHub reconnected: @{fresh.username}', 'success')
             return redirect(url_for('profile'))
         try:
             result = analyze_github_profile(username)
@@ -2663,7 +2758,7 @@ def register_routes(app):
         if fresh and (fresh.username or '').lower() == username.lower():
             current_user.leetcode_username = fresh.username
             db.session.commit()
-            flash('LeetCode reconnected: {}'.format(fresh.username), 'success')
+            flash(f'LeetCode reconnected: {fresh.username}', 'success')
             return redirect(url_for('profile'))
         try:
             stats = fetch_leetcode_stats(username)
@@ -2733,7 +2828,7 @@ def register_routes(app):
             return jsonify({'error': 'Invalid file type. Please upload PDF or DOCX.'}), 400
 
         # P2#13: uuid prefix prevents filename collisions between uploads.
-        filename = "{}_{}".format(uuid.uuid4().hex[:8], secure_filename(file.filename))
+        filename = f"{uuid.uuid4().hex[:8]}_{secure_filename(file.filename)}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
         try:
@@ -2811,7 +2906,7 @@ def register_routes(app):
                 # Wave 5 #27: a completed resume analysis earns XP (logged-in only).
                 _momentum_hook(current_user.id, 'resume_analyzed')
                 return jsonify({'success': True,
-                                'redirect': url_for('view_result', analysis_id='db-{}'.format(row.id))})
+                                'redirect': url_for('view_result', analysis_id=f'db-{row.id}')})
 
             analysis_id = uuid.uuid4().hex
             anon = AnonymousAnalysis(
@@ -2863,12 +2958,12 @@ def register_routes(app):
             return jsonify({'error': 'Please paste a job description first.'}), 400
         if len(jd_text) < JD_MIN_CHARS:
             return jsonify({'error': 'The job description looks too short '
-                                     '(minimum {} characters). Please paste the full posting.'
-                                     .format(JD_MIN_CHARS)}), 400
+                                     f'(minimum {JD_MIN_CHARS} characters). Please paste the full posting.'
+                                     }), 400
         if len(jd_text) > JD_MAX_CHARS:
             return jsonify({'error': 'The job description is too long '
-                                     '(maximum {:,} characters). Please trim it and try again.'
-                                     .format(JD_MAX_CHARS)}), 400
+                                     f'(maximum {JD_MAX_CHARS:,} characters). Please trim it and try again.'
+                                     }), 400
 
         # --- Resolve resume text ---
         resume_text = None
@@ -2908,7 +3003,7 @@ def register_routes(app):
                     return jsonify({'error': 'No file selected.'}), 400
                 if not allowed_file(file.filename):
                     return jsonify({'error': 'Invalid file type. Please upload PDF or DOCX.'}), 400
-                filename = "{}_{}".format(uuid.uuid4().hex[:8], secure_filename(file.filename))
+                filename = f"{uuid.uuid4().hex[:8]}_{secure_filename(file.filename)}"
                 uploaded_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(uploaded_path)
                 ext = filename.rsplit('.', 1)[1].lower()
@@ -3492,7 +3587,7 @@ def register_routes(app):
         in_pipeline = counts['applied'] + counts['oa'] + counts['interview'] + counts['offer'] + counts['rejected']
         responded = counts['oa'] + counts['interview'] + counts['offer']
         response_rate = round(100.0 * responded / in_pipeline, 1) if in_pipeline else 0.0
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         dwell = {}
         for sid, _ in TRACKER_STAGES:
             days = []
@@ -3501,7 +3596,7 @@ def register_routes(app):
                     continue
                 ts = a.stage_updated_at
                 if ts.tzinfo is None:
-                    ts = ts.replace(tzinfo=timezone.utc)
+                    ts = ts.replace(tzinfo=UTC)
                 days.append(max(0.0, (now - ts).total_seconds() / 86400.0))
             dwell[sid] = round(sum(days) / len(days), 1) if days else 0.0
         return {'counts': counts, 'total': len(apps),
@@ -3553,7 +3648,7 @@ def register_routes(app):
             return jsonify({'error': 'Invalid stage.'}), 400
         if app_row.stage != stage:
             app_row.stage = stage
-            app_row.stage_updated_at = datetime.now(timezone.utc)
+            app_row.stage_updated_at = datetime.now(UTC)
             db.session.commit()
         return jsonify({'success': True, 'application': _tracker_app_to_dict(app_row)})
 
@@ -3744,7 +3839,7 @@ def register_routes(app):
         if not scored:
             return jsonify({'error': 'No answers matched this session\u2019s questions.'}), 400
         feedback, ai_powered = _interview_feedback(scored, [qmap[s["question_id"]] for s in scored])
-        for s, fb in zip(scored, feedback):
+        for s, fb in zip(scored, feedback, strict=False):
             s["feedback"] = fb
         total = round(sum(s["total"] for s in scored) / len(scored), 1)
         try:
@@ -3993,7 +4088,7 @@ def register_routes(app):
                 num_questions=len(questions),
                 time_limit_sec=cleaned["time_limit"],
                 question_ids=[q["id"] for q in questions],
-                started_at=datetime.now(timezone.utc),
+                started_at=datetime.now(UTC),
             )
             db.session.add(row)
             db.session.commit()
@@ -4032,10 +4127,10 @@ def register_routes(app):
                     continue
                 if 0 <= idx <= 3:
                     answers[qid] = idx
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         started = row.started_at
         if started.tzinfo is None:
-            started = started.replace(tzinfo=timezone.utc)
+            started = started.replace(tzinfo=UTC)
         elapsed = (now - started).total_seconds()
         expired = elapsed > (row.time_limit_sec + SUBMIT_GRACE_SEC)
         results, summary = score_attempt(row.question_ids or [], answers)
@@ -4303,9 +4398,9 @@ def register_routes(app):
             f"{g['skill_name']} to {g['min_stage']} (priority {g['priority']})"
             for g in gaps[:6])
         fallback_tip = (
-            f"Start with your highest-priority gap and finish one stage "
-            f"before moving on. Consistency beats intensity — 1 focused hour "
-            f"daily compounds fast.")
+            "Start with your highest-priority gap and finish one stage "
+            "before moving on. Consistency beats intensity — 1 focused hour "
+            "daily compounds fast.")
         # SEC-12: the AI tip burns LLM quota — only for logged-in users;
         # anonymous callers get the deterministic fallback.
         if current_user.is_authenticated:
@@ -4409,7 +4504,7 @@ def register_routes(app):
                 timed=cleaned["timed"], time_limit_sec=cleaned["time_limit_sec"],
                 question_ids=[q["id"] for q in questions],
                 checks_json=[],
-                started_at=datetime.now(timezone.utc))
+                started_at=datetime.now(UTC))
             db.session.add(row)
             db.session.commit()
         except Exception:
@@ -4443,8 +4538,8 @@ def register_routes(app):
         if not question:
             return jsonify({'error': 'Unknown question.'}), 400
         if row.timed and row.time_limit_sec:
-            elapsed = (datetime.now(timezone.utc) -
-                       row.started_at.replace(tzinfo=timezone.utc)).total_seconds()
+            elapsed = (datetime.now(UTC) -
+                       row.started_at.replace(tzinfo=UTC)).total_seconds()
             if elapsed > row.time_limit_sec + SUBMIT_GRACE_SEC:
                 return jsonify({'error': 'Time is up for this quiz.'}), 400
         raw_answer = payload.get("answer")
@@ -4491,8 +4586,8 @@ def register_routes(app):
             return jsonify({'error': 'This quiz has no questions.'}), 400
         expired = False
         if row.timed and row.time_limit_sec:
-            elapsed = (datetime.now(timezone.utc) -
-                       row.started_at.replace(tzinfo=timezone.utc)).total_seconds()
+            elapsed = (datetime.now(UTC) -
+                       row.started_at.replace(tzinfo=UTC)).total_seconds()
             if elapsed > row.time_limit_sec + SUBMIT_GRACE_SEC:
                 expired = True
         results, summary = grade_quiz(questions, answers)
@@ -4503,7 +4598,7 @@ def register_routes(app):
             row.answers_json = json_safe({str(k): v for k, v in answers.items()})
             row.results_json = json_safe(results)
             row.summary_json = json_safe(summary)
-            row.submitted_at = datetime.now(timezone.utc)
+            row.submitted_at = datetime.now(UTC)
             db.session.commit()
         except Exception:
             log.exception("Quiz submit save failed")
@@ -4925,7 +5020,7 @@ def register_routes(app):
         row.show_github = data["show_github"]
         row.show_leetcode = data["show_leetcode"]
         row.is_published = data["is_published"]
-        row.updated_at = datetime.now(timezone.utc)
+        row.updated_at = datetime.now(UTC)
         db.session.commit()
         return jsonify({'success': True, 'slug': row.slug,
                         'is_published': row.is_published,
@@ -5034,7 +5129,7 @@ def register_routes(app):
         ok, err = pdfqa_validate_upload(file)
         if not ok:
             return jsonify({'error': err}), 400
-        filename = "{}_{}".format(uuid.uuid4().hex[:8], secure_filename(file.filename))
+        filename = f"{uuid.uuid4().hex[:8]}_{secure_filename(file.filename)}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         try:
             file.save(filepath)
@@ -5277,7 +5372,7 @@ def register_routes(app):
             return jsonify({'error': 'Invalid PDF URL.'}), 400
         arxiv_id = (payload.get('arxiv_id') or '').strip()
         doi = (payload.get('doi') or '').strip()
-        filename = "{}.pdf".format(uuid.uuid4().hex)
+        filename = f"{uuid.uuid4().hex}.pdf"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         try:
             downloaded = arxiv_download_pdf(pdf_url, filepath)
@@ -5285,7 +5380,7 @@ def register_routes(app):
                 # OpenAlex sometimes points at mirrors that block direct
                 # download; arXiv's own PDF URL is deterministic — try it.
                 downloaded = arxiv_download_pdf(
-                    "https://arxiv.org/pdf/{}".format(arxiv_id), filepath)
+                    f"https://arxiv.org/pdf/{arxiv_id}", filepath)
             if not downloaded:
                 return jsonify({'error': 'Could not download the PDF.'}), 502
             pages = pdfqa_parse_pages(filepath)
@@ -6069,7 +6164,7 @@ def register_routes(app):
                 db.session.add(retro)
             first = not retro.completed
             retro.completed = True
-            retro.completed_at = datetime.now(timezone.utc)
+            retro.completed_at = datetime.now(UTC)
             db.session.commit()
         except Exception:
             log.exception("Retrospective completion failed")
@@ -6352,7 +6447,7 @@ def register_routes(app):
             return _peer_api_error('You cannot join this room.', 403)
         try:
             room.guest_id = me
-            now_naive = datetime.now(timezone.utc).replace(tzinfo=None)
+            now_naive = datetime.now(UTC).replace(tzinfo=None)
             if room.scheduled_at and room.scheduled_at > now_naive:
                 room.status = 'waiting'
             else:
@@ -6671,7 +6766,7 @@ def register_routes(app):
                                    400)
         try:
             room.scheduled_at = slot
-            if slot > datetime.now(timezone.utc).replace(tzinfo=None):
+            if slot > datetime.now(UTC).replace(tzinfo=None):
                 room.status = 'waiting'
             else:
                 room.status = 'in_progress'
@@ -6798,14 +6893,14 @@ def register_routes(app):
             history_block = ("\nCONVERSATION SO FAR (for context):\n" + "\n".join(history_lines)
                              if history_lines else "")
 
-            prompt = """
+            prompt = f"""
             You are a PhD-level Research Assistant. You are grounded 100% in the following document text.
-            {history}
+            {history_block}
             DOCUMENT TEXT:
-            {doc}
+            {doc_text[:15000]}
 
             USER QUESTION:
-            {q}
+            {user_msg}
 
             INSTRUCTIONS:
             1. Answer with professional depth and technical precision.
@@ -6814,7 +6909,7 @@ def register_routes(app):
             4. If the answer is directly in the text, cite the context professionally.
             5. If the answer is not present, state so clearly in a formal manner.
             6. Use the conversation history above to resolve follow-up references like "it", "that section", or "the second point".
-            """.format(history=history_block, doc=doc_text[:15000], q=user_msg)
+            """
 
             try:
                 response_text = call_gemini_ai(prompt)
@@ -6874,7 +6969,7 @@ def register_routes(app):
                 return jsonify({'error': str(e)}), 502
 
             lang_lines = "\n".join(
-                "- {}: {}%".format(lang, pct)
+                f"- {lang}: {pct}%"
                 for lang, pct in repo_data["top_languages"]) or "- Unknown"
             prompt = (
                 "Generate a strictly professional IEEE Research Paper draft based on the REAL "
@@ -7079,7 +7174,7 @@ def register_routes(app):
     def _oh_to_dict(oh):
         scheduled = oh.scheduled_at
         if scheduled is not None and scheduled.tzinfo is None:
-            scheduled = scheduled.replace(tzinfo=timezone.utc)
+            scheduled = scheduled.replace(tzinfo=UTC)
         return {
             'id': oh.id,
             'mentor_id': oh.mentor_id,
@@ -7122,7 +7217,7 @@ def register_routes(app):
             mentors = mentors_q.limit(60).all()
             upcoming = (OfficeHour.query
                         .filter(OfficeHour.status.in_(('open', 'full')),
-                                OfficeHour.scheduled_at >= datetime.now(timezone.utc))
+                                OfficeHour.scheduled_at >= datetime.now(UTC))
                         .order_by(OfficeHour.scheduled_at.asc())
                         .limit(40).all())
             my_bookings = (OHBooking.query
@@ -7155,7 +7250,7 @@ def register_routes(app):
             upcoming = (OfficeHour.query
                         .filter_by(mentor_id=mentor.id)
                         .filter(OfficeHour.status.in_(('open', 'full')),
-                                OfficeHour.scheduled_at >= datetime.now(timezone.utc))
+                                OfficeHour.scheduled_at >= datetime.now(UTC))
                         .order_by(OfficeHour.scheduled_at.asc())
                         .limit(20).all())
             past = (OfficeHour.query
@@ -7372,7 +7467,7 @@ def register_routes(app):
             for b in rows:
                 sched = b.session.scheduled_at
                 if sched is not None and sched.tzinfo is None:
-                    sched = sched.replace(tzinfo=timezone.utc)
+                    sched = sched.replace(tzinfo=UTC)
                 items.append({
                     'id': b.id,
                     'topic': b.session.topic,
@@ -7554,11 +7649,11 @@ def register_routes(app):
         raw_when = (payload.get('scheduled_at') or '').strip()
         try:
             scheduled = datetime.strptime(raw_when, "%Y-%m-%d %H:%M")
-            scheduled = scheduled.replace(tzinfo=timezone.utc)
+            scheduled = scheduled.replace(tzinfo=UTC)
         except ValueError:
             return _mentor_api_error('scheduled_at must look like '
                                      '"YYYY-MM-DD HH:MM" (UTC).', 400)
-        if scheduled <= datetime.now(timezone.utc):
+        if scheduled <= datetime.now(UTC):
             return _mentor_api_error('scheduled_at must be in the future.',
                                      400)
         try:

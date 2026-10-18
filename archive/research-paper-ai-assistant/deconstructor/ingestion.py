@@ -1,9 +1,5 @@
-import os
-import tempfile
-from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from shared.embeddings import get_embeddings
 
 CHROMA_DIR = "./data/chroma"
 

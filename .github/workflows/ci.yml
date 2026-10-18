@@ -1,0 +1,79 @@
+# TEST-01: Continuous Integration — runs on every push and PR.
+# Jobs: lint (Ruff) | test (pytest, SQLite + Postgres 16) | security (Bandit, pip-audit)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  OPP_NO_AUTO_REFRESH: "1"
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  lint:
+    name: Ruff lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install ruff==0.9.4
+      - run: ruff check .
+      # NOTE: ruff format is intentionally not gated yet — 187 legacy files
+      # would be reformatted. ARC-07 ratchets formatting per-module.
+
+  test-sqlite:
+    name: pytest (SQLite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt pytest pytest-xdist
+      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
+
+  test-postgres:
+    name: pytest (Postgres 16)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sb
+          POSTGRES_PASSWORD: sb
+          POSTGRES_DB: sb_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://sb:sb@localhost:5432/sb_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt pytest pytest-xdist psycopg2-binary
+      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
+
+  security:
+    name: Bandit + pip-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt bandit pip-audit
+      - run: bandit -q -r unified_app.py studybuddy/ -x tests
+      - run: pip-audit --desc

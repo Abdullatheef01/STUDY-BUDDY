@@ -1,15 +1,19 @@
 """Feature 28 ultimate: harsh tests for pairing, rubrics, recurring slots."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.peer_mocks import (
-    match_partners, mock_rubric, score_rubric, recurring_slot,
+    match_partners,
+    mock_rubric,
+    recurring_slot,
+    score_rubric,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

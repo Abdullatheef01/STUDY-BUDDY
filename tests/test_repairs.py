@@ -7,8 +7,13 @@ from types import SimpleNamespace
 import pytest
 
 import unified_app
-from unified_app import (create_app, db, GeminiError, _parse_json_safely,
-                         _gemini_api_key, _discover_model_names, _MODEL_CACHE)
+from unified_app import (
+    _MODEL_CACHE,
+    GeminiError,
+    _gemini_api_key,
+    _parse_json_safely,
+    create_app,
+)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 JS = (REPO_ROOT / "static" / "js" / "research_app.js").read_text()

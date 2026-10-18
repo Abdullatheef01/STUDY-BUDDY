@@ -28,7 +28,7 @@ same dedupe keys, so it is timezone-safe on both SQLite and Postgres.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 log = logging.getLogger(__name__)
 
@@ -112,12 +112,12 @@ def _coerce_now(now):
     """Normalize the optional ``now`` override to an aware UTC datetime."""
     try:
         if now is None:
-            return datetime.now(timezone.utc)
+            return datetime.now(UTC)
         if isinstance(now, datetime):
-            return now if now.tzinfo else now.replace(tzinfo=timezone.utc)
-        return datetime.now(timezone.utc)
+            return now if now.tzinfo else now.replace(tzinfo=UTC)
+        return datetime.now(UTC)
     except Exception:
-        return datetime.now(timezone.utc)
+        return datetime.now(UTC)
 
 
 def week_start_date(now=None):
@@ -126,7 +126,7 @@ def week_start_date(now=None):
         d = _coerce_now(now).date()
         return d - timedelta(days=d.weekday())
     except Exception:
-        d = datetime.now(timezone.utc).date()
+        d = datetime.now(UTC).date()
         return d - timedelta(days=d.weekday())
 
 
@@ -136,7 +136,7 @@ def iso_week_key(now=None):
         iso = _coerce_now(now).isocalendar()
         return "%d-W%02d" % (iso[0], iso[1])
     except Exception:
-        iso = datetime.now(timezone.utc).isocalendar()
+        iso = datetime.now(UTC).isocalendar()
         return "%d-W%02d" % (iso[0], iso[1])
 
 
@@ -145,7 +145,7 @@ def month_key(now=None):
     try:
         d = _coerce_now(now).date()
     except Exception:
-        d = datetime.now(timezone.utc).date()
+        d = datetime.now(UTC).date()
     return "%04d-%02d" % (d.year, d.month)
 
 
@@ -277,9 +277,17 @@ def _week_dedupe_keys(user_id, event_types, week_start):
 # ---------------------------------------------------------------------------
 
 def _models():
-    from unified_app import (db, XPLedger, StreakState, LeagueMember,
-                             LeagueResult, QuestProgress, WeeklyReflection,
-                             MomentumSettings, User)
+    from unified_app import (
+        LeagueMember,
+        LeagueResult,
+        MomentumSettings,
+        QuestProgress,
+        StreakState,
+        User,
+        WeeklyReflection,
+        XPLedger,
+        db,
+    )
     return (db, XPLedger, StreakState, LeagueMember, LeagueResult,
             QuestProgress, WeeklyReflection, MomentumSettings, User)
 
@@ -942,7 +950,7 @@ def _build_summary(user_id, now):
 # 27.1 Streak freeze | 27.2 Squad challenges | 27.3 Reward unlocks
 
 import re as _re20
-from datetime import date as _date20, timedelta as _td20
+from datetime import date as _date20
 
 
 def _clean20(text):
@@ -976,7 +984,7 @@ def streak_freeze_status(last_active, freezes_used_week, week_start=None, today=
                         "Freeze would save your streak today — take the rest day."
                         if would_apply else
                         "Freeze used this week — stay active to keep the streak.")}
-    
+
 
 def squad_leaderboard(members, week_key=None):
     """Weekly XP competition between friends.

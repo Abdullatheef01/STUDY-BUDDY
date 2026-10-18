@@ -97,12 +97,12 @@ def generate_roadmap(skill_gaps, resume_skills):
     """
     roadmap = []
     order = 1
-    
+
     # Process critical gaps first
     for gap in skill_gaps.get('critical', []):
         skill = gap['skill']
         resources = LEARNING_RESOURCES.get(skill, DEFAULT_RESOURCES)
-        
+
         roadmap.append({
             'order': order,
             'skill': skill,
@@ -114,12 +114,12 @@ def generate_roadmap(skill_gaps, resume_skills):
             'related_jobs': gap['related_jobs']
         })
         order += 1
-    
+
     # Then important gaps
     for gap in skill_gaps.get('important', []):
         skill = gap['skill']
         resources = LEARNING_RESOURCES.get(skill, DEFAULT_RESOURCES)
-        
+
         roadmap.append({
             'order': order,
             'skill': skill,
@@ -131,12 +131,12 @@ def generate_roadmap(skill_gaps, resume_skills):
             'related_jobs': gap['related_jobs']
         })
         order += 1
-    
+
     # Nice to have (limit to top 3)
     for gap in skill_gaps.get('nice_to_have', [])[:3]:
         skill = gap['skill']
         resources = LEARNING_RESOURCES.get(skill, DEFAULT_RESOURCES)
-        
+
         roadmap.append({
             'order': order,
             'skill': skill,
@@ -148,7 +148,7 @@ def generate_roadmap(skill_gaps, resume_skills):
             'related_jobs': gap['related_jobs']
         })
         order += 1
-    
+
     return roadmap
 
 
@@ -156,7 +156,7 @@ def estimate_total_time(roadmap):
     """Estimate total learning time for the roadmap."""
     if not roadmap:
         return "0 weeks"
-    
+
     total_weeks = 0
     for item in roadmap:
         time_str = item.get('estimated_time', '2-4 weeks')
@@ -166,7 +166,7 @@ def estimate_total_time(roadmap):
         if nums:
             avg = sum(int(n) for n in nums) / len(nums)
             total_weeks += avg
-    
+
     if total_weeks <= 4:
         return f"~{int(total_weeks)} weeks"
     else:

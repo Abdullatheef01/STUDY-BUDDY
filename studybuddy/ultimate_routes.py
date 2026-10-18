@@ -14,7 +14,7 @@ import importlib
 import json
 from datetime import date, datetime
 
-from flask import jsonify, request, render_template
+from flask import jsonify, render_template, request
 from flask_login import current_user, login_required
 
 from studybuddy.ultimate_reg_a import TOOLS_A

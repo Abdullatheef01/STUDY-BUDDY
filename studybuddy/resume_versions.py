@@ -105,7 +105,7 @@ def tailor_resume_for_jd(resume_text, jd_text, version_name=None):
     - Reorders experience bullets so keyword-rich ones come first.
     - Returns {tailored_text, changes_made, missing_still}.
     """
-    from studybuddy.jd_matcher import score_jd_match, extract_jd_keywords
+    from studybuddy.jd_matcher import extract_jd_keywords, score_jd_match
     resume = _clean(resume_text)
     jd = _clean(jd_text)
     if not resume:

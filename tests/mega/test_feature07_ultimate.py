@@ -1,13 +1,14 @@
 """Feature 7 ultimate: harsh tests for AI-role fit, roadmap export, delta."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
+from studybuddy.career_assessment import ai_role_fit, assessment_delta, roadmap_export
 from tests.mega.harsh_corpus import HARSH_STRINGS
-from studybuddy.career_assessment import ai_role_fit, roadmap_export, assessment_delta
 
 
 def _ok(fn, *args, **kwargs):

@@ -3,8 +3,8 @@ import json
 
 import pytest
 
-from unified_app import create_app, db, JobApplication, TRACKER_STAGE_IDS
-from tests.conftest import register, login
+from tests.conftest import login, register
+from unified_app import JobApplication
 
 
 @pytest.fixture()
@@ -114,7 +114,7 @@ def test_per_user_isolation(client, app):
     login(client, email="b@example.com")
     assert client.get("/tracker").status_code == 200
     assert "<h4>Acme Corp</h4>" not in client.get("/tracker").get_data(as_text=True)
-    for path, method in [(f"/tracker/{app_id}/move", "move"),
+    for path, _method in [(f"/tracker/{app_id}/move", "move"),
                          (f"/tracker/{app_id}/edit", "edit"),
                          (f"/tracker/{app_id}/delete", "delete")]:
         r = client.post(path, data=json.dumps({"stage": "offer"}),

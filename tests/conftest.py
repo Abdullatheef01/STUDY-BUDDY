@@ -1,12 +1,13 @@
 """Shared pytest fixtures for Phase 1 foundation tests."""
 import os
+
 import pytest
 
 # Never let the opportunity auto-refresh fire during tests: it would hit the
 # real network and rewrite data/opportunities.json mid-suite.
 os.environ["OPP_NO_AUTO_REFRESH"] = "1"
 
-from unified_app import create_app, db
+from unified_app import create_app
 
 
 @pytest.fixture()

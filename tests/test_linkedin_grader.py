@@ -3,10 +3,14 @@ import json
 
 import pytest
 
-from unified_app import create_app, db, LinkedInReport
-from studybuddy.linkedin_grader import (grade_linkedin_profile, validate_linkedin_inputs,
-                             generate_rule_based_summary, MAX_FIELD_CHARS)
-from tests.conftest import register, login
+from studybuddy.linkedin_grader import (
+    MAX_FIELD_CHARS,
+    generate_rule_based_summary,
+    grade_linkedin_profile,
+    validate_linkedin_inputs,
+)
+from tests.conftest import login, register
+from unified_app import LinkedInReport
 
 STRONG_PROFILE = {
     "headline": "CS Undergrad @ GEHU | Python & ML Developer | Built 5+ projects, 2 internships",

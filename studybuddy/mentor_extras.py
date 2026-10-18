@@ -6,7 +6,7 @@ Feature 30 x3:
   30.3 alumni_outcomes — "mentees of X got placed at Y" social proof.
 """
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _clean(text):
@@ -24,7 +24,7 @@ def validate_async_question(payload):
         return None, "Question is too long (max 2000 characters)."
     topic = _clean(payload.get("topic") or "").strip()[:80]
     return ({"question": question, "topic": topic or "General",
-             "asked_at": datetime.now(timezone.utc).isoformat()}, None)
+             "asked_at": datetime.now(UTC).isoformat()}, None)
 
 
 def async_qa_digest(questions, mentor_name=""):

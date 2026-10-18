@@ -3,9 +3,9 @@ import json
 
 import pytest
 
-from studybuddy.portfolio import validate_portfolio_payload, slugify, unique_slug
-from unified_app import create_app, db, Portfolio
-from tests.conftest import register, login
+from studybuddy.portfolio import slugify, unique_slug, validate_portfolio_payload
+from tests.conftest import login, register
+from unified_app import Portfolio
 
 
 @pytest.fixture()

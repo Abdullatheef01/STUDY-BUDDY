@@ -3,17 +3,24 @@
 Tests min/max edges, off-by-ones, empty collections, oversized inputs.
 ~600 tests.
 """
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_NUMBERS_SAFE, HARSH_IDS
 from studybuddy import (
-    aptitude_test, dsa_practice, skill_quizzes, star_builder,
-    learning_roadmaps, cert_guide, salary_data, mock_interview,
+    aptitude_test,
+    cert_guide,
+    dsa_practice,
+    learning_roadmaps,
+    mock_interview,
+    salary_data,
+    skill_quizzes,
+    star_builder,
 )
+from tests.mega.harsh_corpus import HARSH_IDS, HARSH_NUMBERS_SAFE
 
 
 def _ok(fn, *args):

@@ -4,7 +4,6 @@ Section Extractor - Identifies and extracts resume sections.
 import re
 from datetime import datetime
 
-
 # Common section headers in resumes
 SECTION_PATTERNS = {
     'summary': r'(?i)(?:summary|objective|about\s*me|profile|professional\s*summary|career\s*objective|personal\s*statement|executive\s*profile|career\s*summary|professional\s*profile)',
@@ -48,7 +47,7 @@ def extract_sections(text):
         found_section = None
         # Remove numbers/icons for better matching
         clean_line = re.sub(r'^[^\w\s]+|^\d+[\.\)\s-]*', '', line_stripped).strip()
-        
+
         for section_name, pattern in SECTION_PATTERNS.items():
             if re.search(pattern, clean_line):
                 # Ensure the line is relatively short (headers aren't usually long sentences)
@@ -96,7 +95,7 @@ def extract_education_details(education_text):
         return []
 
     entries = []
-    
+
     # Common degree patterns
     degree_patterns = [
         r'(?i)(B\.?(?:Tech|E|Sc|A|Com|S)|Bachelor(?:\'s)?)',
@@ -114,7 +113,7 @@ def extract_education_details(education_text):
     lines = education_text.split('\n')
     for line in lines:
         entry = {'raw': line}
-        
+
         # Find degree
         for dp in degree_patterns:
             match = re.search(dp, line)

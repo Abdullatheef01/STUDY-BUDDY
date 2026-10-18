@@ -1,6 +1,5 @@
 from groq import Groq
 import os
-from langchain_core.messages import HumanMessage, AIMessage
 
 
 def get_client():

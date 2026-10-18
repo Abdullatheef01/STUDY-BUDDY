@@ -100,12 +100,12 @@ def suggest_career_paths(resume_skills, experience_years):
     """
     resume_skills_lower = {s.lower() for s in resume_skills}
     suggestions = []
-    
+
     for path_name, path_info in CAREER_PATHS.items():
         core_skills_lower = {s.lower() for s in path_info['core_skills']}
         matched = resume_skills_lower.intersection(core_skills_lower)
         match_pct = (len(matched) / len(core_skills_lower)) * 100 if core_skills_lower else 0
-        
+
         if match_pct > 0:  # Only suggest if at least some skills match
             # Determine current level based on experience
             progression = path_info['progression']
@@ -117,9 +117,9 @@ def suggest_career_paths(resume_skills, experience_years):
                 current_level = min(1, len(progression) - 1)
             else:
                 current_level = 0
-            
+
             missing_core = [s for s in path_info['core_skills'] if s.lower() not in resume_skills_lower]
-            
+
             suggestions.append({
                 'path': path_name,
                 'icon': path_info['icon'],
@@ -133,8 +133,8 @@ def suggest_career_paths(resume_skills, experience_years):
                 'industry_demand': path_info['industry_demand'],
                 'related_roles': path_info['related_roles']
             })
-    
+
     # Sort by match percentage
     suggestions.sort(key=lambda x: x['match_percentage'], reverse=True)
-    
+
     return suggestions[:5]  # Return top 5 career paths

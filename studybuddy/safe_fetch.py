@@ -23,7 +23,7 @@ import contextlib
 import ipaddress
 import logging
 import socket
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin, urlparse
 
 import requests
 

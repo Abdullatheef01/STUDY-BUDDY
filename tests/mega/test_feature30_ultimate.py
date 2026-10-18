@@ -1,15 +1,19 @@
 """Feature 30 ultimate: harsh tests for async QA, prep packets, alumni outcomes."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.mentor_extras import (
-    validate_async_question, async_qa_digest, prep_packet, alumni_outcomes,
+    alumni_outcomes,
+    async_qa_digest,
+    prep_packet,
+    validate_async_question,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

@@ -2,12 +2,14 @@
 import json
 import os
 
-import pytest
-
 from studybuddy import live_data
 from studybuddy.live_data import (
-    atomic_write, freshness_badge, is_stale, touch_updated,
-    acquire_lock, release_lock,
+    acquire_lock,
+    atomic_write,
+    freshness_badge,
+    is_stale,
+    release_lock,
+    touch_updated,
 )
 
 

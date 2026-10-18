@@ -1,15 +1,18 @@
 """Feature 4 ultimate: harsh tests for recipient finder, follow-ups, outreach score."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.cover_generator import (
-    suggest_recipients, followup_sequence, outreach_score,
+    followup_sequence,
+    outreach_score,
+    suggest_recipients,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

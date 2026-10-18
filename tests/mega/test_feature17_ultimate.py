@@ -1,16 +1,21 @@
 """Feature 17 ultimate: harsh tests for exam-day sim, ROI, renewal tracker."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-import pytest
 from datetime import date, timedelta
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
+import pytest
+
 from studybuddy.cert_guide import (
-    exam_day_simulator, cert_roi, renewal_status, all_certs,
+    all_certs,
+    cert_roi,
+    exam_day_simulator,
+    renewal_status,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

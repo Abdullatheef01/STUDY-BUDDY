@@ -1,18 +1,26 @@
 """Tests for Wave 2 #15: DSA practice with hints and weak-topic diagnosis."""
-import os
 
 import pytest
 
-from studybuddy.dsa_practice import (all_problems, get_problem, topics, difficulties,
-                          filter_problems, public_problem, reveal_hint,
-                          reveal_approach, validate_status_payload,
-                          weak_topic_diagnosis)
+from studybuddy.dsa_practice import (
+    all_problems,
+    difficulties,
+    filter_problems,
+    get_problem,
+    public_problem,
+    reveal_approach,
+    reveal_hint,
+    topics,
+    validate_status_payload,
+    weak_topic_diagnosis,
+)
 
 
 @pytest.fixture
 def authed_client(client, app):
     from werkzeug.security import generate_password_hash
-    from unified_app import db, User
+
+    from unified_app import User, db
     with app.app_context():
         u = User(email="dsa@test.com", name="DSA Tester",
                  password_hash=generate_password_hash("password123"))
@@ -226,7 +234,8 @@ def test_diagnosis_page(authed_client):
 
 def test_dsa_isolation(client, authed_client, app):
     from werkzeug.security import generate_password_hash
-    from unified_app import db, User, DSAProgress
+
+    from unified_app import DSAProgress, User, db
     pid = all_problems()[3]["id"]
     with app.app_context():
         u2 = User(email="dsa2@test.com", name="Other",

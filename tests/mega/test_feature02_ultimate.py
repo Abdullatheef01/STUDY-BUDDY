@@ -1,13 +1,14 @@
 """Feature 2 ultimate: harsh tests for STAR converter, verb ranking, metric finder."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
+from studybuddy.bullet_rewriter import metric_finder, star_convert, verb_power_report
 from tests.mega.harsh_corpus import HARSH_STRINGS
-from studybuddy.bullet_rewriter import star_convert, verb_power_report, metric_finder
 
 
 def _ok(fn, *args):

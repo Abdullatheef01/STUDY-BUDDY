@@ -1,16 +1,21 @@
 """Feature 16 ultimate: harsh tests for exam mode, drills, leaderboard."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.skill_quizzes import (
-    certification_exam_mode, grade_exam, weakness_drill, leaderboard,
-    quiz_skills, get_question,
+    certification_exam_mode,
+    get_question,
+    grade_exam,
+    leaderboard,
+    quiz_skills,
+    weakness_drill,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

@@ -8,7 +8,10 @@ CSRF rejections, and invalid-input handling.
 import pytest
 
 import studybuddy.retrospective_data as retro_data
+from tests.conftest import login, register
 from unified_app import (
+    RETRO_PIPELINE,
+    RETRO_SMALL_SAMPLE_N,
     Experiment,
     JobApplication,
     Retrospective,
@@ -22,10 +25,7 @@ from unified_app import (
     retro_source_breakdown,
     retro_source_of,
     retro_suggestions,
-    RETRO_PIPELINE,
-    RETRO_SMALL_SAMPLE_N,
 )
-from tests.conftest import register, login
 
 
 @pytest.fixture()
@@ -801,7 +801,7 @@ def test_csrf_rejected_on_retro_posts(csrf_app):
         {"hypothesis": "h", "change": "c", "target": "t"},
         {"status": "running"},
     ]
-    for url, body in zip(cases, bodies):
+    for url, body in zip(cases, bodies, strict=False):
         r = client.post(url, json=body)
         assert r.status_code == 400, url
 

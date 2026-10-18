@@ -3,7 +3,6 @@
 Live-network tests are skipped unless STUDY_LIVE_TESTS=1.
 No route tests here — logic module only.
 """
-import json
 import os
 
 import pytest
@@ -20,7 +19,6 @@ from studybuddy.arxiv_import import (
     validate_arxiv_id,
     validate_doi,
 )
-
 
 LIVE = os.environ.get("STUDY_LIVE_TESTS") == "1"
 needs_live = pytest.mark.skipif(not LIVE, reason="needs real network (set STUDY_LIVE_TESTS=1)")

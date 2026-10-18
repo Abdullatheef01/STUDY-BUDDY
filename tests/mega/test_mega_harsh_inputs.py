@@ -4,18 +4,25 @@ Every harsh string is fed to every text function. Functions must never
 raise on hostile input — they return safe defaults or validation errors.
 ~700 tests.
 """
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy import (
-    bullet_rewriter, jd_matcher, communication_coach, cover_generator,
-    linkedin_grader, career_assessment, mock_interview, citation_fmt,
+    bullet_rewriter,
+    career_assessment,
+    citation_fmt,
+    communication_coach,
+    cover_generator,
     gap_finder,
+    jd_matcher,
+    linkedin_grader,
+    mock_interview,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _safe_call(fn, *args):

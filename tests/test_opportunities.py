@@ -4,10 +4,14 @@ from datetime import date
 
 import pytest
 
-from studybuddy.opportunities import (load_dataset, list_opportunities, get_opportunity,
-                           opp_exists, CLOSING_SOON_DAYS)
-from unified_app import create_app, db, OpportunityBookmark
-from tests.conftest import register, login
+from studybuddy.opportunities import (
+    get_opportunity,
+    list_opportunities,
+    load_dataset,
+    opp_exists,
+)
+from tests.conftest import login, register
+from unified_app import OpportunityBookmark
 
 
 @pytest.fixture()

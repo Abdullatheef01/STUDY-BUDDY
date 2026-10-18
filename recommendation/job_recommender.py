@@ -17,16 +17,16 @@ def get_recommendations(resume_text, resume_skills, top_k=10):
         list: Top matching jobs with detailed scores
     """
     matches = match_jobs(resume_text, resume_skills, top_k=top_k)
-    
+
     # Enhance with additional metadata
     for i, match in enumerate(matches):
         match['rank'] = i + 1
-        
+
         # Calculate skill match percentage
         total_required = len(match['required_skills'])
         total_matched = len(match['matched_skills'])
         match['skill_match_percent'] = round((total_matched / total_required * 100) if total_required > 0 else 0, 1)
-        
+
         # Fit level assessment
         score = match['match_score']
         if score >= 75:
@@ -41,7 +41,7 @@ def get_recommendations(resume_text, resume_skills, top_k=10):
         else:
             match['fit_level'] = 'Stretch Role'
             match['fit_color'] = '#ff6b6b'
-    
+
     return matches
 
 

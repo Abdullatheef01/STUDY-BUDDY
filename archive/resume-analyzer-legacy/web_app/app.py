@@ -4,7 +4,6 @@ Flask Web Application - Main Entry Point
 """
 import os
 import sys
-import json
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -27,7 +26,7 @@ from preparation.interview_questions import generate_interview_questions
 from preparation.company_questions import get_company_questions, get_available_companies as get_interview_companies, get_company_stats
 from preparation.coding_practice import (
     get_coding_questions, get_available_companies as get_coding_companies,
-    get_available_topics, get_company_coding_stats, get_recommended_problems
+    get_available_topics, get_company_coding_stats
 )
 from models.bert_matcher import _get_model as prewarm_bert
 
@@ -137,7 +136,7 @@ def analyze():
         # Clean up uploaded file
         try:
             os.remove(filepath)
-        except:
+        except Exception:
             pass
 
         # Build result

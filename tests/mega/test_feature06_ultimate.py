@@ -1,15 +1,18 @@
 """Feature 6 ultimate: harsh tests for README grader, commit bullets, pin optimizer."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.github_integration import (
-    grade_readme, commit_messages_to_bullets, pin_optimizer,
+    commit_messages_to_bullets,
+    grade_readme,
+    pin_optimizer,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

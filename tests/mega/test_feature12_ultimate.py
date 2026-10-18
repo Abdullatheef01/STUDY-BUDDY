@@ -1,16 +1,21 @@
 """Feature 12 ultimate: harsh tests for pattern mastery, mock OA, spaced repetition."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-import pytest
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
+import pytest
+
 from studybuddy.dsa_practice import (
-    pattern_mastery, mock_oa, spaced_repetition_queue, all_problems,
+    all_problems,
+    mock_oa,
+    pattern_mastery,
+    spaced_repetition_queue,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):
@@ -87,7 +92,7 @@ def test_queue_rejects_non_list():
 
 
 def test_queue_intervals():
-    old = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    old = (datetime.now(UTC) - timedelta(days=30)).isoformat()
     q = spaced_repetition_queue([
         {"problem_id": 1, "wrong_at": old, "streak": 1},
         {"problem_id": 2, "wrong_at": old, "streak": 2},
@@ -99,7 +104,7 @@ def test_queue_intervals():
 
 
 def test_queue_future_not_due():
-    recent = datetime.now(timezone.utc).isoformat()
+    recent = datetime.now(UTC).isoformat()
     q = spaced_repetition_queue([{"problem_id": 1, "wrong_at": recent, "streak": 1}])
     assert q["due_count"] == 0
     assert len(q["upcoming"]) == 1

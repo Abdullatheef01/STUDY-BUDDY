@@ -232,7 +232,7 @@ def progress_summary(progress_rows):
 # 15.1 Agentic-AI track | 15.2 Project milestones | 15.3 Weekly auto-planner
 
 import re as _re9
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 
 def _clean9(text):
@@ -318,9 +318,9 @@ def weekly_planner(roadmap_stages, hours_per_week=6, start_date=None):
     try:
         start = datetime.fromisoformat(str(start_date or "").replace("Z", "+00:00"))
     except (ValueError, TypeError):
-        start = datetime.now(timezone.utc)
+        start = datetime.now(UTC)
     if start.tzinfo is None:
-        start = start.replace(tzinfo=timezone.utc)
+        start = start.replace(tzinfo=UTC)
 
     weeks = []
     week_no = 1

@@ -22,8 +22,7 @@ from studybuddy.lit_review import (
     score_sentences,
     split_sentences,
 )
-from unified_app import User, StudyDoc, db
-
+from unified_app import StudyDoc, User, db
 
 # ---------------------------------------------------------------------------
 # Golden fixture: three synthetic mini-papers, 5 substantive sentences each
@@ -456,7 +455,7 @@ def test_review_to_html_escapes_script(app):
         db.session.add(user)
         db.session.flush()
         docs = []
-        for i, title in enumerate(["Paper %s One" % evil,
+        for _i, title in enumerate(["Paper %s One" % evil,
                                    "Paper %s Two" % evil]):
             doc = StudyDoc(
                 user_id=user.id, title=title,

@@ -2,8 +2,14 @@
 import pytest
 
 from studybuddy.skill_quizzes import (
-    quiz_skills, skill_topics, public_question, build_quiz, check_answer,
-    grade_quiz, validate_start_payload, get_question)
+    build_quiz,
+    check_answer,
+    get_question,
+    grade_quiz,
+    public_question,
+    quiz_skills,
+    validate_start_payload,
+)
 
 
 def test_bank_size_and_schema():
@@ -100,7 +106,8 @@ def test_validate_start_payload():
 @pytest.fixture
 def authed_client(client, app):
     from werkzeug.security import generate_password_hash
-    from unified_app import db, User
+
+    from unified_app import User, db
     with app.app_context():
         u = User(email="learn19@test.com", name="Quizzer",
                  password_hash=generate_password_hash("password123"))

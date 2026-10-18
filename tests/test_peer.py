@@ -72,7 +72,7 @@ def _create_room(client, role="backend", category="technical",
 def _two_users_room(client, app, **kwargs):
     """Host creates a room; guest registers and joins. Returns token."""
     data = _create_room(client, **kwargs)
-    host_email = "aarav@example.com"
+    _host_email = "aarav@example.com"
     _register_extra(client, "Priya Nair", "priya@example.com")
     _login_as(client, "priya@example.com")
     r = client.post("/peer/api/room/%s/join" % data["token"], json={})
@@ -615,7 +615,7 @@ def test_feedback_both_directions(authed_client, app):
 def test_feedback_score_validation(authed_client, app):
     token = _two_users_room(authed_client, app)
     host_id = _uid(app, "aarav@example.com")
-    guest_id = _uid(app, "priya@example.com")
+    _guest_id = _uid(app, "priya@example.com")
     _login_as(authed_client, "aarav@example.com")
     _finish(authed_client, token)
     _login_as(authed_client, "priya@example.com")
@@ -692,7 +692,7 @@ def test_feedback_non_participant_rejected(authed_client, app):
 def test_feedback_summary_on_room_page(authed_client, app):
     token = _two_users_room(authed_client, app)
     host_id = _uid(app, "aarav@example.com")
-    guest_id = _uid(app, "priya@example.com")
+    _guest_id = _uid(app, "priya@example.com")
     _login_as(authed_client, "aarav@example.com")
     _finish(authed_client, token)
     _login_as(authed_client, "priya@example.com")
@@ -779,7 +779,7 @@ def test_accept_slot_host_rejected(authed_client, app):
 # ---------------------------------------------------------------------------
 
 def test_report_creates_block(authed_client, app):
-    token = _two_users_room(authed_client, app)
+    _token = _two_users_room(authed_client, app)
     guest_id = _uid(app, "priya@example.com")
     _login_as(authed_client, "aarav@example.com")
     r = authed_client.post("/peer/api/report",
@@ -793,7 +793,7 @@ def test_report_creates_block(authed_client, app):
 
 
 def test_report_is_idempotent(authed_client, app):
-    token = _two_users_room(authed_client, app)
+    _token = _two_users_room(authed_client, app)
     guest_id = _uid(app, "priya@example.com")
     _login_as(authed_client, "aarav@example.com")
     for _ in range(2):

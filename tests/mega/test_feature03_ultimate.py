@@ -1,16 +1,19 @@
 """Feature 3 ultimate: harsh tests for diff, JD compare, tailor, performance."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.resume_versions import (
-    diff_resume_versions, compare_versions_for_jd, tailor_resume_for_jd,
+    compare_versions_for_jd,
+    diff_resume_versions,
+    tailor_resume_for_jd,
     version_performance,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

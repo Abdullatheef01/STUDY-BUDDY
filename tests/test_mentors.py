@@ -9,28 +9,27 @@ redirects, CSRF rejection, pure-logic helpers (booking_eligibility,
 can_cancel, refresh_session_status, mentor_is_admin), and seed/template
 data sanity.
 """
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 import studybuddy.community as community_mod
+from tests.conftest import login, register
 from unified_app import (
     Mentor,
     MentorApplication,
+    OfficeHour,
     OHBooking,
     OHFeedback,
     OHNote,
     OHReport,
-    OfficeHour,
     User,
     XPLedger,
     create_app,
     db,
 )
-from tests.conftest import register, login
 
-
-UTC = timezone.utc
+UTC = UTC
 
 
 # ---------------------------------------------------------------------------
@@ -351,7 +350,7 @@ def test_booking_unique_constraint(app, client):
         db.session.commit()
         db.session.add(OHBooking(user_id=uid, office_hour_id=oh_id,
                                  status="booked"))
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017 - intent is 'any commit failure'
             db.session.commit()
         db.session.rollback()
 

@@ -3,17 +3,22 @@
 PDF QA, arXiv import, flashcards, lit review, opportunities, trending.
 ~600 tests.
 """
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS, HARSH_IDS
 from studybuddy import (
-    arxiv_import, flashcards, lit_review, opportunities, trending,
+    arxiv_import,
+    flashcards,
+    lit_review,
+    opportunities,
     pdf_qa,
+    trending,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

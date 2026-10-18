@@ -1,5 +1,4 @@
 from docx import Document
-import os
 
 def create_resume(filename):
     doc = Document()

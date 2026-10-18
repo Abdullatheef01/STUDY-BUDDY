@@ -10,18 +10,15 @@ Fix: alias sys.modules["unified_app"] to __main__ when run as a script.
 This test boots the real dev server in a subprocess and proves /review
 returns 200 there. (Under gunicorn the module loads once, unaffected.)
 """
+import http.cookiejar
 import os
 import re
 import socket
 import subprocess
-import sys
 import tempfile
 import time
-import urllib.request
 import urllib.parse
-import http.cookiejar
-
-import pytest
+import urllib.request
 
 REPO = os.path.join(os.path.dirname(__file__), "..")
 APP = os.path.join(REPO, "unified_app.py")

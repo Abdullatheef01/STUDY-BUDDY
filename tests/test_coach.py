@@ -1,19 +1,22 @@
 """Tests for Wave 2 #14: communication coach."""
-import json
 import os
 
 import pytest
 
-from studybuddy.communication_coach import (analyze_transcript, find_filler_hits,
-                                 validate_coach_inputs)
+from studybuddy.communication_coach import (
+    analyze_transcript,
+    find_filler_hits,
+    validate_coach_inputs,
+)
 
 
 @pytest.fixture
 def authed_client(client, app):
-    from werkzeug.security import generate_password_hash
     import sys
+
+    from werkzeug.security import generate_password_hash
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from unified_app import db, User
+    from unified_app import User, db
     with app.app_context():
         u = User(email="coach@test.com", name="Coach Tester",
                  password_hash=generate_password_hash("password123"))
@@ -130,7 +133,8 @@ def test_analyze_flow(authed_client, app):
 
 def test_coach_isolation(client, authed_client, app):
     from werkzeug.security import generate_password_hash
-    from unified_app import db, User, CommunicationAnalysis
+
+    from unified_app import CommunicationAnalysis, User, db
     with app.app_context():
         u2 = User(email="coach2@test.com", name="Other",
                   password_hash=generate_password_hash("password123"))

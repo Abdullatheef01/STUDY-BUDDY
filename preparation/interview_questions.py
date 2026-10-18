@@ -133,7 +133,7 @@ def generate_interview_questions(role, skills=None):
         if template_role.lower() in role.lower() or role.lower() in template_role.lower():
             questions = template_questions
             break
-    
+
     if not questions:
         # Try partial matching
         role_lower = role.lower()
@@ -145,22 +145,22 @@ def generate_interview_questions(role, skills=None):
             if role_words.intersection(template_words):
                 questions = template_questions
                 break
-    
+
     if not questions:
         questions = DEFAULT_QUESTIONS
-    
+
     result = {
         'role': role,
         'technical': questions.get('technical', DEFAULT_QUESTIONS['technical']),
         'behavioral': questions.get('behavioral', DEFAULT_QUESTIONS['behavioral']),
         'system_design': questions.get('system_design', DEFAULT_QUESTIONS['system_design']),
     }
-    
+
     # Add skill-specific questions if skills provided
     if skills:
         skill_questions = []
         for skill in skills[:5]:  # Top 5 skills
             skill_questions.append(f"Describe your experience working with {skill}.")
         result['skill_specific'] = skill_questions
-    
+
     return result

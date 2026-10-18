@@ -1,15 +1,18 @@
 """Feature 24 ultimate: harsh tests for personalized feed, project ideas, digest."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.trending import (
-    personalized_feed, paper_to_project_ideas, weekly_digest,
+    paper_to_project_ideas,
+    personalized_feed,
+    weekly_digest,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

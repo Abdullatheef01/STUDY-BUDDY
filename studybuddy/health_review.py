@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 log = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ def valid_month_key(month_key):
 
 def current_month_key(now=None):
     """'YYYY-MM' for now (UTC)."""
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     return "%04d-%02d" % (now.year, now.month)
 
 
@@ -294,7 +294,7 @@ def _agg_wellbeing(M, user_id, now=None):
     """StreakState current/longest + shields used (forgiveness respected —
     score consistency, not grind). MomentumSettings opt-out respected: opted
     out -> score None with an affirming note. Rest days noted positively."""
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     settings = M.MomentumSettings.query.filter_by(user_id=user_id).first()
     if settings is not None and settings.momentum_opt_out:
         return {"score": None, "trend": None, "confidence": 0,
@@ -523,7 +523,6 @@ def generate_review(user_id, month_key, now=None):
 # 31.1 Monthly auto-report | 31.2 Peer benchmarks | 31.3 Action nudges
 
 import re as _re21
-from datetime import datetime as _dt21, timezone as _tz21
 
 
 def _clean21(text):

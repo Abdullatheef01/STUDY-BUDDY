@@ -1,15 +1,19 @@
 """Feature 8 ultimate: harsh tests for offer evaluator, negotiation coach, bands."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.salary_data import (
-    get_options, evaluate_offer, negotiation_coach, band_comparison,
+    band_comparison,
+    evaluate_offer,
+    get_options,
+    negotiation_coach,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 OPTS = get_options()
 ROLE = OPTS["roles"][0]

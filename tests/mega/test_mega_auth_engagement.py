@@ -3,14 +3,15 @@
 Registration, login, momentum, community, health review month keys.
 ~500 tests.
 """
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS, HARSH_EMAILS, HARSH_IDS
-from studybuddy import momentum, health_review
+from studybuddy import health_review, momentum
+from tests.mega.harsh_corpus import HARSH_EMAILS, HARSH_IDS, HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

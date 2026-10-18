@@ -1,15 +1,18 @@
 """Feature 13 ultimate: harsh tests for video checklist, HR sim, clarity score."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.communication_coach import (
-    video_presence_checklist, hr_round_simulator, clarity_score,
+    clarity_score,
+    hr_round_simulator,
+    video_presence_checklist,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

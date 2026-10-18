@@ -1,15 +1,18 @@
 """Feature 1 ultimate: harsh tests for AI pre-screen sim, action plan, checklist."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.jd_matcher import (
-    simulate_ai_screen, keyword_action_plan, competitiveness_checklist,
+    competitiveness_checklist,
+    keyword_action_plan,
+    simulate_ai_screen,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args):

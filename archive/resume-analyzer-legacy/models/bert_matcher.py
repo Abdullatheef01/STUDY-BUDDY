@@ -4,7 +4,6 @@ Uses all-MiniLM-L6-v2 model for fast, accurate semantic similarity.
 """
 import os
 import csv
-import numpy as np
 
 # Lazy load to avoid slow startup
 _model = None

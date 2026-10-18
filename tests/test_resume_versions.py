@@ -1,10 +1,9 @@
 """Tests for Wave 1 feature #3: multiple saved resume versions."""
-import json
 
 import pytest
 
-from unified_app import create_app, db, ResumeVersion
-from tests.conftest import register, login
+from tests.conftest import login, register
+from unified_app import ResumeVersion
 
 
 @pytest.fixture()

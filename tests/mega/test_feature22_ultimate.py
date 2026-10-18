@@ -1,13 +1,14 @@
 """Feature 22 ultimate: harsh tests for trend check, feasibility, proposal export."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
 
+from studybuddy.gap_finder import feasibility_score, gap_to_proposal, trend_cross_check
 from tests.mega.harsh_corpus import HARSH_STRINGS
-from studybuddy.gap_finder import trend_cross_check, feasibility_score, gap_to_proposal
 
 
 def _ok(fn, *args, **kwargs):

@@ -292,7 +292,8 @@ CERT_STALE_AFTER_DAYS = 60  # exam fees/syllabi change; review bi-monthly
 def get_freshness():
     """Freshness badge info for the certification hub."""
     import json as _json
-    from studybuddy.live_data import freshness_badge, data_path
+
+    from studybuddy.live_data import data_path, freshness_badge
     try:
         with open(data_path("certifications.meta.json"), encoding="utf-8") as f:
             meta = _json.load(f)
@@ -305,7 +306,7 @@ def get_freshness():
 # 17.1 Exam-day simulator | 17.2 ROI calculator | 17.3 Renewal tracker
 
 import re as _re11
-from datetime import datetime, timedelta, timezone, date
+from datetime import UTC, date, datetime, timedelta
 
 
 def _clean11(text):
@@ -416,11 +417,11 @@ def renewal_status(cert_id, earned_date):
     try:
         if isinstance(earned_date, date) and not isinstance(earned_date, datetime):
             earned = datetime(earned_date.year, earned_date.month, earned_date.day,
-                              tzinfo=timezone.utc)
+                              tzinfo=UTC)
         else:
             earned = datetime.fromisoformat(str(earned_date).replace("Z", "+00:00"))
             if earned.tzinfo is None:
-                earned = earned.replace(tzinfo=timezone.utc)
+                earned = earned.replace(tzinfo=UTC)
     except (ValueError, TypeError):
         raise ValueError("earned_date must be an ISO date (YYYY-MM-DD).")
     try:
@@ -428,7 +429,7 @@ def renewal_status(cert_id, earned_date):
     except (TypeError, ValueError):
         validity = 3
     expires = earned + timedelta(days=365 * validity)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     days_left = (expires - now).days
     if days_left < 0:
         urgency, action = "expired", "Recertify now — expired certs hurt credibility."

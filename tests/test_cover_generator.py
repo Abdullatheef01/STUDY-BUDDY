@@ -1,10 +1,15 @@
 """Tests for Wave 1 feature #4: cover-letter + cold-outreach generator."""
 import pytest
 
-from unified_app import create_app, db, CoverDoc, ResumeVersion
-from studybuddy.cover_generator import (rule_based_cover_letter, rule_based_outreach,
-                             extract_contact, validate_cover_inputs, TONES)
-from tests.conftest import register, login
+from studybuddy.cover_generator import (
+    TONES,
+    extract_contact,
+    rule_based_cover_letter,
+    rule_based_outreach,
+    validate_cover_inputs,
+)
+from tests.conftest import login, register
+from unified_app import CoverDoc
 
 
 @pytest.fixture()

@@ -248,8 +248,7 @@ def validate_linkedin_inputs(payload):
     for key in ("headline", "about", "experience", "skills"):
         val = (payload.get(key) or "").strip()
         if len(val) > MAX_FIELD_CHARS:
-            return None, "The {} field is too long (max {:,} characters).".format(
-                key, MAX_FIELD_CHARS)
+            return None, f"The {key} field is too long (max {MAX_FIELD_CHARS:,} characters)."
         fields[key] = val
     if not any(fields.values()):
         return None, "Paste at least one profile section (headline, about, experience, or skills)."

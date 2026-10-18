@@ -67,7 +67,7 @@ def _content_words(text):
     stop = {"the", "a", "an", "and", "or", "of", "to", "in", "on", "for",
             "with", "is", "are", "was", "were", "be", "it", "its", "that",
             "this", "as", "by", "at", "from", "you", "your", "we", "our",
-            "they", "their", "i", "my", "me", "my", "an", "so", "if",
+            "they", "their", "i", "my", "me", "so", "if",
             "not", "no", "do", "does", "did", "have", "has", "had", "will",
             "would", "can", "could", "should", "what", "when", "where",
             "which", "who", "how", "why"}
@@ -292,7 +292,6 @@ def validate_interview_setup(payload):
 # 11.1 Voice interview prep | 11.2 Company intel cards | 11.3 Redo loop
 
 import re as _re5
-import time as _time5
 
 
 def _clean5(text):

@@ -1,16 +1,20 @@
 """Feature 26 ultimate: harsh tests for pipeline analytics, nudges, offer compare."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-import pytest
 from datetime import date, timedelta
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
+import pytest
+
 from studybuddy.tracker_analytics import (
-    pipeline_analytics, followup_nudges, compare_offers,
+    compare_offers,
+    followup_nudges,
+    pipeline_analytics,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

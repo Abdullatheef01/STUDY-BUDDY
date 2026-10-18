@@ -1,10 +1,8 @@
 """Tests for Wave 1 feature #8: India salary explorer."""
-import json
 
-import pytest
 
-from studybuddy.salary_data import get_options, query, lookup, load_dataset
-from tests.conftest import register, login
+from studybuddy.salary_data import load_dataset, lookup, query
+from tests.conftest import login, register
 
 
 def test_dataset_loads_and_valid():

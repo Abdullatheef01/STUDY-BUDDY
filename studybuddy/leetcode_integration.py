@@ -82,7 +82,7 @@ def fetch_leetcode_stats(username):
     matched = data.get("matchedUser")
     if not matched:
         raise LeetCodeAPIError(
-            "LeetCode user '{}' was not found. Check the spelling and try again.".format(username))
+            f"LeetCode user '{username}' was not found. Check the spelling and try again.")
 
     solved = {"easy": 0, "medium": 0, "hard": 0, "total": 0}
     stats_global = matched.get("submitStatsGlobal") or {}
@@ -139,16 +139,16 @@ def render_leetcode_card_svg(stats):
     def bar(value, maximum, color, y):
         pct = min(100.0, (100.0 * value / maximum)) if maximum else 0
         return (
-            '<rect x="20" y="{y}" width="220" height="8" rx="4" fill="#1e2235"/>'
-            '<rect x="20" y="{y}" width="{w:.1f}" height="8" rx="4" fill="{c}"/>'
-        ).format(y=y, w=2.2 * pct, c=color)
+            f'<rect x="20" y="{y}" width="220" height="8" rx="4" fill="#1e2235"/>'
+            f'<rect x="20" y="{y}" width="{2.2 * pct:.1f}" height="8" rx="4" fill="{color}"/>'
+        )
 
     def row(label, value, color, y):
         return (
-            '<text x="20" y="{y}" fill="#94a3b8" font-size="12" font-family="Inter,sans-serif">{label}</text>'
-            '<text x="380" y="{y}" fill="{c}" font-size="13" font-weight="700" text-anchor="end" font-family="Inter,sans-serif">{v}</text>'
-            '{bar}'
-        ).format(y=y, label=_esc(label), c=color, v=_esc(value), bar=bar(value, max(total, 1), color, y + 8))
+            f'<text x="20" y="{y}" fill="#94a3b8" font-size="12" font-family="Inter,sans-serif">{_esc(label)}</text>'
+            f'<text x="380" y="{y}" fill="{color}" font-size="13" font-weight="700" text-anchor="end" font-family="Inter,sans-serif">{_esc(value)}</text>'
+            f'{bar(value, max(total, 1), color, y + 8)}'
+        )
 
     rating_line = "Rating " + (str(rating) if rating else "—")
     if crank:
@@ -182,6 +182,6 @@ def render_error_svg(message):
         '<rect width="400" height="90" rx="14" fill="#0a0b1e"/>'
         '<rect width="400" height="90" rx="14" fill="none" stroke="rgba(255,255,255,0.12)"/>'
         '<text x="20" y="38" fill="#f8fafc" font-size="14" font-weight="700" font-family="Inter,sans-serif">LeetCode Stats</text>'
-        '<text x="20" y="62" fill="#94a3b8" font-size="12" font-family="Inter,sans-serif">{m}</text>'
+        f'<text x="20" y="62" fill="#94a3b8" font-size="12" font-family="Inter,sans-serif">{_esc(message[:90])}</text>'
         '</svg>'
-    ).format(m=_esc(message[:90]))
+    )

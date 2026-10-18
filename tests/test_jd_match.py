@@ -1,14 +1,17 @@
 """Tests for Wave 1 feature #1: JD-matched ATS scoring."""
 import io
-import json
 
 import pytest
 
-from unified_app import create_app, db, JDMatchReport, ResumeAnalysis
-from studybuddy.jd_matcher import (extract_jd_keywords, parse_jd_requirements,
-                        score_jd_match, generate_rule_based_suggestions,
-                        JD_MIN_CHARS, JD_MAX_CHARS)
-from tests.conftest import register, login, make_pdf_bytes, SAMPLE_RESUME_LINES
+from studybuddy.jd_matcher import (
+    JD_MAX_CHARS,
+    extract_jd_keywords,
+    generate_rule_based_suggestions,
+    parse_jd_requirements,
+    score_jd_match,
+)
+from tests.conftest import SAMPLE_RESUME_LINES, login, make_pdf_bytes, register
+from unified_app import JDMatchReport, ResumeAnalysis, create_app, db
 
 SAMPLE_JD = """Senior Python Developer - Backend Team
 
@@ -239,7 +242,7 @@ def test_jd_match_report_visible_in_dashboard(authed_client, monkeypatch, app):
 def test_jd_match_saved_report_page(authed_client, monkeypatch):
     r = _jd_match(authed_client, monkeypatch=monkeypatch)
     rid = r.get_json()["report_id"]
-    r = authed_client.get("/jd-match/{}".format(rid))
+    r = authed_client.get(f"/jd-match/{rid}")
     assert r.status_code == 200
     assert "jdSavedReport" in r.get_data(as_text=True)
 
@@ -258,7 +261,7 @@ def test_jd_match_reports_isolated_between_users(client, monkeypatch, app):
     register(client, name="User Two", email="two@example.com")
     login(client, email="two@example.com")
     # User two cannot see user one's report.
-    assert client.get("/jd-match/{}".format(rid)).status_code == 404
+    assert client.get(f"/jd-match/{rid}").status_code == 404
     html = client.get("/dashboard").get_data(as_text=True)
     assert "Senior Python Developer" not in html
     with app.app_context():

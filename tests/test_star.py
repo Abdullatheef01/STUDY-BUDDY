@@ -1,11 +1,18 @@
 """Tests for Wave 2 feature #17: STAR answer builder."""
 import pytest
 
-from unified_app import create_app, db, STARDraft
-from studybuddy.star_builder import (COMPETENCIES, COMPETENCY_IDS, SECTIONS,
-                          SECTION_GUIDE, all_examples, examples_for,
-                          validate_draft, score_draft, score_section)
-from tests.conftest import register, login
+from studybuddy.star_builder import (
+    COMPETENCIES,
+    COMPETENCY_IDS,
+    SECTION_GUIDE,
+    SECTIONS,
+    all_examples,
+    examples_for,
+    score_draft,
+    score_section,
+    validate_draft,
+)
+from tests.conftest import login, register
 
 
 @pytest.fixture()

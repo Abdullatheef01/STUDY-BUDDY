@@ -1,10 +1,9 @@
 """
 Skill Extractor - Rule-based skill extraction using comprehensive skills database.
 """
+import csv
 import os
 import re
-import csv
-
 
 # Load skills database
 SKILLS_DB = {}
@@ -13,25 +12,25 @@ SKILL_ALIASES = {}
 def _load_skills_db():
     """Load skills database from CSV file."""
     global SKILLS_DB, SKILL_ALIASES
-    
+
     db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'skills_db.csv')
-    
+
     if not os.path.exists(db_path):
         print(f"Warning: Skills DB not found at {db_path}")
         return
-    
-    with open(db_path, 'r', encoding='utf-8') as f:
+
+    with open(db_path, encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             skill_name = row['skill'].strip()
             category = row['category'].strip()
             aliases = row.get('aliases', '').strip()
-            
+
             SKILLS_DB[skill_name.lower()] = {
                 'name': skill_name,
                 'category': category
             }
-            
+
             # Build alias mapping
             if aliases:
                 for alias in aliases.split('|'):
@@ -55,17 +54,17 @@ def extract_skills(text):
     """
     if not text:
         return []
-    
+
     text_lower = text.lower()
     found_skills = {}
-    
+
     # Method 1: Direct skill name matching
     for skill_lower, info in SKILLS_DB.items():
         # Use word boundary matching to avoid partial matches
         pattern = r'(?<![a-zA-Z])' + re.escape(skill_lower) + r'(?![a-zA-Z])'
         if re.search(pattern, text_lower):
             found_skills[info['name']] = info['category']
-    
+
     # Method 2: Alias matching
     for alias, skill_name in SKILL_ALIASES.items():
         pattern = r'(?<![a-zA-Z])' + re.escape(alias) + r'(?![a-zA-Z])'
@@ -75,7 +74,7 @@ def extract_skills(text):
             else:
                 category = 'Other'
             found_skills[skill_name] = category
-    
+
     # Convert to list of dicts
     result = []
     for name, category in found_skills.items():
@@ -83,10 +82,10 @@ def extract_skills(text):
             'name': name,
             'category': category
         })
-    
+
     # Sort by category then name
     result.sort(key=lambda x: (x['category'], x['name']))
-    
+
     return result
 
 

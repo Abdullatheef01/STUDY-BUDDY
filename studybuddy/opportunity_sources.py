@@ -20,7 +20,7 @@ as "no new data" rather than a crash.
 
 import logging
 import re
-from datetime import date, datetime
+from datetime import date
 
 log = logging.getLogger(__name__)
 

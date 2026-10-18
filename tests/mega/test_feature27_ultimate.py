@@ -1,16 +1,20 @@
 """Feature 27 ultimate: harsh tests for streak freeze, squads, rewards."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-import pytest
 from datetime import date, timedelta
 
-from tests.mega.harsh_corpus import HARSH_STRINGS
+import pytest
+
 from studybuddy.momentum import (
-    streak_freeze_status, squad_leaderboard, reward_tiers,
+    reward_tiers,
+    squad_leaderboard,
+    streak_freeze_status,
 )
+from tests.mega.harsh_corpus import HARSH_STRINGS
 
 
 def _ok(fn, *args, **kwargs):

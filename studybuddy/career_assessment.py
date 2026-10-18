@@ -251,11 +251,11 @@ def rule_based_why(cluster):
     name = cluster["name"]
     signals = cluster.get("top_signals") or []
     if signals:
-        quoted = "; ".join("you leaned toward building/creating in \u201c{}\u201d".format(s) for s in signals[:2])
-        return ("Your answers point to {}: {} — a pattern that matches how {}s "
-                "think and work.".format(name, quoted, name))
-    return ("Your overall answer pattern aligns best with {} — explore its "
-            "starter skills below to confirm the fit.".format(name))
+        quoted = "; ".join(f"you leaned toward building/creating in \u201c{s}\u201d" for s in signals[:2])
+        return (f"Your answers point to {name}: {quoted} — a pattern that matches how {name}s "
+                "think and work.")
+    return (f"Your overall answer pattern aligns best with {name} — explore its "
+            "starter skills below to confirm the fit.")
 
 
 def validate_assessment_inputs(payload):

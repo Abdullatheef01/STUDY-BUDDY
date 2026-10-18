@@ -2,13 +2,19 @@
 import pytest
 
 from studybuddy.learning_roadmaps import (
-    list_skills, list_domains, get_skill, list_roles, get_role, skill_ids,
-    analyze_gap, build_personal_roadmap, validate_progress_payload,
-    validate_gap_payload, STAGE_ORDER)
+    STAGE_ORDER,
+    analyze_gap,
+    build_personal_roadmap,
+    get_role,
+    list_roles,
+    skill_ids,
+    validate_gap_payload,
+    validate_progress_payload,
+)
 
 
 def test_bank_size_and_schema():
-    from studybuddy.learning_roadmaps import _skills, _roles
+    from studybuddy.learning_roadmaps import _roles, _skills
     skills, roles = _skills(), _roles()
     assert len(skills) >= 20, f"need 20+ skills, got {len(skills)}"
     assert len(roles) >= 6, f"need 6+ roles, got {len(roles)}"
@@ -101,7 +107,8 @@ def test_validate_gap_payload():
 @pytest.fixture
 def authed_client(client, app):
     from werkzeug.security import generate_password_hash
-    from unified_app import db, User
+
+    from unified_app import User, db
     with app.app_context():
         u = User(email="learn18@test.com", name="Learner",
                  password_hash=generate_password_hash("password123"))
@@ -155,7 +162,7 @@ def test_progress_requires_login(client):
 
 
 def test_progress_roundtrip(authed_client, app):
-    from unified_app import db, RoadmapProgress, User
+    from unified_app import RoadmapProgress, User
     sid = skill_ids()[0]
     r = authed_client.post("/learn/roadmaps/progress", json={
         "skill_id": sid, "stage": "beginner", "status": "in_progress"})
