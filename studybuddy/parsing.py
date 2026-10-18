@@ -383,8 +383,8 @@ def extract_docx(data: bytes) -> ParseResult:
 # ---------------------------------------------------------------------------
 # SEC-08.3 — sandboxed subprocess parsing
 # ---------------------------------------------------------------------------
-def _sandbox_target(data: bytes, ftype: str, max_pages: int, conn):
-    """Runs in the child: apply rlimits, parse, send result back."""
+def _sandbox_target(data: bytes, ftype: str, max_pages: int, queue):
+    """Runs in the child: apply rlimits, parse, send result back via queue."""
     try:
         import resource
         # CPU seconds (hard kill) and address space cap
@@ -397,16 +397,14 @@ def _sandbox_target(data: bytes, ftype: str, max_pages: int, conn):
             res = extract_pdf(data, max_pages)
         else:
             res = extract_docx(data)
-        conn.send(("ok", res))
+        queue.put(("ok", res))
     except ParseError as e:
-        conn.send(("parse_error", str(e)))
+        queue.put(("parse_error", str(e)))
     except MemoryError:
-        conn.send(("error", "File was too complex to parse within memory limits."))
-    except Exception as e:
+        queue.put(("error", "File was too complex to parse within memory limits."))
+    except Exception:
         log.exception("Sandbox parse failed")
-        conn.send(("error", "Could not read this file. Try exporting again."))
-    finally:
-        conn.close()
+        queue.put(("error", "Could not read this file. Try exporting again."))
 
 
 def parse_document(data: bytes, filename: str = "", kind: str = "resume") -> ParseResult:
@@ -418,16 +416,18 @@ def parse_document(data: bytes, filename: str = "", kind: str = "resume") -> Par
     ftype = validate_upload(data, filename, kind)
     max_pages = MAX_RESUME_PAGES if kind == "resume" else MAX_PAPER_PAGES
 
-    parent_conn, child_conn = multiprocessing.Pipe(duplex=False)
-    proc = multiprocessing.Process(
-        target=_sandbox_target, args=(data, ftype, max_pages, child_conn),
+    # Use spawn (not fork): safe in multi-threaded processes like gunicorn
+    # threaded workers or pytest-xdist. Queue carries the pickled result.
+    ctx = multiprocessing.get_context("spawn")
+    queue = ctx.Queue()
+    proc = ctx.Process(
+        target=_sandbox_target, args=(data, ftype, max_pages, queue),
         daemon=True)
     proc.start()
-    child_conn.close()
     try:
-        if parent_conn.poll(PARSE_TIMEOUT_S):
-            status, payload = parent_conn.recv()
-        else:
+        try:
+            status, payload = queue.get(timeout=PARSE_TIMEOUT_S)
+        except Exception:
             proc.terminate()
             proc.join(timeout=2)
             raise ParseError(
@@ -437,7 +437,6 @@ def parse_document(data: bytes, filename: str = "", kind: str = "resume") -> Par
             return payload
         raise ParseError(payload)
     finally:
-        parent_conn.close()
         if proc.is_alive():
             proc.terminate()
             proc.join(timeout=2)
