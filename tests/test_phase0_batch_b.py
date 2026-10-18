@@ -97,3 +97,123 @@ class TestLicenseAudit:
                     offenders.append(f"{name} ({lic.strip()})")
         assert not offenders, \
             f"Strong-copyleft deps conflict with MIT: {offenders}"
+
+
+def _addrinfo(*ips):
+    """Fake socket.getaddrinfo result for the given IP strings."""
+    out = []
+    for ip in ips:
+        fam = 10 if ":" in ip else 2
+        out.append((fam, 1, 6, "", (ip, 0)))
+    return out
+
+
+class TestSafeFetch:
+    """SEC-02: SSRF-safe fetcher blocks server-side request forgery."""
+
+    def test_blocks_private_ipv4_literal(self):
+        from studybuddy.safe_fetch import validate_url, SSRFError
+        for bad in ("http://127.0.0.1/", "http://10.0.0.5:8080/x",
+                    "http://192.168.1.1/", "http://169.254.169.254/latest/"):
+            with pytest.raises(SSRFError):
+                validate_url(bad)
+
+    def test_blocks_private_ipv6_and_reserved(self):
+        from studybuddy.safe_fetch import validate_url, SSRFError
+        for bad in ("http://[::1]/", "http://[fc00::1]/",
+                    "http://0.0.0.0/"):
+            with pytest.raises(SSRFError):
+                validate_url(bad)
+
+    def test_blocks_dns_to_private_ip(self):
+        import unittest.mock as mock
+        from studybuddy.safe_fetch import validate_url, SSRFError
+        with mock.patch("socket.getaddrinfo",
+                        return_value=_addrinfo("10.1.2.3")):
+            with pytest.raises(SSRFError):
+                validate_url("http://internal.example.com/")
+
+    def test_blocks_non_http_schemes(self):
+        from studybuddy.safe_fetch import validate_url, SSRFError
+        for bad in ("file:///etc/passwd", "ftp://x/y", "gopher://x/",
+                    "http://user:pass@example.com/"):
+            with pytest.raises(SSRFError):
+                validate_url(bad)
+
+    def test_allows_public_ip(self):
+        import unittest.mock as mock
+        from studybuddy.safe_fetch import validate_url
+        with mock.patch("socket.getaddrinfo",
+                        return_value=_addrinfo("93.184.216.34")):
+            parsed = validate_url("https://example.com/paper.pdf")
+            assert parsed.hostname == "example.com"
+
+    def test_safe_fetch_blocks_before_network(self):
+        """Validation happens before any socket is opened."""
+        import unittest.mock as mock
+        from studybuddy import safe_fetch as sf
+        with mock.patch("socket.getaddrinfo",
+                        return_value=_addrinfo("169.254.169.254")), \
+             mock.patch.object(sf.requests, "request") as mreq:
+            with pytest.raises(sf.SSRFError):
+                sf.safe_fetch("http://169.254.169.254/latest/meta-data/")
+            mreq.assert_not_called()
+
+    def test_safe_fetch_follows_safe_redirects(self):
+        import unittest.mock as mock
+        from studybuddy import safe_fetch as sf
+
+        def fake_request(method, url, **kw):
+            m = mock.Mock()
+            if url == "https://example.com/a":
+                m.status_code = 302
+                m.headers = {"Location": "https://example.com/b"}
+                m.iter_content = lambda chunk_size: iter([b"x"])
+                m.close = lambda: None
+            else:
+                m.status_code = 200
+                m.headers = {}
+                m.iter_content = lambda chunk_size: iter([b"ok"])
+                m.close = lambda: None
+            return m
+
+        with mock.patch("socket.getaddrinfo",
+                        return_value=_addrinfo("93.184.216.34")), \
+             mock.patch.object(sf.requests, "request", side_effect=fake_request):
+            code, body, _hdrs = sf.safe_fetch("https://example.com/a")
+            assert code == 200 and body == b"ok"
+
+    def test_safe_fetch_blocks_redirect_to_private(self):
+        import unittest.mock as mock
+        from studybuddy import safe_fetch as sf
+
+        def fake_request(method, url, **kw):
+            m = mock.Mock()
+            m.status_code = 302
+            m.headers = {"Location": "http://169.254.169.254/x"}
+            m.close = lambda: None
+            return m
+
+        def fake_dns(host, *a, **k):
+            if "169.254.169.254" in host or host == "169.254.169.254":
+                return _addrinfo("169.254.169.254")
+            return _addrinfo("93.184.216.34")
+
+        with mock.patch("socket.getaddrinfo", side_effect=fake_dns), \
+             mock.patch.object(sf.requests, "request", side_effect=fake_request):
+            with pytest.raises(sf.SSRFError):
+                sf.safe_fetch("https://example.com/a")
+
+    def test_check_demo_links_never_touches_private(self):
+        """Portfolio link checker must not open sockets to private IPs."""
+        import unittest.mock as mock
+        from studybuddy import portfolio
+        with mock.patch("socket.getaddrinfo",
+                        return_value=_addrinfo("127.0.0.1")), \
+             mock.patch("studybuddy.safe_fetch.requests.request") as mreq:
+            res = portfolio.check_demo_links(
+                [{"title": "Evil", "demo_link": "http://127.0.0.1:8080/"}])
+            mreq.assert_not_called()
+            assert res["links"][0]["alive"] is False
+            assert "ssrf" in res["links"][0]["status"].lower() or \
+                   "blocked" in res["links"][0]["status"].lower()

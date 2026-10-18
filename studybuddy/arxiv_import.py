@@ -19,6 +19,9 @@ from datetime import datetime, timezone
 
 import requests
 
+from studybuddy.safe_fetch import (  # SEC-02: SSRF-safe fetching
+    validate_url, safe_fetch_stream, SSRFError)
+
 logger = logging.getLogger(__name__)
 
 # --------------------------------------------------------------------------
@@ -619,34 +622,47 @@ _MAX_PDF_BYTES = 30 * 1024 * 1024
 def download_pdf(pdf_url: str, dest_path: str) -> bool:
     """Stream a PDF to dest_path (max 30MB, content-type sanity check).
 
-    Partial downloads are always cleaned up in a finally block. Never raises.
+    SEC-02: the URL goes through the SSRF-safe fetcher — private IPs,
+    metadata endpoints and non-HTTP schemes are rejected before any
+    connection is opened. Partial downloads are always cleaned up in a
+    finally block. Never raises.
     """
     if not pdf_url or not dest_path:
         return False
     dest = os.path.abspath(dest_path)
+    # Policy gate first: SSRF-blocked URLs fail fast with no retries.
+    try:
+        validate_url(pdf_url)
+    except SSRFError:
+        return False
     ok = False
     try:
-        with _get_stream(pdf_url) as resp:
-            if resp.status_code != 200:
-                return False
-            ctype = (resp.headers.get("Content-Type") or "").lower()
-            if "pdf" not in ctype:
-                return False
-            total = 0
-            parent = os.path.dirname(dest)
-            if parent:
-                os.makedirs(parent, exist_ok=True)
-            with open(dest, "wb") as fh:
-                for chunk in resp.iter_content(chunk_size=65536):
-                    if not chunk:
-                        continue
-                    total += len(chunk)
-                    if total > _MAX_PDF_BYTES:
+        for _ in range(_MAX_RETRIES + 1):
+            try:
+                with safe_fetch_stream(pdf_url) as resp:
+                    if resp.status_code != 200:
                         return False
-                    fh.write(chunk)
-        ok = os.path.getsize(dest) > 0
-        return ok
-    except (requests.RequestException, OSError):
+                    ctype = (resp.headers.get("Content-Type") or "").lower()
+                    if "pdf" not in ctype:
+                        return False
+                    total = 0
+                    parent = os.path.dirname(dest)
+                    if parent:
+                        os.makedirs(parent, exist_ok=True)
+                    with open(dest, "wb") as fh:
+                        for chunk in resp.iter_content(chunk_size=65536):
+                            if not chunk:
+                                continue
+                            total += len(chunk)
+                            if total > _MAX_PDF_BYTES:
+                                return False
+                            fh.write(chunk)
+                ok = os.path.getsize(dest) > 0
+                return ok
+            except SSRFError:
+                continue  # transient network failure; retry
+        return False
+    except OSError:
         return False
     finally:
         if not ok:

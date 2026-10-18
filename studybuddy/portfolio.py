@@ -212,11 +212,13 @@ def generate_case_study(project):
 def check_demo_links(projects, timeout=8):
     """Verify project demo/repo links are alive. Returns per-link status.
 
+    SEC-02: URLs go through the SSRF-safe fetcher — private IPs, metadata
+    endpoints and non-HTTP schemes are blocked before any connection opens.
+
     projects: list of {title, link, demo_link}. Never raises on network
     failure — a dead link is a result, not an exception.
     """
-    import urllib.request
-    import socket
+    from studybuddy.safe_fetch import validate_url, safe_fetch, SSRFError
     if not isinstance(projects, (list, tuple)):
         raise ValueError("projects must be a list.")
     results = []
@@ -232,27 +234,34 @@ def check_demo_links(projects, timeout=8):
                 results.append({"title": title, "kind": key, "url": url[:120],
                                 "alive": False, "status": "invalid URL"})
                 continue
+            # SSRF policy gate first — blocked URLs never touch the network.
             try:
-                req = urllib.request.Request(url, method="HEAD",
-                                             headers={"User-Agent": "STUDY-BUDDY/1.0"})
-                with urllib.request.urlopen(req, timeout=timeout) as resp:
-                    code = resp.status
+                validate_url(url)
+            except SSRFError as e:
+                results.append({"title": title, "kind": key, "url": url[:120],
+                                "alive": False,
+                                "status": f"blocked (SSRF policy: {e})"})
+                continue
+            try:
+                code, _body, _hdrs = safe_fetch(
+                    url, method="HEAD", timeout=timeout, max_bytes=65536)
                 alive = 200 <= code < 400
                 results.append({"title": title, "kind": key, "url": url[:120],
                                 "alive": alive, "status": f"HTTP {code}"})
-            except Exception as e:
+            except SSRFError:
                 # HEAD may be blocked; try GET as fallback once.
                 try:
-                    req = urllib.request.Request(url, headers={"User-Agent": "STUDY-BUDDY/1.0"})
-                    with urllib.request.urlopen(req, timeout=timeout) as resp:
-                        code = resp.status
+                    code, _body, _hdrs = safe_fetch(
+                        url, method="GET", timeout=timeout, max_bytes=65536)
                     alive = 200 <= code < 400
-                    results.append({"title": title, "kind": key, "url": url[:120],
-                                    "alive": alive, "status": f"HTTP {code} (GET)"})
-                except Exception:
-                    err = type(e).__name__
-                    results.append({"title": title, "kind": key, "url": url[:120],
-                                    "alive": False, "status": f"unreachable ({err})"})
+                    results.append({"title": title, "kind": key,
+                                    "url": url[:120],
+                                    "alive": alive,
+                                    "status": f"HTTP {code} (GET)"})
+                except SSRFError as e2:
+                    results.append({"title": title, "kind": key,
+                                    "url": url[:120], "alive": False,
+                                    "status": f"unreachable ({e2})"})
     dead = [r for r in results if not r["alive"]]
     return {"links": results, "checked": len(results),
             "alive_count": len(results) - len(dead),
