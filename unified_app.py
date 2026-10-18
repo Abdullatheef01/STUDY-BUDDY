@@ -2099,9 +2099,12 @@ def create_app(config_overrides=None):
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     db.init_app(app)
-    # ARC-03: Alembic migrations. render_as_batch keeps SQLite dev/test working.
+    # ARC-03: Alembic migrations. render_as_batch only for SQLite (batch mode
+    # is a SQLite-only workaround; on Postgres it can break migrations).
     if migrate is not None:
-        migrate.init_app(app, db, render_as_batch=True)
+        _db_url = app.config.get("SQLALCHEMY_DATABASE_URI") or ""
+        _is_sqlite = _db_url.startswith("sqlite")
+        migrate.init_app(app, db, render_as_batch=_is_sqlite)
     login_manager.init_app(app)
     login_manager.login_view = "login"
     login_manager.login_message_category = "info"
