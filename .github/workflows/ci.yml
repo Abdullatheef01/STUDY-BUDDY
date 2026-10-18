@@ -36,7 +36,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
       - run: pip install --require-hashes -r requirements-dev.txt
-      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
+      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider --tb=line 2>&1 | tail -50
         env:
           STUDYBUDDY_NO_PARSE_SANDBOX: "1"
 
@@ -69,18 +69,25 @@ jobs:
       # ARC-03: migrate first (prod boots skip create_all on Postgres),
       # then drift-check, then the suite.
       - run: |
-          for i in $(seq 1 30); do
-            pg_isready -h localhost -p 5432 -U sb && break
-            echo "Waiting for postgres... ($i)"
-            sleep 2
-          done
+          python3 -c "
+          import socket, time
+          for i in range(30):
+              try:
+                  s = socket.create_connection(('localhost', 5432), timeout=2)
+                  s.close()
+                  print('Postgres ready')
+                  break
+              except OSError:
+                  print(f'Waiting for postgres... ({i})')
+                  time.sleep(2)
+          "
           flask db upgrade head
         env:
           FLASK_APP: unified_app
       - run: flask db check
         env:
           FLASK_APP: unified_app
-      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
+      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider --tb=line 2>&1 | tail -50
         env:
           STUDYBUDDY_NO_PARSE_SANDBOX: "1"
 
