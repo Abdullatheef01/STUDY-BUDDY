@@ -26,7 +26,7 @@ def extract_fields(text):
     """Baseline field extractor (same logic as production parser)."""
     from studybuddy.parsing import extract_fields as _ef
     # Use the production field extractor for a fair benchmark
-    result = _ef(text) if hasattr(_ef, "__call__") else {}
+    result = _ef(text) if callable(_ef) else {}
     return result if isinstance(result, dict) else {}
 
 
