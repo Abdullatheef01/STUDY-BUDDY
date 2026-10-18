@@ -410,9 +410,17 @@ def parse_document(data: bytes, filename: str = "", kind: str = "resume") -> Par
 
     The caller's bytes are never written to disk; the child parses purely
     in memory and the result crosses the process boundary pickled.
+
+    Set STUDYBUDDY_NO_PARSE_SANDBOX=1 to parse in-process (tests only).
     """
     ftype = validate_upload(data, filename, kind)
     max_pages = MAX_RESUME_PAGES if kind == "resume" else MAX_PAPER_PAGES
+
+    if os.environ.get("STUDYBUDDY_NO_PARSE_SANDBOX") == "1":
+        # Test mode: parse in-process (no multiprocessing overhead)
+        if ftype == "pdf":
+            return extract_pdf(data, max_pages)
+        return extract_docx(data)
 
     # Use spawn (not fork): safe in multi-threaded processes like gunicorn
     # threaded workers or pytest-xdist. Queue carries the pickled result.

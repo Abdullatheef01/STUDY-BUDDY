@@ -37,6 +37,8 @@ jobs:
           cache: pip
       - run: pip install --require-hashes -r requirements-dev.txt
       - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
+        env:
+          STUDYBUDDY_NO_PARSE_SANDBOX: "1"
 
   test-postgres:
     name: pytest (Postgres 16)
@@ -66,13 +68,21 @@ jobs:
       - run: pip install pytest pytest-xdist
       # ARC-03: migrate first (prod boots skip create_all on Postgres),
       # then drift-check, then the suite.
-      - run: flask db upgrade head
+      - run: |
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5432 -U sb && break
+            echo "Waiting for postgres... ($i)"
+            sleep 2
+          done
+          flask db upgrade head
         env:
           FLASK_APP: unified_app
       - run: flask db check
         env:
           FLASK_APP: unified_app
       - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
+        env:
+          STUDYBUDDY_NO_PARSE_SANDBOX: "1"
 
   security:
     name: Bandit + pip-audit
