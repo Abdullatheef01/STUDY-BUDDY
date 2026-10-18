@@ -1,0 +1,17 @@
+{
+  "id": "syn_018",
+  "text": "Sneha Iyer\nsneha.iyer18@example.com | +91 9828814949 | linkedin.com/in/snehaiyer\n\nPROFESSIONAL SUMMARY\nBackend Developer with 1 years of experience building scalable applications.\n\nSKILLS\nMachine Learning, Git, SQL, JavaScript, TypeScript\n\nEXPERIENCE\nBackend Developer \u2014 TechCorp (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Sneha Iyer",
+    "email": "sneha.iyer18@example.com",
+    "phone": "+91 9828814949",
+    "skills": [
+      "Machine Learning",
+      "Git",
+      "SQL",
+      "JavaScript",
+      "TypeScript"
+    ],
+    "role": "Backend Developer"
+  }
+}

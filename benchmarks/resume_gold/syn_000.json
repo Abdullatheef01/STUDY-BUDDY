@@ -1,0 +1,17 @@
+{
+  "id": "syn_000",
+  "text": "Priya Sharma\npriya.sharma0@example.com | +91 9846913810 | linkedin.com/in/priyasharma\n\nPROFESSIONAL SUMMARY\nData Analyst with 1 years of experience building scalable applications.\n\nSKILLS\nReact, JavaScript, Java, TypeScript, AWS\n\nEXPERIENCE\nData Analyst \u2014 TechCorp (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Priya Sharma",
+    "email": "priya.sharma0@example.com",
+    "phone": "+91 9846913810",
+    "skills": [
+      "React",
+      "JavaScript",
+      "Java",
+      "TypeScript",
+      "AWS"
+    ],
+    "role": "Data Analyst"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "syn_015",
+  "text": "Sneha Sharma\nsneha.sharma15@example.com | +91 9819528530 | linkedin.com/in/snehasharma\n\nPROFESSIONAL SUMMARY\nSoftware Engineer with 4 years of experience building scalable applications.\n\nSKILLS\nJavaScript, Python, Docker, MongoDB, SQL\n\nEXPERIENCE\nSoftware Engineer \u2014 CloudNine (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Sneha Sharma",
+    "email": "sneha.sharma15@example.com",
+    "phone": "+91 9819528530",
+    "skills": [
+      "JavaScript",
+      "Python",
+      "Docker",
+      "MongoDB",
+      "SQL"
+    ],
+    "role": "Software Engineer"
+  }
+}

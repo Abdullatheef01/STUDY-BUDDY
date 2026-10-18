@@ -1,0 +1,17 @@
+{
+  "id": "syn_013",
+  "text": "Ananya Singh\nananya.singh13@example.com | +91 9845575298 | linkedin.com/in/ananyasingh\n\nPROFESSIONAL SUMMARY\nBackend Developer with 5 years of experience building scalable applications.\n\nSKILLS\nJava, SQL, Machine Learning, AWS, Docker\n\nEXPERIENCE\nBackend Developer \u2014 InnovateLabs (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Ananya Singh",
+    "email": "ananya.singh13@example.com",
+    "phone": "+91 9845575298",
+    "skills": [
+      "Java",
+      "SQL",
+      "Machine Learning",
+      "AWS",
+      "Docker"
+    ],
+    "role": "Backend Developer"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "syn_004",
+  "text": "Arjun Reddy\narjun.reddy4@example.com | +91 9887490893 | linkedin.com/in/arjunreddy\n\nPROFESSIONAL SUMMARY\nData Analyst with 2 years of experience building scalable applications.\n\nSKILLS\nPython, TypeScript, SQL, Machine Learning\n\nEXPERIENCE\nData Analyst \u2014 TechCorp (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Arjun Reddy",
+    "email": "arjun.reddy4@example.com",
+    "phone": "+91 9887490893",
+    "skills": [
+      "Python",
+      "TypeScript",
+      "SQL",
+      "Machine Learning"
+    ],
+    "role": "Data Analyst"
+  }
+}

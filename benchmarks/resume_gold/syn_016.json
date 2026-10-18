@@ -1,0 +1,17 @@
+{
+  "id": "syn_016",
+  "text": "Sneha Singh\nsneha.singh16@example.com | +91 9886644106 | linkedin.com/in/snehasingh\n\nPROFESSIONAL SUMMARY\nBackend Developer with 3 years of experience building scalable applications.\n\nSKILLS\nGit, AWS, SQL, JavaScript, Java\n\nEXPERIENCE\nBackend Developer \u2014 InnovateLabs (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Sneha Singh",
+    "email": "sneha.singh16@example.com",
+    "phone": "+91 9886644106",
+    "skills": [
+      "Git",
+      "AWS",
+      "SQL",
+      "JavaScript",
+      "Java"
+    ],
+    "role": "Backend Developer"
+  }
+}

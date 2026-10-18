@@ -1,0 +1,17 @@
+{
+  "id": "syn_029",
+  "text": "Kavya Khan\nkavya.khan29@example.com | +91 9893303777 | linkedin.com/in/kavyakhan\n\nPROFESSIONAL SUMMARY\nData Analyst with 4 years of experience building scalable applications.\n\nSKILLS\nReact, MongoDB, AWS, Python, TypeScript\n\nEXPERIENCE\nData Analyst \u2014 CloudNine (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Kavya Khan",
+    "email": "kavya.khan29@example.com",
+    "phone": "+91 9893303777",
+    "skills": [
+      "React",
+      "MongoDB",
+      "AWS",
+      "Python",
+      "TypeScript"
+    ],
+    "role": "Data Analyst"
+  }
+}

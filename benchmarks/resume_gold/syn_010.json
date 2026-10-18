@@ -1,0 +1,19 @@
+{
+  "id": "syn_010",
+  "text": "Arjun Reddy\narjun.reddy10@example.com | +91 9824972279 | linkedin.com/in/arjunreddy\n\nPROFESSIONAL SUMMARY\nFrontend Developer with 5 years of experience building scalable applications.\n\nSKILLS\nReact, Git, Python, Machine Learning, MongoDB, Java, Node.js\n\nEXPERIENCE\nFrontend Developer \u2014 CloudNine (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Arjun Reddy",
+    "email": "arjun.reddy10@example.com",
+    "phone": "+91 9824972279",
+    "skills": [
+      "React",
+      "Git",
+      "Python",
+      "Machine Learning",
+      "MongoDB",
+      "Java",
+      "Node.js"
+    ],
+    "role": "Frontend Developer"
+  }
+}

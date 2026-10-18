@@ -1,0 +1,16 @@
+{
+  "id": "syn_025",
+  "text": "Arjun Sharma\narjun.sharma25@example.com | +91 9899639081 | linkedin.com/in/arjunsharma\n\nPROFESSIONAL SUMMARY\nFrontend Developer with 3 years of experience building scalable applications.\n\nSKILLS\nReact, Machine Learning, JavaScript, Node.js\n\nEXPERIENCE\nFrontend Developer \u2014 DataSystems (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Arjun Sharma",
+    "email": "arjun.sharma25@example.com",
+    "phone": "+91 9899639081",
+    "skills": [
+      "React",
+      "Machine Learning",
+      "JavaScript",
+      "Node.js"
+    ],
+    "role": "Frontend Developer"
+  }
+}

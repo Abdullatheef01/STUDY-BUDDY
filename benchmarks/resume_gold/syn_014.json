@@ -1,0 +1,16 @@
+{
+  "id": "syn_014",
+  "text": "Ananya Patel\nananya.patel14@example.com | +91 9843273328 | linkedin.com/in/ananyapatel\n\nPROFESSIONAL SUMMARY\nData Analyst with 5 years of experience building scalable applications.\n\nSKILLS\nDocker, Python, Node.js, Java\n\nEXPERIENCE\nData Analyst \u2014 DataSystems (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Ananya Patel",
+    "email": "ananya.patel14@example.com",
+    "phone": "+91 9843273328",
+    "skills": [
+      "Docker",
+      "Python",
+      "Node.js",
+      "Java"
+    ],
+    "role": "Data Analyst"
+  }
+}

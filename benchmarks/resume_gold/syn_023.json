@@ -1,0 +1,19 @@
+{
+  "id": "syn_023",
+  "text": "Sneha Reddy\nsneha.reddy23@example.com | +91 9842035886 | linkedin.com/in/snehareddy\n\nPROFESSIONAL SUMMARY\nFrontend Developer with 4 years of experience building scalable applications.\n\nSKILLS\nReact, TypeScript, Machine Learning, Git, Docker, AWS, Python\n\nEXPERIENCE\nFrontend Developer \u2014 TechCorp (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Sneha Reddy",
+    "email": "sneha.reddy23@example.com",
+    "phone": "+91 9842035886",
+    "skills": [
+      "React",
+      "TypeScript",
+      "Machine Learning",
+      "Git",
+      "Docker",
+      "AWS",
+      "Python"
+    ],
+    "role": "Frontend Developer"
+  }
+}

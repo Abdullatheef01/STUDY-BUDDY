@@ -1,0 +1,18 @@
+{
+  "id": "syn_024",
+  "text": "Priya Patel\npriya.patel24@example.com | +91 9882160068 | linkedin.com/in/priyapatel\n\nPROFESSIONAL SUMMARY\nData Analyst with 4 years of experience building scalable applications.\n\nSKILLS\nReact, Docker, JavaScript, SQL, TypeScript, MongoDB\n\nEXPERIENCE\nData Analyst \u2014 DataSystems (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Priya Patel",
+    "email": "priya.patel24@example.com",
+    "phone": "+91 9882160068",
+    "skills": [
+      "React",
+      "Docker",
+      "JavaScript",
+      "SQL",
+      "TypeScript",
+      "MongoDB"
+    ],
+    "role": "Data Analyst"
+  }
+}

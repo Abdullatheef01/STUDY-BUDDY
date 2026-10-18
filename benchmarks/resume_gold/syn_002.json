@@ -1,0 +1,18 @@
+{
+  "id": "syn_002",
+  "text": "Arjun Sharma\narjun.sharma2@example.com | +91 9831429110 | linkedin.com/in/arjunsharma\n\nPROFESSIONAL SUMMARY\nBackend Developer with 1 years of experience building scalable applications.\n\nSKILLS\nMachine Learning, React, SQL, Docker, JavaScript, Python\n\nEXPERIENCE\nBackend Developer \u2014 InnovateLabs (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Arjun Sharma",
+    "email": "arjun.sharma2@example.com",
+    "phone": "+91 9831429110",
+    "skills": [
+      "Machine Learning",
+      "React",
+      "SQL",
+      "Docker",
+      "JavaScript",
+      "Python"
+    ],
+    "role": "Backend Developer"
+  }
+}

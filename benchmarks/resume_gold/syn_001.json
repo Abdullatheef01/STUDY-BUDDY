@@ -1,0 +1,17 @@
+{
+  "id": "syn_001",
+  "text": "Priya Gupta\npriya.gupta1@example.com | +91 9841227216 | linkedin.com/in/priyagupta\n\nPROFESSIONAL SUMMARY\nSoftware Engineer with 5 years of experience building scalable applications.\n\nSKILLS\nMongoDB, TypeScript, Java, AWS, SQL\n\nEXPERIENCE\nSoftware Engineer \u2014 InnovateLabs (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Priya Gupta",
+    "email": "priya.gupta1@example.com",
+    "phone": "+91 9841227216",
+    "skills": [
+      "MongoDB",
+      "TypeScript",
+      "Java",
+      "AWS",
+      "SQL"
+    ],
+    "role": "Software Engineer"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "syn_003",
+  "text": "Kavya Reddy\nkavya.reddy3@example.com | +91 9891030736 | linkedin.com/in/kavyareddy\n\nPROFESSIONAL SUMMARY\nFrontend Developer with 1 years of experience building scalable applications.\n\nSKILLS\nMongoDB, Git, Java, JavaScript\n\nEXPERIENCE\nFrontend Developer \u2014 InnovateLabs (2022\u2013Present)\n- Built microservices handling 10k req/s\n- Reduced latency by 40% through caching\n\nEDUCATION\nB.Tech Computer Science, 2021\n",
+  "labels": {
+    "name": "Kavya Reddy",
+    "email": "kavya.reddy3@example.com",
+    "phone": "+91 9891030736",
+    "skills": [
+      "MongoDB",
+      "Git",
+      "Java",
+      "JavaScript"
+    ],
+    "role": "Frontend Developer"
+  }
+}
