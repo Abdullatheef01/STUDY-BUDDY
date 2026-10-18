@@ -35,7 +35,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-      - run: pip install -r requirements.txt pytest pytest-xdist
+      - run: pip install --require-hashes -r requirements.txt
+      - run: pip install pytest pytest-xdist
       - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
 
   test-postgres:
@@ -62,7 +63,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-      - run: pip install -r requirements.txt pytest pytest-xdist psycopg2-binary
+      - run: pip install --require-hashes -r requirements.txt
+      - run: pip install pytest pytest-xdist
       - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
 
   security:
@@ -74,6 +76,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-      - run: pip install -r requirements.txt bandit pip-audit
+      - run: pip install --require-hashes -r requirements.txt
+      - run: pip install bandit pip-audit
       - run: bandit -q -r unified_app.py studybuddy/ -x tests
       - run: pip-audit --desc

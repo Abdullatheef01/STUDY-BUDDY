@@ -4,7 +4,12 @@ services:
   - type: web
     name: acra
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    # OPS-01: pin the interpreter — a 3.10 vs 3.12 mismatch once crashed
+    # every deploy (backslash in f-string is a SyntaxError on <3.12).
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+    buildCommand: pip install --require-hashes -r requirements.txt
     # 2 workers + threads handle concurrent uploads; 120s timeout covers the
     # resume pipeline and Gemini calls (which fail fast at 30s per attempt).
     startCommand: gunicorn unified_app:app --workers 2 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
