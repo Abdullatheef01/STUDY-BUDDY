@@ -3,18 +3,36 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+os.environ["OPP_NO_AUTO_REFRESH"] = "1"
+
 import pytest
 
-from unified_app import create_app
+from unified_app import create_app, db, User
 from studybuddy.ultimate_routes import run_tool, ALL_TOOLS, _TOOL_INDEX
 
 
 @pytest.fixture(scope="module")
 def client():
-    app = create_app()
-    app.config["TESTING"] = True
-    app.config["WTF_CSRF_ENABLED"] = False
-    return app.test_client()
+    # SEC-01 (Phase 0): the dispatcher now requires login. The old tests
+    # encoded anonymous access as correct; that was the vulnerability, so
+    # the fixture now creates a user and logs in before exercising endpoints.
+    app = create_app({
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SECRET_KEY": "lab-api-test-secret",
+        "WTF_CSRF_ENABLED": False,
+    })
+    with app.app_context():
+        db.create_all()
+        u = User(name="Lab Tester", email="lab@example.com")
+        u.set_password("lab-pass-123")
+        db.session.add(u)
+        db.session.commit()
+    c = app.test_client()
+    r = c.post("/login", data={"email": "lab@example.com",
+                               "password": "lab-pass-123"})
+    assert r.status_code in (302, 303)
+    return c
 
 
 def test_registry_complete():

@@ -397,11 +397,14 @@ def keyword_action_plan(report, resume_text, sections=None):
     return plan
 
 
-def offer_probability(report, applicants_estimate=None):
-    """Blend ATS score into an offer-chances meter.
+def competitiveness_checklist(report, applicants_estimate=None):
+    """Qualitative competitiveness checklist — explicitly NOT a prediction.
 
-    applicants_estimate: rough applicant count for the role (optional).
-    Returns {probability_pct, band, reasoning}. Never raises.
+    ENG-08 (Phase 0): the old ``offer_probability()`` turned an ATS score
+    into a made-up "offer chance %" via an arbitrary logistic curve. No data
+    links those numbers to real hiring outcomes, so the percentages were
+    removed. This returns a qualitative, explicitly illustrative checklist
+    with no percentages and no chance labels. Never raises.
     """
     report = report or {}
     score = report.get("score", 0) or 0
@@ -411,29 +414,48 @@ def offer_probability(report, applicants_estimate=None):
         score = 0.0
     score = max(0.0, min(100.0, score))
 
-    # Base probability from score via a logistic-ish curve.
-    base = 100.0 / (1.0 + 2.71828 ** (-(score - 55) / 12))
-
-    # Competition adjustment: more applicants -> lower chances.
     try:
         n = int(applicants_estimate) if applicants_estimate is not None else 0
     except (TypeError, ValueError):
         n = 0
-    if n > 0:
-        # Halve roughly every 10x applicants beyond ~50.
-        import math
-        factor = 0.5 ** (max(0.0, math.log10(max(n, 1)) - math.log10(50)))
-        base *= 0.35 + 0.65 * factor
 
-    pct = round(max(1.0, min(97.0, base)), 1)
-    band = ("Strong chance" if pct >= 60 else
-            "Decent chance" if pct >= 35 else
-            "Long shot" if pct >= 15 else "Very unlikely")
-    reasoning = (
-        f"ATS match {score:.0f}/100"
-        + (f" against ~{n} applicants" if n > 0 else " (applicant count unknown)")
-        + f" -> estimated {band.lower()}."
-    )
-    return {"probability_pct": pct, "band": band, "reasoning": reasoning,
-            "ats_score": round(score, 1),
-            "applicants_estimate": n if n > 0 else None}
+    if score >= 75:
+        match = ("above", "Your match score is above the range where most "
+                          "applications get a first look. Keep the strongest "
+                          "evidence in the top third of the resume.")
+    elif score >= 55:
+        match = ("around", "Your match score is around the typical first-look "
+                           "range. Tighten the top skills section to the exact "
+                           "terms in the job description.")
+    else:
+        match = ("below", "Your match score is below the typical first-look "
+                          "range. Rework the summary and skills to mirror the "
+                          "job description before applying.")
+
+    checklist = [
+        {"item": "Resume-to-JD match",
+         "status": match[0],
+         "note": match[1]},
+        {"item": "Competition awareness",
+         "status": "known" if n > 0 else "unknown",
+         "note": (f"Roughly {n} applicants estimated — larger pools reward "
+                  "sharper differentiation in the top third of the resume."
+                  if n > 0 else
+                  "Applicant count unknown — assume a competitive pool and "
+                  "lead with your strongest, most relevant evidence.")},
+        {"item": "Proof over claims",
+         "status": "check",
+         "note": "Every skill listed should have at least one bullet with a "
+                 "concrete outcome. Unproven skills read as filler."},
+        {"item": "One tailored version per role",
+         "status": "check",
+         "note": "Re-run the JD match for each application; a generic resume "
+                 "underperforms a tailored one even with the same experience."},
+    ]
+    return {"ats_score": round(score, 1),
+            "applicants_estimate": n if n > 0 else None,
+            "checklist": checklist,
+            "illustrative": True,
+            "disclaimer": ("Illustrative checklist only — not a prediction of "
+                           "offer chances. No data links these factors to "
+                           "actual hiring outcomes.")}

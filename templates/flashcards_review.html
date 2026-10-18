@@ -56,6 +56,6 @@
         <p class="b-form-error" id="fc-error" style="display:none;" role="alert"></p>
     </div>
 </section>
-<script id="fc-data" type="application/json">{{ cards_json|safe }}</script>
+<script id="fc-data" type="application/json">{{ cards|tojson }}</script>
 <script src="{{ url_for('static', filename='js/flashcards.js') }}"></script>
 {% endblock %}

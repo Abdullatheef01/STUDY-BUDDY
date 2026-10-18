@@ -1,4 +1,4 @@
-"""Feature 1 ultimate: harsh tests for AI pre-screen sim, action plan, probability."""
+"""Feature 1 ultimate: harsh tests for AI pre-screen sim, action plan, checklist."""
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -8,7 +8,7 @@ import pytest
 
 from tests.mega.harsh_corpus import HARSH_STRINGS
 from studybuddy.jd_matcher import (
-    simulate_ai_screen, keyword_action_plan, offer_probability,
+    simulate_ai_screen, keyword_action_plan, competitiveness_checklist,
 )
 
 
@@ -77,24 +77,36 @@ def test_plan_skips_present_keywords():
     assert all(p["keyword"].lower() != "python" for p in plan)
 
 
+# ENG-08 (Phase 0): the old offer_probability() fabricated "offer chance %"
+# from a made-up logistic curve. It was replaced by competitiveness_checklist(),
+# which is explicitly illustrative and returns no percentages. These tests
+# lock the honest behavior: harsh inputs must never raise, output must never
+# contain fabricated numbers, and every item must carry actionable guidance.
 @pytest.mark.parametrize("score", [0, 1, 50, 78.5, 100, -10, 150, None, "bad", float("inf")])
 @pytest.mark.parametrize("apps", [None, 0, 1, 50, 200, 10000, -5, "bad"])
-def test_probability_bounds(score, apps):
+def test_checklist_never_raises_and_has_no_percentages(score, apps):
     try:
-        r = offer_probability({"score": score}, apps)
+        r = competitiveness_checklist({"score": score}, apps)
     except (ValueError, TypeError, OverflowError):
         return
-    assert 1 <= r["probability_pct"] <= 97
-    assert r["band"] in ("Strong chance", "Decent chance", "Long shot", "Very unlikely")
+    blob = str(r).lower()
+    assert "probability_pct" not in r
+    assert "%" not in blob
+    assert r.get("illustrative") is True
+    assert r["checklist"]
+    for item in r["checklist"]:
+        assert item.get("item") and item.get("note")
 
 
-def test_probability_more_applicants_lower():
-    high_comp = offer_probability({"score": 80}, 5000)["probability_pct"]
-    low_comp = offer_probability({"score": 80}, 20)["probability_pct"]
-    assert low_comp >= high_comp
+def test_checklist_status_tracks_score():
+    high = competitiveness_checklist({"score": 90}, 100)["checklist"][0]["status"]
+    low = competitiveness_checklist({"score": 40}, 100)["checklist"][0]["status"]
+    assert high == "above"
+    assert low == "below"
 
 
-def test_probability_higher_score_higher():
-    a = offer_probability({"score": 90}, 100)["probability_pct"]
-    b = offer_probability({"score": 40}, 100)["probability_pct"]
-    assert a > b
+def test_checklist_competition_awareness():
+    known = competitiveness_checklist({"score": 80}, 5000)["checklist"][1]
+    unknown = competitiveness_checklist({"score": 80}, None)["checklist"][1]
+    assert known["status"] == "known"
+    assert unknown["status"] == "unknown"

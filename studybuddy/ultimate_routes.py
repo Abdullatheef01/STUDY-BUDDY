@@ -4,12 +4,18 @@ Endpoints (registered by register_ultimate_routes):
   GET  /api/ultimate/tools          -> metadata for every tool (id, feature, name, description, fields)
   POST /api/ultimate/run/<tool_id>  -> run a tool; JSON body = {field: value}; returns {ok, result} or {ok:false, error}
   GET  /ultimate/lab               -> the interactive dashboard page
+
+SEC-01 (Phase 0): every endpoint requires a logged-in user. The two JSON
+APIs return 401 for anonymous callers; the HTML Lab page uses the standard
+@login_required redirect. The run endpoint is rate-limited and rejects
+oversized bodies.
 """
 import importlib
 import json
 from datetime import date, datetime
 
 from flask import jsonify, request, render_template
+from flask_login import current_user, login_required
 
 from studybuddy.ultimate_reg_a import TOOLS_A
 from studybuddy.ultimate_reg_b import TOOLS_B
@@ -17,6 +23,10 @@ from studybuddy.ultimate_reg_c import TOOLS_C
 
 ALL_TOOLS = TOOLS_A + TOOLS_B + TOOLS_C
 _TOOL_INDEX = {t["id"]: t for t in ALL_TOOLS}
+
+# Roadmap SEC-01: hard cap on tool-run request bodies (Flask's global
+# MAX_CONTENT_LENGTH is 16MB; tool payloads never legitimately need that).
+_MAX_RUN_BODY = 64 * 1024  # 64 KiB
 
 # Fields that arrive as YYYY-MM-DD strings but must be date objects.
 _DATE_FIELDS = {"last_active", "date", "start_date", "end_date"}
@@ -114,13 +124,32 @@ def public_tools():
     return out
 
 
-def register_ultimate_routes(app):
+def _deny_anonymous():
+    """401 JSON for anonymous API callers (SEC-01). None when logged in."""
+    if not current_user.is_authenticated:
+        return jsonify({"ok": False,
+                        "error": "Login required to use the Ultimate Lab."}), 401
+    return None
+
+
+def register_ultimate_routes(app, limiter=None):
+    run_limit = app.config.get("ULTIMATE_RUN_LIMIT", "30 per hour")
+
     @app.route("/api/ultimate/tools", methods=["GET"])
     def _ultimate_tools():
+        denied = _deny_anonymous()
+        if denied:
+            return denied
         return jsonify({"ok": True, "count": len(ALL_TOOLS), "tools": public_tools()})
 
     @app.route("/api/ultimate/run/<path:tool_id>", methods=["POST"])
     def _ultimate_run(tool_id):
+        denied = _deny_anonymous()
+        if denied:
+            return denied
+        if request.content_length and request.content_length > _MAX_RUN_BODY:
+            return jsonify({"ok": False,
+                            "error": "Request body too large (max 64 KiB)."}), 413
         payload = request.get_json(silent=True)
         if payload is None:
             return jsonify({"ok": False, "error": "Send a JSON body."}), 400
@@ -129,6 +158,12 @@ def register_ultimate_routes(app):
             return jsonify({"ok": False, "error": error}), 400
         return jsonify({"ok": True, "result": result})
 
+    if limiter is not None:
+        # Rate-limit the (already auth-gated) run endpoint.
+        app.view_functions["_ultimate_run"] = limiter.limit(run_limit)(
+            app.view_functions["_ultimate_run"])
+
     @app.route("/ultimate/lab", methods=["GET"])
+    @login_required
     def _ultimate_lab():
         return render_template("ultimate_lab.html")

@@ -34,10 +34,10 @@ TOOLS_A = [
     {
         "id": "jd/offer-odds",
         "feature": "JD-Matched ATS Scoring",
-        "name": "Offer-Probability Estimator",
-        "description": "Turn your ATS score into an honest estimate of your offer chances.",
+        "name": "Competitiveness Checklist",
+        "description": "An honest, illustrative checklist from your ATS score — no made-up offer percentages.",
         "module": "studybuddy.jd_matcher",
-        "function": "offer_probability",
+        "function": "competitiveness_checklist",
         "fields": [
             {"name": "report", "label": "ATS Report (JSON, from JD-Match scoring)", "type": "textarea", "required": True, "json": True},
             {"name": "applicants_estimate", "label": "Estimated Applicants", "type": "number", "required": False},

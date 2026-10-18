@@ -19,6 +19,15 @@ import hashlib
 import secrets
 import logging
 
+# When run as `python unified_app.py`, make `import unified_app` resolve to
+# this already-running module instead of loading a second copy. Without this,
+# studybuddy/* lazy imports get a *different* module object with its own
+# SQLAlchemy() instance, and their queries fail with "current Flask app is not
+# registered with this 'SQLAlchemy' instance" (dev-only; gunicorn imports the
+# module once as `unified_app`, so this branch never runs there).
+if __name__ == "__main__" and "unified_app" not in sys.modules:
+    sys.modules["unified_app"] = sys.modules["__main__"]
+
 from datetime import datetime, date, timedelta, timezone
 
 import requests
@@ -2447,7 +2456,7 @@ def register_routes(app):
 
     # ---------- ULTIMATE LAB (91 power tools) ----------
     from studybuddy.ultimate_routes import register_ultimate_routes
-    register_ultimate_routes(app)
+    register_ultimate_routes(app, limiter)
 
     # ---------- MAIN HUB ----------
     @app.route('/')
@@ -5560,7 +5569,7 @@ def register_routes(app):
         return render_template('flashcards_review.html', set_id=fs.id,
                                doc_title=doc.title if doc else 'Document',
                                stats=fc_mastery_stats(fs.data or {}),
-                               cards_json=json.dumps(cards))
+                               cards=cards)
 
     @app.route('/research/api/flashcards/<int:sid>/progress', methods=['POST'])
     @limiter.limit("60 per hour")
@@ -7642,9 +7651,25 @@ def call_gemini_ai(prompt, max_attempts=4):
 
 app = create_app()
 
+
+def _resolve_debug(env=None):
+    """Decide Flask debug mode. Debug is NEVER allowed in production-like envs.
+
+    SEC-11: the old ``app.run(debug=True)`` exposed the Werkzeug debugger
+    (remote code execution) if it ever ran outside localhost.
+    """
+    env = os.environ if env is None else env
+    want = env.get("FLASK_DEBUG") == "1"
+    if want and (env.get("FLASK_ENV") == "production" or env.get("RENDER")):
+        raise RuntimeError(
+            "Refusing to run with FLASK_DEBUG=1 in a production environment.")
+    return want
+
+
 if __name__ == '__main__':
     print("\n" + "=" * 60)
     print("  Study-Buddy")
-    print("  Starting server at http://localhost:5000")
+    _port = int(os.environ.get("PORT", "5000"))
+    print(f"  Starting server at http://localhost:{_port}")
     print("=" * 60 + "\n")
-    app.run(debug=True, port=5000, use_reloader=False)
+    app.run(debug=_resolve_debug(), port=_port, use_reloader=False)
