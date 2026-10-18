@@ -22,7 +22,6 @@ import logging
 import multiprocessing
 import os
 import re
-import tempfile
 import zipfile
 from dataclasses import dataclass, field
 
@@ -353,7 +352,6 @@ def extract_docx(data: bytes) -> ParseResult:
                     parts.append(p.text)
     # text boxes via raw XML (w:txbxContent) — ENG-05.4
     try:
-        from docx.oxml.ns import qn
         txbx = doc.element.findall(".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}txbxContent")
         for tb in txbx:
             t = "".join(n.text or "" for n in tb.iter() if n.tag.endswith("}t"))

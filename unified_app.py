@@ -257,8 +257,6 @@ import studybuddy.retrospective_data as retro_data
 from models.ats_scorer import calculate_ats_score
 from models.resume_feedback import generate_feedback, get_overall_summary
 from models.skill_extractor import extract_skills, get_skill_names, get_skills_by_category
-from parser.docx_reader import extract_text_from_docx
-from parser.pdf_reader import extract_text_from_pdf
 # ENG-05 + SEC-08: hardened parsing pipeline (content-validated, sandboxed)
 from studybuddy.parsing import ParseError as _ParseError
 from studybuddy.parsing import parse_upload_file as _parse_upload_file
