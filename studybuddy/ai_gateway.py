@@ -4,6 +4,12 @@ Provider chain (all free tiers):
     1. Gemini  (GEMINI_API_KEY)      — google-genai SDK
     2. Groq    (GROQ_API_KEY)        — OpenAI-compatible, llama-3.3-70b-versatile
     3. OpenRouter (OPENROUTER_API_KEY) — OpenAI-compatible, free :free models
+    4. Local   (LLM_BASE_URL)        — OpenAI-compatible local endpoint (Ollama)
+
+PRIV-05 modes (via LLM_MODE env):
+    - "server" (default): use server-configured provider keys
+    - "off": no LLM calls — raise AIError("disabled") so callers use rule-based fallbacks
+    - "byok": caller must pass user_key; used for that request only, never logged
 
 generate() tries each configured provider in order and returns the first
 successful response. Every provider failure is logged; only if ALL fail
@@ -27,6 +33,11 @@ _GROQ_MODEL = "llama-3.3-70b-versatile"
 
 _OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 _OPENROUTER_MODEL = "google/gemma-4-31b-it:free"  # verified in :free list 2026-10-15
+
+# PRIV-05: local OpenAI-compatible endpoint (e.g. Ollama at http://localhost:11434/v1)
+_LOCAL_URL = os.getenv("LLM_BASE_URL", "").rstrip("/") + "/chat/completions" \
+    if os.getenv("LLM_BASE_URL") else None
+_LOCAL_MODEL = os.getenv("LLM_MODEL", "llama3.2")
 
 _KEY_SENTINELS = frozenset({
     "", "your_actual_api_key_here", "<redacted>", "change-me",
@@ -57,7 +68,29 @@ def openrouter_configured():
 
 def ai_ready():
     """True when at least one provider key is configured."""
-    return gemini_configured() or groq_configured() or openrouter_configured()
+    return gemini_configured() or groq_configured() or openrouter_configured() \
+        or local_configured()
+
+
+def local_configured():
+    """PRIV-05: True when LLM_BASE_URL points at a local OpenAI-compatible endpoint."""
+    return bool(os.getenv("LLM_BASE_URL", "").strip())
+
+
+def llm_mode():
+    """PRIV-05: current LLM mode — off|byok|server (from env, default server)."""
+    mode = os.getenv("LLM_MODE", "server").strip().lower()
+    return mode if mode in ("off", "byok", "server") else "server"
+
+
+def _local_generate(prompt, api_key=None):
+    """PRIV-05: generate via local OpenAI-compatible endpoint (Ollama etc.)."""
+    base = os.getenv("LLM_BASE_URL", "").strip().rstrip("/")
+    if not base:
+        raise AIError("Local LLM not configured (LLM_BASE_URL)")
+    return _openai_compatible_generate(
+        base + "/chat/completions", api_key or "ollama",
+        os.getenv("LLM_MODEL", "llama3.2"), prompt, "local")
 
 
 def providers_configured():
@@ -117,13 +150,34 @@ def _gemini_generate(prompt):
     return app_mod.call_gemini_direct(prompt)
 
 
-def generate(prompt):
+def generate(prompt, user_key=None):
     """Generate text via the first working provider.
 
-    Order: Gemini -> Groq -> OpenRouter. Raises AIError only when every
-    configured provider fails (or none is configured).
+    PRIV-05 modes:
+    - LLM_MODE=off: raises AIError("disabled") — callers use rule-based fallbacks.
+    - LLM_MODE=byok: uses user_key (the user's own API key) via OpenRouter;
+      raises if no key provided.
+    - default: server chain — local (LLM_BASE_URL) -> Gemini -> Groq -> OpenRouter.
+
+    user_key is never logged.
     """
+    mode = llm_mode()
+    if mode == "off":
+        raise AIError(
+            "AI features are disabled (LLM_MODE=off). "
+            "Rule-based results are shown instead.")
+    if mode == "byok":
+        if not user_key or user_key in _KEY_SENTINELS:
+            raise AIError(
+                "BYOK mode: add your own API key in Profile → AI Settings "
+                "to use AI features.")
+        # Use the user's key against OpenRouter (OpenAI-compatible)
+        return _openai_compatible_generate(
+            _OPENROUTER_URL, user_key, _OPENROUTER_MODEL, prompt, "byok")
+
     chain = []
+    if local_configured():
+        chain.append(("local", _local_generate))
     if gemini_configured():
         chain.append(("gemini", _gemini_generate))
     if groq_configured():

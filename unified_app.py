@@ -1306,6 +1306,42 @@ class LLMConsent(db.Model):
     user = db.relationship("User", backref=db.backref("llm_consent", uselist=False,
                                                       cascade="all, delete-orphan"))
 
+class UserAPIKey(db.Model):
+    """PRIV-05 BYOK: user's own LLM API key, stored encrypted.
+
+    The key is encrypted with Fernet (key from ENCRYPTION_KEY env, or
+    SECRET_KEY-derived fallback). Only used per-request, never logged.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        unique=True, index=True)
+    provider = db.Column(db.String(30), nullable=False, default="openrouter")
+    encrypted_key = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                           nullable=False)
+
+    user = db.relationship("User", backref=db.backref("api_key", uselist=False,
+                                                      cascade="all, delete-orphan"))
+
+    @staticmethod
+    def _fernet():
+        from cryptography.fernet import Fernet
+        import hashlib
+        import base64
+        raw = os.environ.get("ENCRYPTION_KEY") or os.environ.get("SECRET_KEY", "")
+        # Derive a 32-byte Fernet key from the secret
+        digest = hashlib.sha256(raw.encode()).digest()
+        return Fernet(base64.urlsafe_b64encode(digest))
+
+    def set_key(self, plaintext):
+        self.encrypted_key = self._fernet().encrypt(
+            plaintext.encode()).decode()
+
+    def get_key(self):
+        return self._fernet().decrypt(
+            self.encrypted_key.encode()).decode()
+
+
 CONSENT_POLICY_VERSION = "v1"
 CONSENT_NOTICE = (
     "AI features send your text (e.g. resume, questions) to our AI provider "
@@ -2255,6 +2291,22 @@ def _error_payload(code, message):
     return render_template("error.html", code=code, message=message), code
 
 
+def _ai_degraded_response(feature_name="This feature"):
+    """LLM-09: Graceful degradation when AI is unavailable.
+
+    Returns a user-friendly payload explaining that rule-based results
+    are shown instead, with no technical jargon.
+    """
+    msg = (
+        f"{feature_name} normally uses AI, which isn't available right now. "
+        "Showing rule-based results instead — they're less personalized "
+        "but still useful. AI will return automatically when the service recovers.")
+    if request.path.startswith("/api/"):
+        return jsonify({"warning": msg, "ai_degraded": True}), 200
+    flash(msg, "warning")
+    return None
+
+
 def register_error_handlers(app):
     @app.errorhandler(400)
     def bad_request(e):
@@ -2972,6 +3024,58 @@ def register_routes(app):
         except Exception:
             db.session.rollback()
         return redirect(url_for('profile'))
+
+    # PRIV-05: BYOK — user manages their own API key
+    @app.route('/profile/ai-key', methods=['GET', 'POST'])
+    @login_required
+    def ai_key_settings():
+        """Let user save/remove their own LLM API key (BYOK mode)."""
+        from studybuddy.ai_gateway import llm_mode
+        if request.method == 'POST':
+            action = request.form.get('action')
+            if action == 'save':
+                key = (request.form.get('api_key') or '').strip()
+                provider = (request.form.get('provider') or 'openrouter').strip()
+                if len(key) < 10:
+                    flash('That key looks too short.', 'error')
+                else:
+                    try:
+                        existing = UserAPIKey.query.filter_by(
+                            user_id=current_user.id).first()
+                        if existing:
+                            existing.provider = provider
+                            existing.set_key(key)
+                        else:
+                            rec = UserAPIKey(user_id=current_user.id,
+                                             provider=provider)
+                            rec.set_key(key)
+                            db.session.add(rec)
+                        db.session.commit()
+                        flash('Your API key was saved (encrypted).', 'success')
+                    except Exception:
+                        db.session.rollback()
+                        flash('Could not save the key.', 'error')
+            elif action == 'remove':
+                try:
+                    UserAPIKey.query.filter_by(
+                        user_id=current_user.id).delete()
+                    db.session.commit()
+                    flash('Your API key was removed.', 'info')
+                except Exception:
+                    db.session.rollback()
+            return redirect(url_for('ai_key_settings'))
+        has_key = UserAPIKey.query.filter_by(
+            user_id=current_user.id).first() is not None
+        return render_template('ai_key.html', has_key=has_key,
+                               llm_mode=llm_mode())
+
+    def _get_user_key(user_id):
+        """PRIV-05: decrypt the user's BYOK key for a single request. Never logged."""
+        try:
+            rec = UserAPIKey.query.filter_by(user_id=user_id).first()
+            return rec.get_key() if rec else None
+        except Exception:
+            return None
 
     # Make consent status available in templates
     @app.context_processor

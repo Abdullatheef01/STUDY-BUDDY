@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}AI Settings — Study Buddy{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+  <h1>AI Settings</h1>
+  <p>Server LLM mode: <code>{{ llm_mode }}</code></p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card" style="padding: 1.5rem; margin: 1rem 0;">
+    <h2>Bring Your Own Key (BYOK)</h2>
+    <p>Use your own OpenRouter / OpenAI-compatible API key for AI features.
+    Your key is encrypted at rest and never logged.</p>
+    {% if has_key %}
+      <p><strong>✓</strong> A key is saved.</p>
+      <form method="POST" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="remove">
+        <button type="submit" class="btn btn-danger">Remove key</button>
+      </form>
+    {% else %}
+      <p>No key saved.</p>
+    {% endif %}
+    <form method="POST" style="margin-top: 1rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="save">
+      <div class="form-group">
+        <label for="provider">Provider:</label>
+        <select id="provider" name="provider" class="form-control">
+          <option value="openrouter">OpenRouter</option>
+          <option value="openai">OpenAI-compatible</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="api_key">API key:</label>
+        <input type="password" id="api_key" name="api_key"
+               class="form-control" placeholder="sk-..." autocomplete="off">
+      </div>
+      <button type="submit" class="btn btn-primary">Save key</button>
+    </form>
+  </div>
+
+  <div class="card" style="padding: 1.5rem; margin: 1rem 0;">
+    <h2>Local mode</h2>
+    <p>Run a local model via Ollama — your text never leaves your machine.
+    Set <code>LLM_BASE_URL</code> (e.g. <code>http://localhost:11434/v1</code>)
+    on the server to enable.</p>
+  </div>
+</div>
+{% endblock %}
