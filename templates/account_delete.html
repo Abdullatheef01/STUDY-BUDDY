@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Delete Account — Study Buddy{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+  <h1>Delete Your Account</h1>
+  <div class="alert alert-danger">
+    <strong>Warning:</strong> This permanently deletes your account and ALL
+    associated data (resumes, analyses, interview sessions, progress, etc.).
+    This cannot be undone.
+  </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group">
+      <label for="password">Confirm your password:</label>
+      <input type="password" id="password" name="password" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="confirm">Type <code>DELETE</code> to confirm:</label>
+      <input type="text" id="confirm" name="confirm" class="form-control"
+             placeholder="DELETE" required>
+    </div>
+    <button type="submit" class="btn btn-danger">Permanently Delete My Account</button>
+    <a href="{{ url_for('profile') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+  <hr>
+  <p><a href="{{ url_for('account_export') }}">Download your data first</a> (recommended).</p>
+</div>
+{% endblock %}

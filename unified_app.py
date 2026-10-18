@@ -2841,6 +2841,96 @@ def register_routes(app):
             leetcode_username=current_user.leetcode_username,
             leetcode_snapshot=(leetcode_snap.data if leetcode_snap else None))
 
+    # PRIV-02: Export my data (JSON download)
+    @app.route('/account/export')
+    @login_required
+    @limiter.limit("10 per hour")
+    def account_export():
+        """Download all personal data as JSON (DPDP data-principal right)."""
+        from flask import Response
+        import json as _json
+        user = current_user
+        data = {
+            "user": {
+                "email": user.email,
+                "name": user.name,
+                "github_username": user.github_username,
+                "leetcode_username": user.leetcode_username,
+                "created_at": str(user.created_at),
+            },
+            "exported_at": str(_utcnow_naive()),
+        }
+        # Collect all user-owned rows across known tables
+        for model, name in [
+            (ResumeAnalysis, "resume_analyses"),
+            (ResumeVersion, "resume_versions"),
+            (JDMatchReport, "jd_matches"),
+            (BulletRewrite, "bullet_rewrites"),
+            (CoverDoc, "cover_docs"),
+            (LinkedInReport, "linkedin_reports"),
+            (JobApplication, "job_applications"),
+            (InterviewSession, "interview_sessions"),
+            (AptitudeAttempt, "aptitude_attempts"),
+            (QuizAttempt, "quiz_attempts"),
+            (STARDraft, "star_drafts"),
+            (RoadmapProgress, "roadmap_progress"),
+            (CareerAssessment, "career_assessments"),
+            (Retrospective, "retrospectives"),
+        ]:
+            try:
+                rows = model.query.filter_by(user_id=user.id).all()
+                data[name] = [
+                    {c.name: str(getattr(r, c.name))
+                     for c in r.__table__.columns}
+                    for r in rows
+                ]
+            except Exception:
+                data[name] = []
+        payload = _json.dumps(data, indent=2, default=str)
+        return Response(
+            payload,
+            mimetype="application/json",
+            headers={"Content-Disposition":
+                     f"attachment; filename=studybuddy-export-{user.id}.json"})
+
+    # PRIV-02: Delete my account (hard delete with cascade)
+    @app.route('/account/delete', methods=['GET', 'POST'])
+    @login_required
+    @limiter.limit("5 per hour")
+    def account_delete():
+        """Hard-delete user + all data. Requires password re-auth + confirmation."""
+        from flask_login import logout_user
+        if request.method == 'POST':
+            password = request.form.get('password', '')
+            confirm = request.form.get('confirm', '')
+            if confirm != 'DELETE':
+                flash('Type DELETE to confirm account deletion.', 'error')
+                return render_template('account_delete.html')
+            if not current_user.check_password(password):
+                flash('Incorrect password.', 'error')
+                return render_template('account_delete.html')
+            uid = current_user.id
+            # Delete all user-owned rows (cascade handles most, be explicit)
+            for model in [ResumeAnalysis, ResumeVersion, JDMatchReport,
+                          BulletRewrite, CoverDoc, LinkedInReport,
+                          JobApplication, InterviewSession, AptitudeAttempt,
+                          QuizAttempt, STARDraft, RoadmapProgress,
+                          CareerAssessment, Retrospective, CertPlan,
+                          StudyDoc, Experiment, CommunicationAnalysis,
+                          DSAProgress]:
+                try:
+                    model.query.filter_by(user_id=uid).delete()
+                except Exception:
+                    pass
+            # Finally delete the user
+            user = User.query.get(uid)
+            db.session.delete(user)
+            db.session.commit()
+            logout_user()
+            flash('Your account and all data have been permanently deleted.', 'info')
+            return redirect(url_for('index'))
+        return render_template('account_delete.html')
+
     @app.route('/profile/connect/github', methods=['POST'])
     @login_required
     @limiter.limit("10 per hour")
