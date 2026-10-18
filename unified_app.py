@@ -2164,22 +2164,62 @@ def register_security_headers(app):
         resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
         resp.headers.setdefault("Referrer-Policy",
                                 "strict-origin-when-cross-origin")
-        # Inline scripts/styles are used across templates, and fonts/CDN
-        # assets come from Google Fonts + cdnjs + unpkg — the policy
-        # allowlists exactly those.
-        resp.headers.setdefault(
-            "Content-Security-Policy",
+        resp.headers.setdefault("Permissions-Policy",
+                                "camera=(), microphone=(), geolocation=()")
+        # SEC-05: CSP in report-only mode. Violations go to /csp-report
+        # (rate-limited, logged without payloads). Full enforcement after
+        # inline scripts are eliminated (43 blocks) via nonces.
+        # Generate a per-request nonce for inline scripts that need it.
+        import secrets
+        nonce = secrets.token_urlsafe(16)
+        # Store nonce in g for templates to use: {{ csp_nonce() }}
+        from flask import g
+        g.csp_nonce = nonce
+        csp = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com; "
+            f"script-src 'self' 'nonce-{nonce}' https://cdnjs.cloudflare.com https://unpkg.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com data:; "
             "img-src 'self' data: https://unpkg.com; "
-            "connect-src 'self'; frame-ancestors 'self'")
+            "connect-src 'self'; "
+            "frame-ancestors 'self'; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'; "
+            "report-uri /csp-report"
+        )
+        # Report-only for now; switch to enforcing after cleanup.
+        # Set CSP_ENFORCE=1 in env to enforce.
+        import os as _os
+        header = "Content-Security-Policy" if _os.environ.get("CSP_ENFORCE") == "1" \
+            else "Content-Security-Policy-Report-Only"
+        resp.headers.setdefault(header, csp)
         if request.is_secure:
             resp.headers.setdefault(
                 "Strict-Transport-Security",
                 "max-age=31536000; includeSubDomains")
         return resp
+
+    # SEC-05: CSP violation reporting endpoint (rate-limited, no payloads logged)
+    @app.route('/csp-report', methods=['POST'])
+    @limiter.limit("60 per hour")
+    def csp_report():
+        try:
+            # Log only the violated directive + blocked URI, never full payload
+            data = request.get_json(silent=True) or {}
+            report = data.get("csp-report", {})
+            log.warning("CSP violation: %s blocked %s",
+                        report.get("violated-directive"),
+                        report.get("blocked-uri"))
+        except Exception:
+            pass
+        return "", 204
+
+    # Make csp_nonce() available in all templates
+    @app.context_processor
+    def _csp_nonce_processor():
+        from flask import g
+        return {"csp_nonce": lambda: getattr(g, "csp_nonce", "")}
 
 
 def _error_payload(code, message):
