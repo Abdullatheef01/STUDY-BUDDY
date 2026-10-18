@@ -2214,15 +2214,15 @@ def register_error_handlers(app):
         # SEC-04: JSON 429 with Retry-After so clients can back off.
         retry_after = 60
         try:
-            retry_after = int(e.description) if str(e.description).isdigit() else 60
+            if str(e.description).isdigit():
+                retry_after = int(e.description)
         except Exception:
             pass
-        resp = _error_payload(429, "You're moving a bit fast. "
-                                   "Please wait a moment and try again.")
-        resp[1] = 429
-        # _error_payload returns (json, status); add header via make_response
         from flask import make_response as _mr
-        r = _mr(*resp) if isinstance(resp, tuple) else _mr(resp)
+        # _error_payload returns (body, code); rebuild with the header
+        body, _code = _error_payload(429, "You're moving a bit fast. "
+                                          "Please wait a moment and try again.")
+        r = _mr(body, 429)
         r.headers["Retry-After"] = str(retry_after)
         return r
 
