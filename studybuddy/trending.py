@@ -18,7 +18,7 @@ serves as fallback so the page never renders empty.
 import json
 import logging
 import re
-import xml.etree.ElementTree as ET
+import defusedxml.ElementTree as ET
 from datetime import UTC, date, timedelta
 from functools import lru_cache
 

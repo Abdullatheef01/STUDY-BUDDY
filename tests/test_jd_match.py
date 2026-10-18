@@ -11,7 +11,7 @@ from studybuddy.jd_matcher import (
     score_jd_match,
 )
 from tests.conftest import SAMPLE_RESUME_LINES, login, make_pdf_bytes, register
-from unified_app import JDMatchReport, ResumeAnalysis, create_app, db
+from unified_app import JDMatchReport
 
 SAMPLE_JD = """Senior Python Developer - Backend Team
 

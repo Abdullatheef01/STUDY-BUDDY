@@ -6,7 +6,7 @@ import pytest
 
 import unified_app
 from studybuddy import github_integration, leetcode_integration
-from unified_app import User, create_app, db
+from unified_app import User, create_app
 
 
 def make_app(**overrides):

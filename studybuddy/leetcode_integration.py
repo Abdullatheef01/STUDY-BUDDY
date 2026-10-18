@@ -5,7 +5,7 @@ Username-based — no credentials needed. Includes an SVG stat-card generator
 """
 import re
 import time
-from xml.sax.saxutils import escape as _xml_escape
+from html import escape as _xml_escape
 
 import requests
 

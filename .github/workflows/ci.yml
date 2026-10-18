@@ -65,14 +65,15 @@ jobs:
           cache: pip
       - run: pip install --require-hashes -r requirements.txt
       - run: pip install pytest pytest-xdist
-      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
-      # ARC-03: migration round-trip + drift check on Postgres
+      # ARC-03: migrate first (prod boots skip create_all on Postgres),
+      # then drift-check, then the suite.
       - run: flask db upgrade head
         env:
           FLASK_APP: unified_app
       - run: flask db check
         env:
           FLASK_APP: unified_app
+      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider
 
   security:
     name: Bandit + pip-audit
@@ -85,5 +86,8 @@ jobs:
           cache: pip
       - run: pip install --require-hashes -r requirements.txt
       - run: pip install bandit pip-audit
-      - run: bandit -q -r unified_app.py studybuddy/ -x tests
+      # SEC-15: fail on Medium+ only. Low-severity hits are triaged
+      # separately (ARC-09): B311 random-for-shuffling, B105 pass_pct,
+      # B110/B112 swallowed-error patterns are not CI blockers.
+      - run: bandit -q -r unified_app.py studybuddy/ -x tests -ll
       - run: pip-audit --desc

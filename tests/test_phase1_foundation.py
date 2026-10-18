@@ -163,3 +163,34 @@ class TestFeatureFlags:
         login(client, email="flagtest@example.com")
         resp = client.get("/api/ultimate/tools")
         assert resp.status_code == 403
+
+
+class TestSafeXmlParsing:
+    """SEC-10: defusedxml blocks billion-laughs; html.escape for escaping."""
+
+    def test_billion_laughs_blocked(self):
+        from defusedxml.ElementTree import fromstring
+        from defusedxml.common import EntitiesForbidden
+        payload = ('<?xml version="1.0"?>'
+                   '<!DOCTYPE lolz ['
+                   '<!ENTITY lol "lollollollollollollollollollol">'
+                   '<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">'
+                   ']>'
+                   '<lolz>&lol2;</lolz>')
+        import pytest
+        with pytest.raises(EntitiesForbidden):
+            fromstring(payload)
+
+    def test_arxiv_uses_defusedxml(self):
+        import studybuddy.arxiv_import as m
+        assert "defusedxml" in open(m.__file__).read()
+
+    def test_trending_uses_defusedxml(self):
+        import studybuddy.trending as m
+        assert "defusedxml" in open(m.__file__).read()
+
+    def test_leetcode_uses_html_escape(self):
+        import studybuddy.leetcode_integration as m
+        src = open(m.__file__).read()
+        assert "from html import escape" in src
+        assert "xml.sax.saxutils" not in src

@@ -18,3 +18,4 @@ flask-login
 psycopg2-binary
 Authlib==1.8.0
 flask-migrate
+defusedxml
