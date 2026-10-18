@@ -217,3 +217,45 @@ class TestSafeFetch:
             assert res["links"][0]["alive"] is False
             assert "ssrf" in res["links"][0]["status"].lower() or \
                    "blocked" in res["links"][0]["status"].lower()
+
+
+class TestSecureDependencyPins:
+    """SEC-07: requirements.txt must pin the patched versions.
+
+    pip-audit baseline (Phase 0): Werkzeug 8 advisories, Flask 1,
+    gunicorn 2 (incl. CVE-2024-1135), pypdf 49. These pins are the fix;
+    this test fails if anyone downgrades them.
+    """
+
+    _MINIMUM = {
+        "flask": (3, 1, 3),
+        "werkzeug": (3, 1, 9),
+        "gunicorn": (26, 2, 0),
+        "pypdf": (6, 20, 1),
+    }
+
+    @staticmethod
+    def _pins():
+        import re
+        pins = {}
+        with open(os.path.join(os.path.dirname(__file__), "..",
+                               "requirements.txt")) as fh:
+            for line in fh:
+                line = line.split("#")[0].strip()
+                m = re.match(r"^([A-Za-z0-9_.-]+)==([0-9][0-9A-Za-z.]*)", line)
+                if m:
+                    pins[m.group(1).lower()] = m.group(2)
+        return pins
+
+    def test_security_pins_present(self):
+        pins = self._pins()
+        for pkg in self._MINIMUM:
+            assert pkg in pins, f"{pkg} must be pinned in requirements.txt"
+
+    def test_security_pins_not_downgraded(self):
+        pins = self._pins()
+        for pkg, min_ver in self._MINIMUM.items():
+            got = tuple(int(x) for x in pins[pkg].split(".")[:3])
+            assert got >= min_ver, \
+                f"{pkg}=={pins[pkg]} is below the secure minimum " \
+                f"{'.'.join(map(str, min_ver))}"
