@@ -2051,7 +2051,7 @@ def create_app(config_overrides=None):
                 "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\" "
                 "and set it as an environment variable.")
         secret = secrets.token_hex(32)
-    if secret is None:
+        # ARC-08: was print(); now a proper log record.
         log.warning("SECRET_KEY is not set - using an ephemeral key for this "
                     "local dev run. Set SECRET_KEY in .env for real use.")
     app.secret_key = secret

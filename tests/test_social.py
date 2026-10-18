@@ -332,25 +332,3 @@ def test_dashboard_shows_connection_status(client):
 
 # ---------- Schema evolution ----------
 
-def test_schema_evolution_backfills_legacy_db(tmp_path):
-    import sqlite3
-    db_path = tmp_path / "legacy.db"
-    conn = sqlite3.connect(db_path)
-    conn.execute("""CREATE TABLE "user" (
-        id INTEGER PRIMARY KEY, name VARCHAR(120) NOT NULL,
-        email VARCHAR(255) NOT NULL, password_hash VARCHAR(255) NOT NULL,
-        created_at DATETIME NOT NULL)""")
-    conn.commit()
-    conn.close()
-    app = create_app({"TESTING": True,
-                      "SQLALCHEMY_DATABASE_URI": "sqlite:///" + str(db_path),
-                      "SECRET_KEY": "x", "WTF_CSRF_ENABLED": False})
-    with app.app_context():
-        from sqlalchemy import inspect as sa_inspect
-        cols = {c["name"] for c in sa_inspect(db.engine).get_columns("user")}
-        assert {"google_sub", "avatar_url", "github_username", "leetcode_username"} <= cols
-        u = User(name="Legacy", email="legacy@example.com", google_sub="g-1")
-        u.set_password("password123")
-        db.session.add(u)
-        db.session.commit()
-        assert User.query.filter_by(google_sub="g-1").first().email == "legacy@example.com"

@@ -56,7 +56,10 @@ def configure_logging(app):
         handler.setFormatter(logging.Formatter(
             "%(asctime)s %(levelname)s [%(name)s] %(message)s"))
     root = logging.getLogger()
-    root.handlers = [handler]
+    # Don't clobber handlers installed by the test runner (pytest's caplog)
+    # or by the deploy platform — add ours only if none exist.
+    if not root.handlers:
+        root.handlers = [handler]
     root.setLevel(logging.INFO if prod else logging.DEBUG)
     # noisy libs stay quiet
     for noisy in ("werkzeug", "urllib3"):

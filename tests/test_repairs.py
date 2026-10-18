@@ -290,14 +290,16 @@ def test_secret_key_required_in_production(monkeypatch):
                     "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
 
 
-def test_secret_key_ephemeral_in_dev(monkeypatch, capsys):
+def test_secret_key_ephemeral_in_dev(monkeypatch, caplog):
+    # ARC-08: the ephemeral-key warning now goes through logging, not print().
     monkeypatch.delenv("SECRET_KEY", raising=False)
     monkeypatch.delenv("FLASK_ENV", raising=False)
     monkeypatch.delenv("RENDER", raising=False)
-    app = create_app({"TESTING": True,
-                      "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
+    with caplog.at_level("WARNING"):
+        app = create_app({"TESTING": True,
+                          "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
     assert len(app.secret_key) >= 32
-    assert "WARNING" in capsys.readouterr().out
+    assert any("ephemeral key" in r.message for r in caplog.records)
 
 
 # ---------- P2#11: CSRF ----------
