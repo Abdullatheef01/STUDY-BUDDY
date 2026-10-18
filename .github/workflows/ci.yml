@@ -69,18 +69,18 @@ jobs:
       # ARC-03: migrate first (prod boots skip create_all on Postgres),
       # then drift-check, then the suite.
       - run: |
-          python3 -c "
+          python3 << 'PYEOF'
           import socket, time
           for i in range(30):
               try:
                   s = socket.create_connection(('localhost', 5432), timeout=2)
                   s.close()
-                  print('Postgres ready')
+                  print('Postgres ready', flush=True)
                   break
               except OSError:
-                  print(f'Waiting for postgres... ({i})')
+                  print(f'Waiting for postgres... ({i})', flush=True)
                   time.sleep(2)
-          "
+          PYEOF
           flask db upgrade head
         env:
           FLASK_APP: unified_app
