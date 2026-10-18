@@ -421,7 +421,31 @@ except ImportError:  # pragma: no cover - dev without flask-migrate
     pass
 login_manager = LoginManager()
 csrf = CSRFProtect()
-limiter = Limiter(key_func=get_remote_address, default_limits=[])
+
+
+def _rate_limit_key():
+    """SEC-04: key by user id when authenticated, else client IP.
+
+    ProxyFix (x_for=1) runs before this, so remote_addr is the real client
+    behind Render's single proxy hop — not one global bucket for everyone.
+    """
+    try:
+        from flask_login import current_user
+        if current_user.is_authenticated:
+            return f"user:{current_user.get_id()}"
+    except Exception:
+        pass
+    return f"ip:{get_remote_address()}"
+
+
+# SEC-04: storage from env (memory:// dev/test; Redis in production via
+# RATELIMIT_STORAGE_URI). Global default limits + per-route limits.
+limiter = Limiter(
+    key_func=_rate_limit_key,
+    default_limits=["200 per day", "60 per hour"],
+    storage_uri=(__import__("os").environ.get("RATELIMIT_STORAGE_URI")
+                 or "memory://"),
+)
 oauth = OAuth()  # social login clients (registered per-app in create_app)
 
 
@@ -2184,8 +2208,20 @@ def register_error_handlers(app):
 
     @app.errorhandler(429)
     def rate_limited(e):
-        return _error_payload(429, "You're moving a bit fast. "
+        # SEC-04: JSON 429 with Retry-After so clients can back off.
+        retry_after = 60
+        try:
+            retry_after = int(e.description) if str(e.description).isdigit() else 60
+        except Exception:
+            pass
+        resp = _error_payload(429, "You're moving a bit fast. "
                                    "Please wait a moment and try again.")
+        resp[1] = 429
+        # _error_payload returns (json, status); add header via make_response
+        from flask import make_response as _mr
+        r = _mr(*resp) if isinstance(resp, tuple) else _mr(resp)
+        r.headers["Retry-After"] = str(retry_after)
+        return r
 
     @app.errorhandler(500)
     def server_error(e):
@@ -2639,6 +2675,7 @@ def register_routes(app):
 
     # ---------- AUTH ----------
     @app.route('/register', methods=['GET', 'POST'])
+    @limiter.limit("20 per hour")  # SEC-04: stricter for auth endpoints
     def register():
         if current_user.is_authenticated:
             return redirect(url_for('dashboard'))
@@ -2668,6 +2705,7 @@ def register_routes(app):
                                google_configured=_google_configured())
 
     @app.route('/login', methods=['GET', 'POST'])
+    @limiter.limit("10 per hour")  # SEC-04: brute-force protection
     def login():
         if current_user.is_authenticated:
             return redirect(url_for('dashboard'))
