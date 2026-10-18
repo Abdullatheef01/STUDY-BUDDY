@@ -259,6 +259,9 @@ from models.resume_feedback import generate_feedback, get_overall_summary
 from models.skill_extractor import extract_skills, get_skill_names, get_skills_by_category
 from parser.docx_reader import extract_text_from_docx
 from parser.pdf_reader import extract_text_from_pdf
+# ENG-05 + SEC-08: hardened parsing pipeline (content-validated, sandboxed)
+from studybuddy.parsing import ParseError as _ParseError
+from studybuddy.parsing import parse_upload_file as _parse_upload_file
 from parser.section_extractor import (
     extract_education_details,
     extract_experience_years,
@@ -2899,6 +2902,29 @@ def register_routes(app):
         return render_template('resume_index.html',
                                has_saved_resume=has_saved_resume)
 
+    # ENG-05.5: "what a parser sees" — extracted text + detected fields.
+    # Helps candidates understand exactly what the analyzer ingested.
+    @app.route('/api/parse_preview', methods=['POST'])
+    @limiter.limit("20 per hour")
+    def parse_preview():
+        file = request.files.get('file') or request.files.get('resume')
+        if not file or not file.filename:
+            return jsonify({'error': 'No file uploaded.'}), 400
+        data = file.read()
+        try:
+            from studybuddy.parsing import parse_document
+            res = parse_document(data, filename=file.filename, kind="resume")
+        except _ParseError as pe:
+            return jsonify({'error': str(pe)}), 400
+        return jsonify({
+            'text': res.text[:20000],
+            'text_truncated': len(res.text) > 20000,
+            'fields': res.fields,
+            'layout': res.layout,
+            'quality': res.quality,
+            'warnings': res.warnings,
+        })
+
     @app.route('/analyze', methods=['POST'])
     @limiter.limit("20 per hour")
     def analyze():
@@ -2925,14 +2951,16 @@ def register_routes(app):
         try:
             file.save(filepath)
 
-            # Step 1: Extract text
-            ext = filename.rsplit('.', 1)[1].lower()
-            if ext == 'pdf':
-                raw_text = extract_text_from_pdf(file_path=filepath)
-            elif ext in ('docx', 'doc'):
-                raw_text = extract_text_from_docx(file_path=filepath)
-            else:
-                return jsonify({'error': 'Unsupported file format'}), 400
+            # Step 1: Extract text (ENG-05 + SEC-08 hardened pipeline:
+            # content-validated, sandboxed, original deleted after parse)
+            try:
+                _parsed = _parse_upload_file(filepath, filename=filename, kind="resume")
+            except _ParseError as _pe:
+                return jsonify({'error': str(_pe)}), 400
+            raw_text = _parsed.text
+            # stash parser warnings/fields for the response ("what a parser sees")
+            _parse_warnings = _parsed.warnings
+            _parse_fields = _parsed.fields
 
             if not raw_text or len(raw_text.strip()) < 50:
                 return jsonify({'error': 'Could not extract enough text from the resume.'}), 400
@@ -3097,13 +3125,13 @@ def register_routes(app):
                 filename = f"{uuid.uuid4().hex[:8]}_{secure_filename(file.filename)}"
                 uploaded_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(uploaded_path)
-                ext = filename.rsplit('.', 1)[1].lower()
-                if ext == 'pdf':
-                    raw_text = extract_text_from_pdf(file_path=uploaded_path)
-                elif ext in ('docx', 'doc'):
-                    raw_text = extract_text_from_docx(file_path=uploaded_path)
-                else:
-                    return jsonify({'error': 'Unsupported file format.'}), 400
+                # ENG-05 + SEC-08 hardened pipeline (content-validated, sandboxed)
+                try:
+                    _parsed = _parse_upload_file(uploaded_path, filename=file.filename,
+                                                 kind="resume")
+                except _ParseError as _pe:
+                    return jsonify({'error': str(_pe)}), 400
+                raw_text = _parsed.text
                 if not raw_text or len(raw_text.strip()) < 50:
                     return jsonify({'error': 'Could not extract enough text from the resume.'}), 400
                 resume_text = clean_text(raw_text)
