@@ -21,3 +21,4 @@ flask-migrate
 defusedxml
 pypdfium2
 pdfplumber
+psycopg[binary]
