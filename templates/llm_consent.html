@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}AI Consent — Study Buddy{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+  <h1>Before you use AI features</h1>
+  <div class="card" style="padding: 1.5rem; margin: 1rem 0;">
+    <p>{{ notice }}</p>
+    <ul>
+      <li><strong>What's sent:</strong> the text you submit (resume, questions, documents)</li>
+      <li><strong>To whom:</strong> Google Gemini (primary), Groq / OpenRouter (fallback)</li>
+      <li><strong>Retention:</strong> prompts are not stored by us</li>
+      <li><strong>Your control:</strong> withdraw anytime from your profile</li>
+    </ul>
+  </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" name="agree" value="yes" class="btn btn-primary">
+      I understand and agree
+    </button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Not now</a>
+  </form>
+</div>
+{% endblock %}

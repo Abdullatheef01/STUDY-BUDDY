@@ -1288,6 +1288,32 @@ class ProfileSnapshot(db.Model):
                                           name="uq_snapshot_user_provider"),)
 
 
+class LLMConsent(db.Model):
+    """PRIV-03: Records when a user consented to LLM processing.
+
+    Shown once before the first LLM-backed action: what text is sent,
+    to which provider, retention. Stored with timestamp + policy version.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False,
+                        unique=True, index=True)
+    consented_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC),
+                             nullable=False)
+    policy_version = db.Column(db.String(20), nullable=False, default="v1")
+    # What the user agreed to (snapshot of the notice text version)
+    notice_text = db.Column(db.Text, nullable=True)
+
+    user = db.relationship("User", backref=db.backref("llm_consent", uselist=False,
+                                                      cascade="all, delete-orphan"))
+
+CONSENT_POLICY_VERSION = "v1"
+CONSENT_NOTICE = (
+    "AI features send your text (e.g. resume, questions) to our AI provider "
+    "(Google Gemini, with Groq/OpenRouter fallback) to generate responses. "
+    "Your prompts are not stored. You can withdraw consent anytime from your profile."
+)
+
+
 _SNAPSHOT_TTL_SECONDS = 24 * 3600
 
 
@@ -2892,6 +2918,66 @@ def register_routes(app):
             mimetype="application/json",
             headers={"Content-Disposition":
                      f"attachment; filename=studybuddy-export-{user.id}.json"})
+
+    # PRIV-03: LLM consent — check + record
+    def _llm_consent_given(user_id):
+        """True if user has consented to LLM processing (current policy version)."""
+        try:
+            c = LLMConsent.query.filter_by(user_id=user_id).first()
+            return c is not None and c.policy_version == CONSENT_POLICY_VERSION
+        except Exception:
+            return False  # table may not exist yet (no migration); treat as not consented
+
+    @app.route('/consent/llm', methods=['GET', 'POST'])
+    @login_required
+    def llm_consent():
+        """Show LLM data-use notice; record consent on POST."""
+        if request.method == 'POST':
+            if request.form.get('agree') == 'yes':
+                try:
+                    existing = LLMConsent.query.filter_by(
+                        user_id=current_user.id).first()
+                    if existing:
+                        existing.consented_at = _utcnow_naive()
+                        existing.policy_version = CONSENT_POLICY_VERSION
+                    else:
+                        db.session.add(LLMConsent(
+                            user_id=current_user.id,
+                            policy_version=CONSENT_POLICY_VERSION,
+                            notice_text=CONSENT_NOTICE))
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
+                # Return to where they came from
+                nxt = request.form.get('next') or url_for('index')
+                return redirect(nxt)
+            flash('You need to agree to use AI features.', 'warning')
+        return render_template('llm_consent.html',
+                               notice=CONSENT_NOTICE,
+                               next=request.args.get('next', ''))
+
+    @app.route('/consent/llm/withdraw', methods=['POST'])
+    @login_required
+    def llm_consent_withdraw():
+        """Withdraw LLM consent (PRIV-03)."""
+        try:
+            LLMConsent.query.filter_by(user_id=current_user.id).delete()
+            db.session.commit()
+            flash('AI consent withdrawn. AI features are now disabled for your account.', 'info')
+        except Exception:
+            db.session.rollback()
+        return redirect(url_for('profile'))
+
+    # Make consent status available in templates
+    @app.context_processor
+    def _consent_processor():
+        from flask_login import current_user as _cu
+        try:
+            authed = _cu.is_authenticated
+        except Exception:
+            authed = False
+        return {"llm_consent_given": (
+            _llm_consent_given(_cu.id) if authed else True)}
 
     # PRIV-02: Delete my account (hard delete with cascade)
     @app.route('/account/delete', methods=['GET', 'POST'])
