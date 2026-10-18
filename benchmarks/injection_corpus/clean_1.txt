@@ -1,0 +1,2 @@
+Machine learning requires large datasets. Neural networks learn patterns.
+Transformers use attention mechanisms for sequence modeling.

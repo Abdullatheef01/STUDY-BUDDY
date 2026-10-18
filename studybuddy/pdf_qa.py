@@ -371,6 +371,11 @@ def chunk_pages(
     for page_no, page_text in enumerate(pages or [], start=1):
         if not isinstance(page_text, str) or not page_text.strip():
             continue
+        # RAG-04: sanitize prompt-injection attempts before chunking.
+        # Documents are data, never instructions.
+        page_text, _inj_report = sanitize_document_text(page_text)
+        if not page_text.strip():
+            continue
         for heading, segment in _split_by_headings(page_text.strip()):
             for piece in _split_text(segment, chunk_chars, overlap):
                 if len(chunks) >= CHUNK_CAP:
@@ -802,3 +807,60 @@ def qa_to_notes(qa_pairs, title="Study Notes"):
     lines.append(f"_Generated from {sections} Q&A pairs._")
     return {"markdown": "\n".join(lines), "sections": sections,
             "title": title}
+
+
+# --- RAG-04: Prompt-injection detection (P1) ---------------------------------
+# Documents are DATA, never instructions. This detector flags hostile
+# instructions embedded in document text so the answering pipeline can
+# sanitize or reject them.
+
+_INJECTION_PATTERNS = [
+    r"ignore\s+(all\s+)?previous\s+instructions",
+    r"disregard\s+(all\s+)?(prior|previous)\s+instructions",
+    r"forget\s+(everything|all)\s+(you\s+know|above)",
+    r"you\s+are\s+now\s+a\s+",
+    r"system\s*:\s*",
+    r"reveal\s+(your|the)\s+(system\s+)?prompt",
+    r"output\s+(your|the)\s+(system|initial)\s+instructions",
+    r"jailbreak",
+    r"do\s+anything\s+now",
+    r"bypass\s+(safety|filter|guardrail)",
+]
+
+
+def detect_prompt_injection(text: str) -> dict:
+    """Scan document text for prompt-injection attempts.
+
+    Returns {"injected": bool, "matches": [pattern, ...]}.
+    Lightweight regex detector — catches common attack phrasings.
+    """
+    import re as _re
+    found = []
+    low = text.lower()
+    for pat in _INJECTION_PATTERNS:
+        if _re.search(pat, low):
+            found.append(pat)
+    return {"injected": bool(found), "matches": found}
+
+
+def sanitize_document_text(text: str) -> tuple[str, dict]:
+    """Remove detected injection attempts; return (clean_text, report).
+
+    The answering pipeline treats documents as data. If injection is
+    detected, the offending sentences are redacted and flagged.
+    """
+    import re as _re
+    report = detect_prompt_injection(text)
+    if not report["injected"]:
+        return text, report
+    # Redact sentences containing injection patterns
+    sentences = _re.split(r"(?<=[.!?])\s+", text)
+    clean = []
+    redacted = 0
+    for s in sentences:
+        if detect_prompt_injection(s)["injected"]:
+            redacted += 1
+            continue
+        clean.append(s)
+    report["redacted_sentences"] = redacted
+    return " ".join(clean), report

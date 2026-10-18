@@ -2661,6 +2661,11 @@ def register_routes(app):
         """Privacy Policy page."""
         return render_template('privacy.html')
 
+    @app.route('/accessibility')
+    def accessibility():
+        """Accessibility statement (UX-03)."""
+        return render_template('accessibility.html')
+
     @app.route('/terms')
     def terms():
         """Terms of Service page."""

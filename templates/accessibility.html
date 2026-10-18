@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Accessibility Statement — Study Buddy{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px; margin: 2rem auto;">
+  <h1>Accessibility Statement</h1>
+  <p><em>Last updated: 18 October 2026</em></p>
+
+  <h2>Our commitment</h2>
+  <p>Study Buddy aims to meet <strong>WCAG 2.2 AA</strong>. We believe
+  career tools should work for everyone, including users of screen readers,
+  keyboard-only navigation, and reduced-motion settings.</p>
+
+  <h2>What we've done</h2>
+  <ul>
+    <li>Skip-to-content link on every page</li>
+    <li>Visible focus indicators (<code>:focus-visible</code>)</li>
+    <li><code>lang="en"</code> declared; semantic landmarks
+      (<code>main</code>, <code>nav</code>, <code>footer</code>)</li>
+    <li><code>role="alert"</code> on flash messages for screen readers</li>
+    <li><code>prefers-reduced-motion</code> respected site-wide</li>
+    <li>Decorative elements marked <code>aria-hidden="true"</code></li>
+  </ul>
+
+  <h2>Timed assessments</h2>
+  <p>If you need extra time on timed aptitude tests due to accessibility
+  needs, contact us — we will accommodate you. No medical documentation
+  required; just ask.</p>
+
+  <h2>Known limitations</h2>
+  <ul>
+    <li>Some older interactive widgets (flashcards, kanban) are being
+      migrated to full keyboard support.</li>
+    <li>PDF rendering fidelity varies for scanned documents.</li>
+  </ul>
+
+  <h2>Feedback</h2>
+  <p>Found a barrier? Email <strong>accessibility@studybuddy</strong> —
+  we treat these reports as bugs and fix them promptly.</p>
+</div>
+{% endblock %}
