@@ -384,6 +384,11 @@ def test_fetch_citation_graph_bad_id_no_network(monkeypatch):
 
 
 # ---------------------------------------------------------------- download_pdf (mocked)
+def _stub_fetch(monkeypatch, resp):
+    """Stub the SEC-02 fetch seam: no DNS, no network."""
+    monkeypatch.setattr(arxiv_import, "validate_url", lambda url: True)
+    monkeypatch.setattr(arxiv_import, "safe_fetch_stream", lambda url, **kw: resp)
+
 class _StreamResp:
     def __init__(self, chunks, ctype="application/pdf", status=200):
         self.status_code = status
@@ -402,28 +407,19 @@ class _StreamResp:
 
 def test_download_pdf_ok(monkeypatch, tmp_path):
     pdf = b"%PDF-1.4 fake content"
-    monkeypatch.setattr(
-        arxiv_import.requests, "get",
-        lambda url, **kw: _StreamResp([pdf]),
-    )
+    _stub_fetch(monkeypatch, _StreamResp([pdf]))
     dest = str(tmp_path / "paper.pdf")
     assert download_pdf("https://example.org/x.pdf", dest) is True
     assert open(dest, "rb").read() == pdf
 
 
 def test_download_pdf_wrong_content_type(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        arxiv_import.requests, "get",
-        lambda url, **kw: _StreamResp([b"<html>"], ctype="text/html"),
-    )
+    _stub_fetch(monkeypatch, _StreamResp([b"<html>"], ctype="text/html"))
     assert download_pdf("https://example.org/x", str(tmp_path / "x.pdf")) is False
 
 
 def test_download_pdf_too_big(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        arxiv_import.requests, "get",
-        lambda url, **kw: _StreamResp([b"x" * (31 * 1024 * 1024)]),
-    )
+    _stub_fetch(monkeypatch, _StreamResp([b"x" * (31 * 1024 * 1024)]))
     dest = str(tmp_path / "big.pdf")
     assert download_pdf("https://example.org/x.pdf", dest) is False
 
@@ -682,10 +678,7 @@ def test_fetch_citation_graph_dedupes_nodes(monkeypatch, tmp_path):
 
 
 def test_download_pdf_http_error(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        arxiv_import.requests, "get",
-        lambda url, **kw: _StreamResp([], status=404),
-    )
+    _stub_fetch(monkeypatch, _StreamResp([], status=404))
     dest = str(tmp_path / "x.pdf")
     assert download_pdf("https://example.org/x.pdf", dest) is False
     assert not os.path.exists(dest)
@@ -697,10 +690,7 @@ def test_download_pdf_midstream_error_cleans_up(monkeypatch, tmp_path):
             yield b"%PDF-1.4 partial"
             raise _rq.ConnectionError("dropped")
 
-    monkeypatch.setattr(
-        arxiv_import.requests, "get",
-        lambda url, **kw: Flaky([b"unused"], ctype="application/pdf"),
-    )
+    _stub_fetch(monkeypatch, Flaky([b"unused"], ctype="application/pdf"))
     dest = str(tmp_path / "partial.pdf")
     assert download_pdf("https://example.org/x.pdf", dest) is False
     assert not os.path.exists(dest)  # partial file cleaned up
@@ -713,3 +703,11 @@ def test_download_pdf_empty_url():
 
 def test_cache_set_unserializable():
     assert cache_set("bad", object()) is False
+
+
+def test_download_pdf_rejects_ssrf_url(tmp_path):
+    """SEC-02: download_pdf must refuse private/metadata URLs (no mock)."""
+    dest = str(tmp_path / "evil.pdf")
+    assert download_pdf("http://169.254.169.254/latest/meta-data/", dest) is False
+    assert download_pdf("http://127.0.0.1:8080/x.pdf", dest) is False
+    assert not os.path.exists(dest)

@@ -14,6 +14,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 JS = (REPO_ROOT / "static" / "js" / "research_app.js").read_text()
 
 
+def _login(client, email="repairs@example.com"):
+    """Register + log in (SEC-12: LLM endpoints require login)."""
+    client.post("/register", data={"name": "Repairs", "email": email,
+                                   "password": "repairs-pass-123"})
+
+
+
 @pytest.fixture()
 def reset_model_cache():
     _MODEL_CACHE.update({"names": [], "fetched_at": 0.0})
@@ -137,6 +144,7 @@ def test_gemini_key_sentinels_rejected(monkeypatch):
 # ---------- P1#4: history reaches the prompt ----------
 
 def test_chat_history_included_in_prompt(client, monkeypatch):
+    _login(client)
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     captured = {}
     monkeypatch.setattr(unified_app, "call_gemini_ai",
@@ -155,6 +163,7 @@ def test_chat_history_included_in_prompt(client, monkeypatch):
 
 
 def test_chat_missing_message_rejected(client, monkeypatch):
+    _login(client)
     # P2#17: never send the literal string "None" to the model.
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     called = []
@@ -167,6 +176,7 @@ def test_chat_missing_message_rejected(client, monkeypatch):
 
 
 def test_chat_gemini_failure_is_502_not_500(client, monkeypatch):
+    _login(client)
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     monkeypatch.setattr(unified_app, "call_gemini_ai",
                         lambda prompt: (_ for _ in ()).throw(GeminiError("down")))
@@ -190,6 +200,7 @@ _FAKE_REPO = {
 
 
 def test_constructor_rejects_empty_repo_url(client, monkeypatch):
+    _login(client)
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     for payload in [{}, {"repo_url": ""}, {"repo_url": "   "}]:
         resp = client.post("/api/constructor_generate", json=payload)
@@ -198,6 +209,7 @@ def test_constructor_rejects_empty_repo_url(client, monkeypatch):
 
 
 def test_constructor_rejects_non_github_url(client, monkeypatch):
+    _login(client)
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     resp = client.post("/api/constructor_generate",
                        json={"repo_url": "https://gitlab.com/a/b"})
@@ -205,6 +217,7 @@ def test_constructor_rejects_non_github_url(client, monkeypatch):
 
 
 def test_constructor_malformed_json_never_500s(client, monkeypatch):
+    _login(client)
     # P1#5: model returns garbage twice -> friendly 502, never 500.
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     monkeypatch.setattr(unified_app, "_fetch_repo_data", lambda o, r: _FAKE_REPO)
@@ -216,6 +229,7 @@ def test_constructor_malformed_json_never_500s(client, monkeypatch):
 
 
 def test_constructor_parses_fenced_json_and_uses_real_stats(client, monkeypatch):
+    _login(client)
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     monkeypatch.setattr(unified_app, "_fetch_repo_data", lambda o, r: _FAKE_REPO)
     captured = {}
@@ -238,6 +252,7 @@ def test_constructor_parses_fenced_json_and_uses_real_stats(client, monkeypatch)
 
 
 def test_constructor_github_failure_is_502(client, monkeypatch):
+    _login(client)
     monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
     def boom(o, r):
         raise unified_app.GithubRepoError("Repository not found on GitHub.")
@@ -333,9 +348,10 @@ def test_csrf_allows_chat_research_with_token(csrf_client):
     token = _meta_csrf_token(csrf_client, "/research")
     resp = csrf_client.post("/api/chat_research", json={},
                             headers={"X-CSRFToken": token})
-    # CSRF passed: reached app logic, which rejects the empty message.
-    assert resp.status_code == 400
-    assert resp.get_json()["error"] == "Please type a question first."
+    # CSRF passed (not 400 "Security check failed"); SEC-12 auth denies
+    # anonymous callers with 401.
+    assert resp.status_code == 401
+    assert "log in" in resp.get_json()["error"]
 
 
 def test_csrf_blocks_constructor_without_token(csrf_client):
@@ -349,9 +365,10 @@ def test_csrf_allows_constructor_with_token(csrf_client):
     token = _meta_csrf_token(csrf_client, "/research")
     resp = csrf_client.post("/api/constructor_generate", json={},
                             headers={"X-CSRFToken": token})
-    # CSRF passed: reached app logic, which rejects the missing repo URL.
-    assert resp.status_code == 400
-    assert resp.get_json()["error"] == "Please paste a GitHub repository URL first."
+    # CSRF passed (not 400 "Security check failed"); SEC-12 auth denies
+    # anonymous callers with 401.
+    assert resp.status_code == 401
+    assert "log in" in resp.get_json()["error"]
 
 
 # ---------- P2#10: error handlers ----------

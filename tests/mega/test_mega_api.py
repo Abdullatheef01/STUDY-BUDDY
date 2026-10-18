@@ -100,7 +100,8 @@ def test_get_harsh_path_never_500(client, path):
 @pytest.mark.parametrize("route", ["/api/chat_research", "/health", "/login"])
 def test_wrong_method(client, method, route):
     r = client.open(route, method=method)
-    assert r.status_code in (405, 404, 400, 302), f"{method} {route} -> {r.status_code}"
+    # 401: /api/chat_research now requires login even before method check (SEC-12)
+    assert r.status_code in (405, 404, 400, 302, 401), f"{method} {route} -> {r.status_code}"
 
 
 def test_huge_headers_rejected(client):

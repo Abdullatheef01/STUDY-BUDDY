@@ -259,3 +259,46 @@ class TestSecureDependencyPins:
             assert got >= min_ver, \
                 f"{pkg}=={pins[pkg]} is below the secure minimum " \
                 f"{'.'.join(map(str, min_ver))}"
+
+
+def _login_client(app, email="b1@example.com", password="pw-12345"):
+    client = app.test_client()
+    client.post("/login", data={"email": email, "password": password})
+    return client
+
+
+class TestDefaultDenyExpensiveEndpoints:
+    """SEC-12: expensive (LLM-backed) endpoints deny anonymous callers."""
+
+    def test_chat_research_anonymous_401(self):
+        app = _make_app()
+        r = app.test_client().post("/api/chat_research",
+                                   json={"message": "hi"})
+        assert r.status_code == 401
+
+    def test_constructor_generate_anonymous_401(self):
+        app = _make_app()
+        r = app.test_client().post("/api/constructor_generate",
+                                   json={"repo_url": "https://github.com/x/y"})
+        assert r.status_code == 401
+
+    def test_chat_research_authenticated_not_401(self):
+        app = _make_app()
+        _mkuser(app)
+        client = _login_client(app)
+        r = client.post("/api/chat_research", json={"message": "hi"})
+        assert r.status_code != 401
+
+    def test_roadmap_gap_anonymous_no_ai_burn(self, monkeypatch):
+        """The /learn/roadmaps/gap AI tip must not burn LLM quota for guests."""
+        import unified_app
+        app = _make_app()
+        calls = []
+        monkeypatch.setattr(unified_app, "call_gemini_ai",
+                            lambda *a, **k: calls.append(1) or "tip")
+        monkeypatch.setattr(unified_app, "_ai_ready", lambda: True)
+        r = app.test_client().post(
+            "/learn/roadmaps/gap",
+            json={"current_skills": [], "target_role": "backend-dev"})
+        assert r.status_code == 200
+        assert calls == [], "AI was called for an anonymous request"

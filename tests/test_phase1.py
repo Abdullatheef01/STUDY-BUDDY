@@ -221,12 +221,20 @@ def test_goal_requires_title(client):
 
 def test_research_chat_without_key_returns_gracefully(client, app):
     # no GEMINI_API_KEY in test env -> friendly message, nothing persisted
+    # (SEC-12: login required for this LLM-backed endpoint)
+    register(client)
     resp = client.post("/api/chat_research", json={"message": "summarize this",
                                                   "document_text": "some paper text"})
     assert resp.status_code == 200
     assert "API Key Missing" in resp.get_json()["response"]
     with app.app_context():
         assert ResearchSession.query.count() == 0
+
+
+def test_research_chat_anonymous_denied(client):
+    # SEC-12: anonymous callers get 401 on LLM-backed endpoints
+    resp = client.post("/api/chat_research", json={"message": "hi"})
+    assert resp.status_code == 401
 
 
 def test_research_chat_saves_session_when_logged_in(client, app, monkeypatch):
@@ -256,11 +264,11 @@ def test_research_chat_saves_session_when_logged_in(client, app, monkeypatch):
         assert len(msgs) == 4  # 2 user + 2 assistant
         assert msgs[0]["role"] == "user"
 
-    # anonymous users get no persistence
+    # anonymous users are denied outright (SEC-12)
     client.post("/logout")
     r3 = client.post("/api/chat_research",
                      json={"message": "hello?", "document_text": doc})
-    assert "research_session_id" not in r3.get_json()
+    assert r3.status_code == 401
 
 
 def test_research_session_new_doc_starts_new_session(client, app, monkeypatch):

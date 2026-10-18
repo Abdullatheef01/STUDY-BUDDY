@@ -4306,10 +4306,15 @@ def register_routes(app):
             f"Start with your highest-priority gap and finish one stage "
             f"before moving on. Consistency beats intensity — 1 focused hour "
             f"daily compounds fast.")
-        tip, ai_powered = _learn_ai_tip(
-            f"A student targeting '{role['name']}' has these skill gaps: "
-            f"{gap_desc}. Give one actionable study tip.",
-            fallback_tip)
+        # SEC-12: the AI tip burns LLM quota — only for logged-in users;
+        # anonymous callers get the deterministic fallback.
+        if current_user.is_authenticated:
+            tip, ai_powered = _learn_ai_tip(
+                f"A student targeting '{role['name']}' has these skill gaps: "
+                f"{gap_desc}. Give one actionable study tip.",
+                fallback_tip)
+        else:
+            tip, ai_powered = fallback_tip, False
         return jsonify({'success': True,
                         'role': {'id': role['id'], 'name': role['name']},
                         'gaps': json_safe(gaps),
@@ -6743,11 +6748,16 @@ def register_routes(app):
     def api_chat_research():
         """Gemini-powered Document Intelligence Chat with Resilience.
 
+        SEC-12: login required — this burns LLM quota, so anonymous callers
+        get 401 (same policy as /api/study/import/pdf and the Ultimate Lab).
+
         Accepts the frontend's `history` (last exchanges) and merges it with
         the server-side ResearchSession when logged in, so follow-up
         questions keep context. When the caller is logged in, the
         conversation is appended to a per-user ResearchSession (returned as
         research_session_id)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
         try:
             data = request.get_json(silent=True) or {}
             # P2#17: never send the literal string "None" to the model.
@@ -6831,8 +6841,13 @@ def register_routes(app):
     def api_constructor_generate():
         """AI-powered IEEE Research Paper Generation from a REAL repository.
 
+        SEC-12: login required — this burns LLM quota, so anonymous callers
+        get 401 (same policy as /api/study/import/pdf and the Ultimate Lab).
+
         Fetches live repository facts from the GitHub API and grounds the
         prompt in them, so statistics reflect the actual repo (P1#3)."""
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Please log in to continue.'}), 401
         try:
             data = request.get_json(silent=True) or {}
             # P2#20: reject empty input server-side (never generate about "None").

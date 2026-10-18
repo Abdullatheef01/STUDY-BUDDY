@@ -659,7 +659,7 @@ def download_pdf(pdf_url: str, dest_path: str) -> bool:
                             fh.write(chunk)
                 ok = os.path.getsize(dest) > 0
                 return ok
-            except SSRFError:
+            except (SSRFError, requests.RequestException):
                 continue  # transient network failure; retry
         return False
     except OSError:
