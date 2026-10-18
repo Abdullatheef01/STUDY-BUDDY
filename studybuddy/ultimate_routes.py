@@ -132,6 +132,15 @@ def _deny_anonymous():
     return None
 
 
+def _labs_disabled():
+    """403 JSON when FEATURE_LABS=0 (ARC-12)."""
+    from studybuddy.app_config import config
+    if not config.feature_labs:
+        return jsonify({"ok": False,
+                        "error": "The Ultimate Lab is disabled."}), 403
+    return None
+
+
 def register_ultimate_routes(app, limiter=None):
     run_limit = app.config.get("ULTIMATE_RUN_LIMIT", "30 per hour")
 
@@ -140,6 +149,9 @@ def register_ultimate_routes(app, limiter=None):
         denied = _deny_anonymous()
         if denied:
             return denied
+        disabled = _labs_disabled()
+        if disabled:
+            return disabled
         return jsonify({"ok": True, "count": len(ALL_TOOLS), "tools": public_tools()})
 
     @app.route("/api/ultimate/run/<path:tool_id>", methods=["POST"])

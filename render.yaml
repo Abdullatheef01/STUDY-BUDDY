@@ -13,7 +13,7 @@ services:
     # 2 workers + threads handle concurrent uploads; 120s timeout covers the
     # resume pipeline and Gemini calls (which fail fast at 30s per attempt).
     startCommand: gunicorn unified_app:app --workers 2 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
-    healthCheckPath: /health
+    healthCheckPath: /healthz
     envVars:
       - key: SECRET_KEY
         generateValue: true

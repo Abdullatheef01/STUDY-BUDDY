@@ -2051,8 +2051,9 @@ def create_app(config_overrides=None):
                 "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\" "
                 "and set it as an environment variable.")
         secret = secrets.token_hex(32)
-        print("WARNING: SECRET_KEY is not set - using an ephemeral key for this "
-              "local dev run. Set SECRET_KEY in .env for real use.")
+    if secret is None:
+        log.warning("SECRET_KEY is not set - using an ephemeral key for this "
+                    "local dev run. Set SECRET_KEY in .env for real use.")
     app.secret_key = secret
 
     # --- Session cookie hardening (scorecard S1) ---
@@ -2120,6 +2121,14 @@ def register_security_headers(app):
     also makes Flask-Limiter's per-IP limits meaningful again.
     """
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+
+    # ARC-08: request IDs + structured access logs (no payloads).
+    from studybuddy.observability import (
+        configure_logging,
+        register_request_tracking,
+    )
+    configure_logging(app)
+    register_request_tracking(app)
 
     @app.after_request
     def _set_security_headers(resp):
@@ -2554,6 +2563,79 @@ def register_routes(app):
     @app.route('/health')
     def health():
         return jsonify({'status': 'ok'})
+
+    # OPS-05: liveness (no DB), readiness (DB + migrations + config),
+    # version (build metadata; never secrets).
+    @app.route('/healthz')
+    def healthz():
+        return jsonify({'status': 'ok'})
+
+    @app.route('/readyz')
+    def readyz():
+        checks = {}
+        ok = True
+        # DB reachable?
+        try:
+            db.session.execute(db.text("SELECT 1"))
+            checks["db"] = "ok"
+        except Exception as e:  # noqa: BLE001 - readiness must not raise
+            checks["db"] = f"error: {type(e).__name__}"
+            ok = False
+        # Migrations at head?
+        try:
+            from alembic.config import Config as AlembicConfig
+            from alembic.script import ScriptDirectory
+            # migrations/ lives next to unified_app.py (repo root)
+            mig_dir = os.path.join(os.path.dirname(__file__), "migrations")
+            if os.path.isdir(mig_dir):
+                script = ScriptDirectory.from_config(
+                    AlembicConfig(os.path.join(mig_dir, "alembic.ini")))
+                heads = script.get_heads()
+                from alembic.runtime.migration import MigrationContext
+                with db.engine.connect() as conn:
+                    ctx = MigrationContext.configure(conn)
+                    current = ctx.get_current_heads()
+                checks["migrations"] = ("ok" if set(current) == set(heads)
+                                        else f"behind: {current} != {heads}")
+                if set(current) != set(heads):
+                    ok = False
+            else:
+                checks["migrations"] = "no migrations dir"
+        except Exception as e:  # noqa: BLE001
+            checks["migrations"] = f"error: {type(e).__name__}"
+            ok = False
+        # Required config present?
+        checks["secret_key"] = ("ok" if app.secret_key else "missing")
+        if not app.secret_key:
+            ok = False
+        return jsonify({"ready": ok, "checks": checks}), 200 if ok else 503
+
+    @app.route('/version')
+    def version():
+        import subprocess
+        sha = "unknown"
+        try:
+            sha = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"],
+                capture_output=True, text=True, timeout=5,
+                cwd=os.path.dirname(__file__)).stdout.strip() or "unknown"
+        except Exception:  # noqa: BLE001 - version must not raise
+            pass
+        schema_rev = "unknown"
+        try:
+            from alembic.runtime.migration import MigrationContext
+            with db.engine.connect() as conn:
+                ctx = MigrationContext.configure(conn)
+                heads = ctx.get_current_heads()
+                schema_rev = ",".join(heads) if heads else "none"
+        except Exception:  # noqa: BLE001
+            pass
+        return jsonify({
+            "app": "study-buddy",
+            "git_sha": sha,
+            "schema_revision": schema_rev,
+            "python": __import__("sys").version.split()[0],
+        })
 
     # ---------- AUTH ----------
     @app.route('/register', methods=['GET', 'POST'])

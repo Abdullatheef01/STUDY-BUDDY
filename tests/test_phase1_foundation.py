@@ -14,10 +14,7 @@ class TestReproducibleBuilds:
         # every pinned package must have at least one sha256 hash
         pkgs = re.findall(r"^([a-zA-Z0-9_.-]+)==[^\s\\]+", text, re.M)
         assert pkgs, "no pinned packages found"
-        missing = [p for p in pkgs
-                   if not re.search(rf"^{re.escape(p)}==.*sha256:",
-                                    text, re.M | re.S)]
-        # simpler: count hash lines vs package lines
+        # count hash lines vs package lines
         hash_blocks = len(re.findall(r"--hash=sha256:", text))
         assert hash_blocks >= len(pkgs), \
             f"{len(pkgs)} packages but only {hash_blocks} hash lines"
@@ -60,7 +57,8 @@ class TestMigrations:
     """ARC-03: Alembic baseline — upgrade/downgrade on a fresh database."""
 
     def _run_flask_db(self, *args, db_url):
-        import subprocess, os
+        import os
+        import subprocess
         env = dict(os.environ, DATABASE_URL=db_url, SKIP_DB_INIT="1",
                    OPP_NO_AUTO_REFRESH="1", FLASK_APP="unified_app",
                    SECRET_KEY="migration-test")
@@ -98,9 +96,70 @@ class TestMigrations:
         calls = []
         monkeypatch.setattr(unified_app.db, "create_all",
                             lambda *a, **k: calls.append(1))
-        app = unified_app.create_app({
+        _app = unified_app.create_app({
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2://u:p@localhost/db",
             "SECRET_KEY": "x", "WTF_CSRF_ENABLED": False,
         })
         assert calls == [], "create_all ran at boot with a Postgres URL"
+
+
+class TestObservability:
+    """ARC-08: request IDs; OPS-05: health/readiness/version."""
+
+    def test_request_id_header(self, client):
+        resp = client.get("/")
+        assert "X-Request-ID" in resp.headers
+        assert len(resp.headers["X-Request-ID"]) >= 8
+
+    def test_request_id_echo(self, client):
+        resp = client.get("/", headers={"X-Request-ID": "test-123"})
+        assert resp.headers["X-Request-ID"] == "test-123"
+
+    def test_healthz(self, client):
+        resp = client.get("/healthz")
+        assert resp.status_code == 200
+        assert resp.get_json()["status"] == "ok"
+
+    def test_readyz(self, client):
+        resp = client.get("/readyz")
+        data = resp.get_json()
+        assert "ready" in data and "checks" in data
+        assert data["checks"]["db"] == "ok"
+        # never leak secrets
+        assert "SECRET" not in resp.get_data(as_text=True).upper().replace(
+            "SECRET_KEY", "")
+
+    def test_version(self, client):
+        resp = client.get("/version")
+        data = resp.get_json()
+        assert data["app"] == "study-buddy"
+        assert data["git_sha"] and data["schema_revision"]
+
+
+class TestFeatureFlags:
+    """ARC-12: validated config + feature flags."""
+
+    def test_bad_llm_mode_falls_back(self, monkeypatch):
+        monkeypatch.setenv("LLM_MODE", "nonsense")
+        from studybuddy.app_config import AppConfig
+        assert AppConfig.from_env().llm_mode == "server"
+
+    def test_llm_off_disables(self, monkeypatch):
+        monkeypatch.setenv("LLM_MODE", "off")
+        from studybuddy.app_config import AppConfig
+        assert not AppConfig.from_env().llm_enabled()
+
+    def test_labs_flag_off_gives_403(self, client, monkeypatch):
+        import dataclasses
+        from studybuddy import app_config
+        # AppConfig is frozen; swap in a modified copy.
+        monkeypatch.setattr(app_config, "config",
+                            dataclasses.replace(app_config.config,
+                                                feature_labs=False))
+        # need a logged-in user (SEC-01: anonymous gets 401 first)
+        from conftest import register, login
+        register(client, email="flagtest@example.com")
+        login(client, email="flagtest@example.com")
+        resp = client.get("/api/ultimate/tools")
+        assert resp.status_code == 403
