@@ -59,11 +59,13 @@ class TestMigrations:
     def _run_flask_db(self, *args, db_url):
         import os
         import subprocess
+        import sys
         env = dict(os.environ, DATABASE_URL=db_url, SKIP_DB_INIT="1",
                    OPP_NO_AUTO_REFRESH="1", FLASK_APP="unified_app",
                    SECRET_KEY="migration-test")
+        # sys.executable -m flask works in venvs AND in CI (no .venv there).
         return subprocess.run(
-            [os.path.join(REPO, ".venv", "bin", "flask"), "db", *args],
+            [sys.executable, "-m", "flask", "db", *args],
             cwd=REPO, env=env, capture_output=True, text=True, timeout=120)
 
     def test_baseline_upgrade_creates_tables(self, tmp_path):
