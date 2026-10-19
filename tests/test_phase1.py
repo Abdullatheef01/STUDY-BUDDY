@@ -87,12 +87,18 @@ def test_register_duplicate_email_rejected(client, app):
 
 
 def test_register_validates_input(client):
-    resp = client.post("/register", data={"name": "", "email": "x@y.z", "password": "password123"})
+    resp = client.post("/register", data={"name": "", "email": "x@y.z", "password": "Str0ng!Test#2026", "age_confirm": "1"})
     assert resp.status_code == 200 and b"fill in" in resp.data
-    resp = client.post("/register", data={"name": "A", "email": "x@y.z", "password": "short"})
-    assert resp.status_code == 200 and b"at least 8 characters" in resp.data
-    resp = client.post("/register", data={"name": "A", "email": "not-an-email", "password": "password123"})
+    resp = client.post("/register", data={"name": "A", "email": "x@y.z", "password": "short", "age_confirm": "1"})
+    assert resp.status_code == 200 and b"at least 10 characters" in resp.data
+    resp = client.post("/register", data={"name": "A", "email": "not-an-email", "password": "Str0ng!Test#2026", "age_confirm": "1"})
     assert resp.status_code == 200 and b"valid email" in resp.data
+    # SEC-09: common password blocked
+    resp = client.post("/register", data={"name": "A", "email": "x@y.z", "password": "password123", "age_confirm": "1"})
+    assert resp.status_code == 200 and b"too common" in resp.data
+    # PRIV-06: age gate
+    resp = client.post("/register", data={"name": "A", "email": "x@y.z", "password": "Str0ng!Test#2026"})
+    assert resp.status_code == 200 and b"13 years" in resp.data
 
 
 def test_navbar_shows_auth_state(client):

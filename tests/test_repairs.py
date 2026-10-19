@@ -22,7 +22,7 @@ JS = (REPO_ROOT / "static" / "js" / "research_app.js").read_text()
 def _login(client, email="repairs@example.com"):
     """Register + log in (SEC-12: LLM endpoints require login)."""
     client.post("/register", data={"name": "Repairs", "email": email,
-                                   "password": "repairs-pass-123"})
+                                   "password": "Str0ng!Test#2026", "age_confirm": "1"})
 
 
 

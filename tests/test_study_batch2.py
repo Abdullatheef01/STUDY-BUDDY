@@ -19,8 +19,8 @@ def _authed(client):
 def _as_second_user(client):
     client.post("/logout")
     register(client, name="Second", email="second@example.com",
-             password="password123")
-    login(client, email="second@example.com", password="password123")
+             password="Str0ng!Test#2026")
+    login(client, email="second@example.com", password="Str0ng!Test#2026")
 
 
 def _seed_doc(app, title, texts):

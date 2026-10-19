@@ -42,9 +42,9 @@ GOOD_USERINFO = {"sub": "google-123", "email": "guser@example.com",
 
 
 def register_login(client, name="Aarav Sharma", email="aarav@example.com",
-                   password="password123"):
+                   password="Str0ng!Test#2026"):
     client.post("/register", data={"name": name, "email": email,
-                                   "password": password})
+                                   "password": password, "age_confirm": "1"})
     return client.post("/login", data={"email": email, "password": password})
 
 
