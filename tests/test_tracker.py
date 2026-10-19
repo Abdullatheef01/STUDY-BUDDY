@@ -18,7 +18,8 @@ def _add(client, **kw):
     payload = {"company": "Acme Corp", "role": "Backend Intern"}
     payload.update(kw)
     return client.post("/tracker/add", data=json.dumps(payload),
-                       content_type="application/json")
+                       content_type="application/json",
+                       headers={"X-CSRFToken": "test"})
 
 
 def test_unauth_add_401(client):

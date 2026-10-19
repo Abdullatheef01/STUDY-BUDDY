@@ -79,13 +79,14 @@ def sample_pdf():
     return make_pdf_bytes(SAMPLE_RESUME_LINES)
 
 
-def register(client, name="Aarav Sharma", email="aarav@example.com", password="password123"):
+def register(client, name="Aarav Sharma", email="aarav@example.com", password="Str0ng!Test#2026"):
     return client.post("/register", data={
         "name": name, "email": email, "password": password,
+        "age_confirm": "1",
     }, follow_redirects=False)
 
 
-def login(client, email="aarav@example.com", password="password123"):
+def login(client, email="aarav@example.com", password="Str0ng!Test#2026"):
     return client.post("/login", data={"email": email, "password": password},
                        follow_redirects=False)
 

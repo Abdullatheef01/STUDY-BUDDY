@@ -16,8 +16,14 @@
             <input class="b-input" type="email" id="email" name="email" placeholder="you@college.edu" required value="{{ request.form.get('email', '') }}">
         </div>
         <div class="b-field">
-            <label class="b-label" for="password">Password <span style="color:var(--b-muted);font-weight:400;">(min 8 characters)</span></label>
-            <input class="b-input" type="password" id="password" name="password" placeholder="••••••••" required minlength="8">
+            <label class="b-label" for="password">Password <span style="color:var(--b-muted);font-weight:400;">(min 10 characters)</span></label>
+            <input class="b-input" type="password" id="password" name="password" placeholder="••••••••" required minlength="10">
+        </div>
+        <div style="margin:.9rem 0;">
+            <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.9rem;">
+                <input type="checkbox" name="age_confirm" value="1" required style="margin-top:.2rem;">
+                <span>I confirm I am at least 13 years old. If under 18, I have had a parent/guardian review the <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms</a> with me.</span>
+            </label>
         </div>
         <button type="submit" class="b-btn b-btn--primary" style="width:100%;padding:.9rem;font-size:1rem;">Create Account</button>
     </form>

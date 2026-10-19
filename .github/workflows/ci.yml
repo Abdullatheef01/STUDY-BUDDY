@@ -25,6 +25,8 @@ jobs:
       - run: ruff check . --no-cache
       # NOTE: ruff format is intentionally not gated yet — 187 legacy files
       # would be reformatted. ARC-07 ratchets formatting per-module.
+      # ARC-07: mypy on new typed modules (gradual adoption)
+      - run: mypy studybuddy/auth_hardening.py studybuddy/pii_redaction.py studybuddy/exceptions.py studybuddy/anti_gaming.py studybuddy/grounded_gen.py --ignore-missing-imports 2>&1 | tail -20
 
   test-sqlite:
     name: pytest (SQLite)

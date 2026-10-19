@@ -67,6 +67,39 @@ _CIRCUIT = {}  # provider -> {"failures": int, "open_until": float}
 _CIRCUIT_THRESHOLD = 5
 _CIRCUIT_COOLDOWN = 300  # seconds
 
+# LLM-04: Simple in-memory cache (prompt hash -> response)
+# For production, use Redis. This is a pragmatic in-process cache.
+_CACHE = {}  # sha256(prompt) -> (response, timestamp)
+_CACHE_TTL = 3600  # 1 hour
+_CACHE_MAX = 1000
+
+
+def _cache_get(prompt):
+    """LLM-04: Get cached response if fresh."""
+    import hashlib
+    import time
+    key = hashlib.sha256(prompt.encode()).hexdigest()
+    entry = _CACHE.get(key)
+    if entry:
+        response, ts = entry
+        if time.time() - ts < _CACHE_TTL:
+            log.info("llm_cache_hit")
+            return response
+        del _CACHE[key]
+    return None
+
+
+def _cache_put(prompt, response):
+    """LLM-04: Cache a response."""
+    import hashlib
+    import time
+    if len(_CACHE) >= _CACHE_MAX:
+        # Evict oldest
+        oldest = min(_CACHE, key=lambda k: _CACHE[k][1])
+        del _CACHE[oldest]
+    key = hashlib.sha256(prompt.encode()).hexdigest()
+    _CACHE[key] = (response, time.time())
+
 
 def _circuit_open(provider):
     """Check if circuit breaker is open for provider."""
@@ -235,7 +268,7 @@ def _gemini_generate(prompt):
     return app_mod.call_gemini_direct(prompt)
 
 
-def generate(prompt, user_key=None):
+def generate(prompt, user_key=None, redact_pii=True):
     """Generate text via the first working provider.
 
     PRIV-05 modes:
@@ -245,7 +278,26 @@ def generate(prompt, user_key=None):
     - default: server chain — local (LLM_BASE_URL) -> Gemini -> Groq -> OpenRouter.
 
     user_key is never logged.
+
+    LLM-06: PII is redacted from the prompt before sending to the provider
+    (unless redact_pii=False and the caller has a specific need).
     """
+    # LLM-06: Pre-LLM redaction
+    redaction_map = {}
+    if redact_pii:
+        from studybuddy.pii_redaction import redact_for_llm
+        prompt, redaction_map = redact_for_llm(prompt)
+        if redaction_map:
+            log.info("llm_prompt_redacted count=%d", len(redaction_map))
+    # LLM-04: Check cache (skip for BYOK — user keys differ)
+    use_cache = user_key is None
+    if use_cache:
+        cached = _cache_get(prompt)
+        if cached:
+            if redaction_map:
+                from studybuddy.pii_redaction import unredact
+                cached = unredact(cached, redaction_map)
+            return cached
     mode = llm_mode()
     if mode == "off":
         raise AIError(
@@ -277,9 +329,24 @@ def generate(prompt, user_key=None):
     errors = []
     for name, fn in chain:
         try:
+            import time
+            start = time.time()
             text = fn(prompt)
+            latency_ms = int((time.time() - start) * 1000)
             if text:
-                log.info("AI gateway: served by %s", name)
+                # LLM-08: observability — provider, latency, prompt size
+                # (never log prompt content or user keys)
+                log.info("ai_request provider=%s latency_ms=%d "
+                         "prompt_chars=%d response_chars=%d cached=%s",
+                         name, latency_ms, len(prompt), len(text),
+                         False)
+                # LLM-06: reinsert redacted PII into response
+                if redaction_map:
+                    from studybuddy.pii_redaction import unredact
+                    text = unredact(text, redaction_map)
+                # LLM-04: cache successful responses
+                if use_cache:
+                    _cache_put(prompt, text)
                 return text
             errors.append(f"{name}: empty response")
         except Exception as exc:

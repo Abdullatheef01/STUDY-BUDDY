@@ -2869,8 +2869,14 @@ def register_routes(app):
             name = (request.form.get('name') or '').strip()
             email = (request.form.get('email') or '').strip().lower()
             password = request.form.get('password') or ''
+            age_confirm = request.form.get('age_confirm')
             if not name or not email or not password:
                 error = 'Please fill in name, email and password.'
+            elif not age_confirm:
+                # PRIV-06: age gate
+                error = ('Please confirm you are at least 13 years old. '
+                         'If under 18, have a parent/guardian review our '
+                         'Privacy Policy and Terms with you.')
             else:
                 pw_ok, pw_msg = check_password_policy(password)
                 if not pw_ok:
