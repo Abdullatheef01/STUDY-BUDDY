@@ -2,7 +2,7 @@
 
 ## Hosted demo
 
-Visit [the live demo](https://ai-career-research-assistant-resume.onrender.com).
+Visit [the live demo](https://study-buddy-3m16.onrender.com).
 First load may take ~30s (free-tier cold start).
 
 ## Local development

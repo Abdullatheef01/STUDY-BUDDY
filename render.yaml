@@ -2,7 +2,7 @@
 # Replaces dashboard-only manual config (P2#19).
 services:
   - type: web
-    name: acra
+    name: study-buddy
     runtime: python
     # OPS-01: pin the interpreter — a 3.10 vs 3.12 mismatch once crashed
     # every deploy (backslash in f-string is a SyntaxError on <3.12).

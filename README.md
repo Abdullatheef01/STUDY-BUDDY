@@ -8,11 +8,11 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)](https://flask.palletsprojects.com/)
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?logo=render)](https://ai-career-research-assistant-resume.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?logo=render)](https://study-buddy-3m16.onrender.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/Vivek492005/AI-Career-Research-Assistant-Resume-Analysis-Job-Recommendation-Research-Paper-Intelligence-Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Vivek492005/AI-Career-Research-Assistant-Resume-Analysis-Job-Recommendation-Research-Paper-Intelligence-Platform/actions/workflows/ci.yml)
 
-[Live Demo](https://ai-career-research-assistant-resume.onrender.com) · [Features](#-features) · [Setup](#-installation--setup) · [Contributing](#-contributing)
+[Live Demo](https://study-buddy-3m16.onrender.com) · [Features](#-features) · [Setup](#-installation--setup) · [Contributing](#-contributing)
 
 </div>
 
@@ -35,7 +35,7 @@ Built as a Flask monolith, it pairs **Google Gemini** (with automatic fallback t
 
 ## 🚀 Live Demo
 
-👉 **https://ai-career-research-assistant-resume.onrender.com**
+👉 **https://study-buddy-3m16.onrender.com**
 
 > Hosted on Render's free tier — the first load may take ~30 seconds while the service wakes up.
 

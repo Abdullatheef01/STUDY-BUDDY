@@ -48,7 +48,7 @@ cp .env.example .env  # add keys
 python unified_app.py
 ```
 
-Or try the [live demo](https://ai-career-research-assistant-resume.onrender.com).
+Or try the [live demo](https://study-buddy-3m16.onrender.com).
 
 ## What's next
 
