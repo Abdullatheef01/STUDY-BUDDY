@@ -49,3 +49,58 @@ codebase should read `os.environ` for config.
 - `GET /healthz` — liveness, no DB. Render health check points here.
 - `GET /readyz` — readiness: DB reachable, migrations at head, secret key set. 503 when not ready. Never exposes secrets.
 - `GET /version` — git SHA, schema revision, Python version.
+- ## LLM Configuration
+
+STUDY-BUDDY supports three LLM modes controlled by the `LLM_MODE` environment variable.
+
+| Variable | Default | Description |
+|---|---|---|
+| `LLM_MODE` | `server` | Selects the LLM operating mode: `off`, `byok`, or `server`. |
+| `LLM_BASE_URL` | Not set | Base URL of a local OpenAI-compatible LLM endpoint, such as Ollama. |
+| `LLM_MODEL` | `llama3.2` | Model name sent to the local LLM endpoint. |
+
+### LLM Modes
+
+- **`off`** — Disables LLM calls. The application uses rule-based fallbacks where available.
+- **`byok`** — Uses the user's own API key configured in Profile → AI Settings. Requests are sent through OpenRouter.
+- **`server`** — Uses configured providers in this order: local endpoint, Gemini, Groq, then OpenRouter. Providers without configured keys are skipped.
+
+### Local Setup with Ollama
+
+1. Install Ollama from [https://ollama.com/](https://ollama.com/).
+2. Download the model and start the Ollama server:
+
+   ```bash
+   ollama pull llama3.2
+   ollama serve
+   ```
+
+3. Set the environment variables.
+
+**Linux/macOS:**
+
+```bash
+export LLM_MODE=server
+export LLM_BASE_URL=http://localhost:11434/v1
+export LLM_MODEL=llama3.2
+```
+
+**Windows PowerShell:**
+
+```powershell
+$env:LLM_MODE="server"
+$env:LLM_BASE_URL="http://localhost:11434/v1"
+$env:LLM_MODEL="llama3.2"
+```
+
+4. Keep Ollama running while using STUDY-BUDDY. The application sends chat-completion requests to the local endpoint.
+
+### Important Notes
+
+- `LLM_BASE_URL` should point to the OpenAI-compatible API base URL, including `/v1` for a standard Ollama setup.
+- `LLM_MODEL` must match a model available in Ollama.
+- In `server` mode, configured cloud providers can be used as fallbacks if the local endpoint fails.
+- For local-only operation, leave cloud provider API keys unset and ensure Ollama is running with the selected model available.
+- `byok` and `off` modes do not use the server-mode provider chain.
+- Environment variables set in a terminal apply to processes launched from that terminal.
+
