@@ -45,7 +45,17 @@
         "es6",
         "javascript",
         "js",
-        "vanilla js"
+        "vanilla js",
+        "typescript",
+        "react",
+        "vue",
+        "angular",
+        "node.js",
+        "express",
+        "next.js",
+        "jest",
+        "webpack",
+        "npm"
       ],
       "related": [
         "TypeScript",
