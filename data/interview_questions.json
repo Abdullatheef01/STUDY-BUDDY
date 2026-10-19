@@ -8961,5 +8961,215 @@
   ],
   "time_minutes": 35,
   "id": "dsa-120"
+ },
+ {
+  "question": "Write a SQL query to find customers who have never placed an order.",
+  "companies": ["Amazon", "Flipkart", "Swiggy", "TCS", "Infosys"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+    "LEFT JOIN customers to orders and keep rows where orders.customer_id IS NULL",
+    "NOT EXISTS is a clean alternative; NOT IN breaks if the subquery returns any NULL",
+    "Mention checking for duplicate customer rows before trusting the count"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-121"
+ },
+ {
+  "question": "Compute a running (cumulative) total of daily revenue in SQL.",
+  "companies": ["Google", "Amazon", "Microsoft", "Flipkart", "Swiggy"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+    "Aggregate to one row per day first, then SUM(revenue) OVER (ORDER BY day)",
+    "Spell out the frame ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW; the default RANGE frame treats ties as peers",
+    "Add PARTITION BY (e.g. region) for a running total per group"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-122"
+ },
+ {
+  "question": "A table has duplicate rows per user_id. Keep only the most recent row per user using SQL.",
+  "companies": ["Google", "Meta", "Amazon", "Microsoft", "Swiggy"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+    "ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY updated_at DESC) AS rn, then filter rn = 1",
+    "Decide a tie-breaker when two rows share the same timestamp",
+    "To delete duplicates instead of selecting, wrap this in a CTE and delete rows where rn > 1"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-123"
+ },
+ {
+  "question": "Calculate month-over-month revenue growth percentage in SQL.",
+  "companies": ["Google", "Meta", "Amazon", "Netflix", "Flipkart"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+    "Aggregate revenue by month, then use LAG(revenue) OVER (ORDER BY month) for the previous month",
+    "Growth % = (current - previous) / NULLIF(previous, 0) * 100 to avoid divide-by-zero",
+    "The first month has no previous value, so it returns NULL; also handle months with no sales rows"
+  ],
+  "time_minutes": 20,
+  "id": "dsa-124"
+ },
+ {
+  "question": "What is the difference between VLOOKUP and XLOOKUP, and when would you use INDEX-MATCH?",
+  "companies": ["TCS", "Infosys", "Wipro", "Microsoft", "Amazon"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+    "VLOOKUP only looks right of the lookup column and defaults to approximate match unless the last argument is FALSE",
+    "XLOOKUP looks in any direction, defaults to exact match, and has a built-in if_not_found argument (Excel 365/2021+)",
+    "INDEX-MATCH works in older Excel versions and in any direction"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-125"
+ },
+ {
+  "question": "Using a pivot table, how would you find the top 5 products by revenue in each region?",
+  "companies": ["Microsoft", "Amazon", "Flipkart", "TCS", "Infosys"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+    "Region and Product in Rows, Sum of Revenue in Values, sorted descending",
+    "Product field > Value Filters > Top 10 > set to 5 by Sum of Revenue",
+    "Add a slicer for interactivity; remember pivots need a refresh when source data changes"
+  ],
+  "time_minutes": 10,
+  "id": "dsa-126"
+ },
+ {
+  "question": "You receive a messy Excel export with extra spaces, duplicate rows, and dates stored as text. How do you clean it?",
+  "companies": ["Microsoft", "Amazon", "TCS", "Infosys", "Wipro"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+    "TRIM and CLEAN for spacing and hidden characters; Remove Duplicates on the right key columns",
+    "Convert text dates with DATEVALUE or Text to Columns, and verify the result",
+    "For work you repeat every week, use Power Query so the steps are recorded and re-runnable"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-127"
+ },
+ {
+  "question": "When would you report the median instead of the mean?",
+  "companies": ["Google", "Meta", "Amazon", "Microsoft", "TCS"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+    "Use the median for skewed data or data with outliers (income, order values, delivery times)",
+    "The mean is pulled by extreme values; the median is robust to them",
+    "Best practice: report both, or add a distribution view, when they differ a lot"
+  ],
+  "time_minutes": 8,
+  "id": "dsa-128"
+ },
+ {
+  "question": "Explain Type I and Type II errors, and what statistical power means.",
+  "companies": ["Google", "Meta", "Amazon", "Netflix", "Flipkart"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+    "Type I = false positive (rejecting a true null), controlled by alpha; Type II = false negative, probability beta",
+    "Power = 1 - beta: the chance of detecting a real effect",
+    "Power rises with larger sample size and larger effect size; running many tests inflates Type I risk"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-129"
+ },
+ {
+  "question": "How do you interpret a 95% confidence interval correctly?",
+  "companies": ["Google", "Meta", "Amazon", "Microsoft", "Apple"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Medium",
+  "key_points": [
+   "If we repeated the sampling many times, about 95% of intervals built this way would contain the true value",
+   "It does not mean there is a 95% probability that this one interval contains the true value",
+   "Width shrinks as sample size grows and widens as the confidence level or variability rises"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-130"
+ },
+ {
+  "question": "What is Simpson's paradox? Give an example and explain how you would handle it.",
+  "companies": ["Google", "Meta", "Amazon", "Netflix", "Microsoft"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Hard",
+  "key_points": [
+    "A trend that appears in every subgroup can reverse when the groups are combined, usually due to a confounding variable and unequal group sizes",
+    "Classic example: the kidney stone treatment study, where one treatment looked better overall but worse within each stone-size group",
+    "Segment by the likely confounder and use domain knowledge to decide whether the aggregate or the segmented view answers the question"
+  ],
+  "time_minutes": 15,
+  "id": "dsa-131"
+ },
+ {
+  "question": "How do you choose the right chart for a given message (trend, comparison, composition, distribution)?",
+  "companies": ["Google", "Amazon", "Microsoft", "Flipkart", "Swiggy"],
+  "roles": ["data_analyst"],
+  "category": "dsa",
+  "difficulty": "Easy",
+  "key_points": [
+    "Trend over time: line chart; comparison across categories: bar chart; distribution: histogram or box plot; relationship: scatter plot",
+    "Avoid pies with many slices, dual axes, and bar charts with truncated axes",
+    "Start from the one message the audience should take away, then choose the chart that shows it"
+  ],
+  "time_minutes": 8,
+  "id": "dsa-132"
+ },
+ {
+  "question": "You have 5 minutes to present an analysis to senior executives who are not technical. How do you structure it?",
+  "companies": ["Google", "Amazon", "Microsoft", "Meta", "Flipkart"],
+  "roles": ["data_analyst"],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+    "Lead with the conclusion and the recommended action, not the methodology",
+    "Support with 2-3 key numbers and one clear chart; keep the detail in an appendix",
+    "End with the decision you need and the risks or caveats, ready to answer follow-up questions"
+  ],
+  "time_minutes": 5,
+  "id": "beh-091"
+ },
+ {
+  "question": "Tell me about a time your analysis contradicted what a stakeholder expected. How did you handle it?",
+  "companies": ["Amazon", "Google", "Meta", "Netflix", "Swiggy"],
+  "roles": ["data_analyst"],
+  "category": "behavioral",
+  "difficulty": "Hard",
+  "key_points": [
+    "Re-check the data and method first so you are confident before you present",
+    "Explain the finding with evidence and respect for their expectations; show how you validated it",
+    "Say what decision changed and what you would do differently next time"
+  ],
+  "time_minutes": 4,
+  "id": "beh-092"
+ },
+ {
+  "question": "A dashboard you built is barely being used. How do you find out why and fix it?",
+  "companies": ["Amazon", "Microsoft", "Flipkart", "Swiggy", "TCS"],
+  "roles": ["data_analyst"],
+  "category": "behavioral",
+  "difficulty": "Medium",
+  "key_points": [
+    "Talk to the intended users to learn what decisions they make and whether the dashboard answers them",
+    "Check usage data, load speed, trust in the numbers, and whether it is too cluttered",
+    "Simplify to the few metrics that drive decisions, then follow up on adoption"
+  ],
+  "time_minutes": 4,
+  "id": "beh-093"
  }
 ]
