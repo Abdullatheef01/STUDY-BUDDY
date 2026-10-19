@@ -81,7 +81,7 @@ def test_upload_happy_path(client, app, tmp_path):
     body = resp.get_json()
     assert body["success"] and body["doc"]["chunks"] > 0
     with app.app_context():
-        doc = StudyDoc.query.get(body["doc"]["id"])
+        doc = db.session.get(StudyDoc, body["doc"]["id"])
         assert doc is not None and doc.num_pages >= 1
         assert (doc.data or {}).get("chunks")
 
@@ -162,13 +162,13 @@ def test_delete_flow(client, app):
     _authed(client)
     doc_id = _upload(client).get_json()["doc"]["id"]
     with app.app_context():
-        fname = StudyDoc.query.get(doc_id).stored_filename
+        fname = db.session.get(StudyDoc, doc_id).stored_filename
         upload_dir = app.config["UPLOAD_FOLDER"]
     assert client.delete("/study/api/documents/999999").status_code == 404
     resp = client.delete(f"/study/api/documents/{doc_id}")
     assert resp.status_code == 200
     with app.app_context():
-        assert StudyDoc.query.get(doc_id) is None
+        assert db.session.get(StudyDoc, doc_id) is None
     import os
     assert not os.path.exists(os.path.join(upload_dir, fname))
 

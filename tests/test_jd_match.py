@@ -11,7 +11,7 @@ from studybuddy.jd_matcher import (
     score_jd_match,
 )
 from tests.conftest import SAMPLE_RESUME_LINES, login, make_pdf_bytes, register
-from unified_app import JDMatchReport
+from unified_app import JDMatchReport, db
 
 SAMPLE_JD = """Senior Python Developer - Backend Team
 
@@ -187,7 +187,7 @@ def test_jd_match_upload_happy_path(authed_client, monkeypatch, app):
     assert payload["saved_url"].endswith(
         "/jd-match/{}".format(payload["report_id"]))
     with app.app_context():
-        row = JDMatchReport.query.get(payload["report_id"])
+        row = db.session.get(JDMatchReport, payload["report_id"])
         assert row is not None
         assert row.score == report["score"]
         assert row.job_title

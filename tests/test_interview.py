@@ -11,7 +11,7 @@ from studybuddy.mock_interview import (
     validate_interview_setup,
 )
 from tests.conftest import login, register
-from unified_app import InterviewSession
+from unified_app import InterviewSession, db
 
 
 @pytest.fixture()
@@ -200,7 +200,7 @@ def test_start_and_submit_flow(authed_client, app):
 
     # persisted
     with app.app_context():
-        row = InterviewSession.query.get(sid)
+        row = db.session.get(InterviewSession, sid)
         assert row is not None and row.total_score == d2["total_score"]
 
 

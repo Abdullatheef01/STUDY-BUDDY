@@ -64,7 +64,7 @@ class TestAuthzMatrix:
         assert r.status_code == 404, f"IDOR: B deleted A's goal ({r.status_code})"
         # Verify the goal still exists
         with app.app_context():
-            assert Goal.query.get(gid) is not None
+            assert db.session.get(Goal, gid) is not None
         _logout(client)
 
     def test_jd_match_report_idor(self, client, app, two_users):
@@ -222,7 +222,7 @@ class TestAdminRouteProtection:
         _, bid = two_users
         from unified_app import Mentor, User, db
         with app.app_context():
-            u = User.query.get(bid)
+            u = db.session.get(User, bid)
             u.is_admin = True
             db.session.commit()
             m = Mentor(name="Mentor Y", headline="Tech mentor",
@@ -234,7 +234,7 @@ class TestAdminRouteProtection:
         r = client.post(f"/mentors/api/admin/verify/{mid}")
         assert r.status_code == 200, f"admin verify failed ({r.status_code})"
         with app.app_context():
-            assert Mentor.query.get(mid).verified is True
+            assert db.session.get(Mentor, mid).verified is True
         _logout(client)
 
 

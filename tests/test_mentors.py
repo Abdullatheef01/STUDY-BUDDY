@@ -16,6 +16,7 @@ import pytest
 import studybuddy.community as community_mod
 from tests.conftest import login, register
 from unified_app import (
+    db,
     Mentor,
     MentorApplication,
     OfficeHour,
@@ -255,7 +256,7 @@ def test_booking_success(app, client):
     assert data["success"] is True
     assert data["booking_id"]
     with app.app_context():
-        b = OHBooking.query.get(data["booking_id"])
+        b = db.session.get(OHBooking, data["booking_id"])
         assert b.question_text == "My question?"
         assert b.status == "booked"
 
@@ -313,7 +314,7 @@ def test_booking_marks_session_full(app, client):
     oh_id = _office_hour(app, mid, capacity=1)
     _book(client, oh_id)
     with app.app_context():
-        assert OfficeHour.query.get(oh_id).status == "full"
+        assert db.session.get(OfficeHour, oh_id).status == "full"
 
 
 def test_booking_past_session_rejected(app, client):
@@ -365,12 +366,12 @@ def test_cancel_success_reopens_session(app, client):
     oh_id = _office_hour(app, mid, capacity=1)
     booking_id = _book(client, oh_id).get_json()["booking_id"]
     with app.app_context():
-        assert OfficeHour.query.get(oh_id).status == "full"
+        assert db.session.get(OfficeHour, oh_id).status == "full"
     r = client.post("/mentors/api/bookings/%d/cancel" % booking_id)
     assert r.status_code == 200
     assert r.get_json()["session_status"] == "open"
     with app.app_context():
-        assert OHBooking.query.get(booking_id).status == "cancelled"
+        assert db.session.get(OHBooking, booking_id).status == "cancelled"
 
 
 def test_cancel_too_close_rejected(app, client):
@@ -430,7 +431,7 @@ def test_attend_records_xp(app, client):
     r = client.post("/mentors/api/bookings/%d/attend" % booking_id)
     assert r.status_code == 200
     with app.app_context():
-        assert OHBooking.query.get(booking_id).status == "attended"
+        assert db.session.get(OHBooking, booking_id).status == "attended"
         row = XPLedger.query.filter_by(
             user_id=uid, event_type="mentor_session_attended").first()
         assert row is not None
@@ -475,7 +476,7 @@ def test_note_saved(app, client):
                     json={"note_text": "Apply to 3 internships this week."})
     assert r.status_code == 201
     with app.app_context():
-        note = OHNote.query.get(r.get_json()["note_id"])
+        note = db.session.get(OHNote, r.get_json()["note_id"])
         assert note.note_text == "Apply to 3 internships this week."
 
 
@@ -530,7 +531,7 @@ def test_feedback_success_records_xp(app, client):
                     json={"rating": 5, "what_helped": "The 90-day breakdown."})
     assert r.status_code == 201
     with app.app_context():
-        fb = OHFeedback.query.get(r.get_json()["feedback_id"])
+        fb = db.session.get(OHFeedback, r.get_json()["feedback_id"])
         assert fb.rating == 5
         row = XPLedger.query.filter_by(
             user_id=uid, event_type="mentor_feedback_given").first()
@@ -632,7 +633,7 @@ def test_apply_success(app, client):
     })
     assert r.status_code == 201
     with app.app_context():
-        row = MentorApplication.query.get(r.get_json()["application_id"])
+        row = db.session.get(MentorApplication, r.get_json()["application_id"])
         assert row.status == "pending"
         assert row.path == "engineering"
 
@@ -683,7 +684,7 @@ def test_report_mentor(app, client):
         "mentor_id": mid, "reason": "spam", "details": "Sent promo links."})
     assert r.status_code == 201
     with app.app_context():
-        rep = OHReport.query.get(r.get_json()["report_id"])
+        rep = db.session.get(OHReport, r.get_json()["report_id"])
         assert rep.reason == "spam"
         assert rep.status == "open"
         assert rep.mentor_id == mid
@@ -737,7 +738,7 @@ def test_admin_verify_forbidden_for_non_admin(app, client, monkeypatch):
     r = client.post("/mentors/api/admin/verify/%d" % mid)
     assert r.status_code == 403
     with app.app_context():
-        assert Mentor.query.get(mid).verified is False
+        assert db.session.get(Mentor, mid).verified is False
 
 
 def test_admin_verify_forbidden_when_env_empty(app, client, monkeypatch):
@@ -754,7 +755,7 @@ def test_admin_verify_success(app, client, monkeypatch):
     r = client.post("/mentors/api/admin/verify/%d" % mid)
     assert r.status_code == 200
     with app.app_context():
-        assert Mentor.query.get(mid).verified is True
+        assert db.session.get(Mentor, mid).verified is True
 
 
 def test_admin_verify_404(app, client, monkeypatch):
@@ -1003,7 +1004,7 @@ def test_admin_create_session_success(app, client, monkeypatch):
     assert data["office_hour"]["topic"] == "Judiciary prep AMA"
     assert data["office_hour"]["path"] == "law"
     with app.app_context():
-        oh = OfficeHour.query.get(data["office_hour"]["id"])
+        oh = db.session.get(OfficeHour, data["office_hour"]["id"])
         assert oh.capacity == 20
         assert oh.duration_min == 60
 

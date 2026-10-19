@@ -122,7 +122,7 @@ def test_analyze_flow(authed_client, app):
     assert d["success"] and d["report"]["clarity_score"] < 75
     assert d["report_url"].startswith("/coach/")
     with app.app_context():
-        row = CommunicationAnalysis.query.get(d["analysis_id"])
+        row = db.session.get(CommunicationAnalysis, d["analysis_id"])
         assert row is not None
         assert abs(row.clarity_score - d["report"]["clarity_score"]) < 0.01
     # saved report page

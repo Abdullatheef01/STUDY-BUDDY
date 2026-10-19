@@ -6,7 +6,6 @@
 """
 import re
 import secrets
-from datetime import datetime, timedelta, timezone
 
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
@@ -14,12 +13,12 @@ from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 COMMON_PASSWORDS = frozenset({
     "password", "1234567890", "123456789", "qwerty123", "password123",
     "admin123", "welcome123", "letmein123", "monkey123", "dragon123",
-    "12345678", "123456789", "qwerty", "abc123", "password1",
+    "12345678", "qwerty", "abc123", "password1",
     "123123", "admin", "welcome", "monkey", "login",
     "princess", "qwertyuiop", "solo", "passw0rd", "starwars",
     "trustno1", "whatever", "freedom", "hello123", "charlie",
     "aa123456", "donald", "password12", "qwerty1234", "1q2w3e4r",
-    "baseball", "football", "superman", "iloveyou", "trustno1",
+    "baseball", "football", "superman", "iloveyou",
 })
 
 MIN_PASSWORD_LEN = 10

@@ -3,7 +3,7 @@
 import pytest
 
 from tests.conftest import login, register
-from unified_app import ResumeVersion
+from unified_app import ResumeVersion, db
 
 
 @pytest.fixture()
@@ -79,8 +79,8 @@ def test_set_default(app, authed_client):
     r = authed_client.post(f"/resume-versions/{v2}/set-default")
     assert r.status_code == 200
     with app.app_context():
-        assert ResumeVersion.query.get(v1).is_default is False
-        assert ResumeVersion.query.get(v2).is_default is True
+        assert db.session.get(ResumeVersion, v1).is_default is False
+        assert db.session.get(ResumeVersion, v2).is_default is True
 
 
 def test_delete_version(app, authed_client):
@@ -91,7 +91,7 @@ def test_delete_version(app, authed_client):
     assert r.status_code == 200
     with app.app_context():
         assert ResumeVersion.query.count() == 1
-        assert ResumeVersion.query.get(v2).is_default is True
+        assert db.session.get(ResumeVersion, v2).is_default is True
 
 
 def test_delete_missing_version(authed_client):

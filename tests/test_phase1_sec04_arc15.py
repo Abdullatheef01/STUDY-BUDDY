@@ -18,7 +18,7 @@ class TestRateLimitKeying:
             db.session.commit()
             uid = user.id
         with client.application.test_request_context("/"):
-            login_user(User.query.get(uid))
+            login_user(db.session.get(User, uid))
             assert _rate_limit_key() == f"user:{uid}"
 
     def test_key_falls_back_to_ip_when_anonymous(self, client):

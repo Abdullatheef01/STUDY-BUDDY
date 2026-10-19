@@ -38,7 +38,8 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
       - run: pip install --require-hashes -r requirements-dev.txt
-      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider --tb=line --cov=studybuddy --cov-report=term-missing 2>&1 | tail -60
+      # TEST-11: -n auto (xdist) + DeprecationWarning as error for our code.
+      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider --tb=line -W error::DeprecationWarning --cov=studybuddy --cov-report=term-missing 2>&1 | tail -60
         env:
           STUDYBUDDY_NO_PARSE_SANDBOX: "1"
       # TEST-04: Benchmarks on every PR (small subset)
@@ -49,9 +50,10 @@ jobs:
   test-postgres:
     name: pytest (Postgres 16)
     runs-on: ubuntu-latest
-    # TODO: flask db upgrade fails on Postgres (migration issue under investigation).
-    # SQLite suite (8804 tests) is green; Postgres migration debug is follow-up work.
-    continue-on-error: true
+    # TEST-03: fixed 2026-10-19 — the migration chain was missing tables for
+    # models added after the baseline (llm_consent, password_reset_token,
+    # user_api_key, user.email_verified*). Migration 01c271a81d47 covers them;
+    # `flask db upgrade head` + `flask db check` are green on Postgres 16.
     services:
       postgres:
         image: postgres:16

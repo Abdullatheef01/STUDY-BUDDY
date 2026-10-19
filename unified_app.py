@@ -65,6 +65,13 @@ from werkzeug.utils import secure_filename
 # SEC-14: structured security event logging (no PII payloads).
 from studybuddy.security_events import log_security_event
 
+# ARC-09: custom exceptions with a central error handler.
+from studybuddy.exceptions import (
+    ExternalServiceError,
+    StudyBuddyError,
+    handle_studybuddy_error,
+)
+
 from studybuddy.github_integration import (
     GithubAPIError,
     analyze_github_profile,
@@ -132,12 +139,24 @@ def _ai_ready():
     return ai_gateway.ai_ready()
 
 
-class GeminiError(Exception):
-    """A Gemini failure with a user-safe message (safe to return to clients)."""
+class GeminiError(ExternalServiceError):
+    """A Gemini failure with a user-safe message (safe to return to clients).
+
+    ARC-09: subclasses ExternalServiceError so AI failures get the central
+    handler (502 + user-safe message) while existing ``except GeminiError``
+    handlers keep working unchanged.
+    """
+    status_code = 502
+    user_message = "The AI service is temporarily unavailable. Please try again shortly."
 
 
-class GithubRepoError(Exception):
-    """A GitHub repository fetch failure with a user-safe message."""
+class GithubRepoError(ExternalServiceError):
+    """A GitHub repository fetch failure with a user-safe message.
+
+    ARC-09: subclasses ExternalServiceError for central handling.
+    """
+    status_code = 502
+    user_message = "Could not fetch the GitHub repository. Please try again later."
 
 
 # --- Gemini model discovery cache (module level, refreshed hourly) ---
@@ -2346,6 +2365,9 @@ def _ai_degraded_response(feature_name="This feature"):
 
 
 def register_error_handlers(app):
+    # ARC-09: central handler for StudyBuddyError subclasses.
+    app.register_error_handler(StudyBuddyError, handle_studybuddy_error)
+
     @app.errorhandler(400)
     def bad_request(e):
         return _error_payload(400, getattr(e, "description", None)
@@ -2942,7 +2964,7 @@ def register_routes(app):
         if not user_id:
             flash('This verification link is invalid or has expired.', 'error')
             return redirect(url_for('login'))
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             flash('Account not found.', 'error')
             return redirect(url_for('login'))
@@ -3016,7 +3038,7 @@ def register_routes(app):
             if not pw_ok:
                 return render_template('reset_password.html', token=token,
                                        error=pw_msg)
-            user = User.query.get(prt.user_id)
+            user = db.session.get(User, prt.user_id)
             user.set_password(password)
             prt.used_at = datetime.now(UTC)
             db.session.commit()
@@ -3282,7 +3304,7 @@ def register_routes(app):
                 except Exception:
                     pass
             # Finally delete the user
-            user = User.query.get(uid)
+            user = db.session.get(User, uid)
             db.session.delete(user)
             db.session.commit()
             logout_user()
@@ -7027,7 +7049,7 @@ def register_routes(app):
         partner = None
         if partner_id:
             try:
-                partner = User.query.get(partner_id)
+                partner = db.session.get(User, partner_id)
             except Exception:
                 partner = None
         i_am_interviewer = (room.interviewer_id == me)
@@ -7316,7 +7338,7 @@ def register_routes(app):
     def peer_propose_slots(room_id):
         """Host proposes time slots (comma-separated 'YYYY-MM-DD HH:MM')."""
         try:
-            room = PeerRoom.query.get(room_id)
+            room = db.session.get(PeerRoom, room_id)
         except Exception:
             log.exception("Peer room lookup failed")
             return _peer_api_error('Room not found.', 404)
@@ -7409,7 +7431,7 @@ def register_routes(app):
         if target_id == current_user.id:
             return _peer_api_error("You can't report yourself.", 400)
         try:
-            target = User.query.get(target_id)
+            target = db.session.get(User, target_id)
         except Exception:
             log.exception("Peer report target lookup failed")
             return _peer_api_error('User not found.', 404)
@@ -7809,7 +7831,7 @@ def register_routes(app):
             'Admin access required.', 403)
 
     def _oh_session_or_404(oh_id):
-        return OfficeHour.query.get(oh_id)
+        return db.session.get(OfficeHour, oh_id)
 
     def _oh_active_booking_count(oh_id):
         return (OHBooking.query
@@ -7888,7 +7910,7 @@ def register_routes(app):
     @login_required
     def mentor_profile(mentor_id):
         """Mentor profile + their upcoming office hours."""
-        mentor = Mentor.query.get(mentor_id)
+        mentor = db.session.get(Mentor, mentor_id)
         if mentor is None:
             return render_template('error.html',
                                    message='Mentor not found.'), 404
@@ -8223,7 +8245,7 @@ def register_routes(app):
                 mentor_id = int(mentor_id)
             except (TypeError, ValueError):
                 return _mentor_api_error('mentor_id must be an integer.', 400)
-            if Mentor.query.get(mentor_id) is None:
+            if db.session.get(Mentor, mentor_id) is None:
                 return _mentor_api_error('Mentor not found.', 404)
         if oh_id is not None:
             try:
@@ -8231,7 +8253,7 @@ def register_routes(app):
             except (TypeError, ValueError):
                 return _mentor_api_error('office_hour_id must be an integer.',
                                          400)
-            if OfficeHour.query.get(oh_id) is None:
+            if db.session.get(OfficeHour, oh_id) is None:
                 return _mentor_api_error('Office hour not found.', 404)
         if mentor_id is None and oh_id is None:
             return _mentor_api_error('Report a mentor, a session, or both.',
@@ -8258,7 +8280,7 @@ def register_routes(app):
         forbidden = _mentor_admin_required()
         if forbidden is not None:
             return forbidden
-        mentor = Mentor.query.get(mentor_id)
+        mentor = db.session.get(Mentor, mentor_id)
         if mentor is None:
             return _mentor_api_error('Mentor not found.', 404)
         try:
@@ -8289,7 +8311,7 @@ def register_routes(app):
             mentor_id = int(payload.get('mentor_id'))
         except (TypeError, ValueError):
             return _mentor_api_error('mentor_id must be an integer.', 400)
-        mentor = Mentor.query.get(mentor_id)
+        mentor = db.session.get(Mentor, mentor_id)
         if mentor is None:
             return _mentor_api_error('Mentor not found.', 404)
         topic = (payload.get('topic') or '').strip()

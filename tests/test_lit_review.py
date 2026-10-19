@@ -111,7 +111,7 @@ def golden_docs(app):
             docs.append(doc)
         db.session.commit()
         ids = [d.id for d in docs]
-        docs = [StudyDoc.query.get(i) for i in ids]
+        docs = [db.session.get(StudyDoc, i) for i in ids]
         yield docs
 
 
@@ -374,7 +374,7 @@ def test_generate_review_no_chunks_error(app):
                          data={"chunks": []}) for i in range(3)]
         db.session.add_all(docs)
         db.session.commit()
-        docs = [StudyDoc.query.get(d.id) for d in docs]
+        docs = [db.session.get(StudyDoc, d.id) for d in docs]
         review = generate_review(docs)
     assert review["error"]
     assert review["per_paper"] == []
@@ -472,7 +472,7 @@ def test_review_to_html_escapes_script(app):
             db.session.add(doc)
             docs.append(doc)
         db.session.commit()
-        docs = [StudyDoc.query.get(d.id) for d in docs]
+        docs = [db.session.get(StudyDoc, d.id) for d in docs]
         review = generate_review(docs)
     assert "error" not in review
     html_out = review_to_html(review)
