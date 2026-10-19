@@ -88,3 +88,11 @@ def register(client, name="Aarav Sharma", email="aarav@example.com", password="p
 def login(client, email="aarav@example.com", password="password123"):
     return client.post("/login", data={"email": email, "password": password},
                        follow_redirects=False)
+
+@pytest.fixture(autouse=True)
+def _reset_ai_circuit():
+    """Reset AI gateway circuit breaker between tests (LLM-01 isolation)."""
+    from studybuddy import ai_gateway
+    ai_gateway._CIRCUIT.clear()
+    yield
+    ai_gateway._CIRCUIT.clear()

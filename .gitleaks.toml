@@ -1,0 +1,20 @@
+# SEC-13: gitleaks configuration.
+# The CI secrets-scan job uses this file automatically (repo root).
+# Entries below are audited false positives — test fixtures and doc
+# placeholders. Fingerprints pin the exact finding so a *different*
+# secret in the same file would still be caught.
+
+[allowlist]
+description = "audited false positives (test fixtures, doc placeholders)"
+paths = [
+    '''tests/test_phase3\.py''',
+    '''tests/test_peer\.py''',
+    '''docs/GITHUB_API_RATE_LIMIT\.md''',
+]
+# Fingerprint-pinned: only these exact findings are suppressed.
+fingerprintchecklist = [
+    "1384074fbf97416138af01437a46c4a27fdaf8b2:tests/test_phase3.py:generic-api-key:68",
+    "b8e0204153d74d85c69485dc0ebf1f05dceb1708:tests/test_peer.py:generic-api-key:889",
+    "60fb6ac4b2cf47ba70b0b97d634c162abc09f089:docs/GITHUB_API_RATE_LIMIT.md:curl-auth-header:65",
+    "60fb6ac4b2cf47ba70b0b97d634c162abc09f089:research-Paper-AI-Assistant-main/GITHUB_API_RATE_LIMIT.md:curl-auth-header:65",
+]

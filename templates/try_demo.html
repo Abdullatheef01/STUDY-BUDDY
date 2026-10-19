@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Try It Now — Study Buddy{% endblock %}
+{% block content %}
+<main id="main-content" class="demo-page">
+  <h1>Try Study Buddy — No Signup Needed</h1>
+  <p>Upload your resume and get an instant <strong>Resume Readiness</strong> report.
+     No account, no AI calls, nothing stored.</p>
+
+  <div class="demo-upload">
+    <h2>Upload Resume</h2>
+    <form id="demo-form" enctype="multipart/form-data">
+      <input type="file" id="resume" name="resume"
+             accept=".pdf,.docx,.txt" required>
+      <button type="submit">Analyze</button>
+    </form>
+    <p>Or <a href="{{ url_for('static', filename='sample_resume.txt') }}"
+             download>download a sample resume</a> to try.</p>
+  </div>
+
+  <div id="demo-result" hidden>
+    <h2>Your Report</h2>
+    <div id="demo-output"></div>
+    <p><a href="{{ url_for('register') }}">Create a free account</a>
+       to save reports, track progress, and unlock AI features.</p>
+  </div>
+</main>
+<script nonce="{{ csp_nonce() }}">
+document.getElementById('demo-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData();
+  fd.append('resume', document.getElementById('resume').files[0]);
+  const r = await fetch('/analyze', {method: 'POST', body: fd});
+  const data = await r.json();
+  document.getElementById('demo-result').hidden = false;
+  document.getElementById('demo-output').innerHTML =
+    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+});
+</script>
+{% endblock %}

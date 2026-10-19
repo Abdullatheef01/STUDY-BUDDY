@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Ultimate Lab | Study-Buddy{% endblock %}
+{% block title %}Study-Buddy Labs | Study-Buddy{% endblock %}
 
 {% block head %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
-  /* ---- Ultimate Lab layout (page-specific) ---- */
+  /* ---- Study-Buddy Labs layout (page-specific) ---- */
   .lab-layout {
     display: grid;
     grid-template-columns: 260px minmax(0, 1fr);
@@ -83,7 +83,7 @@
 <section class="b-section">
   <div class="b-card b-card--hero">
     <div class="b-pill">Power tools</div>
-    <h1 class="b-hero-title">Ultimate Lab</h1>
+    <h1 class="b-hero-title">Study-Buddy Labs <span class="beta-badge">BETA</span></h1>
     <p class="b-lede"><span id="lab-hero-count">91</span> power tools across 31 features — every ultimate enhancement, runnable right here.</p>
     <div class="lab-search">
       <label class="b-label" for="lab-search">Search tools</label>
@@ -109,7 +109,7 @@
 
 {% block scripts %}
 <script>
-/* Ultimate Lab: dynamic tool grid. XSS-safe: textContent only, no innerHTML with API data. */
+/* Study-Buddy Labs: dynamic tool grid. XSS-safe: textContent only, no innerHTML with API data. */
 (function () {
     'use strict';
 

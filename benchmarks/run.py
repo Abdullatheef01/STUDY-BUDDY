@@ -64,7 +64,7 @@ def run_benchmark(quick=False):
 
         # Field extraction (regex baseline matching production)
         email_m = re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text)
-        phone_m = re.search(r"(\+91[\s-]?)?[6-9]\d{9}", text)
+        phone_m = re.search(r"(?:\+?91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}", text)
         # Name: first non-empty line
         lines = [ln.strip() for ln in text.split("\n") if ln.strip()]
         name_pred = lines[0] if lines else ""

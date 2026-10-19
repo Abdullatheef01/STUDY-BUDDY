@@ -20,6 +20,7 @@ non-HTTP schemes — are closed.
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import ipaddress
 import logging
 import socket
@@ -28,6 +29,25 @@ from urllib.parse import urljoin, urlparse
 import requests
 
 log = logging.getLogger(__name__)
+
+
+def _deny(category, message, host=None):
+    """SEC-14: log an SSRF policy block, then raise SSRFError.
+
+    Only the block category and a hashed hostname are logged — never
+    the full URL (it may carry query-string PII). Logging must never
+    break the fetch path.
+    """
+    try:
+        from studybuddy.security_events import log_security_event
+        details = {"reason": category}
+        if host:
+            details["host_hash"] = hashlib.sha256(
+                str(host).encode("utf-8")).hexdigest()[:16]
+        log_security_event("ssrf_block", details=details)
+    except Exception:
+        pass
+    raise SSRFError(message)
 
 _USER_AGENT = "STUDY-BUDDY/1.0 (SSRF-safe fetcher)"
 _MAX_REDIRECTS = 3
@@ -47,7 +67,7 @@ def _validated_ips(hostname):
     literal that is not public, or resolves to any non-public address.
     """
     if not hostname:
-        raise SSRFError("URL has no hostname")
+        _deny("missing_hostname", "URL has no hostname")
     # IP literal? (urlparse().hostname strips brackets from IPv6 literals)
     try:
         ip = ipaddress.ip_address(hostname)
@@ -55,28 +75,29 @@ def _validated_ips(hostname):
         ip = None
     if ip is not None:
         if not ip.is_global:
-            raise SSRFError(f"IP address {hostname} is not publicly routable")
+            _deny("private_ip_literal", f"IP address {hostname} is not publicly routable", host=hostname)
         return [str(ip)]
     try:
         infos = socket.getaddrinfo(hostname, None, family=socket.AF_UNSPEC,
                                    type=socket.SOCK_STREAM)
     except socket.gaierror as e:
-        raise SSRFError(f"DNS resolution failed for {hostname!r}: {e}")
+        _deny("dns_failure", f"DNS resolution failed for {hostname!r}: {e}", host=hostname)
     except UnicodeError as e:
-        raise SSRFError(f"Bad hostname {hostname!r}: {e}")
+        _deny("bad_hostname", f"Bad hostname {hostname!r}: {e}", host=hostname)
     ips = []
     for _fam, _typ, _proto, _canon, sockaddr in infos:
         ip_str = sockaddr[0]
         try:
             ip = ipaddress.ip_address(ip_str)
         except ValueError:
-            raise SSRFError(f"Unparseable resolved address {ip_str!r}")
+            _deny("bad_resolved_ip", f"Unparseable resolved address {ip_str!r}", host=hostname)
         if not ip.is_global:
-            raise SSRFError(
-                f"Hostname {hostname!r} resolves to non-public IP {ip_str}")
+            _deny("private_resolved_ip",
+              f"Hostname {hostname!r} resolves to non-public IP {ip_str}",
+              host=hostname)
         ips.append(ip_str)
     if not ips:
-        raise SSRFError(f"Hostname {hostname!r} resolved to no addresses")
+        _deny("no_addresses", f"Hostname {hostname!r} resolved to no addresses", host=hostname)
     return list(dict.fromkeys(ips))  # de-dupe, keep order
 
 
@@ -87,18 +108,18 @@ def validate_url(url):
     with a human-readable reason on any problem.
     """
     if not url or not isinstance(url, str):
-        raise SSRFError("Empty URL")
+        _deny("empty_url", "Empty URL")
     url = url.strip()
     if len(url) > _MAX_URL_LEN:
-        raise SSRFError("URL too long")
+        _deny("url_too_long", "URL too long")
     parsed = urlparse(url)
     if parsed.scheme not in ("http", "https"):
-        raise SSRFError(
-            f"Scheme {parsed.scheme!r} not allowed (http/https only)")
+        _deny("bad_scheme",
+              f"Scheme {parsed.scheme!r} not allowed (http/https only)")
     # urlparse puts userinfo in .username/.password; also catch a raw "@"
     # in case of tricky encodings the parser accepts.
     if parsed.username or parsed.password or "@" in (parsed.netloc or ""):
-        raise SSRFError("Credentials in URL are not allowed")
+        _deny("url_credentials", "Credentials in URL are not allowed")
     hostname = parsed.hostname
     if not hostname:
         raise SSRFError("URL has no hostname")
@@ -138,11 +159,12 @@ def safe_fetch_stream(url, method="GET", timeout=_DEFAULT_TIMEOUT,
                 resp.close()
                 resp = None
                 if not loc:
-                    raise SSRFError("Redirect without Location header")
+                    _deny("bad_redirect", "Redirect without Location header", host=urlparse(current).hostname)
                 hops += 1
                 if hops > max_redirects:
-                    raise SSRFError(
-                        f"Too many redirects (>{max_redirects})")
+                    _deny("too_many_redirects",
+                      f"Too many redirects (>{max_redirects})",
+                      host=urlparse(current).hostname)
                 current = urljoin(current, loc)
                 if code == 303 or (code in (301, 302) and method != "HEAD"):
                     # 303 always becomes GET; 301/302 downgrade non-HEAD.
@@ -173,6 +195,7 @@ def safe_fetch(url, method="GET", timeout=_DEFAULT_TIMEOUT,
                 continue
             body.extend(chunk)
             if len(body) > max_bytes:
-                raise SSRFError(
-                    f"Response exceeds {max_bytes}-byte cap")
+                _deny("body_too_large",
+                  f"Response exceeds {max_bytes}-byte cap",
+                  host=urlparse(url).hostname)
         return resp.status_code, bytes(body), dict(resp.headers)

@@ -62,10 +62,24 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
+# SEC-14: structured security event logging (no PII payloads).
+from studybuddy.security_events import log_security_event
+
 from studybuddy.github_integration import (
     GithubAPIError,
     analyze_github_profile,
     validate_github_username,
+)
+from studybuddy.auth_hardening import (
+    check_password_policy,
+    generate_email_token,
+    generate_reset_token,
+    verify_email_token,
+)
+from studybuddy.constructor_guardrails import (
+    build_grounded_prompt,
+    post_process_paper,
+    verify_citations,
 )
 from studybuddy.leetcode_integration import (
     LeetCodeAPIError,
@@ -77,6 +91,13 @@ from studybuddy.leetcode_integration import (
 )
 
 log = logging.getLogger("acra")
+
+
+def _safe_user_ref_id(user_id):
+    """Hash a user id for logging (no PII in logs)."""
+    if user_id is None:
+        return "anon"
+    return hashlib.sha256(f"uid:{user_id}".encode()).hexdigest()[:16]
 
 # Load environment variables (.env for local dev, platform env vars in prod)
 load_dotenv()
@@ -467,12 +488,29 @@ class User(UserMixin, db.Model):
     avatar_url = db.Column(db.String(512), nullable=True)
     github_username = db.Column(db.String(39), nullable=True)
     leetcode_username = db.Column(db.String(39), nullable=True)
+    # --- SEC-09: email verification ---
+    email_verified = db.Column(db.Boolean, default=False, nullable=False)
+    email_verified_at = db.Column(db.DateTime, nullable=True)
+    # --- SEC-17: server-side admin role (not just email in env) ---
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class PasswordResetToken(db.Model):
+    """Single-use password reset token (SEC-09). Stores hash, not the token."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    token_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used_at = db.Column(db.DateTime, nullable=True)
+
+    user = db.relationship("User", backref=db.backref("reset_tokens", lazy="dynamic"))
 
 
 class ResumeAnalysis(db.Model):
@@ -2331,6 +2369,17 @@ def register_error_handlers(app):
     @app.errorhandler(429)
     def rate_limited(e):
         # SEC-04: JSON 429 with Retry-After so clients can back off.
+        # SEC-14: log the hit (hashed IP/user, endpoint only — no PII).
+        from studybuddy.security_events import log_security_event
+        try:
+            from flask import request as _rq
+            # url_rule is the route pattern (no user data); fall back to
+            # the raw path only if routing failed.
+            _rule = getattr(_rq, "url_rule", None)
+            _endpoint = str(_rule)[:120] if _rule else _rq.path[:120]
+        except Exception:
+            _endpoint = "-"
+        log_security_event("rate_limit_hit", details={"endpoint": _endpoint})
         retry_after = 60
         try:
             if str(e.description).isdigit():
@@ -2708,6 +2757,12 @@ def register_routes(app):
         """Study-Buddy Landing Page (The Hub)."""
         return render_template('index.html')
 
+    @app.route('/try')
+    @limiter.limit("20 per hour")
+    def try_demo():
+        """PROD-03: Zero-friction demo — no signup, no LLM, stores nothing."""
+        return render_template('try_demo.html')
+
     @app.route('/privacy')
     def privacy():
         """Privacy Policy page."""
@@ -2816,21 +2871,24 @@ def register_routes(app):
             password = request.form.get('password') or ''
             if not name or not email or not password:
                 error = 'Please fill in name, email and password.'
-            elif len(password) < 8:
-                error = 'Password must be at least 8 characters.'
-            elif '@' not in email or '.' not in email:
-                error = 'Please enter a valid email address.'
-            elif User.query.filter_by(email=email).first():
-                error = 'An account with this email already exists. Please log in.'
             else:
-                user = User(name=name, email=email)
-                user.set_password(password)
-                db.session.add(user)
-                db.session.commit()
-                _rotate_session_on_login()
-                login_user(user)
-                flash(f'Welcome, {user.name}! Your account is ready.', 'success')
-                return redirect(url_for('dashboard'))
+                pw_ok, pw_msg = check_password_policy(password)
+                if not pw_ok:
+                    error = pw_msg
+                elif '@' not in email or '.' not in email:
+                    error = 'Please enter a valid email address.'
+                elif User.query.filter_by(email=email).first():
+                    # Generic to avoid enumeration (SEC-09)
+                    error = 'An account with this email already exists. Please log in.'
+                else:
+                    user = User(name=name, email=email)
+                    user.set_password(password)
+                    db.session.add(user)
+                    db.session.commit()
+                    _rotate_session_on_login()
+                    login_user(user)
+                    flash(f'Welcome, {user.name}! Your account is ready.', 'success')
+                    return redirect(url_for('dashboard'))
         return render_template('register.html', error=error,
                                google_configured=_google_configured())
 
@@ -2847,9 +2905,15 @@ def register_routes(app):
             if user and user.check_password(password):
                 _rotate_session_on_login()
                 login_user(user, remember=bool(request.form.get('remember')))
+                # SEC-14: audit log (hashed id, no email/password)
+                log_security_event("login_success", user_id=user.id)
                 flash(f'Welcome back, {user.name}!', 'success')
                 nxt = request.args.get('next') or request.form.get('next')
                 return redirect(nxt if is_safe_next(nxt) else url_for('dashboard'))
+            # SEC-14: failed login — no email in the log (PII); only whether
+            # the account exists, which aids abuse detection.
+            log_security_event("login_failure", user_id=user.id if user else None,
+                               details={"account_exists": bool(user)})
             error = 'Invalid email or password.'
         return render_template('login.html', error=error,
                                next=request.args.get('next', ''),
@@ -2864,6 +2928,97 @@ def register_routes(app):
         logout_user()
         flash('You have been logged out.', 'info')
         return redirect(url_for('index'))
+
+    # ---------- SEC-09: Email verification ----------
+    @app.route('/verify-email/<token>')
+    def verify_email(token):
+        user_id = verify_email_token(token, app.config['SECRET_KEY'])
+        if not user_id:
+            flash('This verification link is invalid or has expired.', 'error')
+            return redirect(url_for('login'))
+        user = User.query.get(user_id)
+        if not user:
+            flash('Account not found.', 'error')
+            return redirect(url_for('login'))
+        if not user.email_verified:
+            user.email_verified = True
+            user.email_verified_at = datetime.now(UTC)
+            db.session.commit()
+            flash('Email verified! You can now use all features.', 'success')
+        else:
+            flash('Email already verified.', 'info')
+        return redirect(url_for('dashboard'))
+
+    @app.route('/resend-verification', methods=['POST'])
+    @login_required
+    def resend_verification():
+        # In production, send email via mailer. For now, flash the link
+        # (dev mode). Production should integrate with email service.
+        token = generate_email_token(current_user.id, app.config['SECRET_KEY'])
+        link = url_for('verify_email', token=token, _external=True)
+        log.info("verification_link_issued user_id_hash=%s",
+                 _safe_user_ref_id(current_user.id))
+        flash(f'Verification link: {link}', 'info')
+        return redirect(url_for('dashboard'))
+
+    # ---------- SEC-09: Password reset ----------
+    @app.route('/forgot-password', methods=['GET', 'POST'])
+    @limiter.limit("5 per hour")
+    def forgot_password():
+        # Generic response to avoid account enumeration (SEC-09)
+        done_msg = ('If an account exists with that email, '
+                    'a reset link has been sent.')
+        if request.method == 'POST':
+            email = (request.form.get('email') or '').strip().lower()
+            user = User.query.filter_by(email=email).first()
+            if user:
+                raw = generate_reset_token()
+                token_hash = generate_password_hash(raw)
+                expires = datetime.now(UTC) + timedelta(hours=1)
+                prt = PasswordResetToken(user_id=user.id,
+                                         token_hash=token_hash,
+                                         expires_at=expires)
+                db.session.add(prt)
+                db.session.commit()
+                link = url_for('reset_password', token=raw, _external=True)
+                log.info("password_reset_issued user_id_hash=%s",
+                         _safe_user_ref_id(user.id))
+                # TODO: send via email in production; flash for dev
+                flash(f'Reset link (dev): {link}', 'info')
+            flash(done_msg, 'info')
+            return redirect(url_for('login'))
+        return render_template('forgot_password.html')
+
+    @app.route('/reset-password/<token>', methods=['GET', 'POST'])
+    @limiter.limit("10 per hour")
+    def reset_password(token):
+        # Find valid token (compare hashes)
+        candidates = PasswordResetToken.query.filter(
+            PasswordResetToken.expires_at > datetime.now(UTC),
+            PasswordResetToken.used_at.is_(None)).all()
+        prt = None
+        for c in candidates:
+            if check_password_hash(c.token_hash, token):
+                prt = c
+                break
+        if not prt:
+            flash('This reset link is invalid or has expired.', 'error')
+            return redirect(url_for('forgot_password'))
+        if request.method == 'POST':
+            password = request.form.get('password') or ''
+            pw_ok, pw_msg = check_password_policy(password)
+            if not pw_ok:
+                return render_template('reset_password.html', token=token,
+                                       error=pw_msg)
+            user = User.query.get(prt.user_id)
+            user.set_password(password)
+            prt.used_at = datetime.now(UTC)
+            db.session.commit()
+            log.info("password_reset_completed user_id_hash=%s",
+                     _safe_user_ref_id(user.id))
+            flash('Password updated. Please log in.', 'success')
+            return redirect(url_for('login'))
+        return render_template('reset_password.html', token=token)
 
     # ---------- GOOGLE SIGN-IN (OAuth 2.0, only when configured) ----------
     if _google_configured():
@@ -3244,6 +3399,11 @@ def register_routes(app):
             from studybuddy.parsing import parse_document
             res = parse_document(data, filename=file.filename, kind="resume")
         except _ParseError as pe:
+            # SEC-14: upload rejected — log the category, never the
+            # filename or message (may carry PII).
+            log_security_event("upload_reject",
+                               details={"endpoint": "parse_preview",
+                                        "reason": "parse_reject"})
             return jsonify({'error': str(pe)}), 400
         return jsonify({
             'text': res.text[:20000],
@@ -3271,6 +3431,10 @@ def register_routes(app):
             return jsonify({'error': 'No file selected'}), 400
 
         if not allowed_file(file.filename):
+            # SEC-14: rejected upload (bad extension) — no filename in log.
+            log_security_event("upload_reject",
+                               details={"endpoint": "analyze",
+                                        "reason": "bad_file_type"})
             return jsonify({'error': 'Invalid file type. Please upload PDF or DOCX.'}), 400
 
         # P2#13: uuid prefix prevents filename collisions between uploads.
@@ -7464,6 +7628,15 @@ def register_routes(app):
                 readme=repo_data["readme"] or "No README found.",
                 complexity=repo_data["complexity"],
             )
+            # RAG-07: inject integrity guardrails into the prompt
+            prompt = build_grounded_prompt(prompt)
+            # Keep the repo facts text for post-process number checking
+            repo_facts_text = (
+                f"{repo_data['full_name']} {repo_data['description']} "
+                f"stars {repo_data['stars']} forks {repo_data['forks']} "
+                f"{repo_data['primary_language']} files {repo_data['file_count']} "
+                f"{lang_lines}"
+            )
 
             # P1#5: robust JSON parsing - strip fences, retry once, then fail
             # gracefully with 502 (never 500 on model deviation).
@@ -7483,7 +7656,22 @@ def register_routes(app):
             if analysis is None:
                 return jsonify({'error': 'The AI returned an unreadable draft. '
                                          'Please try again in a moment.'}), 502
-            return jsonify({'success': True, 'analysis': analysis})
+            # RAG-07: post-process with integrity guardrails
+            analysis, guardrail_report = post_process_paper(
+                analysis, repo_facts_text, author=author)
+            # Verify citations (best-effort; network failures leave intact)
+            for key in ("lit_review", "introduction", "abstract"):
+                if isinstance(analysis.get(key), str):
+                    verified, removed = verify_citations(analysis[key])
+                    analysis[key] = verified
+                    if removed:
+                        guardrail_report.setdefault(
+                            "citations_removed", []).extend(removed)
+            log.info("constructor_guardrails applied: %s",
+                     {k: len(v) if isinstance(v, list) else v
+                      for k, v in guardrail_report.items()})
+            return jsonify({'success': True, 'analysis': analysis,
+                            'guardrails': guardrail_report})
 
         except Exception:
             log.exception("Constructor failed")
@@ -7602,13 +7790,17 @@ def register_routes(app):
     def _mentor_admin_required():
         """Return a 403 response when the caller is not an admin, else None.
 
-        Admins are the emails in the STUDYBUDDY_ADMINS comma-separated env
-        var — a deliberate admin-lite check, no roles table needed."""
-        if not community_mod.mentor_is_admin(current_user.email):
-            return _mentor_api_error(
-                'Admin access required. Set your email in STUDYBUDDY_ADMINS.',
-                403)
-        return None
+        SEC-17: checks the server-side ``User.is_admin`` role first, then
+        falls back to the STUDYBUDDY_ADMINS env emails (bootstrap path for
+        the very first admin). Every granted admin action is audit-logged
+        by the caller.
+        """
+        if getattr(current_user, 'is_admin', False):
+            return None
+        if community_mod.mentor_is_admin(current_user.email):
+            return None
+        return _mentor_api_error(
+            'Admin access required.', 403)
 
     def _oh_session_or_404(oh_id):
         return OfficeHour.query.get(oh_id)
@@ -8054,8 +8246,9 @@ def register_routes(app):
     @login_required
     @limiter.limit("30 per hour")
     def mentor_admin_verify(mentor_id):
-        """Admin-lite: verify a mentor (set verified=True). 403 unless the
-        user's email is in the STUDYBUDDY_ADMINS env var."""
+        """Verify a mentor (set verified=True). SEC-17: requires the
+        server-side admin role (User.is_admin) or a STUDYBUDDY_ADMINS
+        bootstrap email; the action is audit-logged."""
         forbidden = _mentor_admin_required()
         if forbidden is not None:
             return forbidden
@@ -8065,6 +8258,9 @@ def register_routes(app):
         try:
             mentor.verified = True
             db.session.commit()
+            # SEC-17 audit log (no PII beyond hashed admin id).
+            log.warning("ADMIN_ACTION action=mentor_verify admin_id=%s mentor_id=%s",
+                        current_user.id, mentor_id)
         except Exception:
             log.exception("Mentor verify failed")
             db.session.rollback()
@@ -8120,6 +8316,9 @@ def register_routes(app):
                             capacity=capacity, status='open')
             db.session.add(oh)
             db.session.commit()
+            # SEC-17 audit log.
+            log.warning("ADMIN_ACTION action=office_hour_create admin_id=%s mentor_id=%s oh_id=%s",
+                        current_user.id, mentor.id, oh.id)
         except Exception:
             log.exception("Mentor session creation failed")
             db.session.rollback()

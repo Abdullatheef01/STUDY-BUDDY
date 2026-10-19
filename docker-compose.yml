@@ -1,0 +1,57 @@
+# PROD-04: One-command self-hosting
+# Usage: docker compose up
+#   - SQLite by default, LLM_MODE=off (no API keys needed)
+#   - Optional: docker compose --profile ollama up (local LLM)
+#   - Optional: docker compose --profile postgres up (Postgres instead of SQLite)
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - LLM_MODE=off
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///instance/studybuddy.db}
+    volumes:
+      - studybuddy-data:/app/instance
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: local LLM via Ollama
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    profiles:
+      - ollama
+    restart: unless-stopped
+
+  # Optional: Postgres instead of SQLite
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=studybuddy
+      - POSTGRES_USER=studybuddy
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-studybuddy}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    profiles:
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studybuddy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  studybuddy-data:
+  ollama-data:
+  postgres-data:

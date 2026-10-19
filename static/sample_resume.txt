@@ -1,0 +1,16 @@
+Priya Sharma
+priya.sharma0@example.com | +91 9846913810 | linkedin.com/in/priyasharma
+
+PROFESSIONAL SUMMARY
+Data Analyst with 1 years of experience building scalable applications.
+
+SKILLS
+React, JavaScript, Java, TypeScript, AWS
+
+EXPERIENCE
+Data Analyst — TechCorp (2022–Present)
+- Built microservices handling 10k req/s
+- Reduced latency by 40% through caching
+
+EDUCATION
+B.Tech Computer Science, 2021

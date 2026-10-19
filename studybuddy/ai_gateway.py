@@ -21,6 +21,7 @@ rotation via Render env vars takes effect without a restart.
 
 import logging
 import os
+import re
 
 import requests
 
@@ -47,6 +48,87 @@ _KEY_SENTINELS = frozenset({
 
 class AIError(Exception):
     """All providers failed; message is safe to show to users."""
+
+
+class RateLimited(AIError):
+    """Provider returned 429."""
+
+
+class ProviderDown(AIError):
+    """Provider returned 5xx or is unreachable."""
+
+
+class BadOutput(AIError):
+    """Provider returned unusable output."""
+
+
+# LLM-01: Circuit breaker state (per provider)
+_CIRCUIT = {}  # provider -> {"failures": int, "open_until": float}
+_CIRCUIT_THRESHOLD = 5
+_CIRCUIT_COOLDOWN = 300  # seconds
+
+
+def _circuit_open(provider):
+    """Check if circuit breaker is open for provider."""
+    import time
+    state = _CIRCUIT.get(provider, {})
+    open_until = state.get("open_until", 0)
+    if time.time() < open_until:
+        return True
+    # Half-open: reset failures after cooldown
+    if open_until and time.time() >= open_until:
+        _CIRCUIT[provider] = {"failures": 0, "open_until": 0}
+    return False
+
+
+def _circuit_record(provider, success):
+    """Record success/failure for circuit breaker."""
+    import time
+    state = _CIRCUIT.setdefault(provider, {"failures": 0, "open_until": 0})
+    if success:
+        state["failures"] = 0
+        state["open_until"] = 0
+    else:
+        state["failures"] += 1
+        if state["failures"] >= _CIRCUIT_THRESHOLD:
+            state["open_until"] = time.time() + _CIRCUIT_COOLDOWN
+            log.warning("circuit_open provider=%s", provider)
+
+
+def _retry_with_backoff(fn, provider, max_retries=3):
+    """LLM-01: Exponential backoff with jitter on 429/5xx."""
+    import random
+    import time
+    last_exc = None
+    for attempt in range(max_retries):
+        if _circuit_open(provider):
+            raise ProviderDown(f"{provider}: circuit breaker open")
+        try:
+            result = fn()
+            _circuit_record(provider, True)
+            return result
+        except requests.HTTPError as e:
+            status = e.response.status_code if e.response else 0
+            _circuit_record(provider, False)
+            last_exc = e
+            if status == 429:
+                raise RateLimited(f"{provider}: rate limited")
+            if 500 <= status < 600 and attempt < max_retries - 1:
+                delay = (2 ** attempt) + random.uniform(0, 1)
+                log.info("retry provider=%s attempt=%d delay=%.1f",
+                         provider, attempt + 1, delay)
+                time.sleep(delay)
+                continue
+            raise ProviderDown(f"{provider}: HTTP {status}")
+        except (requests.ConnectionError, requests.Timeout) as e:
+            _circuit_record(provider, False)
+            last_exc = e
+            if attempt < max_retries - 1:
+                delay = (2 ** attempt) + random.uniform(0, 1)
+                time.sleep(delay)
+                continue
+            raise ProviderDown(f"{provider}: connection failed")
+    raise ProviderDown(f"{provider}: all retries failed: {last_exc}")
 
 
 def _key(name):
@@ -107,25 +189,28 @@ def providers_configured():
 
 def _openai_compatible_generate(url, key, model, prompt, provider):
     """POST a chat-completion request to an OpenAI-compatible endpoint."""
-    headers = {
-        "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json",
-    }
-    if provider == "openrouter":
-        headers["HTTP-Referer"] = "https://study-buddy.app"
-        headers["X-Title"] = "STUDY-BUDDY"
-    payload = {
-        "model": model,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.7,
-    }
-    r = requests.post(url, headers=headers, json=payload, timeout=REQUEST_TIMEOUT)
-    r.raise_for_status()
-    data = r.json()
-    text = (data["choices"][0]["message"]["content"] or "").strip()
-    if not text:
-        raise ValueError(f"{provider}: empty response")
-    return text
+    def _call():
+        headers = {
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        }
+        if provider == "openrouter":
+            headers["HTTP-Referer"] = "https://study-buddy.app"
+            headers["X-Title"] = "STUDY-BUDDY"
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7,
+        }
+        r = requests.post(url, headers=headers, json=payload,
+                          timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+        data = r.json()
+        text = (data["choices"][0]["message"]["content"] or "").strip()
+        if not text:
+            raise BadOutput(f"{provider}: empty response")
+        return text
+    return _retry_with_backoff(_call, provider)
 
 
 def _groq_generate(prompt):
@@ -203,3 +288,47 @@ def generate(prompt, user_key=None):
     raise AIError(
         "All AI providers failed just now. Please try again in a moment. "
         f"({'; '.join(errors)[:200]})")
+
+
+# LLM-02: Structured outputs with pydantic validation
+def generate_structured(prompt, schema_cls, user_key=None, max_repair=1):
+    """Generate JSON conforming to a pydantic schema.
+
+    Args:
+        prompt: base prompt (schema instructions auto-appended)
+        schema_cls: pydantic BaseModel class
+        user_key: optional BYOK key
+        max_repair: retries with repair prompt on validation failure
+
+    Returns:
+        Validated schema instance. Raises AIError if all fail.
+    """
+    import json
+    schema_json = schema_cls.model_json_schema()
+    full_prompt = (
+        f"{prompt}\n\n"
+        f"Respond with ONLY valid JSON matching this schema:\n"
+        f"{json.dumps(schema_json, indent=2)}\n"
+        f"No markdown, no explanation, just the JSON."
+    )
+    last_err = None
+    for attempt in range(max_repair + 1):
+        try:
+            text = generate(full_prompt, user_key=user_key)
+            # Strip markdown code fences if present
+            text = text.strip()
+            if text.startswith("```"):
+                text = re.sub(r"^```(?:json)?\s*", "", text)
+                text = re.sub(r"\s*```$", "", text)
+            data = json.loads(text)
+            return schema_cls.model_validate(data)
+        except Exception as e:
+            last_err = e
+            log.warning("structured_output attempt %d failed: %r",
+                        attempt + 1, e)
+            if attempt < max_repair:
+                full_prompt += (
+                    f"\n\nPrevious output was invalid: {e}. "
+                    f"Return ONLY valid JSON."
+                )
+    raise BadOutput(f"Structured output failed: {last_err}")

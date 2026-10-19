@@ -36,7 +36,11 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
       - run: pip install --require-hashes -r requirements-dev.txt
-      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider --tb=line 2>&1 | tail -50
+      - run: python -m pytest tests/ -q -n auto -p no:cacheprovider --tb=line --cov=studybuddy --cov-report=term-missing 2>&1 | tail -60
+        env:
+          STUDYBUDDY_NO_PARSE_SANDBOX: "1"
+      # TEST-04: Benchmarks on every PR (small subset)
+      - run: python benchmarks/run.py --quick 2>&1 | tail -10
         env:
           STUDYBUDDY_NO_PARSE_SANDBOX: "1"
 
@@ -96,3 +100,15 @@ jobs:
       # B110/B112 swallowed-error patterns are not CI blockers.
       - run: bandit -q -r unified_app.py studybuddy/ -x tests -ll
       - run: pip-audit --desc
+
+  secrets-scan:
+    # SEC-13: fail the build if any secret (API key, token, private key)
+    # is committed. Full history is scanned so a secret can never hide
+    # in an old commit either.
+    name: Gitleaks secrets scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2

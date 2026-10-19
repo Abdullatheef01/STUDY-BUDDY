@@ -1,0 +1,44 @@
+name: "📊 Data contribution"
+description: "Fix a question, add a skill alias, add an opportunity, or update salary data. No Python needed."
+title: "[data] "
+labels: ["data", "good first issue"]
+
+body:
+  - type: dropdown
+    id: data-type
+    attributes:
+      label: "What are you contributing?"
+      options:
+        - "Fix a question (wrong answer / typo / unclear explanation)"
+        - "Add a skill alias"
+        - "Add an opportunity (internship / job)"
+        - "Update salary data"
+        - "Other data fix"
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: "Details"
+      description: "Which file and question? What's wrong, or what are you adding? Include the question ID (e.g. apt-0042) if fixing a question."
+      placeholder: "data/aptitude_questions.json, apt-0042: the answer index points to the wrong option. Correct answer is 180 (option index 2), not 162."
+    validations:
+      required: true
+
+  - type: textarea
+    id: source
+    attributes:
+      label: "Source (for new data)"
+      description: "Link to the source of this data. Required for opportunities and salary data."
+      placeholder: "https://example.com/source"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Checklist"
+      options:
+        - label: "I ran `python scripts/validate_questions.py` and it reports 0 errors"
+        - label: "I ran `python scripts/validate_data.py` and it reports 0 errors (if I touched data/*.json)"
+        - label: "This is my own phrasing, not copied verbatim from a copyrighted source"
+        - label: "I did not add unverifiable 'asked at <Company>' claims"
