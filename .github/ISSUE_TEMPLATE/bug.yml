@@ -1,0 +1,26 @@
+name: Bug report
+description: Report something that's broken
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what actually happened.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit (git rev-parse --short HEAD)
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Python version, browser if UI-related.

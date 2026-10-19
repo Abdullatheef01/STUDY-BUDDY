@@ -2784,6 +2784,8 @@ def register_routes(app):
                 cwd=os.path.dirname(__file__)).stdout.strip() or "unknown"
         except Exception:  # noqa: BLE001 - version must not raise
             pass
+        # OSS-06: semantic version for releases
+        app_version = "1.0.0"
         schema_rev = "unknown"
         try:
             from alembic.runtime.migration import MigrationContext
@@ -2795,6 +2797,7 @@ def register_routes(app):
             pass
         return jsonify({
             "app": "study-buddy",
+            "version": app_version,
             "git_sha": sha,
             "schema_revision": schema_rev,
             "python": __import__("sys").version.split()[0],

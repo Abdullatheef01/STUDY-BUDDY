@@ -269,12 +269,34 @@ The live site runs on **Render's free tier**:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
-1. Fork the repo and create a feature branch (`git checkout -b feature/my-feature`)
-2. Add tests for anything you build — the suite must stay 100% green
-3. Follow the existing module pattern: logic in a feature module, models in `unified_app.py`, Bento-styled templates
-4. Open a pull request with a clear description
+Quick version:
+1. Fork the repo and create a feature branch (`git checkout -b feat/my-feature`)
+2. Add tests — the suite must stay 100% green
+3. Run `ruff check --no-cache` — must be clean
+4. Open a PR using the template
+
+### Benchmarks
+
+We measure, we don't guess. See [docs/benchmarks.md](docs/benchmarks.md):
+
+| Benchmark | Metric | Score |
+|-----------|--------|-------|
+| Resume parsing | Field accuracy (name/email/phone) | 1.00* |
+| Resume parsing | Skill F1 | 1.00* |
+| RAG retrieval | Recall@1 / MRR | 1.00* |
+| RAG answers | Citation validity / Abstention | 1.00* |
+
+\* *On synthetic gold sets. Real-world documents score lower — help us expand
+the gold sets with challenging examples!*
+
+Run them yourself:
+```bash
+python benchmarks/run.py --quick
+python benchmarks/rag_eval.py --quick
+python scripts/validate_data.py
+```
 
 ---
 

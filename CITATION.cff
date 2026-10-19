@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: "Study Buddy: AI Career & Research Assistant"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Bartwal
+    given-names: Vivek
+    orcid: ""
+version: 1.0.0
+date-released: 2026-10-19
+license: MIT
+repository-code: "https://github.com/Vivek492005/AI-Career-Research-Assistant-Resume-Analysis-Job-Recommendation-Research-Paper-Intelligence-Platform"
+abstract: >-
+  Open-source AI career copilot: resume readiness analysis, JD matching,
+  interview practice, and research-paper Q&A with citations. Privacy-first:
+  no-LLM, BYOK, and local (Ollama) modes. Built with Flask, TF-IDF/BM25
+  retrieval, and multi-provider LLM gateway.
+keywords:
+  - resume
+  - career
+  - flask
+  - rag
+  - nlp
+  - students
+  - open-source
+  - privacy
+  - self-hosted

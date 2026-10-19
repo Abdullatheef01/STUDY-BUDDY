@@ -1,0 +1,40 @@
+site_name: Study Buddy Docs
+site_description: Documentation for Study Buddy — AI career & research assistant
+site_author: Vivek Bartwal
+repo_url: https://github.com/Vivek492005/AI-Career-Research-Assistant-Resume-Analysis-Job-Recommendation-Research-Paper-Intelligence-Platform
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - Getting Started: guide/quickstart.md
+    - Resume Readiness: guide/resume.md
+    - Research Q&A: guide/research.md
+  - Self-Hosting:
+    - Docker: selfhost/docker.md
+    - Configuration: selfhost/configuration.md
+    - No-LLM / BYOK / Local: selfhost/privacy-modes.md
+  - Reference:
+    - Benchmarks: reference/benchmarks.md
+    - Privacy: reference/privacy.md
+    - Security: reference/security.md
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
